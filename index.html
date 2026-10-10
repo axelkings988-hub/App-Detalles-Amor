@@ -84,6 +84,15 @@
       🚀 Generar Enlace y Guardar en la Nube
     </button>
 
+    <!-- ÁREA PARA MOSTRAR EL ENLACE GENERADO -->
+    <div id="resultBox" class="hidden bg-white p-4 rounded-2xl shadow-sm border border-pink-200 space-y-2 text-center">
+      <p class="text-xs font-bold text-pink-600">¡Enlace generado con éxito! 🎉</p>
+      <input type="text" id="generatedLink" readonly class="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-center text-gray-600 select-all">
+      <button onclick="copyLink()" class="w-full bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold py-2 rounded-xl text-xs transition-all">
+        📋 Copiar Enlace
+      </button>
+    </div>
+
   </main>
 
   <script type="module">
@@ -145,17 +154,4 @@
           specialDate: date,
           loveLetter: letter,
           version: currentVersion,
-          presetTone: tone,
-          createdAt: new Date()
-        });
-
-        alert(`¡Minisitio guardado con éxito en Firebase!\nID del registro: ${docRef.id}`);
-      } catch (e) {
-        console.error("Error al guardar el documento: ", e);
-        alert("Hubo un error al guardar los datos en la base de datos.");
-      }
-    }
-  </script>
-
-</body>
-</html>
+          presetTone:
