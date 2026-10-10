@@ -46,20 +46,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        let siteId = urlParams.get('id');
-
-        if (siteId) {
-            // Limpia automáticamente cualquier corchete o carácter sobrante
-            siteId = siteId.replace(/[^a-zA-Z0-9]/g, '');
-        }
-
         async function cargarDatos() {
+            // 1. Obtener y limpiar el ID de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            let siteId = urlParams.get('id');
+
+            if (siteId) {
+                siteId = siteId.replace(/[^\w]/g, '');
+            }
+
+            // 2. Validar que exista el ID
             if (!siteId) {
-                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold">Enlace no válido o incompleto ❌</p>';
+                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold p-4 bg-white rounded-xl shadow">❌ Enlace no válido o incompleto.</p>';
                 return;
             }
 
+            // 3. Consultar en Firestore
             try {
                 const docRef = doc(db, "minisites", siteId);
                 const docSnap = await getDoc(docRef);
@@ -73,11 +75,11 @@
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('content').classList.remove('hidden');
                 } else {
-                    document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold">El minisitio no existe o fue eliminado 💔</p>';
+                    document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold p-4 bg-white rounded-xl shadow">💔 El registro no existe en la base de datos.</p>';
                 }
             } catch (error) {
                 console.error("Error:", error);
-                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold">Error de conexión con la base de datos.</p>';
+                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold p-4 bg-white rounded-xl shadow">⚠️ Error de conexión con la base de datos.</p>';
             }
         }
 
