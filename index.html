@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Creador de Detalles - Panel App</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería externa para generación de Códigos QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen pb-12 font-sans">
 
@@ -84,13 +86,25 @@
       🚀 Generar Enlace y Guardar en la Nube
     </button>
 
-    <!-- ÁREA PARA MOSTRAR EL ENLACE GENERADO -->
-    <div id="resultBox" class="hidden bg-white p-4 rounded-2xl shadow-sm border border-pink-200 space-y-2 text-center">
-      <p class="text-xs font-bold text-pink-600">¡Enlace generado con éxito! 🎉</p>
+    <!-- ÁREA PARA MOSTRAR EL ENLACE Y CÓDIGO QR GENERADO -->
+    <div id="resultBox" class="hidden bg-white p-5 rounded-2xl shadow-sm border border-pink-200 space-y-4 text-center">
+      <p class="text-xs font-bold text-pink-600 uppercase tracking-wide">¡Detalle generado con éxito! 🎉</p>
+
+      <!-- Contenedor del QR -->
+      <div class="flex justify-center my-2">
+        <div id="qrcode" class="p-3 bg-white border border-gray-100 rounded-xl shadow-inner"></div>
+      </div>
+
       <input type="text" id="generatedLink" readonly class="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-center text-gray-600 select-all">
-      <button onclick="copyLink()" class="w-full bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold py-2 rounded-xl text-xs transition-all">
-        📋 Copiar Enlace
-      </button>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="copyLink()" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold py-2 px-3 rounded-xl text-xs transition-all">
+          📋 Copiar Enlace
+        </button>
+        <a id="openLinkBtn" href="#" target="_blank" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition-all text-center flex items-center justify-center">
+          🔗 Abrir Detalle
+        </a>
+      </div>
     </div>
 
   </main>
@@ -154,4 +168,54 @@
           specialDate: date,
           loveLetter: letter,
           version: currentVersion,
-          presetTone:
+          presetTone: tone,
+          createdAt: new Date()
+        });
+
+        // Construir la URL limpia
+        let baseUrl = window.location.href;
+        if (baseUrl.includes('index.html')) {
+          baseUrl = baseUrl.replace('index.html', '');
+        }
+        if (!baseUrl.endsWith('/')) {
+          baseUrl += '/';
+        }
+
+        const finalUrl = `${baseUrl}ver.html?id=${docRef.id}`;
+
+        // Mostrar enlace en pantalla
+        document.getElementById('generatedLink').value = finalUrl;
+        document.getElementById('openLinkBtn').href = finalUrl;
+
+        // Generar Código QR
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = ""; // Limpia QR anterior si existía
+        new QRCode(qrContainer, {
+          text: finalUrl,
+          width: 128,
+          height: 128,
+          colorDark: "#db2777",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        document.getElementById('resultBox').classList.remove('hidden');
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+      } catch (e) {
+        console.error("Error al guardar el documento: ", e);
+        alert("Hubo un error al guardar los datos en la base de datos.");
+      }
+    }
+
+    window.copyLink = function() {
+      const linkInput = document.getElementById('generatedLink');
+      linkInput.select();
+      linkInput.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(linkInput.value);
+      alert("¡Enlace copiado al portapapeles! 📋");
+    }
+  </script>
+
+</body>
+</html>
