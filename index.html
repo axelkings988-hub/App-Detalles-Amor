@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <!-- SECCIÓN 3: GESTIÓN DE MÚSICA (CAMBIA SEGÚN VERSIÓN) -->
+    <!-- SECCIÓN 3: GESTIÓN DE MÚSICA -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
       <h2 class="text-xs font-bold text-pink-600 uppercase tracking-wide">2. Pista de Audio</h2>
       
@@ -57,7 +57,7 @@
         <p class="text-[10px] text-gray-400 italic">* Estos tonos vienen integrados en la app de forma gratuita.</p>
       </div>
 
-      <!-- Opciones para Versión Pro (Oculto por defecto) -->
+      <!-- Opciones para Versión Pro -->
       <div id="proMusicSection" class="space-y-2 hidden">
         <label class="block text-xs font-semibold text-gray-600">Sube tu archivo MP3 personalizado:</label>
         <div class="border-2 border-dashed border-pink-300 bg-pink-50/50 p-4 rounded-xl text-center">
@@ -83,15 +83,34 @@
 
     <!-- BOTÓN DE ACCIÓN PRINCIPAL -->
     <button onclick="generateDetails()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all text-sm active:scale-95">
-      🚀 Generar Enlace y Código QR
+      🚀 Generar Enlace y Guardar en la Nube
     </button>
 
   </main>
 
-  <script>
+  <!-- LÓGICA DE FIREBASE Y GUARDADO EN FIRESTORE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
+    // Configuración oficial de tu proyecto Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+      authDomain: "appdetallesamor.firebaseapp.com",
+      projectId: "appdetallesamor",
+      storageBucket: "appdetallesamor.firebasestorage.app",
+      messagingSenderId: "917968456649",
+      appId: "1:917968456649:web:24759220e7e129a085b618",
+      measurementId: "G-X2NGZ3HC41"
+    };
+
+    // Inicializar Firebase y Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     let currentVersion = 'free';
 
-    function setVersion(version) {
+    window.setVersion = function(version) {
       currentVersion = version;
       const btnFree = document.getElementById('btnFree');
       const btnPro = document.getElementById('btnPro');
@@ -114,13 +133,35 @@
       }
     }
 
-    function generateDetails() {
+    window.generateDetails = async function() {
       const names = document.getElementById('coupleNames').value;
+      const date = document.getElementById('specialDate').value;
+      const letter = document.getElementById('loveLetter').value;
+      const tone = document.getElementById('presetTone').value;
+
       if (!names) {
         alert("Por favor ingresa los nombres de la pareja.");
         return;
       }
-      alert(`¡Datos listos! Procesando enlace para: ${names} (${currentVersion.toUpperCase()})`);
+
+      try {
+        // Guardar los datos en Firestore (crea una colección llamada 'minisites')
+        const docRef = await addDoc(collection(db, "minisites"), {
+          names: names,
+          specialDate: date,
+          loveLetter: letter,
+          version: currentVersion,
+          presetTone: tone,
+          createdAt: new Date()
+        });
+
+        alert(`¡Minisitio guardado con éxito en Firebase!\nID del registro: ${docRef.id}`);
+        
+        // Limpiar formulario o redirigir después de guardar
+      } catch (e) {
+        console.error("Error al guardar el documento: ", e);
+        alert("Hubo un error al guardar los datos en la base de datos.");
+      }
     }
   </script>
 
