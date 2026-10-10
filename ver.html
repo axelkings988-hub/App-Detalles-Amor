@@ -41,20 +41,20 @@
 
     <!-- Script de Firebase y Lógica -->
     <script>
-        // ⚠️ REEMPLAZA ESTO CON TU MISMA CONFIGURACIÓN DE FIREBASE
+        // ⚠️ REEMPLAZA ESTOS DATOS CON TUS CREDENCIALES REALES DE FIREBASE
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
+            apiKey: "TU_API_KEY_AQUI",
             authDomain: "appdetallesamor.firebaseapp.com",
             projectId: "appdetallesamor",
             storageBucket: "appdetallesamor.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+            messagingSenderId: "TU_SENDER_ID_AQUI",
+            appId: "TU_APP_ID_AQUI"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Obtener el ID del minisitio de la URL (ejemplo: ver.html?id=XYZ)
+        // Obtener el ID de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const siteId = urlParams.get('id');
 
@@ -66,12 +66,12 @@
                 if (doc.exists) {
                     const data = doc.data();
 
-                    // Insertar los datos en el HTML
-                    document.getElementById('title').textContent = `${data.coupleNames || 'Nuestra Historia'}`;
+                    // Mapeo corregido de campos de la base de datos
+                    document.getElementById('title').textContent = data.names || 'Nuestra Historia';
                     document.getElementById('date').textContent = data.specialDate ? `📅 ${data.specialDate}` : '';
                     document.getElementById('message').textContent = data.loveLetter || '';
 
-                    // Mostrar contenido y ocultar loader
+                    // Mostrar contenido y ocultar pantalla de carga
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('content').classList.remove('hidden');
                 } else {
