@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creador de Detalles - Panel App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen pb-12 font-sans">
+
+  <!-- CABECERA DE LA APP -->
+  <header class="bg-pink-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
+    <h1 class="font-bold text-lg">❤️ Crear Nuevo Detalle</h1>
+    <span class="bg-pink-500 text-xs px-2.5 py-1 rounded-full font-bold">Modo App</span>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL DEL FORMULARIO -->
+  <main class="max-w-md mx-auto p-4 space-y-4">
+
+    <!-- SECCIÓN 1: SELECCIÓN DE VERSIÓN (GRATIS VS PRO) -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+      <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Elige la Versión:</label>
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="setVersion('free')" id="btnFree" class="py-2.5 px-3 text-xs font-bold rounded-xl border-2 border-pink-600 bg-pink-50 text-pink-700 transition-all">
+          🎁 Versión Gratis <span class="block text-[9px] font-normal text-gray-500">Con anuncios y tonos base</span>
+        </button>
+        <button type="button" onclick="setVersion('pro')" id="btnPro" class="py-2.5 px-3 text-xs font-bold rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all">
+          👑 Versión Pro <span class="block text-[9px] font-normal text-gray-500">Sin anuncios + Tu música</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: DATOS DE LA PAREJA -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+      <h2 class="text-xs font-bold text-pink-600 uppercase tracking-wide">1. Información Principal</h2>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Nombres de la Pareja</label>
+        <input type="text" id="coupleNames" placeholder="Ej. Carlos & Sofía" class="w-full text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Fecha Especial o Aniversario</label>
+        <input type="date" id="specialDate" class="w-full text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500">
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: GESTIÓN DE MÚSICA (CAMBIA SEGÚN VERSIÓN) -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+      <h2 class="text-xs font-bold text-pink-600 uppercase tracking-wide">2. Pista de Audio</h2>
+      
+      <!-- Opciones para Versión Gratis -->
+      <div id="freeMusicSection" class="space-y-2">
+        <label class="block text-xs font-semibold text-gray-600">Elige un tono predeterminado:</label>
+        <select id="presetTone" class="w-full text-xs p-3 rounded-xl border border-gray-300 bg-gray-50 focus:outline-none">
+          <option value="piano">🎹 Melodía Dulce de Piano</option>
+          <option value="musicbox">🎶 Caja de Música Romántica</option>
+        </select>
+        <p class="text-[10px] text-gray-400 italic">* Estos tonos vienen integrados en la app de forma gratuita.</p>
+      </div>
+
+      <!-- Opciones para Versión Pro (Oculto por defecto) -->
+      <div id="proMusicSection" class="space-y-2 hidden">
+        <label class="block text-xs font-semibold text-gray-600">Sube tu archivo MP3 personalizado:</label>
+        <div class="border-2 border-dashed border-pink-300 bg-pink-50/50 p-4 rounded-xl text-center">
+          <input type="file" id="customAudioFile" accept="audio/mp3" class="text-xs text-gray-500 w-full">
+          <p class="text-[10px] text-pink-600 mt-1 font-medium">Selecciona la canción de tu artista favorito</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: FOTOS Y CARTA -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 space-y-3">
+      <h2 class="text-xs font-bold text-pink-600 uppercase tracking-wide">3. Fotos y Mensaje</h2>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Fotos para el Carrusel</label>
+        <input type="file" id="photosInput" multiple accept="image/*" class="w-full text-xs p-3 rounded-xl border border-gray-300 bg-gray-50">
+        <p id="photoLimitText" class="text-[10px] text-gray-400 mt-1">Máximo 3 fotos permitidas en versión gratuita.</p>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Carta de Amor (Sección Inicial)</label>
+        <textarea id="loveLetter" rows="3" placeholder="Escribe aquí un mensaje especial..." class="w-full text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500"></textarea>
+      </div>
+    </div>
+
+    <!-- BOTÓN DE ACCIÓN PRINCIPAL -->
+    <button onclick="generateDetails()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all text-sm active:scale-95">
+      🚀 Generar Enlace y Código QR
+    </button>
+
+  </main>
+
+  <script>
+    let currentVersion = 'free';
+
+    function setVersion(version) {
+      currentVersion = version;
+      const btnFree = document.getElementById('btnFree');
+      const btnPro = document.getElementById('btnPro');
+      const freeMusic = document.getElementById('freeMusicSection');
+      const proMusic = document.getElementById('proMusicSection');
+      const limitText = document.getElementById('photoLimitText');
+
+      if (version === 'free') {
+        btnFree.className = "py-2.5 px-3 text-xs font-bold rounded-xl border-2 border-pink-600 bg-pink-50 text-pink-700 transition-all";
+        btnPro.className = "py-2.5 px-3 text-xs font-bold rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all";
+        freeMusic.classList.remove('hidden');
+        proMusic.classList.add('hidden');
+        limitText.innerText = "Máximo 3 fotos permitidas en versión gratuita.";
+      } else {
+        btnPro.className = "py-2.5 px-3 text-xs font-bold rounded-xl border-2 border-purple-600 bg-purple-50 text-purple-700 transition-all";
+        btnFree.className = "py-2.5 px-3 text-xs font-bold rounded-xl border-2 border-gray-200 bg-white text-gray-600 transition-all";
+        proMusic.classList.remove('hidden');
+        freeMusic.classList.add('hidden');
+        limitText.innerText = "Fotos ilimitadas desbloqueadas con la versión Pro 👑.";
+      }
+    }
+
+    function generateDetails() {
+      const names = document.getElementById('coupleNames').value;
+      if (!names) {
+        alert("Por favor ingresa los nombres de la pareja.");
+        return;
+      }
+      alert(`¡Datos listos! Procesando enlace para: ${names} (${currentVersion.toUpperCase()})`);
+    }
+  </script>
+
+</body>
+</html>
