@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    <audio id="bgMusic" loop preload="auto"></audio>
+    <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
     <!-- PANTALLA DE DESBLOQUEO CON CORAZÓN -->
     <section id="heart-game-section" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10">
@@ -114,7 +114,7 @@
             <p id="mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
         </div>
 
-        <!-- CARRUSEL DE FOTOS (5 a 10 fotos) -->
+        <!-- CARRUSEL DE FOTOS -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
@@ -144,7 +144,7 @@
             </div>
         </section>
 
-        <!-- TRIVIA DE PAREJA (5 Preguntas) -->
+        <!-- TRIVIA DE PAREJA -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
@@ -201,12 +201,6 @@
                     document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
                     document.getElementById('mainDate').innerText = data.fecha || '';
                     document.getElementById('cardMessage').innerText = data.mensaje || '';
-
-                    if (data.audioBase64) {
-                        document.getElementById('bgMusic').src = data.audioBase64;
-                    } else {
-                        document.getElementById('bgMusic').src = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3";
-                    }
 
                     photosArray = data.fotos || [];
                     totalSlides = photosArray.length > 0 ? photosArray.length : 1;
@@ -355,4 +349,8 @@
                 correct: 3,
                 feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊"
             },
-   
+            {
+                question: "¿Cuál es nuestro pasatiempo favorito en pareja?",
+                options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"],
+                correct: 3,
+                fee
