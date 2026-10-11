@@ -175,7 +175,7 @@
         if (!docId) {
             showError("No se encontró el identificador de la tarjeta.");
         } else {
-            db.collection("cartas").doc(docId).get().then((doc) => {
+            db.collection("detalles").doc(docId).get().then((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
