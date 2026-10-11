@@ -70,22 +70,11 @@
                 <p class="text-[10px] text-rose-300/60">Selecciona entre 5 y 10 imágenes a la vez.</p>
             </div>
 
-            <!-- Pista de Audio con Selector de Fragmento -->
-            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
-                <label class="text-xs font-semibold text-rose-200 block">4. SELECCIONAR FRAGMENTO DE CANCIÓN (20 Segundos):</label>
-                <input type="file" id="audioInput" accept="audio/*" onchange="cargarAudioParaRecortar(this)" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                
-                <!-- Controles de recorte (ocultos hasta que eligen audio) -->
-                <div id="audioTrimContainer" class="hidden space-y-2 pt-2 border-t border-rose-500/20">
-                    <p class="text-[11px] text-rose-300" id="audioInfoText">Elige el segundo donde iniciará tu fragmento:</p>
-                    <div class="flex items-center space-x-2">
-                        <input type="range" id="audioStartTime" min="0" max="100" value="0" step="1" oninput="actualizarInicioAudio(this.value)" class="w-full h-2 accent-rose-500 bg-burgundy-900 rounded-lg cursor-pointer">
-                        <span id="startTimeLabel" class="text-xs font-mono text-rose-200">0s</span>
-                    </div>
-                    <button type="button" onclick="preescucharFragmento()" class="w-full py-1.5 bg-rose-600/40 border border-rose-500/40 text-xs text-rose-200 rounded-lg hover:bg-rose-600/60">
-                        <i class="fas fa-play"></i> Escuchar fragmento elegido (20s)
-                    </button>
-                </div>
+            <!-- Pista de Audio -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">4. PISTA DE AUDIO / CANCIÓN (Opcional):</label>
+                <input type="file" id="audioInput" accept="audio/*" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
+                <p class="text-[10px] text-rose-300/60">Sube un archivo ligero (MP3 corto).</p>
             </div>
 
             <!-- Mensaje o carta -->
@@ -140,56 +129,6 @@
         const db = firebase.firestore();
 
         let generatedUrl = "";
-        let audioGlobalBuffer = null;
-        let selectedStartSecond = 0;
-        let previewAudioElement = null;
-
-        // Cargar audio y configurar el control deslizante
-        async function cargarAudioParaRecortar(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            document.getElementById('statusBox').classList.remove('hidden');
-            document.getElementById('statusText').innerText = "Cargando canción para elegir fragmento...";
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                audioGlobalBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-                const maxStart = Math.max(0, audioGlobalBuffer.duration - 20);
-                const slider = document.getElementById('audioStartTime');
-                slider.max = Math.floor(maxStart);
-                slider.value = 0;
-                selectedStartSecond = 0;
-                document.getElementById('startTimeLabel').innerText = "0s";
-
-                document.getElementById('audioTrimContainer').classList.remove('hidden');
-                document.getElementById('statusBox').classList.add('hidden');
-            } catch (e) {
-                console.error(e);
-                alert("No se pudo leer el archivo de audio. Intenta con otro formato.");
-                document.getElementById('statusBox').classList.add('hidden');
-            }
-        }
-
-        function actualizarInicioAudio(val) {
-            selectedStartSecond = parseFloat(val);
-            document.getElementById('startTimeLabel').innerText = `${selectedStartSecond}s`;
-        }
-
-        // Preescuchar el fragmento de 20 segundos elegido
-        async function preescucharFragmento() {
-            if (!audioGlobalBuffer) return;
-            if (previewAudioElement) {
-                previewAudioElement.pause();
-            }
-
-            const wavBlob = recortarBufferAWav(audioGlobalBuffer, selectedStartSecond, 20);
-            const audioUrl = URL.createObjectURL(wavBlob);
-            previewAudioElement = new Audio(audioUrl);
-            previewAudioElement.play();
-        }
 
         async function guardarDetalle() {
             const nombres = document.getElementById('nombresInput').value.trim();
@@ -203,35 +142,34 @@
                 return;
             }
 
-            if (previewAudioElement) {
-                previewAudioElement.pause();
-            }
-
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
-                // 1. Comprimir imágenes
+                // 1. Comprimir imágenes fuertemente para que quepan en Firebase
                 const fotosBase64 = [];
                 const maxFotos = Math.min(photosFiles.length, 10);
                 
                 for (let i = 0; i < maxFotos; i++) {
-                    document.getElementById('statusText').innerText = `Comprimiendo foto ${i + 1} de ${maxFotos}...`;
-                    const compressedBase64 = await compressImage(photosFiles[i], 800, 0.7);
+                    document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
+                    const compressedBase64 = await compressImage(photosFiles[i], 600, 0.6);
                     fotosBase64.push(compressedBase64);
                 }
 
-                // 2. Extraer el fragmento exacto elegido por el usuario
+                // 2. Procesar audio ligero si se adjuntó
                 let audioBase64 = null;
-                if (audioFile && audioGlobalBuffer) {
-                    document.getElementById('statusText').innerText = "Generando fragmento de audio personalizado...";
-                    const wavBlob = recortarBufferAWav(audioGlobalBuffer, selectedStartSecond, 20);
-                    audioBase64 = await blobToBase64(wavBlob);
+                if (audioFile) {
+                    document.getElementById('statusText').innerText = "Procesando pista de audio...";
+                    if (audioFile.size > 1.5 * 1024 * 1024) {
+                        alert("El archivo de audio supera 1.5MB. Para asegurar que guarde correctamente en la base de datos gratuita, elige un archivo más ligero o continúa sin audio.");
+                    } else {
+                        audioBase64 = await convertFileToBase64(audioFile);
+                    }
                 }
 
                 document.getElementById('statusText').innerText = "Guardando en la nube...";
 
-                // 3. Guardar en Firestore
+                // 3. Subir a Firestore
                 const docRef = await db.collection("detalles").add({
                     nombres: nombres,
                     fecha: fecha,
@@ -256,13 +194,13 @@
 
             } catch (error) {
                 console.error("Error al guardar: ", error);
-                alert("Ocurrió un error al guardar. Intenta de nuevo.");
+                alert("Ocurrió un error al guardar. Las imágenes o el audio pesan demasiado para la base de datos gratuita. Intenta elegir fotos más ligeras.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
         }
 
-        // Compresor de imágenes
+        // Compresor optimizado de imágenes
         function compressImage(file, maxWidth, quality) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -293,71 +231,12 @@
             });
         }
 
-        // Recortar buffer de audio desde un segundo específico por 20 segundos
-        function recortarBufferAWav(audioBuffer, startSec, durationSec) {
-            const sampleRate = audioBuffer.sampleRate;
-            const numChannels = audioBuffer.numberOfChannels;
-            const startOffset = Math.floor(sampleRate * startSec);
-            const targetLength = Math.floor(sampleRate * Math.min(durationSec, audioBuffer.duration - startSec));
-
-            const trimmedBuffer = audioBuffer.constructor(numChannels, targetLength, sampleRate);
-            for (let i = 0; i < numChannels; i++) {
-                const channelData = audioBuffer.getChannelData(i);
-                const trimmedData = trimmedBuffer.getChannelData(i);
-                trimmedData.set(channelData.subarray(startOffset, startOffset + targetLength));
-            }
-
-            return bufferToWav(trimmedBuffer, targetLength);
-        }
-
-        function bufferToWav(buffer, len) {
-            const numOfChan = buffer.numberOfChannels;
-            const length = len * numOfChan * 2 + 44;
-            const out = new DataView(new ArrayBuffer(length));
-            let channels = [], sample, offset = 0, pos = 0;
-
-            function writeString(str) {
-                for (let i = 0; i < str.length; i++) {
-                    out.setUint8(pos++, str.charCodeAt(i));
-                }
-            }
-
-            writeString('RIFF');
-            out.setUint32(pos, length - 8, true); pos += 4;
-            writeString('WAVE');
-            writeString('fmt ');
-            out.setUint32(pos, 16, true); pos += 4;
-            out.setUint16(pos, 1, true); pos += 2;
-            out.setUint16(pos, numOfChan, true); pos += 2;
-            out.setUint32(pos, buffer.sampleRate, true); pos += 4;
-            out.setUint32(pos, buffer.sampleRate * 2 * numOfChan, true); pos += 4;
-            out.setUint16(pos, numOfChan * 2, true); pos += 2;
-            out.setUint16(pos, 16, true); pos += 2;
-            writeString('data');
-            out.setUint32(pos, length - pos - 4, true); pos += 4;
-
-            for (let i = 0; i < buffer.numberOfChannels; i++) {
-                channels.push(buffer.getChannelData(i));
-            }
-
-            while (offset < len) {
-                for (let i = 0; i < numOfChan; i++) {
-                    sample = Math.max(-1, Math.min(1, channels[i][offset]));
-                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
-                    out.setInt16(pos, sample, true); pos += 2;
-                }
-                offset++;
-            }
-
-            return new Blob([out.buffer], { type: 'audio/wav' });
-        }
-
-        function blobToBase64(blob) {
+        function convertFileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
         }
 
