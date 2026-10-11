@@ -1,171 +1,222 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Creador de Detalles - Panel App</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crear Detalle de Amor</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- QRCode JS Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: { 800: '#58111A', 900: '#3B0A11', 950: '#230408' },
+                        rose: { 300: '#F472B6', 500: '#EC4899', 600: '#DB2777', 900: '#831843' },
+                        gold: { 400: '#FBBF24', 500: '#F59E0B' }
+                    },
+                    fontFamily: {
+                        cursive: ['"Dancing Script"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; }
+        .font-cursive { font-family: 'Dancing Script', cursive; }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen pb-12 font-sans">
+<body class="p-4 flex items-center justify-center min-h-screen">
 
-  <!-- CABECERA DE LA APP -->
-  <header class="bg-pink-600 text-white p-4 shadow-md flex justify-between items-center">
-    <h1 class="font-bold text-lg">❤️ Crear Nuevo Detalle</h1>
-    <span class="bg-pink-500 text-xs px-2.5 py-1 rounded-full font-semibold">Modo App</span>
-  </header>
+    <div class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+        
+        <div class="text-center space-y-1">
+            <h1 class="text-3xl font-bold font-cursive text-rose-100">Crear Detalle Especial</h1>
+            <p class="text-xs text-rose-300/80">Personaliza tu regalo digital con recuerdos y música</p>
+        </div>
 
-  <!-- CONTENEDOR PRINCIPAL DEL FORMULARIO -->
-  <main class="max-w-md mx-auto p-4 space-y-4">
+        <form id="createForm" onsubmit="event.preventDefault(); guardarDetalle();" class="space-y-4">
+            <!-- Nombres -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">Nombres / De quién para quién:</label>
+                <input type="text" id="nombresInput" placeholder="Ej. Carlos & Sofía" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
 
-    <div class="bg-white p-5 rounded-2xl shadow-sm space-y-4">
-      
-      <!-- SECCIÓN 1: INFORMACIÓN -->
-      <div>
-        <label class="block text-xs font-bold text-pink-700 uppercase mb-1">1. Nombres del Detalle</label>
-        <input type="text" id="inputNombres" placeholder="Ej. Ana y Francisco" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-pink-500">
-      </div>
+            <!-- Fecha especial -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">Fecha especial o aniversario:</label>
+                <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
 
-      <div>
-        <label class="block text-xs font-bold text-pink-700 uppercase mb-1">2. Fecha Especial</label>
-        <input type="date" id="inputFecha" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-pink-500">
-      </div>
+            <!-- Mensaje o carta -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">Mensaje o carta de amor:</label>
+                <textarea id="mensajeInput" rows="4" placeholder="Escribe aquí tu carta o dedicatoria..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
+            </div>
 
-      <!-- SECCIÓN 2: FOTOS Y MENSAJE -->
-      <div>
-        <label class="block text-xs font-bold text-pink-700 uppercase mb-1">3. Fotos para el Carrusel (Máx. 3)</label>
-        <input type="file" id="inputFotos" accept="image/*" multiple class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50 focus:outline-none">
-        <p class="text-xs text-gray-400 mt-1">Selecciona hasta 3 imágenes de tu galería.</p>
-      </div>
+            <!-- Galería de Fotos (5 a 10 fotos) -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">Fotos de recuerdos (mínimo 5, máximo 10):</label>
+                <input type="file" id="photosInput" accept="image/*" multiple required class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
+                <p class="text-[10px] text-rose-300/60">Mantén presionado para seleccionar varias imágenes a la vez.</p>
+            </div>
 
-      <div>
-        <label class="block text-xs font-bold text-pink-700 uppercase mb-1">4. Carta de Amor / Mensaje</label>
-        <textarea id="inputMensaje" rows="4" placeholder="Escribe tu mensaje aquí..." class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-pink-500"></textarea>
-      </div>
+            <!-- Pista de Audio Personalizada -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">Canción o pista musical (Opcional):</label>
+                <input type="file" id="audioInput" accept="audio/*" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
+            </div>
 
-      <!-- BOTÓN PRINCIPAL -->
-      <button id="btnGuardar" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-        🚀 Generar Enlace y Guardar en la Nube
-      </button>
+            <!-- Botón de Envío -->
+            <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <i class="fas fa-heart"></i> Generar Enlace y Código QR
+            </button>
+        </form>
+
+        <!-- Indicador de Carga -->
+        <div id="statusBox" class="hidden text-center py-4 space-y-2">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
+            <p id="statusText" class="text-xs text-rose-300">Procesando fotos y canción... Por favor espera unos segundos.</p>
+        </div>
+
+        <!-- RESULTADO (ENLACE Y QR) -->
+        <div id="resultBox" class="hidden text-center space-y-4 pt-4 border-t border-rose-500/20">
+            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle fue guardado con éxito! ❤️</h3>
+            
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
+                <div id="qrcode"></div>
+            </div>
+
+            <div class="space-y-2">
+                <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
+                    Abrir Detalle
+                </a>
+                <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-950 text-xs text-rose-300 rounded-xl border border-rose-500/30">
+                    <i class="fas fa-copy"></i> Copiar Enlace
+                </button>
+            </div>
+        </div>
 
     </div>
 
-    <!-- SECCIÓN DE RESULTADO Y QR (OCULTA INICIALMENTE) -->
-    <div id="seccionResultado" class="bg-white p-5 rounded-2xl shadow-sm text-center space-y-4 hidden">
-      <h2 class="text-pink-600 font-bold text-base">¡DETALLE GENERADO CON ÉXITO! 🎉</h2>
-      
-      <!-- CONTENEDOR DEL CÓDIGO QR -->
-      <div id="contenedorQR" class="flex justify-center p-3 bg-gray-50 rounded-xl border border-gray-100"></div>
+    <script>
+        // Configuración de Firebase (Tus datos reales)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618",
+            measurementId: "G-ZTGDLNQXSF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-      <!-- ENLACE Y ACCIONES -->
-      <input type="text" id="inputEnlaceGenerado" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg p-2.5 text-xs text-gray-600 text-center focus:outline-none">
+        let generatedUrl = "";
 
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <button id="btnCopiar" class="bg-pink-100 text-pink-700 font-semibold py-2.5 rounded-lg text-xs hover:bg-pink-200">
-          📋 Copiar Enlace
-        </button>
-        <a id="btnAbrirDetalle" target="_blank" href="#" class="bg-pink-600 text-white font-semibold py-2.5 rounded-lg text-xs hover:bg-pink-700 flex items-center justify-center">
-          🔗 Abrir Detalle
-        </a>
-      </div>
-    </div>
+        async function guardarDetalle() {
+            const nombres = document.getElementById('nombresInput').value.trim();
+            const fecha = document.getElementById('fechaInput').value.trim();
+            const mensaje = document.getElementById('mensajeInput').value.trim();
+            const photosFiles = document.getElementById('photosInput').files;
+            const audioFile = document.getElementById('audioInput').files[0];
 
-  </main>
+            if (photosFiles.length < 5) {
+                alert("Por favor selecciona al menos 5 fotografías para crear el detalle.");
+                return;
+            }
 
-  <!-- MÓDULO FIREBASE -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+            // Mostrar estado de procesamiento
+            document.getElementById('createForm').classList.add('hidden');
+            document.getElementById('statusBox').classList.remove('hidden');
 
-    // Reemplaza con tu configuración de Firebase si es distinta
-    const firebaseConfig = {
-  apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
-  authDomain: "appdetallesamor.firebaseapp.com",
-  projectId: "appdetallesamor",
-  storageBucket: "appdetallesamor.firebasestorage.app",
-  messagingSenderId: "917968456649",
-  appId: "1:917968456649:web:32261e841942825685b618",
-  measurementId: "G-ZTGDLNQXSF"
-};
+            try {
+                // 1. Convertir fotos a Base64 (Máximo 10)
+                const fotosBase64 = [];
+                const maxFotos = Math.min(photosFiles.length, 10);
+                for (let i = 0; i < maxFotos; i++) {
+                    document.getElementById('statusText').innerText = `Procesando foto ${i + 1} de ${maxFotos}...`;
+                    const base64 = await convertToBase64(photosFiles[i]);
+                    fotosBase64.push(base64);
+                }
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+                // 2. Convertir canción/audio a Base64 si se adjuntó una
+                let audioBase64 = null;
+                if (audioFile) {
+                    document.getElementById('statusText').innerText = "Procesando pista de audio...";
+                    audioBase64 = await convertToBase64(audioFile);
+                }
 
-    // Convertir imágenes a Base64
-    function convertirImagenesBase64(inputElement) {
-      const archivos = Array.from(inputElement.files).slice(0, 3);
-      return Promise.all(archivos.map(archivo => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-          reader.readAsDataURL(archivo);
-        });
-      }));
-    }
+                document.getElementById('statusText').innerText = "Guardando en la nube...";
 
-    const btnGuardar = document.getElementById('btnGuardar');
-    const seccionResultado = document.getElementById('seccionResultado');
-    const contenedorQR = document.getElementById('contenedorQR');
-    const inputEnlaceGenerado = document.getElementById('inputEnlaceGenerado');
-    const btnAbrirDetalle = document.getElementById('btnAbrirDetalle');
-    const btnCopiar = document.getElementById('btnCopiar');
+                // 3. Guardar en Firestore dentro de la colección 'detalles'
+                const docRef = await db.collection("detalles").add({
+                    nombres: nombres,
+                    fecha: fecha,
+                    mensaje: mensaje,
+                    fotos: fotosBase64,
+                    audioBase64: audioBase64,
+                    creado: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-    btnGuardar.addEventListener('click', async () => {
-      const nombres = document.getElementById('inputNombres').value.trim();
-      const fecha = document.getElementById('inputFecha').value;
-      const mensaje = document.getElementById('inputMensaje').value.trim();
-      const inputFotos = document.getElementById('inputFotos');
+                // 4. Crear la URL final hacia ver.html
+                generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-      if (!nombres || !mensaje) {
-        alert("Por favor completa al menos los nombres y el mensaje.");
-        return;
-      }
+                // Mostrar el resultado con el QR
+                document.getElementById('statusBox').classList.add('hidden');
+                document.getElementById('resultBox').classList.remove('hidden');
+                document.getElementById('finalLink').href = generatedUrl;
 
-      btnGuardar.disabled = true;
-      btnGuardar.innerText = "Guardando en la nube...";
+                // Generar QR
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: generatedUrl,
+                    width: 160,
+                    height: 160
+                });
 
-      try {
-        const fotosBase64 = await convertirImagenesBase64(inputFotos);
+            } catch (error) {
+                console.error("Error al guardar: ", error);
+                alert("Ocurrió un error al guardar el detalle. Intenta con imágenes o audios de menor peso.");
+                document.getElementById('statusBox').classList.add('hidden');
+                document.getElementById('createForm').classList.remove('hidden');
+            }
+        }
 
-        const docRef = await addDoc(collection(db, "detalles"), {
-          nombres: nombres,
-          fecha: fecha,
-          mensaje: mensaje,
-          fotos: fotosBase64,
-          creado: new Date()
-        });
+        // Función auxiliar para convertir archivos a Base64
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
-        // Construcción de la URL con ver.html e ID
-        const urlFinal = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
-
-        // Limpiar y generar QR
-        contenedorQR.innerHTML = "";
-        new QRCode(contenedorQR, {
-          text: urlFinal,
-          width: 180,
-          height: 180,
-          colorDark: "#db2777",
-          colorLight: "#ffffff"
-        });
-
-        inputEnlaceGenerado.value = urlFinal;
-        btnAbrirDetalle.href = urlFinal;
-        seccionResultado.classList.remove('hidden');
-
-      } catch (error) {
-        console.error("Error al guardar:", error);
-        alert("Hubo un error al guardar el detalle. Revisa la consola.");
-      } finally {
-        btnGuardar.disabled = false;
-        btnGuardar.innerText = "🚀 Generar Enlace y Guardar en la Nube";
-      }
-    });
-
-    btnCopiar.addEventListener('click', () => {
-      navigator.clipboard.writeText(inputEnlaceGenerado.value);
-      alert("¡Enlace copiado al portapapeles!");
-    });
-  </script>
+        // Copiar enlace al portapapeles
+        function copiarEnlace() {
+            if (generatedUrl) {
+                navigator.clipboard.writeText(generatedUrl).then(() => {
+                    alert("¡Enlace copiado al portapapeles! ❤️");
+                });
+            }
+        }
+    </script>
 </body>
 </html>
