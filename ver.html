@@ -168,7 +168,6 @@
     </main>
 
     <script>
-        // Configuración Firebase (Tus credenciales reales)
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
@@ -186,7 +185,6 @@
         let totalSlides = 1;
         let touchStartX = 0, touchEndX = 0;
 
-        // Cargar Datos desde Firestore usando ?id=
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
@@ -200,19 +198,16 @@
                     document.getElementById('heart-game-section').classList.remove('hidden');
                     document.getElementById('musicPlayerContainer').classList.remove('hidden');
 
-                    // Asignar textos
                     document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
                     document.getElementById('mainDate').innerText = data.fecha || '';
                     document.getElementById('cardMessage').innerText = data.mensaje || '';
 
-                    // Configurar Música (si subió audio personalizado se usa, si no, uno romántico por defecto)
                     if (data.audioBase64) {
                         document.getElementById('bgMusic').src = data.audioBase64;
                     } else {
                         document.getElementById('bgMusic').src = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3";
                     }
 
-                    // Configurar Galería de Fotos (Soporta de 5 a 10 fotos)
                     photosArray = data.fotos || [];
                     totalSlides = photosArray.length > 0 ? photosArray.length : 1;
                     buildCarousel();
@@ -222,7 +217,8 @@
                     showError("La tarjeta no existe o fue eliminada.");
                 }
             }).catch((error) => {
-                showError("Ocurrió un error al cargar la información.");
+                console.error("Error al cargar datos:", error);
+                showError("Ocurrió un error al cargar la información desde la nube.");
             });
         }
 
@@ -235,7 +231,6 @@
             `;
         }
 
-        // --- AUDIO ---
         const bgMusic = document.getElementById('bgMusic');
         const playIcon = document.getElementById('playIcon');
         const musicStatus = document.getElementById('musicStatus');
@@ -256,7 +251,6 @@
         }
         function adjustVolume(val) { bgMusic.volume = val; }
 
-        // --- CORAZÓN INTERACTIVO ---
         let heartClicks = 0;
         const targetClicks = 10;
         let musicAutoTriggered = false;
@@ -301,7 +295,6 @@
             }
         }
 
-        // --- CARRUSEL (5 a 10 Fotos) ---
         function buildCarousel() {
             const track = document.getElementById('carouselTrack');
             const dotsContainer = document.getElementById('carouselDots');
@@ -349,10 +342,17 @@
             else if (touchEndX - touchStartX > 40) prevSlide();
         }
 
-        // --- TRIVIA DE PAREJA (5 Preguntas) ---
         const quizData = [
             {
                 question: "¿Cuál es el lugar que más disfrutamos visitar juntos?",
                 options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"],
                 correct: 2,
-                feedback: "¡Totalmente cierto! Lo mejor de cua
+                feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️"
+            },
+            {
+                question: "¿Qué fue lo primero que pensé al conocerte?",
+                options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"],
+                correct: 3,
+                feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊"
+            },
+   
