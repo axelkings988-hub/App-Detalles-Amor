@@ -14,7 +14,7 @@
     <!-- Canvas Confetti CDN -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <!-- Firebase SDKs (Compat / Modular) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -114,7 +114,7 @@
             <p id="mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
         </div>
 
-        <!-- CARRUSEL DE FOTOS DINÁMICO -->
+        <!-- CARRUSEL DE FOTOS (5 a 10 fotos) -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
@@ -129,7 +129,7 @@
 
             <div class="flex items-center justify-between pt-2">
                 <button onclick="prevSlide()" class="w-9 h-9 rounded-full bg-burgundy-950/80 border border-rose-500/30 text-rose-200 flex items-center justify-center active:scale-95"><i class="fas fa-chevron-left text-xs"></i></button>
-                <div class="flex space-x-2" id="carouselDots"></div>
+                <div class="flex space-x-1 overflow-x-auto max-w-[200px] py-1 px-2" id="carouselDots"></div>
                 <button onclick="nextSlide()" class="w-9 h-9 rounded-full bg-burgundy-950/80 border border-rose-500/30 text-rose-200 flex items-center justify-center active:scale-95"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
         </section>
@@ -144,22 +144,40 @@
             </div>
         </section>
 
+        <!-- TRIVIA DE PAREJA (5 Preguntas) -->
+        <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
+                    <i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja
+                </h3>
+                <span id="quizScore" class="text-xs bg-gold-400/20 text-gold-400 border border-gold-400/30 px-2.5 py-1 rounded-full font-bold">
+                    Puntos: 0
+                </span>
+            </div>
+
+            <div id="quizContainer" class="bg-burgundy-950/60 p-4 rounded-2xl border border-rose-500/10 space-y-4">
+                <p id="quizQuestion" class="text-xs font-semibold text-rose-100">Cargando pregunta...</p>
+                <div id="quizOptions" class="space-y-2"></div>
+                <div id="quizFeedback" class="hidden text-xs font-semibold p-3 rounded-xl text-center"></div>
+            </div>
+        </section>
+
         <footer class="text-center py-6 text-xs text-rose-400/60 space-y-1">
             <p class="font-cursive text-lg text-rose-300">Con todo mi amor ❤️</p>
         </footer>
     </main>
 
     <script>
-        // Configuración Firebase (Reemplaza con tus datos)
+        // Configuración Firebase (Tus credenciales reales)
         const firebaseConfig = {
-  apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
-  authDomain: "appdetallesamor.firebaseapp.com",
-  projectId: "appdetallesamor",
-  storageBucket: "appdetallesamor.firebasestorage.app",
-  messagingSenderId: "917968456649",
-  appId: "1:917968456649:web:32261e841942825685b618",
-  measurementId: "G-ZTGDLNQXSF"
-};
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618",
+            measurementId: "G-ZTGDLNQXSF"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -187,17 +205,18 @@
                     document.getElementById('mainDate').innerText = data.fecha || '';
                     document.getElementById('cardMessage').innerText = data.mensaje || '';
 
-                    // Configurar Música si existe
+                    // Configurar Música (si subió audio personalizado se usa, si no, uno romántico por defecto)
                     if (data.audioBase64) {
                         document.getElementById('bgMusic').src = data.audioBase64;
                     } else {
                         document.getElementById('bgMusic').src = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3";
                     }
 
-                    // Configurar Galería de Fotos
+                    // Configurar Galería de Fotos (Soporta de 5 a 10 fotos)
                     photosArray = data.fotos || [];
                     totalSlides = photosArray.length > 0 ? photosArray.length : 1;
                     buildCarousel();
+                    loadQuizQuestion();
 
                 } else {
                     showError("La tarjeta no existe o fue eliminada.");
@@ -282,7 +301,7 @@
             }
         }
 
-        // --- CARRUSEL ---
+        // --- CARRUSEL (5 a 10 Fotos) ---
         function buildCarousel() {
             const track = document.getElementById('carouselTrack');
             const dotsContainer = document.getElementById('carouselDots');
@@ -297,14 +316,14 @@
                         <img src="${photo}" alt="Foto ${idx+1}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-burgundy-950 via-transparent to-transparent opacity-80"></div>
                         <div class="absolute bottom-0 inset-x-0 p-4">
-                            <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">Recuerdo ${idx + 1}</span>
+                            <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">Recuerdo ${idx + 1} de ${photosArray.length}</span>
                         </div>
                     </div>
                 `;
                 track.appendChild(slideDiv);
 
                 const dot = document.createElement('span');
-                dot.className = idx === 0 ? 'w-2.5 h-2.5 rounded-full bg-rose-500' : 'w-2.5 h-2.5 rounded-full bg-rose-950 border border-rose-500/40';
+                dot.className = idx === 0 ? 'w-2 h-2 rounded-full bg-rose-500 flex-shrink-0' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40 flex-shrink-0';
                 dotsContainer.appendChild(dot);
             });
             updateCarousel();
@@ -316,7 +335,7 @@
             document.getElementById('carouselIndicator').innerText = `${currentSlide + 1} / ${totalSlides}`;
             const dots = document.getElementById('carouselDots').children;
             for (let i = 0; i < dots.length; i++) {
-                dots[i].className = i === currentSlide ? 'w-2.5 h-2.5 rounded-full bg-rose-500' : 'w-2.5 h-2.5 rounded-full bg-rose-950 border border-rose-500/40';
+                dots[i].className = i === currentSlide ? 'w-2 h-2 rounded-full bg-rose-500 flex-shrink-0' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40 flex-shrink-0';
             }
         }
 
@@ -330,19 +349,10 @@
             else if (touchEndX - touchStartX > 40) prevSlide();
         }
 
-        function initFloatingHearts() {
-            const container = document.getElementById('bg-hearts-container');
-            for (let i = 0; i < 15; i++) {
-                const heart = document.createElement('i');
-                heart.className = 'fas fa-heart bg-heart text-rose-500';
-                heart.style.left = `${Math.random() * 100}%`;
-                heart.style.animationDuration = `${6 + Math.random() * 8}s`;
-                heart.style.animationDelay = `${Math.random() * 5}s`;
-                heart.style.fontSize = `${12 + Math.random() * 18}px`;
-                container.appendChild(heart);
-            }
-        }
-        window.onload = initFloatingHearts;
-    </script>
-</body>
-      </html>
+        // --- TRIVIA DE PAREJA (5 Preguntas) ---
+        const quizData = [
+            {
+                question: "¿Cuál es el lugar que más disfrutamos visitar juntos?",
+                options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"],
+                correct: 2,
+                feedback: "¡Totalmente cierto! Lo mejor de cua
