@@ -63,23 +63,16 @@
                 <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
-            <!-- Galería de Fotos (5 a 10 fotos) -->
+            <!-- Galería de Fotos (Máximo 4 para estabilidad total) -->
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (DE 5 A 10 FOTOS):</label>
+                <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 4):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple required class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p class="text-[10px] text-rose-300/60">Selecciona entre 5 y 10 imágenes a la vez.</p>
-            </div>
-
-            <!-- Pista de Audio -->
-            <div class="space-y-1">
-                <label class="text-xs font-semibold text-rose-200">4. PISTA DE AUDIO / CANCIÓN (Opcional):</label>
-                <input type="file" id="audioInput" accept="audio/*" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p class="text-[10px] text-rose-300/60">Sube un archivo ligero (MP3 corto).</p>
+                <p class="text-[10px] text-rose-300/60">Selecciona hasta 4 de tus mejores fotos.</p>
             </div>
 
             <!-- Mensaje o carta -->
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-rose-200">5. CARTA DE AMOR / MENSAJE:</label>
+                <label class="text-xs font-semibold text-rose-200">4. CARTA DE AMOR / MENSAJE:</label>
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
@@ -92,7 +85,7 @@
         <!-- Indicador de Carga -->
         <div id="statusBox" class="hidden text-center py-4 space-y-2">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando contenido... Por favor espera.</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando fotos... Por favor espera.</p>
         </div>
 
         <!-- RESULTADO (ENLACE Y QR) -->
@@ -135,10 +128,9 @@
             const fecha = document.getElementById('fechaInput').value.trim();
             const mensaje = document.getElementById('mensajeInput').value.trim();
             const photosFiles = document.getElementById('photosInput').files;
-            const audioFile = document.getElementById('audioInput').files[0];
 
-            if (photosFiles.length < 5) {
-                alert("Por favor selecciona al menos 5 fotografías.");
+            if (photosFiles.length === 0) {
+                alert("Por favor selecciona al menos una fotografía.");
                 return;
             }
 
@@ -146,36 +138,24 @@
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
-                // 1. Comprimir imágenes fuertemente para que quepan en Firebase
+                // Comprimir imágenes de manera eficiente (máximo 4)
                 const fotosBase64 = [];
-                const maxFotos = Math.min(photosFiles.length, 10);
+                const maxFotos = Math.min(photosFiles.length, 4);
                 
                 for (let i = 0; i < maxFotos; i++) {
                     document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
-                    const compressedBase64 = await compressImage(photosFiles[i], 600, 0.6);
+                    const compressedBase64 = await compressImage(photosFiles[i], 600, 0.65);
                     fotosBase64.push(compressedBase64);
-                }
-
-                // 2. Procesar audio ligero si se adjuntó
-                let audioBase64 = null;
-                if (audioFile) {
-                    document.getElementById('statusText').innerText = "Procesando pista de audio...";
-                    if (audioFile.size > 1.5 * 1024 * 1024) {
-                        alert("El archivo de audio supera 1.5MB. Para asegurar que guarde correctamente en la base de datos gratuita, elige un archivo más ligero o continúa sin audio.");
-                    } else {
-                        audioBase64 = await convertFileToBase64(audioFile);
-                    }
                 }
 
                 document.getElementById('statusText').innerText = "Guardando en la nube...";
 
-                // 3. Subir a Firestore
+                // Guardar en Firestore
                 const docRef = await db.collection("detalles").add({
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
                     fotos: fotosBase64,
-                    audioBase64: audioBase64,
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -194,13 +174,12 @@
 
             } catch (error) {
                 console.error("Error al guardar: ", error);
-                alert("Ocurrió un error al guardar. Las imágenes o el audio pesan demasiado para la base de datos gratuita. Intenta elegir fotos más ligeras.");
+                alert("Ocurrió un error al guardar. Intenta con imágenes más ligeras.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
         }
 
-        // Compresor optimizado de imágenes
         function compressImage(file, maxWidth, quality) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -227,15 +206,6 @@
                     };
                     img.onerror = error => reject(error);
                 };
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        function convertFileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
         }
