@@ -1,89 +1,96 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Un Detalle Especial ❤️</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tu Detalle Especial ❤️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-pink-100 via-red-50 to-pink-200 min-h-screen flex flex-col items-center justify-center p-4 text-gray-800">
+<body class="bg-pink-50 min-h-screen flex items-center justify-center p-4">
 
-    <div id="loading" class="text-center py-10">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-        <p class="text-lg font-semibold text-gray-600">Cargando tu detalle especial...</p>
+  <div id="tarjetaContenedor" class="bg-white max-w-sm w-full rounded-3xl shadow-xl p-6 text-center space-y-4 border border-pink-100 relative">
+    
+    <!-- ETIQUETA ENCABEZADO -->
+    <span class="bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+      Un regalo para ti
+    </span>
+
+    <!-- NOMBRES Y FECHA -->
+    <h1 id="tituloNombres" class="text-2xl font-extrabold text-pink-600 pt-2">Cargando...</h1>
+    <p id="textoFecha" class="text-xs text-gray-400 font-medium"></p>
+
+    <!-- CARRUSEL / CONTENEDOR DE FOTOS -->
+    <div id="carruselFotos" class="space-y-2 pt-2"></div>
+
+    <!-- CARTA DE MENSAJE -->
+    <div class="bg-pink-50/60 p-4 rounded-2xl border border-pink-100 text-left">
+      <p id="textoMensaje" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line"></p>
     </div>
 
-    <div id="content" class="hidden max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-pink-100 p-6 text-center space-y-6">
-        <div class="space-y-2">
-            <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Un regalo para ti</span>
-            <h1 id="title" class="text-3xl font-extrabold text-red-600 mt-2"></h1>
-            <p id="date" class="text-sm text-gray-500 italic"></p>
-        </div>
-
-        <div class="bg-pink-50 rounded-2xl p-5 border border-pink-100 text-left">
-            <p id="message" class="text-gray-700 whitespace-pre-line leading-relaxed text-sm"></p>
-        </div>
-
-        <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
-            Hecho con ❤️ en <span class="font-bold text-red-500">AppDetallesAmor</span>
-        </div>
+    <!-- PIE DE PÁGINA -->
+    <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
+      Hecho con ❤️ en <span class="font-bold text-pink-500">AppDetallesAmor</span>
     </div>
+  </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+  <!-- MÓDULO FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
-            authDomain: "appdetallesamor.firebaseapp.com",
-            projectId: "appdetallesamor",
-            storageBucket: "appdetallesamor.firebasestorage.app",
-            messagingSenderId: "917968456649",
-            appId: "1:917968456649:web:24759220e7e129a085b618",
-            measurementId: "G-X2NGZ3HC41"
-        };
+    // Reemplaza con tu configuración de Firebase si es distinta
+    const firebaseConfig = {
+      apiKey: "AIzaSy...",
+      authDomain: "tu-app.firebaseapp.com",
+      projectId: "tu-app-id",
+      storageBucket: "tu-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abc"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        async function cargarDatos() {
-            // 1. Obtener y limpiar el ID de la URL
-            const urlParams = new URLSearchParams(window.location.search);
-            let siteId = urlParams.get('id');
+    async function cargarDetalle() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const idDetalle = urlParams.get('id');
 
-            if (siteId) {
-                siteId = siteId.replace(/[^\w]/g, '');
-            }
+      if (!idDetalle) {
+        document.getElementById('tituloNombres').innerText = "Detalle no encontrado";
+        document.getElementById('textoMensaje').innerText = "No se proporcionó un ID válido en el enlace.";
+        return;
+      }
 
-            // 2. Validar que exista el ID
-            if (!siteId) {
-                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold p-4 bg-white rounded-xl shadow">❌ Enlace no válido o incompleto.</p>';
-                return;
-            }
+      try {
+        const docRef = doc(db, "detalles", idDetalle);
+        const docSnap = await getDoc(docRef);
 
-            // 3. Consultar en Firestore
-            try {
-                const docRef = doc(db, "minisites", siteId);
-                const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const datos = docSnap.data();
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('title').textContent = data.names || 'Nuestra Historia';
-                    document.getElementById('date').textContent = data.specialDate ? `📅 ${data.specialDate}` : '';
-                    document.getElementById('message').textContent = data.loveLetter || '';
+          document.getElementById('tituloNombres').innerText = datos.nombres || "";
+          document.getElementById('textoFecha').innerText = datos.fecha ? `📅 ${datos.fecha}` : "";
+          document.getElementById('textoMensaje').innerText = datos.mensaje || "";
 
-                    document.getElementById('loading').classList.add('hidden');
-                    document.getElementById('content').classList.remove('hidden');
-                } else {
-                    document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold p-4 bg-white rounded-xl shadow">💔 El registro no existe en la base de datos.</p>';
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold p-4 bg-white rounded-xl shadow">⚠️ Error de conexión con la base de datos.</p>';
-            }
+          // Renderizar fotos si existen
+          if (datos.fotos && datos.fotos.length > 0) {
+            const carrusel = document.getElementById('carruselFotos');
+            carrusel.innerHTML = datos.fotos.map(foto => `
+              <img src="${foto}" class="w-full h-52 object-cover rounded-2xl shadow-sm border border-gray-100" alt="Foto del detalle">
+            `).join('');
+          }
+        } else {
+          document.getElementById('tituloNombres').innerText = "Detalle no encontrado";
+          document.getElementById('textoMensaje').innerText = "Este detalle no existe o fue eliminado.";
         }
+      } catch (error) {
+        console.error("Error al cargar detalle:", error);
+        document.getElementById('tituloNombres').innerText = "Error";
+        document.getElementById('textoMensaje').innerText = "Ocurrió un error al cargar la información desde la base de datos.";
+      }
+    }
 
-        cargarDatos();
-    </script>
+    cargarDetalle();
+  </script>
 </body>
 </html>
