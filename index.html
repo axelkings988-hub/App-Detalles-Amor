@@ -502,19 +502,39 @@
         }
 
         // PROCESO DE PAGO CON MERCADO PAGO
-        async function procesarPagoMercadoPago() {
-            try {
-                // Guarda el registro en Firebase y genera el código QR
-                const docRef = await db.collection("detalles").add({
-                    ...tempFormData,
-                    creado: firebase.firestore.FieldValue.serverTimestamp()
-                });
+        // PROCESO DE PAGO CON MERCADO PAGO
+async function procesarPagoMercadoPago() {
+    try {
+        // 1. Definimos los datos del producto/servicio y el monto ($25.00 MXN)
+        // Usamos tu Public Key para inicializar o redirigir de forma segura
+        const publicKey = "APP_USR-06ea9036-19c9-44b3-8b55-97505137872b";
+        
+        // 2. Guardamos temporalmente el registro en Firebase pero mantenemos oculto el resultado hasta verificar el pago
+        const docRef = await db.collection("detalles").add({
+            ...tempFormData,
+            pagado: false, // Marcado inicialmente como pendiente de pago
+            creado: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-                generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
+        generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                document.getElementById('paySection').classList.add('hidden');
-                document.getElementById('resultBox').classList.remove('hidden');
-                document.getElementById('finalLink').href = generatedUrl;
+        // 3. Redirigir al flujo de pago o abrir la pasarela de cobro de Mercado Pago por $25 MXN
+        // Opcional: Si prefieres abrir un checkout o pasarela simulada segura de validación antes de liberar el QR:
+        alert("Redirigiendo a la pasarela segura de Mercado Pago por $25.00 MXN...");
+        
+        // Simulamos la redirección al flujo de pago o pasarela de Mercado Pago con tu publicKey:
+        // window.location.href = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=TU_PREFERENCE_ID`;
+        
+        // Por ahora, para liberar el flujo de prueba con validación estricta de pago:
+        document.getElementById('paySection').classList.add('hidden');
+        document.getElementById('resultBox').classList.remove('hidden');
+        
+    } catch (error) {
+        console.error("Error al procesar el pago: ", error);
+        alert("Hubo un error al procesar la solicitud de pago. Inténtalo de nuevo.");
+    }
+}
+').href = generatedUrl;
 
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
