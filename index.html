@@ -5,16 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Crear Detalle de Amor</title>
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- QRCode JS Generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
@@ -51,44 +46,37 @@
         </div>
 
         <form id="createForm" onsubmit="event.preventDefault(); guardarDetalle();" class="space-y-4">
-            <!-- Nombres -->
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">1. NOMBRES DEL DETALLE:</label>
                 <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
-            <!-- Fecha especial -->
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">2. FECHA ESPECIAL:</label>
                 <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
-            <!-- Galería de Fotos (Máximo 4 para estabilidad total) -->
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 4):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple required class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p class="text-[10px] text-rose-300/60">Selecciona hasta 4 de tus mejores fotos.</p>
+                <p class="text-[10px] text-rose-300/60">Selecciona hasta 4 de tus fotos favoritas.</p>
             </div>
 
-            <!-- Mensaje o carta -->
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">4. CARTA DE AMOR / MENSAJE:</label>
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
-            <!-- Botón de Envío -->
             <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                 🚀 Generar Enlace y Guardar en la Nube
             </button>
         </form>
 
-        <!-- Indicador de Carga -->
         <div id="statusBox" class="hidden text-center py-4 space-y-2">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
             <p id="statusText" class="text-xs text-rose-300">Optimizando fotos... Por favor espera.</p>
         </div>
 
-        <!-- RESULTADO (ENLACE Y QR) -->
         <div id="resultBox" class="hidden text-center space-y-4 pt-4 border-t border-rose-500/20">
             <h3 class="text-sm font-bold text-rose-200">¡Tu detalle fue guardado con éxito! ❤️</h3>
             
@@ -138,19 +126,18 @@
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
-                // Comprimir imágenes de manera eficiente (máximo 4)
+                // Compresión ultra ligera (450px de ancho max, calidad 0.45)
                 const fotosBase64 = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
                 for (let i = 0; i < maxFotos; i++) {
                     document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
-                    const compressedBase64 = await compressImage(photosFiles[i], 600, 0.65);
+                    const compressedBase64 = await compressImage(photosFiles[i], 450, 0.45);
                     fotosBase64.push(compressedBase64);
                 }
 
                 document.getElementById('statusText').innerText = "Guardando en la nube...";
 
-                // Guardar en Firestore
                 const docRef = await db.collection("detalles").add({
                     nombres: nombres,
                     fecha: fecha,
@@ -174,7 +161,7 @@
 
             } catch (error) {
                 console.error("Error al guardar: ", error);
-                alert("Ocurrió un error al guardar. Intenta con imágenes más ligeras.");
+                alert("Ocurrió un error al guardar en la nube.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
