@@ -501,44 +501,23 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // PROCESO DE PAGO CON MERCADO PAGO
-async function procesarPagoMercadoPago() {
-    try {
-        // 1. Guardamos el registro en Firebase primero
-        const docRef = await db.collection("detalles").add({
-            ...tempFormData,
-            pagado: false, 
-            creado: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
-
-        // 2. Enlace oficial de Mercado Pago por $25.00 MXN
-        const urlPagoMercadoPago = "https://mpago.la/225XuPD";
-
-        // 3. Redirigir a la pasarela de pago real
-        window.location.href = urlPagoMercadoPago;
-
-    } catch (error) {
-        console.error("Error al procesar el pago: ", error);
-        alert("Hubo un error al procesar la solicitud de pago. Inténtalo de nuevo.");
-    }
-}
-                generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
-
-                alert("Redirigiendo a la pasarela segura de Mercado Pago por $25.00 MXN...");
-                
-                document.getElementById('paySection').classList.add('hidden');
-                document.getElementById('resultBox').classList.remove('hidden');
-
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), {
-                    text: generatedUrl,
-                    width: 160,
-                    height: 160
+        // PROCESO DE PAGO CON MERCADO PAGO (Redirección oficial)
+        async function procesarPagoMercadoPago() {
+            try {
+                // 1. Guardamos el registro en Firebase primero con estado pendiente
+                const docRef = await db.collection("detalles").add({
+                    ...tempFormData,
+                    pagado: false, 
+                    creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                document.getElementById('finalLink').href = generatedUrl;
+                generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
+
+                // 2. Enlace oficial de Mercado Pago por $25.00 MXN
+                const urlPagoMercadoPago = "https://mpago.la/225XuPD";
+
+                // 3. Redirigir a la pasarela de pago real
+                window.location.href = urlPagoMercadoPago;
 
             } catch (error) {
                 console.error("Error al procesar el pago: ", error);
