@@ -39,7 +39,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
-        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #pv-heartFill { transition: height 0.25s ease-out; }
     </style>
     <link rel="manifest" href="./manifest.json">
@@ -117,7 +117,7 @@
         <!-- CARGA + ANUNCIO 1 ADSENSE REAL -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando fotografías...</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando fotos y contenido...</p>
             
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[100px] flex items-center justify-center">
                 <ins class="adsbygoogle"
@@ -163,21 +163,14 @@
                 <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
             </div>
 
-            <!-- CARRUSEL DE FOTOS CON NAVEGACIÓN -->
+            <!-- CARRUSEL -->
             <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
                     <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
                     <span id="pv-carouselIndicator">1 / 1</span>
                 </div>
-                <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative w-full">
+                <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative">
                     <div id="pv-carouselTrack" class="carousel-track"></div>
-                    <!-- Botones de navegación -->
-                    <button onclick="moveCarousel(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg z-10">
-                        <i class="fas fa-chevron-left text-xs"></i>
-                    </button>
-                    <button onclick="moveCarousel(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg z-10">
-                        <i class="fas fa-chevron-right text-xs"></i>
-                    </button>
                 </div>
             </section>
 
@@ -209,10 +202,10 @@
             </section>
         </div>
 
-        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR -->
+        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR Y ANUNCIO 2 ADSENSE REAL -->
         <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
             <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
-            <p class="text-xs text-rose-300/80">Obtén el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
+            <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
 
             <!-- CONTENEDOR ANUNCIO 2 -->
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
@@ -225,10 +218,11 @@
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
-            <!-- BOTÓN GENERAR QR DIRECTO -->
-            <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                ✨ Generar Enlace y Código QR
+            <!-- BOTÓN DE PAGO MERCADO PAGO -->
+            <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                💳 Desbloquear Código QR ($25.00 MXN)
             </button>
+            <p class="text-[10px] text-rose-300/60">Pago 100% seguro procesado por Mercado Pago.</p>
         </div>
 
         <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
@@ -249,6 +243,11 @@
     </div>
 
     <script>
+        // Inicializar Mercado Pago con la Public Key de Producción Real
+        const mp = new MercadoPago('APP_USR-06ea9036-19c9-44b3-8b55-97505137872b', {
+            locale: 'es-MX'
+        });
+
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
@@ -355,7 +354,6 @@
         }
 
         let pvPhotosArray = [];
-        let currentSlide = 0;
 
         async function generarVistaPrevia() {
             const nombres = document.getElementById('nombresInput').value.trim();
@@ -372,23 +370,24 @@
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
-                pvPhotosArray = [];
+                const fotosBase64 = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
                 for (let i = 0; i < maxFotos; i++) {
                     document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
-                    const optimizedBase64 = await compressImage(photosFiles[i], 1200, 0.80);
-                    pvPhotosArray.push(optimizedBase64);
+                    const compressedBase64 = await compressImage(photosFiles[i], 800, 0.7);
+                    fotosBase64.push(compressedBase64);
                 }
 
                 tempFormData = {
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
-                    fotosData: pvPhotosArray,
+                    fotos: fotosBase64,
                     voiceNoteBase64: recordedAudioBase64 || null
                 };
 
+                pvPhotosArray = fotosBase64;
                 document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${nombres}`;
                 document.getElementById('pv-mainDate').innerText = fecha;
                 document.getElementById('pv-cardMessage').innerText = mensaje;
@@ -404,11 +403,9 @@
                 document.getElementById('formContainer').classList.add('hidden');
                 document.getElementById('previewContainer').classList.remove('hidden');
                 document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
-                document.getElementById('statusBox').classList.add('hidden');
 
             } catch (error) {
-                console.error(error);
-                alert("Ocurrió un error al procesar las fotografías.");
+                alert("Ocurrió un error al procesar el contenido.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -447,24 +444,9 @@
             pvPhotosArray.forEach((photo) => {
                 const slideDiv = document.createElement('div');
                 slideDiv.className = 'w-full flex-shrink-0 relative';
-                slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl shadow-md">`;
+                slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl">`;
                 track.appendChild(slideDiv);
             });
-            currentSlide = 0;
-            updateCarouselPosition();
-        }
-
-        function moveCarousel(direction) {
-            currentSlide += direction;
-            if (currentSlide < 0) currentSlide = pvPhotosArray.length - 1;
-            if (currentSlide >= pvPhotosArray.length) currentSlide = 0;
-            updateCarouselPosition();
-        }
-
-        function updateCarouselPosition() {
-            const track = document.getElementById('pv-carouselTrack');
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
-            document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
         const pvQuizData = [
@@ -519,42 +501,21 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // GENERAR ENLACE Y CÓDIGO QR DIRECTO (SIN MERCADO PAGO)
+        // PROCESO DE PAGO CON MERCADO PAGO
         async function procesarPagoMercadoPago() {
             try {
-                const photosBase64 = tempFormData.fotosData || [];
-                const uploadedUrls = [];
-
-                // Subimos las fotos a ImgBB para obtener enlaces ligeros
-                for (let i = 0; i < photosBase64.length; i++) {
-                    const cleanBase64 = photosBase64[i].replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
-                    const formData = new FormData();
-                    formData.append("image", cleanBase64);
-
-                    const response = await fetch("https://api.imgbb.com/1/upload?key=6d207488941253245492d2b591b9efb9", {
-                        method: "POST",
-                        body: formData
-                    });
-                    const data = await response.json();
-                    if (data && data.success) {
-                        uploadedUrls.push(data.data.url);
-                    }
-                }
-
-                // Guardamos en Firebase Firestore
+                const publicKey = "APP_USR-06ea9036-19c9-44b3-8b55-97505137872b";
+                
                 const docRef = await db.collection("detalles").add({
-                    nombres: tempFormData.nombres,
-                    fecha: tempFormData.fecha,
-                    mensaje: tempFormData.mensaje,
-                    fotos: uploadedUrls.length > 0 ? uploadedUrls : photosBase64,
-                    voiceNoteBase64: tempFormData.voiceNoteBase64,
-                    pagado: true, 
+                    ...tempFormData,
+                    pagado: false, 
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // Ocultar sección de pago y mostrar directamente el código QR y enlace final
+                alert("Redirigiendo a la pasarela segura de Mercado Pago por $25.00 MXN...");
+                
                 document.getElementById('paySection').classList.add('hidden');
                 document.getElementById('resultBox').classList.remove('hidden');
 
@@ -568,8 +529,8 @@
                 document.getElementById('finalLink').href = generatedUrl;
 
             } catch (error) {
-                console.error("Error al generar el detalle: ", error);
-                alert("Hubo un problema al procesar los datos. Inténtalo de nuevo.");
+                console.error("Error al procesar el pago: ", error);
+                alert("Hubo un error al procesar la solicitud de pago. Inténtalo de nuevo.");
             }
         }
 
