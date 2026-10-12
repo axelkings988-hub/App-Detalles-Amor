@@ -39,7 +39,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
-        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
     </style>
     <link rel="manifest" href="./manifest.json">
@@ -117,7 +117,7 @@
         <!-- CARGA + ANUNCIO 1 ADSENSE REAL -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando fotos en alta calidad...</p>
+            <p id="statusText" class="text-xs text-rose-300">Subiendo fotos originales a la nube...</p>
             
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[100px] flex items-center justify-center">
                 <ins class="adsbygoogle"
@@ -163,14 +163,21 @@
                 <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
             </div>
 
-            <!-- CARRUSEL -->
+            <!-- CARRUSEL DE FOTOS CON NAVEGACIÓN -->
             <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
                     <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
                     <span id="pv-carouselIndicator">1 / 1</span>
                 </div>
-                <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative">
+                <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative w-full">
                     <div id="pv-carouselTrack" class="carousel-track"></div>
+                    <!-- Botones de navegación -->
+                    <button onclick="moveCarousel(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button onclick="moveCarousel(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
                 </div>
             </section>
 
@@ -243,11 +250,6 @@
     </div>
 
     <script>
-        // Inicializar Mercado Pago con la Public Key de Producción Real
-        const mp = new MercadoPago('APP_USR-06ea9036-19c9-44b3-8b55-97505137872b', {
-            locale: 'es-MX'
-        });
-
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
@@ -354,6 +356,7 @@
         }
 
         let pvPhotosArray = [];
+        let currentSlide = 0;
 
         async function generarVistaPrevia() {
             const nombres = document.getElementById('nombresInput').value.trim();
@@ -373,17 +376,18 @@
                 pvPhotosArray = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
+                // Creamos URLs locales temporales para mostrar las fotos en alta calidad al instante en la vista previa
                 for (let i = 0; i < maxFotos; i++) {
-                    document.getElementById('statusText').innerText = `Procesando foto ${i + 1} de ${maxFotos}...`;
-                    const compressedBase64 = await compressImage(photosFiles[i], 1200, 0.85); // Gran nitidez y peso ligero
-                    pvPhotosArray.push(compressedBase64);
+                    const localUrl = URL.createObjectURL(photosFiles[i]);
+                    pvPhotosArray.push(localUrl);
                 }
 
+                // Guardamos los archivos originales seleccionados para subirlos a la nube al pagar
                 tempFormData = {
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
-                    fotos: pvPhotosArray,
+                    rawFiles: Array.from(photosFiles).slice(0, 4),
                     voiceNoteBase64: recordedAudioBase64 || null
                 };
 
@@ -407,7 +411,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Ocurrió un error al procesar el contenido.");
+                alert("Ocurrió un error al procesar las fotografías.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -449,6 +453,21 @@
                 slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl">`;
                 track.appendChild(slideDiv);
             });
+            currentSlide = 0;
+            updateCarouselPosition();
+        }
+
+        function moveCarousel(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = pvPhotosArray.length - 1;
+            if (currentSlide >= pvPhotosArray.length) currentSlide = 0;
+            updateCarouselPosition();
+        }
+
+        function updateCarouselPosition() {
+            const track = document.getElementById('pv-carouselTrack');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
         const pvQuizData = [
@@ -503,55 +522,53 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // PROCESO DE PAGO Y REDIRECCIÓN INMEDIATA A MERCADO PAGO
+        // PROCESO DE SUBIDA A NUBE (IMGBB) Y REDIRECCIÓN A MERCADO PAGO
         async function procesarPagoMercadoPago() {
             try {
-                // 1. Guardamos el registro en Firestore de forma instantánea
+                alert("Subiendo tus fotos originales a la nube en máxima calidad...");
+                const rawFiles = tempFormData.rawFiles || [];
+                const uploadedUrls = [];
+
+                // Subimos cada foto a través de la API pública de almacenamiento de imágenes
+                for (let file of rawFiles) {
+                    const formData = new FormData();
+                    formData.append("image", file);
+
+                    const response = await fetch("https://api.imgbb.com/1/upload?key=6d207488941253245492d2b591b9efb9", {
+                        method: "POST",
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data && data.success) {
+                        uploadedUrls.push(data.data.url);
+                    }
+                }
+
+                if (uploadedUrls.length === 0) {
+                    alert("No se pudieron subir las imágenes. Inténtalo de nuevo.");
+                    return;
+                }
+
+                // Guardamos en Firebase Firestore con los enlaces en alta calidad
                 const docRef = await db.collection("detalles").add({
-                    ...tempFormData,
+                    nombres: tempFormData.nombres,
+                    fecha: tempFormData.fecha,
+                    mensaje: tempFormData.mensaje,
+                    fotos: uploadedUrls, // URLs originales alojadas en la nube
+                    voiceNoteBase64: tempFormData.voiceNoteBase64,
                     pagado: false, 
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // 2. Enlace oficial de Mercado Pago por $25.00 MXN
-                const urlPagoMercadoPago = "https://mpago.la/225XuPD";
-
-                // 3. Redirigir de inmediato a la pasarela real de pago
-                window.location.href = urlPagoMercadoPago;
+                // Redirigir de inmediato a la pasarela oficial de Mercado Pago por $25 MXN
+                window.location.href = "https://mpago.la/225XuPD";
 
             } catch (error) {
-                console.error("Error al procesar el pago: ", error);
-                alert("Hubo un error al procesar la solicitud de pago. Inténtalo de nuevo.");
+                console.error("Error al procesar la subida y pago: ", error);
+                alert("Hubo un error al subir las fotos a la nube. Revisa tu conexión.");
             }
-        }
-
-        function compressImage(file, maxWidth, quality) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = event => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = error => reject(error);
-                };
-                reader.onerror = error => reject(error);
-            });
         }
 
         function copiarEnlace() {
@@ -564,9 +581,7 @@
     </script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(() => {});
-        });
+        window.serviceWorker.register('./sw.js').catch(() => {});
       }
     </script>
 </body>
