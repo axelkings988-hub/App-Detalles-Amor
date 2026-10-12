@@ -42,7 +42,7 @@
         
         <div class="text-center space-y-1">
             <h1 class="text-3xl font-bold font-cursive text-rose-100">Crear Detalle Especial</h1>
-            <p class="text-xs text-rose-300/80">Personaliza tu regalo digital con recuerdos y música</p>
+            <p class="text-xs text-rose-300/80">Personaliza tu regalo digital con recuerdos, música y voz</p>
         </div>
 
         <form id="createForm" onsubmit="event.preventDefault(); guardarDetalle();" class="space-y-4">
@@ -67,6 +67,22 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
+            <!-- NUEVA OPCIÓN: GRABAR MENSAJE DE VOZ (MÁX 10 SEGUNDOS) -->
+            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
+                <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
+                <p class="text-[10px] text-rose-300/70">Graba un saludo o dedicatoria para que se escuche al final de la tarjeta.</p>
+                
+                <div class="flex items-center justify-center gap-3 pt-1">
+                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2">
+                        <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Grabar Audio</span>
+                    </button>
+                    <span id="timerLabel" class="text-xs font-mono text-rose-300 hidden">00:10</span>
+                </div>
+                <div id="audioPreviewContainer" class="hidden pt-2">
+                    <audio id="audioPreview" controls class="w-full h-8 mt-1"></audio>
+                </div>
+            </div>
+
             <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                 🚀 Generar Enlace y Guardar en la Nube
             </button>
@@ -74,7 +90,7 @@
 
         <div id="statusBox" class="hidden text-center py-4 space-y-2">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando fotos... Por favor espera.</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando contenido... Por favor espera.</p>
         </div>
 
         <div id="resultBox" class="hidden text-center space-y-4 pt-4 border-t border-rose-500/20">
@@ -110,6 +126,75 @@
         const db = firebase.firestore();
 
         let generatedUrl = "";
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedAudioBase64 = null;
+        let countdownInterval;
+
+        // Lógica de grabación de voz (Límite 10 segundos)
+        async function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordText = document.getElementById('recordText');
+            const recordIcon = document.getElementById('recordIcon');
+            const timerLabel = document.getElementById('timerLabel');
+
+            if (!mediaRecorder || mediaRecorder.state === "inactive") {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                        const reader = new FileReader();
+                        reader.readAsDataURL(audioBlob);
+                        reader.onloadend = () => {
+                            recordedAudioBase64 = reader.result;
+                            const preview = document.getElementById('audioPreview');
+                            preview.src = recordedAudioBase64;
+                            document.getElementById('audioPreviewContainer').classList.remove('hidden');
+                        };
+                        
+                        recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2";
+                        recordText.innerText = "Grabar de nuevo";
+                        recordIcon.className = "fas fa-microphone";
+                        timerLabel.classList.add('hidden');
+                    };
+
+                    mediaRecorder.start();
+                    recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2 animate-pulse";
+                    recordText.innerText = "Grabando...";
+                    recordIcon.className = "fas fa-stop";
+                    timerLabel.classList.remove('hidden');
+
+                    let timeLeft = 10;
+                    timerLabel.innerText = `00:0${timeLeft}`;
+                    clearInterval(countdownInterval);
+                    countdownInterval = setInterval(() => {
+                        timeLeft--;
+                        timerLabel.innerText = `00:0${timeLeft}`;
+                        if (timeLeft <= 0) {
+                            clearInterval(countdownInterval);
+                            if (mediaRecorder && mediaRecorder.state === "recording") {
+                                mediaRecorder.stop();
+                                stream.getTracks().forEach(track => track.stop());
+                            }
+                        }
+                    }, 1000);
+
+                } catch (e) {
+                    alert("No se pudo acceder al micrófono. Verifica los permisos de tu navegador.");
+                }
+            } else if (mediaRecorder.state === "recording") {
+                clearInterval(countdownInterval);
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        }
 
         async function guardarDetalle() {
             const nombres = document.getElementById('nombresInput').value.trim();
@@ -126,7 +211,6 @@
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
-                // Compresión ultra ligera (450px de ancho max, calidad 0.45)
                 const fotosBase64 = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
@@ -143,6 +227,7 @@
                     fecha: fecha,
                     mensaje: mensaje,
                     fotos: fotosBase64,
+                    voiceNoteBase64: recordedAudioBase64 || null,
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
