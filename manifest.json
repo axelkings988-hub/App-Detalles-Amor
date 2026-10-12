@@ -1,6 +1,7 @@
 {
   "name": "App Detalles de Amor",
   "short_name": "DetallesAmor",
+  "description": "Crea hermosos minisitios web personalizados y códigos QR de amor, amistad y detalles especiales para compartir con tu pareja o seres queridos.",
   "start_url": "/App-Detalles-Amor/",
   "display": "standalone",
   "background_color": "#230408",
