@@ -5,13 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Crear Detalle de Amor</title>
 
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- QRCode JS Generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+    <!-- SDK de Mercado Pago -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Google AdSense SDK (Reemplaza ca-pub-XXXXXXXXXX con tu ID cuando tengas tu cuenta) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
 
     <script>
         tailwind.config = {
@@ -32,20 +45,23 @@
     </script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
+        #heartFill { transition: height 0.25s ease-out; }
     </style>
 </head>
 <body class="p-4 flex items-center justify-center min-h-screen">
 
-    <div class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+    <!-- FORMULARIO DE CREACIÓN -->
+    <div id="formContainer" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         
         <div class="text-center space-y-1">
             <h1 class="text-3xl font-bold font-cursive text-rose-100">Crear Detalle Especial</h1>
             <p class="text-xs text-rose-300/80">Personaliza tu regalo digital con recuerdos, música y voz</p>
         </div>
 
-        <form id="createForm" onsubmit="event.preventDefault(); guardarDetalle();" class="space-y-4">
+        <form id="createForm" onsubmit="event.preventDefault(); generarVistaPrevia();" class="space-y-4">
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">1. NOMBRES DEL DETALLE:</label>
                 <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
@@ -67,7 +83,7 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
-            <!-- BOTÓN DE GRABACIÓN DE VOZ MEJORADO CON DETENER MANUAL -->
+            <!-- GRABACIÓN DE VOZ (MÁXIMO 10 SEGUNDOS CON DETENER MANUAL) -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
                 <p class="text-[10px] text-rose-300/70">Graba una dedicatoria que se escuchará al final de la tarjeta.</p>
@@ -84,17 +100,106 @@
             </div>
 
             <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                🚀 Generar Enlace y Guardar en la Nube
+                ✨ Generar Vista Previa
             </button>
         </form>
 
-        <div id="statusBox" class="hidden text-center py-4 space-y-2">
+        <!-- ESPACIO DE CARGA + ANUNCIO 1 -->
+        <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando contenido... Por favor espera.</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando fotos y contenido...</p>
+            
+            <!-- CONTENEDOR ANUNCIO 1 -->
+            <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[100px] flex items-center justify-center">
+                <!-- Banner AdSense 1 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXX"
+                     data-ad-slot="1111111111"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE VISTA PREVIA INTERACTIVA EN TIEMPO REAL -->
+    <div id="previewContainer" class="hidden w-full max-w-md mx-auto space-y-6 pt-4 pb-20 relative">
+        <div class="bg-rose-500 text-white text-[11px] font-bold text-center py-2 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
+            👀 VISTA PREVIA - Interactúa con tu tarjeta
         </div>
 
-        <div id="resultBox" class="hidden text-center space-y-4 pt-4 border-t border-rose-500/20">
-            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle fue guardado con éxito! ❤️</h3>
+        <!-- JUEGO DEL CORAZÓN DE LA VISTA PREVIA -->
+        <section id="pv-heart-section" class="bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl text-center">
+            <h2 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h2>
+            <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo</p>
+
+            <div id="pv-heartContainer" onclick="handlePvHeartClick()" class="relative w-28 h-28 mx-auto mb-4 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
+                <svg class="absolute inset-0 w-full h-full text-burgundy-950 fill-current drop-shadow-lg" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <div id="pv-heartFill" class="absolute bottom-0 left-0 w-full overflow-hidden" style="height: 0%;">
+                    <svg class="w-28 h-28 text-rose-500 fill-current absolute bottom-0 left-0" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </div>
+                <span id="pv-clickCounter" class="relative z-10 text-base font-bold text-white">0 / 10</span>
+            </div>
+        </section>
+
+        <!-- CONTENIDO PRINCIPAL DE LA VISTA PREVIA -->
+        <div id="pv-mainContent" class="hidden space-y-6">
+            <div class="text-center space-y-1">
+                <h2 id="pv-mainTitle" class="text-3xl font-cursive font-bold text-rose-200"></h2>
+                <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
+            </div>
+
+            <!-- CARRUSEL -->
+            <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
+                <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative">
+                    <div id="pv-carouselTrack" class="carousel-track"></div>
+                </div>
+            </section>
+
+            <!-- CARTA -->
+            <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4">
+                <p id="pv-cardMessage" class="text-xs text-rose-200 whitespace-pre-line leading-relaxed"></p>
+            </section>
+
+            <!-- NOTA DE VOZ -->
+            <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
+                <p class="text-xs font-bold text-rose-200"><i class="fas fa-microphone"></i> Tu Mensaje de Voz</p>
+                <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1"></audio>
+            </section>
+        </div>
+
+        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR Y ANUNCIO 2 -->
+        <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
+            <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
+            <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
+
+            <!-- CONTENEDOR ANUNCIO 2 -->
+            <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
+                <!-- Banner AdSense 2 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXX"
+                     data-ad-slot="2222222222"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+
+            <!-- BOTÓN DE PAGO CON MERCADO PAGO ($25 MXN INSTANTÁNEO) -->
+            <button onclick="iniciarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                🔒 Desbloquear Código QR ($25.00 MXN)
+            </button>
+            <p class="text-[10px] text-rose-300/60">Pago 100% seguro con tarjeta de débito, crédito o Mercado Pago. Activación instantánea.</p>
+        </div>
+
+        <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
+        <div id="resultBox" class="hidden bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
+            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está disponible! 🎉</h3>
             
             <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
                 <div id="qrcode"></div>
@@ -102,14 +207,13 @@
 
             <div class="space-y-2">
                 <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
-                    Abrir Detalle
+                    Abrir Detalle Público
                 </a>
                 <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-950 text-xs text-rose-300 rounded-xl border border-rose-500/30">
                     <i class="fas fa-copy"></i> Copiar Enlace
                 </button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -125,12 +229,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Inicializar SDK de Mercado Pago con tu Public Key
+        // Reemplaza 'TEST-PUBLIC-KEY' por tu clave pública real de Mercado Pago
+        const mp = new MercadoPago('TEST-PUBLIC-KEY', { locale: 'es-MX' });
+
         let generatedUrl = "";
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
         let countdownInterval = null;
         let audioStream = null;
+        let tempFormData = {};
 
         async function toggleRecording() {
             const recordBtn = document.getElementById('recordBtn');
@@ -138,22 +247,18 @@
             const recordIcon = document.getElementById('recordIcon');
             const timerLabel = document.getElementById('timerLabel');
 
-            // SI ESTÁ GRABANDO -> DETENER MANUALMENTE
             if (mediaRecorder && mediaRecorder.state === "recording") {
                 detenerGrabacion();
                 return;
             }
 
-            // INICIAR NUEVA GRABACIÓN
             try {
                 audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(audioStream);
                 audioChunks = [];
 
                 mediaRecorder.ondataavailable = event => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
+                    if (event.data.size > 0) audioChunks.push(event.data);
                 };
 
                 mediaRecorder.onstop = () => {
@@ -186,27 +291,21 @@
                 countdownInterval = setInterval(() => {
                     timeLeft--;
                     timerLabel.innerText = `00:0${timeLeft}`;
-                    if (timeLeft <= 0) {
-                        detenerGrabacion();
-                    }
+                    if (timeLeft <= 0) detenerGrabacion();
                 }, 1000);
 
             } catch (e) {
-                alert("No se pudo acceder al micrófono. Por favor permite el acceso al micrófono en tu navegador.");
+                alert("No se pudo acceder al micrófono.");
             }
         }
 
         function detenerGrabacion() {
             clearInterval(countdownInterval);
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-            }
-            if (audioStream) {
-                audioStream.getTracks().forEach(track => track.stop());
-            }
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            if (audioStream) audioStream.getTracks().forEach(track => track.stop());
         }
 
-        async function guardarDetalle() {
+        async function generarVistaPrevia() {
             const nombres = document.getElementById('nombresInput').value.trim();
             const fecha = document.getElementById('fechaInput').value.trim();
             const mensaje = document.getElementById('mensajeInput').value.trim();
@@ -221,7 +320,6 @@
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
-                // Compresión ligera mejorada (380px ancho max, calidad 0.35)
                 const fotosBase64 = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
@@ -231,20 +329,70 @@
                     fotosBase64.push(compressedBase64);
                 }
 
-                document.getElementById('statusText').innerText = "Guardando en la nube...";
-
-                const docRef = await db.collection("detalles").add({
+                tempFormData = {
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
                     fotos: fotosBase64,
-                    voiceNoteBase64: recordedAudioBase64 || null,
+                    voiceNoteBase64: recordedAudioBase64 || null
+                };
+
+                // Cargar vista previa interactiva
+                document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${nombres}`;
+                document.getElementById('pv-mainDate').innerText = fecha;
+                document.getElementById('pv-cardMessage').innerText = mensaje;
+
+                const track = document.getElementById('pv-carouselTrack');
+                track.innerHTML = '';
+                fotosBase64.forEach((photo, idx) => {
+                    const slideDiv = document.createElement('div');
+                    slideDiv.className = 'w-full flex-shrink-0 relative';
+                    slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl">`;
+                    track.appendChild(slideDiv);
+                });
+
+                if (recordedAudioBase64) {
+                    document.getElementById('pv-voicePlayer').src = recordedAudioBase64;
+                    document.getElementById('pv-voiceSection').classList.remove('hidden');
+                }
+
+                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('previewContainer').classList.remove('hidden');
+
+            } catch (error) {
+                alert("Ocurrió un error al procesar el contenido.");
+                document.getElementById('statusBox').classList.add('hidden');
+                document.getElementById('createForm').classList.remove('hidden');
+            }
+        }
+
+        let pvClicks = 0;
+        function handlePvHeartClick() {
+            if (pvClicks < 10) {
+                pvClicks++;
+                document.getElementById('pv-heartFill').style.height = `${pvClicks * 10}%`;
+                document.getElementById('pv-clickCounter').innerText = `${pvClicks} / 10`;
+                if (pvClicks === 10) {
+                    confetti({ particleCount: 50, spread: 60 });
+                    document.getElementById('pv-mainContent').classList.remove('hidden');
+                }
+            }
+        }
+
+        // INTEGRACIÓN DE PAGO MERCADO PAGO ($25.00 MXN INSTANTÁNEO)
+        async function iniciarPagoMercadoPago() {
+            try {
+                // 1. Guardar en Firestore
+                const docRef = await db.collection("detalles").add({
+                    ...tempFormData,
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                document.getElementById('statusBox').classList.add('hidden');
+                // 2. Simulación / Redirección a tu Link de Pago o Checkout de Mercado Pago
+                // Para producción, se usa tu Link de Pago o la API Preference con exclusión de SPEI/OXXO
+                document.getElementById('paySection').classList.add('hidden');
                 document.getElementById('resultBox').classList.remove('hidden');
                 document.getElementById('finalLink').href = generatedUrl;
 
@@ -255,11 +403,8 @@
                     height: 160
                 });
 
-            } catch (error) {
-                console.error("Error al guardar: ", error);
-                alert("Ocurrió un error al guardar en la nube.");
-                document.getElementById('statusBox').classList.add('hidden');
-                document.getElementById('createForm').classList.remove('hidden');
+            } catch (e) {
+                alert("Ocurrió un error al procesar el pago. Inténtalo de nuevo.");
             }
         }
 
@@ -302,4 +447,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
