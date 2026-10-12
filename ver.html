@@ -49,8 +49,8 @@
 
     <!-- PANTALLA DE CARGA / ERROR -->
     <div id="loadingScreen" class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
-        <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl">
-            <div id="spinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
+        <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
+            <div id="spinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto"></div>
             <p id="loadingText" class="text-xs text-rose-300">Cargando tu sorpresa de amor...</p>
         </div>
     </div>
@@ -184,9 +184,18 @@
         const docId = urlParams.get('id');
 
         if (!docId) {
-            showError("No se encontró el identificador de la tarjeta.");
+            showError("No se encontró el identificador (ID) en el enlace.");
         } else {
-            db.collection("detalles").doc(docId).get().then((doc) => {
+            // Temporizador de seguridad de 6 segundos por si Firebase no responde
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Tiempo de espera agotado")), 6000)
+            );
+
+            Promise.race([
+                db.collection("detalles").doc(docId).get(),
+                timeoutPromise
+            ])
+            .then((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
@@ -203,19 +212,21 @@
                     loadQuizQuestion();
 
                 } else {
-                    showError("La tarjeta no existe o fue eliminada.");
+                    showError("La tarjeta no existe o fue eliminada de la base de datos.");
                 }
-            }).catch((error) => {
-                console.error("Error al cargar datos:", error);
-                showError("Ocurrió un error al cargar la información desde la nube.");
+            })
+            .catch((error) => {
+                console.error("Error al conectar con Firebase:", error);
+                showError("No se pudo conectar con la base de datos. Revisa tus reglas de Firebase o genera un nuevo enlace.");
             });
         }
 
         function showError(msg) {
             document.getElementById('loadingScreen').innerHTML = `
-                <div class="w-full max-w-sm bg-burgundy-900/60 p-8 rounded-3xl border border-rose-500/20">
-                    <h2 class="text-xl font-bold text-rose-400 mb-2">Error</h2>
+                <div class="w-full max-w-sm bg-burgundy-900/60 p-8 rounded-3xl border border-rose-500/20 space-y-3">
+                    <h2 class="text-lg font-bold text-rose-400">Aviso importante</h2>
                     <p class="text-xs text-rose-200">${msg}</p>
+                    <a href="index.html" class="inline-block mt-2 px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-xl">Crear Nuevo Enlace</a>
                 </div>
             `;
         }
@@ -351,4 +362,97 @@
                 feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨"
             },
             {
-                question: "¿Qué palabra define
+                question: "¿Qué palabra define mejor lo que siento por ti?",
+                options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"],
+                correct: 3,
+                feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖"
+            },
+            {
+                question: "¿Qué promesa nos hacemos para el futuro?",
+                options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"],
+                correct: 3,
+                feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀"
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        function loadQuizQuestion() {
+            if (currentQuizIndex >= quizData.length) {
+                document.getElementById('quizContainer').innerHTML = `
+                    <div class="text-center py-4 space-y-2">
+                        <i class="fas fa-trophy text-3xl text-gold-400 animate-bounce"></i>
+                        <h4 class="text-sm font-bold text-white">¡Trivia Superada!</h4>
+                        <p class="text-xs text-rose-200">¡Obtuviste ${quizScore} de ${quizData.length} respuestas correctas!</p>
+                        <p class="text-[11px] text-rose-300 italic">Demostraste que nos conocemos a la perfección.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const q = quizData[currentQuizIndex];
+            document.getElementById('quizQuestion').innerText = `${currentQuizIndex + 1}. ${q.question}`;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            document.getElementById('quizFeedback').className = 'hidden';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between active:scale-[0.98]';
+                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-rose-400/50"></i>`;
+                btn.onclick = () => checkAnswer(idx, q.correct, q.feedback, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, feedbackText, btnElement) {
+            const options = document.getElementById('quizOptions').children;
+            for (let btn of options) { btn.disabled = true; }
+
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+
+            if (selected === correct) {
+                quizScore++;
+                document.getElementById('quizScore').innerText = `Puntos: ${quizScore}`;
+                btnElement.className = 'w-full text-left p-3 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
+                btnElement.querySelector('i').className = 'fas fa-check-circle text-emerald-400';
+                
+                feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
+                feedback.innerText = feedbackText;
+
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+                }
+            } else {
+                btnElement.className = 'w-full text-left p-3 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fas fa-times-circle text-rose-500';
+
+                feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
+                feedback.innerText = "¡Casi, pero lo importante es cuánto nos amamos! ❤️";
+            }
+
+            setTimeout(() => {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            }, 2000);
+        }
+
+        function initFloatingHearts() {
+            const container = document.getElementById('bg-hearts-container');
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('i');
+                heart.className = 'fas fa-heart bg-heart text-rose-500';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.animationDuration = `${6 + Math.random() * 8}s`;
+                heart.style.animationDelay = `${Math.random() * 5}s`;
+                heart.style.fontSize = `${12 + Math.random() * 18}px`;
+                container.appendChild(heart);
+            }
+        }
+        window.onload = initFloatingHearts;
+    </script>
+</body>
+</html>
