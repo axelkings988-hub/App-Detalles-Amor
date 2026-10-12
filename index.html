@@ -5,26 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Crear Detalle de Amor</title>
 
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- QRCode JS Generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Canvas Confetti CDN -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <!-- SDK de Mercado Pago -->
+    <!-- Mercado Pago SDK -->
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Google AdSense SDK -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
+    <!-- Google AdSense SDK con tu ID Real -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
 
     <script>
         tailwind.config = {
@@ -35,15 +31,11 @@
                         rose: { 300: '#F472B6', 500: '#EC4899', 600: '#DB2777', 900: '#831843' },
                         gold: { 400: '#FBBF24', 500: '#F59E0B' }
                     },
-                    fontFamily: {
-                        cursive: ['"Dancing Script"', 'cursive'],
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    }
+                    fontFamily: { cursive: ['"Dancing Script"', 'cursive'], sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
                 }
             }
         }
     </script>
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
@@ -53,7 +45,7 @@
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
 
-    <!-- REPRODUCTOR DE MÚSICA FLOTANTE VISTA PREVIA -->
+    <!-- REPRODUCTOR MÚSICA FLOTANTE VISTA PREVIA -->
     <div id="pv-musicPlayerContainer" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
         <div class="bg-burgundy-950/90 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-2xl">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -76,7 +68,6 @@
 
     <!-- FORMULARIO DE CREACIÓN -->
     <div id="formContainer" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
-        
         <div class="text-center space-y-1">
             <h1 class="text-3xl font-bold font-cursive text-rose-100">Crear Detalle Especial</h1>
             <p class="text-xs text-rose-300/80">Personaliza tu regalo digital con recuerdos, música y voz</p>
@@ -96,7 +87,6 @@
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 4):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple required class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p class="text-[10px] text-rose-300/60">Selecciona hasta 4 de tus fotos favoritas.</p>
             </div>
 
             <div class="space-y-1">
@@ -107,10 +97,8 @@
             <!-- GRABACIÓN DE VOZ -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
-                <p class="text-[10px] text-rose-300/70">Graba una dedicatoria que se escuchará al final de la tarjeta.</p>
-                
                 <div class="flex items-center justify-center gap-3 pt-1">
-                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2">
+                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2">
                         <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Iniciar Grabación</span>
                     </button>
                     <span id="timerLabel" class="text-xs font-mono text-rose-300 hidden">00:10</span>
@@ -125,7 +113,7 @@
             </button>
         </form>
 
-        <!-- ESPACIO DE CARGA + ANUNCIO 1 -->
+        <!-- CARGA + ANUNCIO 1 ADSENSE REAL -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
             <p id="statusText" class="text-xs text-rose-300">Optimizando fotos y contenido...</p>
@@ -133,7 +121,7 @@
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[100px] flex items-center justify-center">
                 <ins class="adsbygoogle"
                      style="display:block"
-                     data-ad-client="ca-pub-XXXXXXXXXX"
+                     data-ad-client="ca-pub-2082458944224549"
                      data-ad-slot="1111111111"
                      data-ad-format="auto"
                      data-full-width-responsive="true"></ins>
@@ -142,13 +130,13 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE VISTA PREVIA INTERACTIVA EN TIEMPO REAL -->
+    <!-- PANTALLA DE VISTA PREVIA INTERACTIVA -->
     <div id="previewContainer" class="hidden w-full max-w-md mx-auto space-y-6 pt-12 pb-20 relative">
         <div class="bg-rose-500 text-white text-[11px] font-bold text-center py-2 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
             👀 VISTA PREVIA INTERACTIVA - Prueba tu tarjeta
         </div>
 
-        <!-- JUEGO DEL CORAZÓN VISTA PREVIA -->
+        <!-- JUEGO DEL CORAZÓN -->
         <section id="pv-heart-section" class="bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl text-center">
             <h2 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h2>
             <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo...</p>
@@ -174,7 +162,7 @@
                 <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
             </div>
 
-            <!-- CARRUSEL DE FOTOS -->
+            <!-- CARRUSEL -->
             <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
                     <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
@@ -182,11 +170,6 @@
                 </div>
                 <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative">
                     <div id="pv-carouselTrack" class="carousel-track"></div>
-                </div>
-                <div class="flex items-center justify-between pt-1">
-                    <button onclick="pvPrevSlide()" class="w-8 h-8 rounded-full bg-burgundy-950 border border-rose-500/30 text-rose-200 flex items-center justify-center"><i class="fas fa-chevron-left text-xs"></i></button>
-                    <div id="pv-carouselDots" class="flex space-x-1"></div>
-                    <button onclick="pvNextSlide()" class="w-8 h-8 rounded-full bg-burgundy-950 border border-rose-500/30 text-rose-200 flex items-center justify-center"><i class="fas fa-chevron-right text-xs"></i></button>
                 </div>
             </section>
 
@@ -198,7 +181,7 @@
                 </div>
             </section>
 
-            <!-- TRIVIA DE PAREJA INTERACTIVA EN VISTA PREVIA -->
+            <!-- TRIVIA DE PAREJA -->
             <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja</h3>
@@ -211,14 +194,14 @@
                 </div>
             </section>
 
-            <!-- NOTA DE VOZ EN VISTA PREVIA -->
+            <!-- NOTA DE VOZ -->
             <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
                 <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz</h3>
                 <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
             </section>
         </div>
 
-        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR Y ANUNCIO 2 -->
+        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR Y ANUNCIO 2 ADSENSE REAL -->
         <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
             <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
             <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
@@ -227,28 +210,26 @@
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
                 <ins class="adsbygoogle"
                      style="display:block"
-                     data-ad-client="ca-pub-XXXXXXXXXX"
+                     data-ad-client="ca-pub-2082458944224549"
                      data-ad-slot="2222222222"
                      data-ad-format="auto"
                      data-full-width-responsive="true"></ins>
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
-            <!-- BOTÓN DE PAGO INSTANTÁNEO -->
-            <button onclick="iniciarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                🔒 Desbloquear Código QR ($25.00 MXN)
+            <!-- BOTÓN DE PAGO MERCADO PAGO -->
+            <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                💳 Desbloquear Código QR ($25.00 MXN)
             </button>
-            <p class="text-[10px] text-rose-300/60">Pago 100% seguro con tarjeta de débito, crédito o Mercado Pago. Activación instantánea.</p>
+            <p class="text-[10px] text-rose-300/60">Pago 100% seguro procesado por Mercado Pago.</p>
         </div>
 
         <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
         <div id="resultBox" class="hidden bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
             <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
-            
             <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
                 <div id="qrcode"></div>
             </div>
-
             <div class="space-y-2">
                 <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
                     Abrir Detalle Público
@@ -261,6 +242,11 @@
     </div>
 
     <script>
+        // Inicializar Mercado Pago con la Public Key de Producción Real
+        const mp = new MercadoPago('APP_USR-06ea9036-19c9-44b3-8b55-97505137872b', {
+            locale: 'es-MX'
+        });
+
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
@@ -333,15 +319,14 @@
                         preview.src = recordedAudioBase64;
                         document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     };
-                    
-                    recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2";
+                    recordBtn.className = "px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
                     recordText.innerText = "Volver a Grabar";
                     recordIcon.className = "fas fa-microphone";
                     timerLabel.classList.add('hidden');
                 };
 
                 mediaRecorder.start();
-                recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2 animate-pulse";
+                recordBtn.className = "px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2 animate-pulse";
                 recordText.innerText = "Detener Grabación";
                 recordIcon.className = "fas fa-square";
                 timerLabel.classList.remove('hidden');
@@ -368,7 +353,6 @@
         }
 
         let pvPhotosArray = [];
-        let pvCurrentSlide = 0;
 
         async function generarVistaPrevia() {
             const nombres = document.getElementById('nombresInput').value.trim();
@@ -402,7 +386,6 @@
                     voiceNoteBase64: recordedAudioBase64 || null
                 };
 
-                // Configurar datos de la vista previa
                 pvPhotosArray = fotosBase64;
                 document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${nombres}`;
                 document.getElementById('pv-mainDate').innerText = fecha;
@@ -427,7 +410,6 @@
             }
         }
 
-        // CORAZÓN INTERACTIVO DE LA VISTA PREVIA CON MÚSICA
         let pvClicks = 0;
         function handlePvHeartClick() {
             if (!musicAutoStarted && !isPvMusicPlaying) {
@@ -444,15 +426,9 @@
                 document.getElementById('pv-heartFill').style.height = `${pvClicks * 10}%`;
                 document.getElementById('pv-clickCounter').innerText = `${pvClicks} / 10`;
 
-                const container = document.getElementById('pv-heartContainer');
-                container.classList.add('scale-110');
-                setTimeout(() => container.classList.remove('scale-110'), 150);
-
                 if (pvClicks === 10) {
                     document.getElementById('pv-tapHint').innerText = "¡Desbloqueado! ❤️";
-                    if (typeof confetti === 'function') {
-                        confetti({ particleCount: 60, spread: 60 });
-                    }
+                    if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60 });
                     setTimeout(() => {
                         document.getElementById('pv-heart-section').classList.add('hidden');
                         document.getElementById('pv-mainContent').classList.remove('hidden');
@@ -461,71 +437,23 @@
             }
         }
 
-        // CARRUSEL VISTA PREVIA
         function buildPvCarousel() {
             const track = document.getElementById('pv-carouselTrack');
-            const dotsContainer = document.getElementById('pv-carouselDots');
             track.innerHTML = '';
-            dotsContainer.innerHTML = '';
-
-            pvPhotosArray.forEach((photo, idx) => {
+            pvPhotosArray.forEach((photo) => {
                 const slideDiv = document.createElement('div');
                 slideDiv.className = 'w-full flex-shrink-0 relative';
                 slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl">`;
                 track.appendChild(slideDiv);
-
-                const dot = document.createElement('span');
-                dot.className = idx === 0 ? 'w-2 h-2 rounded-full bg-rose-500' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40';
-                dotsContainer.appendChild(dot);
             });
-            updatePvCarousel();
         }
 
-        function updatePvCarousel() {
-            const track = document.getElementById('pv-carouselTrack');
-            track.style.transform = `translateX(-${pvCurrentSlide * 100}%)`;
-            document.getElementById('pv-carouselIndicator').innerText = `${pvCurrentSlide + 1} / ${pvPhotosArray.length}`;
-            const dots = document.getElementById('pv-carouselDots').children;
-            for (let i = 0; i < dots.length; i++) {
-                dots[i].className = i === pvCurrentSlide ? 'w-2 h-2 rounded-full bg-rose-500' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40';
-            }
-        }
-
-        function pvNextSlide() { pvCurrentSlide = (pvCurrentSlide + 1) % pvPhotosArray.length; updatePvCarousel(); }
-        function pvPrevSlide() { pvCurrentSlide = (pvCurrentSlide - 1 + pvPhotosArray.length) % pvPhotosArray.length; updatePvCarousel(); }
-
-        // TRIVIA VISTA PREVIA
         const pvQuizData = [
-            {
-                question: "¿Cuál es el lugar que más disfrutamos visitar juntos?",
-                options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"],
-                correct: 2,
-                feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️"
-            },
-            {
-                question: "¿Qué fue lo primero que pensé al conocerte?",
-                options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"],
-                correct: 3,
-                feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊"
-            },
-            {
-                question: "¿Cuál es nuestro pasatiempo favorito en pareja?",
-                options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"],
-                correct: 3,
-                feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨"
-            },
-            {
-                question: "¿Qué palabra define mejor lo que siento por ti?",
-                options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"],
-                correct: 3,
-                feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖"
-            },
-            {
-                question: "¿Qué promesa nos hacemos para el futuro?",
-                options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"],
-                correct: 3,
-                feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀"
-            }
+            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2, feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️" },
+            { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
+            { question: "¿Cuál es nuestro pasatiempo favorito en pareja?", options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"], correct: 3, feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨" },
+            { question: "¿Qué palabra define mejor lo que siento por ti?", options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"], correct: 3, feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖" },
+            { question: "¿Qué promesa nos hacemos para el futuro?", options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"], correct: 3, feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀" }
         ];
 
         let pvCurrentQuizIndex = 0;
@@ -533,19 +461,11 @@
 
         function loadPvQuizQuestion() {
             if (pvCurrentQuizIndex >= pvQuizData.length) {
-                document.getElementById('pv-quizContainer').innerHTML = `
-                    <div class="text-center py-3 space-y-1">
-                        <i class="fas fa-trophy text-2xl text-gold-400 animate-bounce"></i>
-                        <h4 class="text-xs font-bold text-white">¡Trivia Superada!</h4>
-                        <p class="text-[11px] text-rose-200">¡Obtuviste ${pvQuizScore} de ${pvQuizData.length} puntos!</p>
-                    </div>
-                `;
+                document.getElementById('pv-quizContainer').innerHTML = `<div class="text-center py-3 space-y-1"><i class="fas fa-trophy text-2xl text-gold-400 animate-bounce"></i><h4 class="text-xs font-bold text-white">¡Trivia Superada!</h4></div>`;
                 return;
             }
-
             const q = pvQuizData[pvCurrentQuizIndex];
             document.getElementById('pv-quizQuestion').innerText = `${pvCurrentQuizIndex + 1}. ${q.question}`;
-            
             const optionsContainer = document.getElementById('pv-quizOptions');
             optionsContainer.innerHTML = '';
             document.getElementById('pv-quizFeedback').className = 'hidden';
@@ -562,7 +482,6 @@
         function checkPvAnswer(selected, correct, feedbackText, btnElement) {
             const options = document.getElementById('pv-quizOptions').children;
             for (let btn of options) { btn.disabled = true; }
-
             const feedback = document.getElementById('pv-quizFeedback');
             feedback.classList.remove('hidden');
 
@@ -570,27 +489,21 @@
                 pvQuizScore++;
                 document.getElementById('pv-quizScore').innerText = `Puntos: ${pvQuizScore}`;
                 btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
-                btnElement.querySelector('i').className = 'fas fa-check-circle text-emerald-400';
-                
                 feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
                 feedback.innerText = feedbackText;
             } else {
                 btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
-                btnElement.querySelector('i').className = 'fas fa-times-circle text-rose-500';
-
                 feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
                 feedback.innerText = "¡Casi! Lo importante es cuánto nos amamos. ❤️";
             }
 
-            setTimeout(() => {
-                pvCurrentQuizIndex++;
-                loadPvQuizQuestion();
-            }, 1800);
+            setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // PAGO E INTERACCIÓN FINAL
-        async function iniciarPagoMercadoPago() {
+        // PROCESO DE PAGO CON MERCADO PAGO
+        async function procesarPagoMercadoPago() {
             try {
+                // Guarda el registro en Firebase y genera el código QR
                 const docRef = await db.collection("detalles").add({
                     ...tempFormData,
                     creado: firebase.firestore.FieldValue.serverTimestamp()
@@ -610,12 +523,12 @@
                 });
 
             } catch (e) {
-                alert("Ocurrió un error al procesar el pago. Inténtalo de nuevo.");
+                alert("Ocurrió un error al procesar la solicitud.");
             }
         }
 
         function compressImage(file, maxWidth, quality) {
-            return new Promise((resolve, reject) => {
+            return new Promise((readyState, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = event => {
@@ -625,18 +538,15 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-
                         if (width > maxWidth) {
                             height = Math.round((height * maxWidth) / width);
                             width = maxWidth;
                         }
-
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-
-                        resolve(canvas.toDataURL('image/jpeg', quality));
+                        readyState(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = error => reject(error);
                 };
