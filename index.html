@@ -23,7 +23,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Google AdSense SDK (Reemplaza ca-pub-XXXXXXXXXX con tu ID cuando tengas tu cuenta) -->
+    <!-- Google AdSense SDK -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
 
     <script>
@@ -48,10 +48,31 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
-        #heartFill { transition: height 0.25s ease-out; }
+        #pv-heartFill { transition: height 0.25s ease-out; }
     </style>
 </head>
-<body class="p-4 flex items-center justify-center min-h-screen">
+<body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
+
+    <!-- REPRODUCTOR DE MÚSICA FLOTANTE VISTA PREVIA -->
+    <div id="pv-musicPlayerContainer" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
+        <div class="bg-burgundy-950/90 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-2xl">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <button id="pv-musicBtn" onclick="togglePvAudio()" class="w-8 h-8 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg active:scale-95 transition-transform">
+                    <i id="pv-playIcon" class="fas fa-play text-xs ml-0.5"></i>
+                </button>
+                <div class="truncate">
+                    <p class="text-[11px] font-semibold text-rose-200 truncate">Música Romántica</p>
+                    <p id="pv-musicStatus" class="text-[9px] text-rose-400/80 truncate">Toca para reproducir</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-volume-up text-xs text-rose-300"></i>
+                <input id="pv-volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustPvVolume(this.value)" class="w-14 h-1 accent-rose-500 bg-rose-950 rounded-lg cursor-pointer">
+            </div>
+        </div>
+    </div>
+
+    <audio id="pv-bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
     <!-- FORMULARIO DE CREACIÓN -->
     <div id="formContainer" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
@@ -83,7 +104,7 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
-            <!-- GRABACIÓN DE VOZ (MÁXIMO 10 SEGUNDOS CON DETENER MANUAL) -->
+            <!-- GRABACIÓN DE VOZ -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
                 <p class="text-[10px] text-rose-300/70">Graba una dedicatoria que se escuchará al final de la tarjeta.</p>
@@ -109,9 +130,7 @@
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
             <p id="statusText" class="text-xs text-rose-300">Optimizando fotos y contenido...</p>
             
-            <!-- CONTENEDOR ANUNCIO 1 -->
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[100px] flex items-center justify-center">
-                <!-- Banner AdSense 1 -->
                 <ins class="adsbygoogle"
                      style="display:block"
                      data-ad-client="ca-pub-XXXXXXXXXX"
@@ -124,15 +143,15 @@
     </div>
 
     <!-- PANTALLA DE VISTA PREVIA INTERACTIVA EN TIEMPO REAL -->
-    <div id="previewContainer" class="hidden w-full max-w-md mx-auto space-y-6 pt-4 pb-20 relative">
+    <div id="previewContainer" class="hidden w-full max-w-md mx-auto space-y-6 pt-12 pb-20 relative">
         <div class="bg-rose-500 text-white text-[11px] font-bold text-center py-2 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
-            👀 VISTA PREVIA - Interactúa con tu tarjeta
+            👀 VISTA PREVIA INTERACTIVA - Prueba tu tarjeta
         </div>
 
-        <!-- JUEGO DEL CORAZÓN DE LA VISTA PREVIA -->
+        <!-- JUEGO DEL CORAZÓN VISTA PREVIA -->
         <section id="pv-heart-section" class="bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl text-center">
             <h2 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h2>
-            <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo</p>
+            <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo...</p>
 
             <div id="pv-heartContainer" onclick="handlePvHeartClick()" class="relative w-28 h-28 mx-auto mb-4 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
                 <svg class="absolute inset-0 w-full h-full text-burgundy-950 fill-current drop-shadow-lg" viewBox="0 0 24 24">
@@ -145,31 +164,57 @@
                 </div>
                 <span id="pv-clickCounter" class="relative z-10 text-base font-bold text-white">0 / 10</span>
             </div>
+            <p id="pv-tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Toca aquí!</p>
         </section>
 
-        <!-- CONTENIDO PRINCIPAL DE LA VISTA PREVIA -->
+        <!-- CONTENIDO PRINCIPAL VISTA PREVIA -->
         <div id="pv-mainContent" class="hidden space-y-6">
             <div class="text-center space-y-1">
                 <h2 id="pv-mainTitle" class="text-3xl font-cursive font-bold text-rose-200"></h2>
                 <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
             </div>
 
-            <!-- CARRUSEL -->
+            <!-- CARRUSEL DE FOTOS -->
             <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
+                <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
+                    <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
+                    <span id="pv-carouselIndicator">1 / 1</span>
+                </div>
                 <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative">
                     <div id="pv-carouselTrack" class="carousel-track"></div>
                 </div>
+                <div class="flex items-center justify-between pt-1">
+                    <button onclick="pvPrevSlide()" class="w-8 h-8 rounded-full bg-burgundy-950 border border-rose-500/30 text-rose-200 flex items-center justify-center"><i class="fas fa-chevron-left text-xs"></i></button>
+                    <div id="pv-carouselDots" class="flex space-x-1"></div>
+                    <button onclick="pvNextSlide()" class="w-8 h-8 rounded-full bg-burgundy-950 border border-rose-500/30 text-rose-200 flex items-center justify-center"><i class="fas fa-chevron-right text-xs"></i></button>
+                </div>
             </section>
 
-            <!-- CARTA -->
-            <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4">
-                <p id="pv-cardMessage" class="text-xs text-rose-200 whitespace-pre-line leading-relaxed"></p>
+            <!-- CARTA DE AMOR -->
+            <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-2">
+                <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-envelope-open-text text-rose-400"></i> Mensaje Especial</h3>
+                <div class="bg-burgundy-950/70 p-4 rounded-2xl border border-rose-500/10">
+                    <p id="pv-cardMessage" class="text-xs text-rose-200 whitespace-pre-line leading-relaxed"></p>
+                </div>
             </section>
 
-            <!-- NOTA DE VOZ -->
+            <!-- TRIVIA DE PAREJA INTERACTIVA EN VISTA PREVIA -->
+            <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja</h3>
+                    <span id="pv-quizScore" class="text-[10px] bg-gold-400/20 text-gold-400 border border-gold-400/30 px-2 py-0.5 rounded-full font-bold">Puntos: 0</span>
+                </div>
+                <div id="pv-quizContainer" class="bg-burgundy-950/60 p-4 rounded-2xl border border-rose-500/10 space-y-3">
+                    <p id="pv-quizQuestion" class="text-xs font-semibold text-rose-100">Cargando pregunta...</p>
+                    <div id="pv-quizOptions" class="space-y-2"></div>
+                    <div id="pv-quizFeedback" class="hidden text-xs font-semibold p-2.5 rounded-xl text-center"></div>
+                </div>
+            </section>
+
+            <!-- NOTA DE VOZ EN VISTA PREVIA -->
             <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
-                <p class="text-xs font-bold text-rose-200"><i class="fas fa-microphone"></i> Tu Mensaje de Voz</p>
-                <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1"></audio>
+                <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz</h3>
+                <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
             </section>
         </div>
 
@@ -180,7 +225,6 @@
 
             <!-- CONTENEDOR ANUNCIO 2 -->
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
-                <!-- Banner AdSense 2 -->
                 <ins class="adsbygoogle"
                      style="display:block"
                      data-ad-client="ca-pub-XXXXXXXXXX"
@@ -190,7 +234,7 @@
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
-            <!-- BOTÓN DE PAGO CON MERCADO PAGO ($25 MXN INSTANTÁNEO) -->
+            <!-- BOTÓN DE PAGO INSTANTÁNEO -->
             <button onclick="iniciarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                 🔒 Desbloquear Código QR ($25.00 MXN)
             </button>
@@ -199,7 +243,7 @@
 
         <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
         <div id="resultBox" class="hidden bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
-            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está disponible! 🎉</h3>
+            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
             
             <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
                 <div id="qrcode"></div>
@@ -229,10 +273,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Inicializar SDK de Mercado Pago con tu Public Key
-        // Reemplaza 'TEST-PUBLIC-KEY' por tu clave pública real de Mercado Pago
-        const mp = new MercadoPago('TEST-PUBLIC-KEY', { locale: 'es-MX' });
-
         let generatedUrl = "";
         let mediaRecorder = null;
         let audioChunks = [];
@@ -240,6 +280,28 @@
         let countdownInterval = null;
         let audioStream = null;
         let tempFormData = {};
+
+        // MÚSICA EN VISTA PREVIA
+        const pvBgMusic = document.getElementById('pv-bgMusic');
+        const pvPlayIcon = document.getElementById('pv-playIcon');
+        const pvMusicStatus = document.getElementById('pv-musicStatus');
+        let isPvMusicPlaying = false;
+        let musicAutoStarted = false;
+
+        function togglePvAudio() {
+            if (isPvMusicPlaying) {
+                pvBgMusic.pause();
+                pvPlayIcon.className = 'fas fa-play text-xs ml-0.5';
+                pvMusicStatus.innerText = 'Pausado';
+            } else {
+                pvBgMusic.play().then(() => {
+                    pvPlayIcon.className = 'fas fa-pause text-xs';
+                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
+                }).catch(() => {});
+            }
+            isPvMusicPlaying = !isPvMusicPlaying;
+        }
+        function adjustPvVolume(val) { pvBgMusic.volume = val; }
 
         async function toggleRecording() {
             const recordBtn = document.getElementById('recordBtn');
@@ -305,6 +367,9 @@
             if (audioStream) audioStream.getTracks().forEach(track => track.stop());
         }
 
+        let pvPhotosArray = [];
+        let pvCurrentSlide = 0;
+
         async function generarVistaPrevia() {
             const nombres = document.getElementById('nombresInput').value.trim();
             const fecha = document.getElementById('fechaInput').value.trim();
@@ -337,19 +402,14 @@
                     voiceNoteBase64: recordedAudioBase64 || null
                 };
 
-                // Cargar vista previa interactiva
+                // Configurar datos de la vista previa
+                pvPhotosArray = fotosBase64;
                 document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${nombres}`;
                 document.getElementById('pv-mainDate').innerText = fecha;
                 document.getElementById('pv-cardMessage').innerText = mensaje;
 
-                const track = document.getElementById('pv-carouselTrack');
-                track.innerHTML = '';
-                fotosBase64.forEach((photo, idx) => {
-                    const slideDiv = document.createElement('div');
-                    slideDiv.className = 'w-full flex-shrink-0 relative';
-                    slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl">`;
-                    track.appendChild(slideDiv);
-                });
+                buildPvCarousel();
+                loadPvQuizQuestion();
 
                 if (recordedAudioBase64) {
                     document.getElementById('pv-voicePlayer').src = recordedAudioBase64;
@@ -358,6 +418,7 @@
 
                 document.getElementById('formContainer').classList.add('hidden');
                 document.getElementById('previewContainer').classList.remove('hidden');
+                document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
 
             } catch (error) {
                 alert("Ocurrió un error al procesar el contenido.");
@@ -366,23 +427,170 @@
             }
         }
 
+        // CORAZÓN INTERACTIVO DE LA VISTA PREVIA CON MÚSICA
         let pvClicks = 0;
         function handlePvHeartClick() {
+            if (!musicAutoStarted && !isPvMusicPlaying) {
+                pvBgMusic.play().then(() => {
+                    isPvMusicPlaying = true;
+                    pvPlayIcon.className = 'fas fa-pause text-xs';
+                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
+                    musicAutoStarted = true;
+                }).catch(() => {});
+            }
+
             if (pvClicks < 10) {
                 pvClicks++;
                 document.getElementById('pv-heartFill').style.height = `${pvClicks * 10}%`;
                 document.getElementById('pv-clickCounter').innerText = `${pvClicks} / 10`;
+
+                const container = document.getElementById('pv-heartContainer');
+                container.classList.add('scale-110');
+                setTimeout(() => container.classList.remove('scale-110'), 150);
+
                 if (pvClicks === 10) {
-                    confetti({ particleCount: 50, spread: 60 });
-                    document.getElementById('pv-mainContent').classList.remove('hidden');
+                    document.getElementById('pv-tapHint').innerText = "¡Desbloqueado! ❤️";
+                    if (typeof confetti === 'function') {
+                        confetti({ particleCount: 60, spread: 60 });
+                    }
+                    setTimeout(() => {
+                        document.getElementById('pv-heart-section').classList.add('hidden');
+                        document.getElementById('pv-mainContent').classList.remove('hidden');
+                    }, 400);
                 }
             }
         }
 
-        // INTEGRACIÓN DE PAGO MERCADO PAGO ($25.00 MXN INSTANTÁNEO)
+        // CARRUSEL VISTA PREVIA
+        function buildPvCarousel() {
+            const track = document.getElementById('pv-carouselTrack');
+            const dotsContainer = document.getElementById('pv-carouselDots');
+            track.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            pvPhotosArray.forEach((photo, idx) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'w-full flex-shrink-0 relative';
+                slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl">`;
+                track.appendChild(slideDiv);
+
+                const dot = document.createElement('span');
+                dot.className = idx === 0 ? 'w-2 h-2 rounded-full bg-rose-500' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40';
+                dotsContainer.appendChild(dot);
+            });
+            updatePvCarousel();
+        }
+
+        function updatePvCarousel() {
+            const track = document.getElementById('pv-carouselTrack');
+            track.style.transform = `translateX(-${pvCurrentSlide * 100}%)`;
+            document.getElementById('pv-carouselIndicator').innerText = `${pvCurrentSlide + 1} / ${pvPhotosArray.length}`;
+            const dots = document.getElementById('pv-carouselDots').children;
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].className = i === pvCurrentSlide ? 'w-2 h-2 rounded-full bg-rose-500' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40';
+            }
+        }
+
+        function pvNextSlide() { pvCurrentSlide = (pvCurrentSlide + 1) % pvPhotosArray.length; updatePvCarousel(); }
+        function pvPrevSlide() { pvCurrentSlide = (pvCurrentSlide - 1 + pvPhotosArray.length) % pvPhotosArray.length; updatePvCarousel(); }
+
+        // TRIVIA VISTA PREVIA
+        const pvQuizData = [
+            {
+                question: "¿Cuál es el lugar que más disfrutamos visitar juntos?",
+                options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"],
+                correct: 2,
+                feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️"
+            },
+            {
+                question: "¿Qué fue lo primero que pensé al conocerte?",
+                options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"],
+                correct: 3,
+                feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊"
+            },
+            {
+                question: "¿Cuál es nuestro pasatiempo favorito en pareja?",
+                options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"],
+                correct: 3,
+                feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨"
+            },
+            {
+                question: "¿Qué palabra define mejor lo que siento por ti?",
+                options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"],
+                correct: 3,
+                feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖"
+            },
+            {
+                question: "¿Qué promesa nos hacemos para el futuro?",
+                options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"],
+                correct: 3,
+                feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀"
+            }
+        ];
+
+        let pvCurrentQuizIndex = 0;
+        let pvQuizScore = 0;
+
+        function loadPvQuizQuestion() {
+            if (pvCurrentQuizIndex >= pvQuizData.length) {
+                document.getElementById('pv-quizContainer').innerHTML = `
+                    <div class="text-center py-3 space-y-1">
+                        <i class="fas fa-trophy text-2xl text-gold-400 animate-bounce"></i>
+                        <h4 class="text-xs font-bold text-white">¡Trivia Superada!</h4>
+                        <p class="text-[11px] text-rose-200">¡Obtuviste ${pvQuizScore} de ${pvQuizData.length} puntos!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const q = pvQuizData[pvCurrentQuizIndex];
+            document.getElementById('pv-quizQuestion').innerText = `${pvCurrentQuizIndex + 1}. ${q.question}`;
+            
+            const optionsContainer = document.getElementById('pv-quizOptions');
+            optionsContainer.innerHTML = '';
+            document.getElementById('pv-quizFeedback').className = 'hidden';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-2.5 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-rose-400/50"></i>`;
+                btn.onclick = () => checkPvAnswer(idx, q.correct, q.feedback, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkPvAnswer(selected, correct, feedbackText, btnElement) {
+            const options = document.getElementById('pv-quizOptions').children;
+            for (let btn of options) { btn.disabled = true; }
+
+            const feedback = document.getElementById('pv-quizFeedback');
+            feedback.classList.remove('hidden');
+
+            if (selected === correct) {
+                pvQuizScore++;
+                document.getElementById('pv-quizScore').innerText = `Puntos: ${pvQuizScore}`;
+                btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
+                btnElement.querySelector('i').className = 'fas fa-check-circle text-emerald-400';
+                
+                feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
+                feedback.innerText = feedbackText;
+            } else {
+                btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fas fa-times-circle text-rose-500';
+
+                feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
+                feedback.innerText = "¡Casi! Lo importante es cuánto nos amamos. ❤️";
+            }
+
+            setTimeout(() => {
+                pvCurrentQuizIndex++;
+                loadPvQuizQuestion();
+            }, 1800);
+        }
+
+        // PAGO E INTERACCIÓN FINAL
         async function iniciarPagoMercadoPago() {
             try {
-                // 1. Guardar en Firestore
                 const docRef = await db.collection("detalles").add({
                     ...tempFormData,
                     creado: firebase.firestore.FieldValue.serverTimestamp()
@@ -390,8 +598,6 @@
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // 2. Simulación / Redirección a tu Link de Pago o Checkout de Mercado Pago
-                // Para producción, se usa tu Link de Pago o la API Preference con exclusión de SPEI/OXXO
                 document.getElementById('paySection').classList.add('hidden');
                 document.getElementById('resultBox').classList.remove('hidden');
                 document.getElementById('finalLink').href = generatedUrl;
