@@ -209,10 +209,10 @@
             </section>
         </div>
 
-        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR Y ANUNCIO 2 ADSENSE REAL -->
+        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR -->
         <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
             <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
-            <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
+            <p class="text-xs text-rose-300/80">Obtén el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
 
             <!-- CONTENEDOR ANUNCIO 2 -->
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
@@ -225,11 +225,10 @@
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
-            <!-- BOTÓN DE PAGO MERCADO PAGO -->
-            <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                💳 Desbloquear Código QR ($25.00 MXN)
+            <!-- BOTÓN GENERAR QR DIRECTO -->
+            <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                ✨ Generar Enlace y Código QR
             </button>
-            <p class="text-[10px] text-rose-300/60">Pago 100% seguro procesado por Mercado Pago.</p>
         </div>
 
         <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
@@ -376,7 +375,6 @@
                 pvPhotosArray = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
-                // Optimizamos las imágenes a max 1200px / 80% calidad (alta definición, ultra ligeras)
                 for (let i = 0; i < maxFotos; i++) {
                     document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
                     const optimizedBase64 = await compressImage(photosFiles[i], 1200, 0.80);
@@ -521,13 +519,13 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // PROCESO DE SUBIDA RÁPIDA A IMGBB Y REDIRECCIÓN INMEDIATA
+        // GENERAR ENLACE Y CÓDIGO QR DIRECTO (SIN MERCADO PAGO)
         async function procesarPagoMercadoPago() {
             try {
                 const photosBase64 = tempFormData.fotosData || [];
                 const uploadedUrls = [];
 
-                // Subimos de forma rápida cada imagen optimizada a la API de ImgBB
+                // Subimos las fotos a ImgBB para obtener enlaces ligeros
                 for (let i = 0; i < photosBase64.length; i++) {
                     const cleanBase64 = photosBase64[i].replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
                     const formData = new FormData();
@@ -543,25 +541,35 @@
                     }
                 }
 
-                // Guardamos los enlaces limpios en Firebase Firestore
+                // Guardamos en Firebase Firestore
                 const docRef = await db.collection("detalles").add({
                     nombres: tempFormData.nombres,
                     fecha: tempFormData.fecha,
                     mensaje: tempFormData.mensaje,
                     fotos: uploadedUrls.length > 0 ? uploadedUrls : photosBase64,
                     voiceNoteBase64: tempFormData.voiceNoteBase64,
-                    pagado: false, 
+                    pagado: true, 
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // Redirigir directamente a Mercado Pago
-                window.location.href = "https://mpago.la/225XuPD";
+                // Ocultar sección de pago y mostrar directamente el código QR y enlace final
+                document.getElementById('paySection').classList.add('hidden');
+                document.getElementById('resultBox').classList.remove('hidden');
+
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: generatedUrl,
+                    width: 160,
+                    height: 160
+                });
+
+                document.getElementById('finalLink').href = generatedUrl;
 
             } catch (error) {
-                console.error("Error al procesar la subida y pago: ", error);
-                alert("Hubo un problema al conectar. Inténtalo de nuevo.");
+                console.error("Error al generar el detalle: ", error);
+                alert("Hubo un problema al procesar los datos. Inténtalo de nuevo.");
             }
         }
 
