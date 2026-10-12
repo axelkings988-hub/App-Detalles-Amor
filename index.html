@@ -19,7 +19,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Google AdSense SDK -->
+    <!-- Google AdSense SDK con tu ID Real -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
 
     <script>
@@ -114,7 +114,7 @@
             </button>
         </form>
 
-        <!-- CARGA + ANUNCIO 1 -->
+        <!-- CARGA + ANUNCIO 1 ADSENSE REAL -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
             <p id="statusText" class="text-xs text-rose-300">Optimizando fotografías...</p>
@@ -163,7 +163,7 @@
                 <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
             </div>
 
-            <!-- CARRUSEL DE FOTOS -->
+            <!-- CARRUSEL DE FOTOS CON NAVEGACIÓN -->
             <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                 <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
                     <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
@@ -171,6 +171,7 @@
                 </div>
                 <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative w-full">
                     <div id="pv-carouselTrack" class="carousel-track"></div>
+                    <!-- Botones de navegación -->
                     <button onclick="moveCarousel(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg z-10">
                         <i class="fas fa-chevron-left text-xs"></i>
                     </button>
@@ -208,11 +209,12 @@
             </section>
         </div>
 
-        <!-- SECCIÓN DE DESBLOQUEO -->
+        <!-- SECCIÓN DE DESBLOQUEO DEL CÓDIGO QR Y ANUNCIO 2 ADSENSE REAL -->
         <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
             <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
             <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
 
+            <!-- CONTENEDOR ANUNCIO 2 -->
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
                 <ins class="adsbygoogle"
                      style="display:block"
@@ -223,13 +225,14 @@
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
 
+            <!-- BOTÓN DE PAGO MERCADO PAGO -->
             <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                 💳 Desbloquear Código QR ($25.00 MXN)
             </button>
             <p class="text-[10px] text-rose-300/60">Pago 100% seguro procesado por Mercado Pago.</p>
         </div>
 
-        <!-- RESULTADO FINAL -->
+        <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
         <div id="resultBox" class="hidden bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
             <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
             <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
@@ -266,10 +269,8 @@
         let countdownInterval = null;
         let audioStream = null;
         let tempFormData = {};
-        let pvPhotosArray = [];
-        let currentSlide = 0;
 
-        // ===== MÚSICA =====
+        // MÚSICA EN VISTA PREVIA
         const pvBgMusic = document.getElementById('pv-bgMusic');
         const pvPlayIcon = document.getElementById('pv-playIcon');
         const pvMusicStatus = document.getElementById('pv-musicStatus');
@@ -291,7 +292,6 @@
         }
         function adjustPvVolume(val) { pvBgMusic.volume = val; }
 
-        // ===== GRABACIÓN DE VOZ =====
         async function toggleRecording() {
             const recordBtn = document.getElementById('recordBtn');
             const recordText = document.getElementById('recordText');
@@ -355,43 +355,9 @@
             if (audioStream) audioStream.getTracks().forEach(track => track.stop());
         }
 
-        // ===== COMPRESIÓN DE ALTA CALIDAD =====
-        function compressImage(file, maxWidth = 1920, quality = 0.93) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = event => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+        let pvPhotosArray = [];
+        let currentSlide = 0;
 
-                        // Solo redimensionamos si es necesario
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-
-                        // Máxima calidad de suavizado
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = reject;
-                };
-                reader.onerror = reject;
-            });
-        }
-
-        // ===== GENERAR VISTA PREVIA =====
         async function generarVistaPrevia() {
             const nombres = document.getElementById('nombresInput').value.trim();
             const fecha = document.getElementById('fechaInput').value.trim();
@@ -409,10 +375,11 @@
             try {
                 pvPhotosArray = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
-
+                
+                // Optimizamos las imágenes a max 1200px / 80% calidad (alta definición, ultra ligeras)
                 for (let i = 0; i < maxFotos; i++) {
-                    document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos} (alta calidad)...`;
-                    const optimizedBase64 = await compressImage(photosFiles[i], 1920, 0.93);
+                    document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
+                    const optimizedBase64 = await compressImage(photosFiles[i], 1200, 0.80);
                     pvPhotosArray.push(optimizedBase64);
                 }
 
@@ -449,7 +416,6 @@
             }
         }
 
-        // ===== CORAZÓN =====
         let pvClicks = 0;
         function handlePvHeartClick() {
             if (!musicAutoStarted && !isPvMusicPlaying) {
@@ -477,7 +443,6 @@
             }
         }
 
-        // ===== CARRUSEL =====
         function buildPvCarousel() {
             const track = document.getElementById('pv-carouselTrack');
             track.innerHTML = '';
@@ -504,7 +469,6 @@
             document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
-        // ===== TRIVIA =====
         const pvQuizData = [
             { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2, feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️" },
             { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
@@ -557,63 +521,75 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // ===== SUBIDA OPTIMIZADA EN PARALELO =====
-        async function subirImagenesAImgBB(fotosBase64) {
-            const promesas = fotosBase64.map(async (base64, index) => {
-                const cleanBase64 = base64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, "");
-                const formData = new FormData();
-                formData.append("image", cleanBase64);
-
-                const response = await fetch("https://api.imgbb.com/1/upload?key=6d207488941253245492d2b591b9efb9", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const data = await response.json();
-                if (!data.success) {
-                    throw new Error(`Error al subir la foto ${index + 1}`);
-                }
-                return data.data.url;
-            });
-
-            return Promise.all(promesas);
-        }
-
-        // ===== PROCESO DE PAGO =====
+        // PROCESO DE SUBIDA RÁPIDA A IMGBB Y REDIRECCIÓN INMEDIATA
         async function procesarPagoMercadoPago() {
-            const btn = document.querySelector('#paySection button');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Subiendo fotos de alta calidad...`;
-
             try {
                 const photosBase64 = tempFormData.fotosData || [];
-                
-                // Subimos las 4 imágenes en paralelo
-                const uploadedUrls = await subirImagenesAImgBB(photosBase64);
+                const uploadedUrls = [];
 
-                // Guardamos solo las URLs (nunca el base64)
+                // Subimos de forma rápida cada imagen optimizada a la API de ImgBB
+                for (let i = 0; i < photosBase64.length; i++) {
+                    const cleanBase64 = photosBase64[i].replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+                    const formData = new FormData();
+                    formData.append("image", cleanBase64);
+
+                    const response = await fetch("https://api.imgbb.com/1/upload?key=6d207488941253245492d2b591b9efb9", {
+                        method: "POST",
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data && data.success) {
+                        uploadedUrls.push(data.data.url);
+                    }
+                }
+
+                // Guardamos los enlaces limpios en Firebase Firestore
                 const docRef = await db.collection("detalles").add({
                     nombres: tempFormData.nombres,
                     fecha: tempFormData.fecha,
                     mensaje: tempFormData.mensaje,
-                    fotos: uploadedUrls,
+                    fotos: uploadedUrls.length > 0 ? uploadedUrls : photosBase64,
                     voiceNoteBase64: tempFormData.voiceNoteBase64,
-                    pagado: false,
+                    pagado: false, 
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // Redirigir a Mercado Pago
+                // Redirigir directamente a Mercado Pago
                 window.location.href = "https://mpago.la/225XuPD";
 
             } catch (error) {
-                console.error("Error al procesar:", error);
-                alert("Hubo un problema al subir las fotos. Inténtalo de nuevo.");
-                btn.disabled = false;
-                btn.innerHTML = originalText;
+                console.error("Error al procesar la subida y pago: ", error);
+                alert("Hubo un problema al conectar. Inténtalo de nuevo.");
             }
+        }
+
+        function compressImage(file, maxWidth, quality) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = error => reject(error);
+                };
+                reader.onerror = error => reject(error);
+            });
         }
 
         function copiarEnlace() {
@@ -623,13 +599,13 @@
                 });
             }
         }
-
-        // Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(() => {});
-            });
-        }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
     </script>
 </body>
 </html>
