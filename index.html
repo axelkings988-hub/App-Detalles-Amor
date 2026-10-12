@@ -67,14 +67,14 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
-            <!-- NUEVA OPCIÓN: GRABAR MENSAJE DE VOZ (MÁX 10 SEGUNDOS) -->
+            <!-- BOTÓN DE GRABACIÓN DE VOZ MEJORADO CON DETENER MANUAL -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
-                <p class="text-[10px] text-rose-300/70">Graba un saludo o dedicatoria para que se escuche al final de la tarjeta.</p>
+                <p class="text-[10px] text-rose-300/70">Graba una dedicatoria que se escuchará al final de la tarjeta.</p>
                 
                 <div class="flex items-center justify-center gap-3 pt-1">
                     <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2">
-                        <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Grabar Audio</span>
+                        <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Iniciar Grabación</span>
                     </button>
                     <span id="timerLabel" class="text-xs font-mono text-rose-300 hidden">00:10</span>
                 </div>
@@ -126,73 +126,83 @@
         const db = firebase.firestore();
 
         let generatedUrl = "";
-        let mediaRecorder;
+        let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
-        let countdownInterval;
+        let countdownInterval = null;
+        let audioStream = null;
 
-        // Lógica de grabación de voz (Límite 10 segundos)
         async function toggleRecording() {
             const recordBtn = document.getElementById('recordBtn');
             const recordText = document.getElementById('recordText');
             const recordIcon = document.getElementById('recordIcon');
             const timerLabel = document.getElementById('timerLabel');
 
-            if (!mediaRecorder || mediaRecorder.state === "inactive") {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
+            // SI ESTÁ GRABANDO -> DETENER MANUALMENTE
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                detenerGrabacion();
+                return;
+            }
 
-                    mediaRecorder.ondataavailable = event => {
+            // INICIAR NUEVA GRABACIÓN
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(audioStream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
                         audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        const preview = document.getElementById('audioPreview');
+                        preview.src = recordedAudioBase64;
+                        document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     };
+                    
+                    recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2";
+                    recordText.innerText = "Volver a Grabar";
+                    recordIcon.className = "fas fa-microphone";
+                    timerLabel.classList.add('hidden');
+                };
 
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                        const reader = new FileReader();
-                        reader.readAsDataURL(audioBlob);
-                        reader.onloadend = () => {
-                            recordedAudioBase64 = reader.result;
-                            const preview = document.getElementById('audioPreview');
-                            preview.src = recordedAudioBase64;
-                            document.getElementById('audioPreviewContainer').classList.remove('hidden');
-                        };
-                        
-                        recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2";
-                        recordText.innerText = "Grabar de nuevo";
-                        recordIcon.className = "fas fa-microphone";
-                        timerLabel.classList.add('hidden');
-                    };
+                mediaRecorder.start();
+                recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2 animate-pulse";
+                recordText.innerText = "Detener Grabación";
+                recordIcon.className = "fas fa-square";
+                timerLabel.classList.remove('hidden');
 
-                    mediaRecorder.start();
-                    recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-2 animate-pulse";
-                    recordText.innerText = "Grabando...";
-                    recordIcon.className = "fas fa-stop";
-                    timerLabel.classList.remove('hidden');
-
-                    let timeLeft = 10;
-                    timerLabel.innerText = `00:0${timeLeft}`;
-                    clearInterval(countdownInterval);
-                    countdownInterval = setInterval(() => {
-                        timeLeft--;
-                        timerLabel.innerText = `00:0${timeLeft}`;
-                        if (timeLeft <= 0) {
-                            clearInterval(countdownInterval);
-                            if (mediaRecorder && mediaRecorder.state === "recording") {
-                                mediaRecorder.stop();
-                                stream.getTracks().forEach(track => track.stop());
-                            }
-                        }
-                    }, 1000);
-
-                } catch (e) {
-                    alert("No se pudo acceder al micrófono. Verifica los permisos de tu navegador.");
-                }
-            } else if (mediaRecorder.state === "recording") {
+                let timeLeft = 10;
+                timerLabel.innerText = `00:0${timeLeft}`;
                 clearInterval(countdownInterval);
+
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    timerLabel.innerText = `00:0${timeLeft}`;
+                    if (timeLeft <= 0) {
+                        detenerGrabacion();
+                    }
+                }, 1000);
+
+            } catch (e) {
+                alert("No se pudo acceder al micrófono. Por favor permite el acceso al micrófono en tu navegador.");
+            }
+        }
+
+        function detenerGrabacion() {
+            clearInterval(countdownInterval);
+            if (mediaRecorder && mediaRecorder.state === "recording") {
                 mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            if (audioStream) {
+                audioStream.getTracks().forEach(track => track.stop());
             }
         }
 
@@ -211,12 +221,13 @@
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
+                // Compresión ligera mejorada (380px ancho max, calidad 0.35)
                 const fotosBase64 = [];
                 const maxFotos = Math.min(photosFiles.length, 4);
                 
                 for (let i = 0; i < maxFotos; i++) {
                     document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
-                    const compressedBase64 = await compressImage(photosFiles[i], 450, 0.45);
+                    const compressedBase64 = await compressImage(photosFiles[i], 380, 0.35);
                     fotosBase64.push(compressedBase64);
                 }
 
@@ -291,4 +302,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
