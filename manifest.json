@@ -1,0 +1,16 @@
+{
+  "name": "App Detalles de Amor",
+  "short_name": "DetallesAmor",
+  "start_url": "/App-Detalles-Amor/",
+  "display": "standalone",
+  "background_color": "#230408",
+  "theme_color": "#58111A",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/833/833472.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
