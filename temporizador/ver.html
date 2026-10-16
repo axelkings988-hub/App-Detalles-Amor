@@ -7,7 +7,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <!-- Firebase SDKs -->
@@ -16,6 +16,8 @@
 
     <style>
         .font-cursive { font-family: 'Dancing Script', cursive; }
+        
+        /* Animación de Marquesina Continua */
         @keyframes marquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -23,7 +25,22 @@
         .animate-marquee {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 18s linear infinite;
+            animation: marquee 16s linear infinite;
+        }
+
+        /* Efécto de Destellos Brillantes Dorados */
+        @keyframes destelloBrillante {
+            0%, 100% {
+                text-shadow: 0 0 4px #fef08a, 0 0 10px #f59e0b, 0 0 18px #d97706;
+                color: #ffffff;
+            }
+            50% {
+                text-shadow: 0 0 8px #ffffff, 0 0 18px #fbbf24, 0 0 28px #f59e0b;
+                color: #fef08a;
+            }
+        }
+        .texto-destellos {
+            animation: destelloBrillante 2.5s infinite ease-in-out;
         }
     </style>
 </head>
@@ -33,19 +50,19 @@
         
         <!-- CABECERA: PARA / DE -->
         <div class="space-y-1">
-            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold">Sorpresa</span>
+            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold">Sorpresa Protegida</span>
             <h2 class="text-sm font-semibold opacity-90">Para: <span id="txtPara" class="font-bold">...</span></h2>
             <p class="text-xs opacity-75">De parte de: <span id="txtDe" class="font-bold">...</span></p>
         </div>
 
-        <!-- REGALO CON MOVIMIENTO Y MARCO ANIMADO -->
-        <div class="relative w-44 h-44 mx-auto rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20">
-            <img id="imgRegalo" src="" alt="Regalo Animado" class="w-full h-full object-cover">
+        <!-- CANDADO GIRATORIO -->
+        <div id="candadoBox" class="relative w-40 h-40 mx-auto rounded-3xl bg-black/30 flex items-center justify-center p-3 shadow-2xl border-2 border-white/20">
+            <img id="imgRegalo" src="" alt="Candado de Protección" class="w-full h-full object-contain">
         </div>
 
         <!-- MODO TEMPORIZADOR -->
         <div id="countdownBox" class="space-y-3">
-            <p class="text-xs opacity-80">El regalo se abrirá en:</p>
+            <p class="text-xs opacity-80">El contenido se desbloqueará en:</p>
             <div class="grid grid-cols-4 gap-1.5 text-center">
                 <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
                     <span id="days" class="text-xl font-bold block">00</span>
@@ -64,7 +81,7 @@
                     <span class="text-[8px] uppercase">Seg</span>
                 </div>
             </div>
-            <p class="text-[10px] italic opacity-60">🔒 Contenido protegido hasta que finalice el tiempo.</p>
+            <p class="text-[10px] italic opacity-60">🔒 Protegido con candado hasta finalizar el tiempo.</p>
         </div>
 
         <!-- MODO REVELADO -->
@@ -74,10 +91,10 @@
             </div>
         </div>
 
-        <!-- MARQUESINA DE TEXTO (FONDO NEGRO, IZQUIERDA A DERECHA) -->
-        <div class="w-full bg-black py-2.5 rounded-xl overflow-hidden border border-white/10">
+        <!-- MARQUESINA CON FONDO NEGRO, LETRA MÁS GRANDE Y DESTELLOS BRILLANTES -->
+        <div class="w-full bg-black py-3 px-2 rounded-2xl overflow-hidden border border-amber-400/40 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
             <div class="overflow-hidden whitespace-nowrap relative">
-                <p id="txtMarquesina" class="animate-marquee text-xs font-medium text-amber-200">Cargando dedicatoria...</p>
+                <p id="txtMarquesina" class="animate-marquee texto-destellos text-sm font-extrabold tracking-wide">✨ Cargando dedicatoria especial... ✨</p>
             </div>
         </div>
 
@@ -107,7 +124,7 @@
                 document.getElementById('txtPara').innerText = data.para;
                 document.getElementById('txtDe').innerText = data.de;
                 document.getElementById('imgRegalo').src = data.fotoUrl;
-                document.getElementById('txtMarquesina').innerText = data.mensaje;
+                document.getElementById('txtMarquesina').innerText = `✨ ${data.mensaje} ✨`;
 
                 iniciarReloj(data.targetDate, data);
             }
@@ -158,6 +175,7 @@
 
         function revelarRegalo(data) {
             document.getElementById('countdownBox').classList.add('hidden');
+            document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
             const container = document.getElementById('contenidoSorpresaContainer');
