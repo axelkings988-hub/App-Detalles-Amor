@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Crear Detalle de Amor</title>
+    <title>Detalle de Amor - Mis Proyectos</title>
 
     <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -67,16 +67,44 @@
 
     <audio id="pv-bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
-    <!-- FORMULARIO DE CREACIÓN -->
-    <div id="formContainer" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+    <!-- SECCIÓN 1: INICIO / PROYECTOS GUARDADOS -->
+    <div id="homeDashboard" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         <div class="text-center space-y-1">
-            <h1 class="text-3xl font-bold font-cursive text-rose-100">Crear Detalle Especial</h1>
-            <p class="text-xs text-rose-300/80">Personaliza tu regalo digital con recuerdos, música y voz</p>
+            <h1 class="text-3xl font-bold font-cursive text-rose-100">Mis Detalles de Amor</h1>
+            <p class="text-xs text-rose-300/80">Crea, guarda y edita tus proyectos antes de liberarlos</p>
         </div>
 
-        <form id="createForm" onsubmit="event.preventDefault(); generarVistaPrevia();" class="space-y-4">
+        <button onclick="mostrarFormularioCreacion()" class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <i class="fas fa-plus-circle"></i> Crear Nuevo Proyecto
+        </button>
+
+        <div class="space-y-3 pt-2">
+            <h3 class="text-xs font-semibold text-rose-200 uppercase tracking-wider"><i class="fas fa-folder-open text-rose-400"></i> Proyectos Guardados en este dispositivo:</h3>
+            <div id="listaProyectosContainer" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                <!-- Se inyecta dinámicamente -->
+                <p class="text-xs text-rose-300/60 text-center py-4 italic">No tienes proyectos guardados aún.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: FORMULARIO DE CREACIÓN / EDICIÓN -->
+    <div id="formContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+        <div class="flex items-center justify-between">
+            <button onclick="volverAlDashboard()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+            <h1 class="text-xl font-bold font-cursive text-rose-100">Nuevo Proyecto</h1>
+            <div class="w-12"></div>
+        </div>
+
+        <form id="createForm" onsubmit="event.preventDefault(); guardarYVerVistaPrevia();" class="space-y-4">
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-rose-200">1. NOMBRES DEL DETALLE:</label>
+                <label class="text-xs font-semibold text-rose-200">NOMBRE DEL PROYECTO (Para identificarlo):</label>
+                <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">1. NOMBRES EN LA TARJETA:</label>
                 <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
@@ -85,7 +113,6 @@
                 <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
-            <!-- FOTOS LIMITADAS A MÁXIMO 2 Y SOLO IMÁGENES -->
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 2):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple onchange="validarCantidadFotos(this)" required class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
@@ -112,14 +139,14 @@
             </div>
 
             <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                ✨ Generar Vista Previa
+                ✨ Guardar y Ver Vista Previa
             </button>
         </form>
 
         <!-- CARGA + ANUNCIO 1 ADSENSE REAL -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Preparando tus recuerdos...</p>
+            <p id="statusText" class="text-xs text-rose-300">Guardando tu proyecto...</p>
             
             <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[100px] flex items-center justify-center">
                 <ins class="adsbygoogle"
@@ -133,11 +160,16 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE VISTA PREVIA EN PANTALLA COMPLETA -->
+    <!-- SECCIÓN 3: VISTA PREVIA EN PANTALLA COMPLETA -->
     <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-burgundy-950/95 backdrop-blur-2xl overflow-y-auto px-4 py-12 space-y-6">
         <div class="w-full max-w-lg mx-auto space-y-6">
-            <div class="bg-rose-500 text-white text-[11px] font-bold text-center py-2 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
-                👀 VISTA PREVIA EN PANTALLA COMPLETA - Prueba tu tarjeta
+            <div class="flex items-center justify-between">
+                <button onclick="cerrarVistaPrevia()" class="text-xs text-rose-300 bg-burgundy-900 px-3 py-2 rounded-xl border border-rose-500/30 shadow flex items-center gap-1.5">
+                    <i class="fas fa-arrow-left"></i> Volver a Mis Proyectos
+                </button>
+                <div class="bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
+                    👀 VISTA PREVIA
+                </div>
             </div>
 
             <!-- JUEGO DEL CORAZÓN -->
@@ -233,7 +265,7 @@
                     <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
                 </button>
 
-                <!-- BOTÓN DE VERIFICACIÓN MANUAL DE RESPALDO (BLOQUEADO HASTA PAGAR) -->
+                <!-- BOTÓN DE VERIFICACIÓN MANUAL DE RESPALDO -->
                 <button onclick="verificarPagoManual()" class="w-full py-2.5 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors">
                     ✨ ¿Ya realizaste tu pago? Toca aquí para ver tu QR
                 </button>
@@ -278,8 +310,92 @@
         let recordedAudioBase64 = null;
         let countdownInterval = null;
         let audioStream = null;
+        let proyectoActualId = null;
 
-        // VALIDADOR PARA IMPEDIR MÁS DE 2 FOTOS
+        // CARGAR PROYECTOS GUARDADOS AL INICIO
+        window.addEventListener('DOMContentLoaded', async () => {
+            renderizarProyectosGuardados();
+
+            // Detector de retorno automático de Mercado Pago
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
+            const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
+
+            if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
+                try {
+                    const docSnap = await db.collection("detalles").doc(docId).get();
+                    if (docSnap.exists && docSnap.data().pagado === true) {
+                        proyectoActualId = docId;
+                        abrirVistaPreviaConDatos(docSnap.data(), true);
+                    }
+                } catch(e) {}
+            }
+        });
+
+        function obtenerProyectosLocales() {
+            try {
+                return JSON.parse(localStorage.getItem("misProyectosAmor") || "[]");
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function guardarProyectosLocales(proyectos) {
+            localStorage.setItem("misProyectosAmor", JSON.stringify(proyectos));
+        }
+
+        function renderizarProyectosGuardados() {
+            const container = document.getElementById('listaProyectosContainer');
+            const proyectos = obtenerProyectosLocales();
+
+            if (proyectos.length === 0) {
+                container.innerHTML = `<p class="text-xs text-rose-300/60 text-center py-4 italic">No tienes proyectos guardados aún.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            proyectos.forEach((proj) => {
+                const div = document.createElement('div');
+                div.className = 'bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/20 flex items-center justify-between gap-2';
+                div.innerHTML = `
+                    <div class="truncate">
+                        <p class="text-xs font-bold text-rose-100 truncate"><i class="fas fa-heart text-rose-500 mr-1"></i> ${proj.nombreProyecto || 'Sin nombre'}</p>
+                        <p class="text-[10px] text-rose-300/70 truncate">Para: ${proj.nombres}</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
+                            Ver / Pagar
+                        </button>
+                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function mostrarFormularioCreacion() {
+            document.getElementById('homeDashboard').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+            document.getElementById('createForm').reset();
+            recordedAudioBase64 = null;
+            document.getElementById('audioPreviewContainer').classList.add('hidden');
+        }
+
+        function volverAlDashboard() {
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('homeDashboard').classList.remove('hidden');
+            renderizarProyectosGuardados();
+        }
+
+        function cerrarVistaPrevia() {
+            document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('homeDashboard').classList.remove('hidden');
+            renderizarProyectosGuardados();
+        }
+
+        // VALIDADOR DE FOTOS
         function validarCantidadFotos(input) {
             if (input.files.length > 2) {
                 alert("⚠️ Solo puedes seleccionar un máximo de 2 fotografías para este detalle.");
@@ -375,7 +491,6 @@
         let pvPhotosArray = [];
         let currentSlide = 0;
 
-        // CONVERSIÓN ROBUSTA DE ARCHIVOS A BASE64 REAL
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -385,87 +500,8 @@
             });
         }
 
-        // DETECTOR AUTOMÁTICO AL REGRESAR DE MERCADO PAGO
-        window.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
-            const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
-
-            if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
-                try {
-                    const docSnap = await db.collection("detalles").doc(docId).get();
-                    if (docSnap.exists && docSnap.data().pagado === true) {
-                        mostrarQrYContenido(docId, docSnap.data());
-                    }
-                } catch(e) {}
-            }
-        });
-
-        // VERIFICACIÓN MANUAL DE RESPALDO (CONSULTA FIRESTORE ESTRICTAMENTE)
-        async function verificarPagoManual() {
-            let savedId = localStorage.getItem("ultimoDetalleId");
-            
-            if (!savedId) {
-                alert("No encontramos un registro reciente en este dispositivo. Por favor, genera tu detalle.");
-                return;
-            }
-
-            const btnRespaldo = event?.target || document.activeElement;
-            const textoOriginal = btnRespaldo.innerText;
-            btnRespaldo.innerText = "Verificando pago...";
-
-            try {
-                const docSnap = await db.collection("detalles").doc(savedId).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-
-                    // VALIDACIÓN: Si no está pagado en Firebase, bloquea el acceso
-                    if (data.pagado === true) {
-                        mostrarQrYContenido(savedId, data);
-                    } else {
-                        alert("⚠️ Tu pago aún no se encuentra aprobado en el sistema. Si ya pagaste, espera unos segundos e inténtalo de nuevo.");
-                    }
-                } else {
-                    alert("No se encontró el registro de este detalle.");
-                }
-            } catch (error) {
-                console.error("Error al verificar:", error);
-                alert("Ocurrió un error al verificar el estado del pago.");
-            } finally {
-                btnRespaldo.innerText = textoOriginal;
-            }
-        }
-
-        function mostrarQrYContenido(docId, data) {
-            document.getElementById('formContainer')?.classList.add('hidden');
-            document.getElementById('previewContainer')?.classList.remove('hidden');
-            document.getElementById('paySection')?.classList.add('hidden');
-            document.getElementById('pv-heart-section')?.classList.add('hidden');
-            document.getElementById('pv-mainContent')?.classList.remove('hidden');
-            document.getElementById('pv-musicPlayerContainer')?.classList.remove('hidden');
-
-            document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
-            document.getElementById('pv-mainDate').innerText = data.fecha;
-            document.getElementById('pv-cardMessage').innerText = data.mensaje;
-            pvPhotosArray = data.fotos || [];
-            buildPvCarousel();
-
-            const resultBox = document.getElementById('resultBox');
-            if (resultBox) {
-                resultBox.classList.remove('hidden');
-                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docId}`;
-                document.getElementById('finalLink').href = finalLink;
-                
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), {
-                    text: finalLink,
-                    width: 160,
-                    height: 160
-                });
-            }
-        }
-
-        async function generarVistaPrevia() {
+        // GUARDAR PROYECTO EN FIREBASE Y LOCALSTORAGE
+        async function guardarYVerVistaPrevia() {
             const photosFiles = document.getElementById('photosInput').files;
             if (!photosFiles || photosFiles.length === 0) return;
 
@@ -481,29 +517,124 @@
                     pvPhotosArray.push(base64Data);
                 }
 
-                document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${document.getElementById('nombresInput').value.trim()}`;
-                document.getElementById('pv-mainDate').innerText = document.getElementById('fechaInput').value.trim();
-                document.getElementById('pv-cardMessage').innerText = document.getElementById('mensajeInput').value.trim();
+                const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
+                const nombres = document.getElementById('nombresInput').value.trim();
+                const fecha = document.getElementById('fechaInput').value.trim();
+                const mensaje = document.getElementById('mensajeInput').value.trim();
 
-                buildPvCarousel();
-                loadPvQuizQuestion();
+                // Guardar en Firestore con pagado: false
+                const docRef = await db.collection("detalles").add({
+                    nombreProyecto: nombreProj,
+                    nombres: nombres,
+                    fecha: fecha,
+                    mensaje: mensaje,
+                    fotos: pvPhotosArray,
+                    voiceNoteBase64: recordedAudioBase64 || null,
+                    pagado: false, 
+                    creado: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-                if (recordedAudioBase64) {
-                    document.getElementById('pv-voicePlayer').src = recordedAudioBase64;
-                    document.getElementById('pv-voiceSection').classList.remove('hidden');
-                }
+                proyectoActualId = docRef.id;
+                localStorage.setItem("ultimoDetalleId", proyectoActualId);
 
-                document.getElementById('formContainer').classList.add('hidden');
-                document.getElementById('previewContainer').classList.remove('hidden');
-                document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
+                // Guardar en la lista local de proyectos guardados
+                let proyectos = obtenerProyectosLocales();
+                proyectos.unshift({
+                    firebaseId: proyectoActualId,
+                    nombreProyecto: nombreProj,
+                    nombres: nombres
+                });
+                guardarProyectosLocales(proyectos);
+
+                abrirVistaPreviaConDatos({
+                    nombreProyecto: nombreProj,
+                    nombres: nombres,
+                    fecha: fecha,
+                    mensaje: mensaje,
+                    fotos: pvPhotosArray,
+                    voiceNoteBase64: recordedAudioBase64,
+                    pagado: false
+                }, false);
+
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
+                document.getElementById('formContainer').classList.add('hidden');
 
             } catch (error) {
                 console.error(error);
-                alert("Ocurrió un error al cargar las imágenes.");
+                alert("Ocurrió un error al guardar el proyecto.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
+            }
+        }
+
+        async function cargarProyecto(firebaseId) {
+            proyectoActualId = firebaseId;
+            localStorage.setItem("ultimoDetalleId", firebaseId);
+
+            try {
+                const docSnap = await db.collection("detalles").doc(firebaseId).get();
+                if (docSnap.exists) {
+                    abrirVistaPreviaConDatos(docSnap.data(), docSnap.data().pagado === true);
+                } else {
+                    alert("No se encontró el proyecto en la base de datos.");
+                }
+            } catch(e) {
+                alert("Error al cargar el proyecto.");
+            }
+        }
+
+        function eliminarProyecto(firebaseId) {
+            if (confirm("¿Estás seguro de eliminar este proyecto guardado?")) {
+                let proyectos = obtenerProyectosLocales();
+                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                guardarProyectosLocales(proyectos);
+                renderizarProyectosGuardados();
+            }
+        }
+
+        function abrirVistaPreviaConDatos(data, yaPagado) {
+            document.getElementById('homeDashboard').classList.add('hidden');
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('previewContainer').classList.remove('hidden');
+            document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
+
+            document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
+            document.getElementById('pv-mainDate').innerText = data.fecha;
+            document.getElementById('pv-cardMessage').innerText = data.mensaje;
+            pvPhotosArray = data.fotos || [];
+            buildPvCarousel();
+
+            if (data.voiceNoteBase64) {
+                document.getElementById('pv-voicePlayer').src = data.voiceNoteBase64;
+                document.getElementById('pv-voiceSection').classList.remove('hidden');
+            } else {
+                document.getElementById('pv-voiceSection').classList.add('hidden');
+            }
+
+            loadPvQuizQuestion();
+
+            if (yaPagado) {
+                document.getElementById('pv-heart-section').classList.add('hidden');
+                document.getElementById('pv-mainContent').classList.remove('hidden');
+                document.getElementById('paySection').classList.add('hidden');
+                
+                const resultBox = document.getElementById('resultBox');
+                resultBox.classList.remove('hidden');
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${proyectoActualId}`;
+                document.getElementById('finalLink').href = finalLink;
+                
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: finalLink,
+                    width: 160,
+                    height: 160
+                });
+            } else {
+                document.getElementById('pv-heart-section').classList.remove('hidden');
+                document.getElementById('pv-mainContent').classList.add('hidden');
+                document.getElementById('paySection').classList.remove('hidden');
+                document.getElementById('resultBox').classList.add('hidden');
             }
         }
 
@@ -612,51 +743,54 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // GUARDAR EN FIREBASE CON 'pagado: false' Y REDIRIGIR A MERCADO PAGO
+        // PROCESAR PAGO MERCADO PAGO
         async function procesarPagoMercadoPago() {
+            if (!proyectoActualId) {
+                alert("No hay un proyecto activo seleccionado.");
+                return;
+            }
+
             const btnText = document.getElementById('payBtnText');
-            btnText.innerText = "Generando pago...";
+            btnText.innerText = "Redirigiendo a pago...";
+            window.location.href = `https://mpago.la/225XuPD`;
+        }
+
+        // VERIFICACIÓN MANUAL DE RESPALDO
+        async function verificarPagoManual() {
+            if (!proyectoActualId) {
+                alert("No hay un proyecto activo seleccionado.");
+                return;
+            }
+
+            const btnRespaldo = event?.target || document.activeElement;
+            const textoOriginal = btnRespaldo.innerText;
+            btnRespaldo.innerText = "Verificando pago...";
 
             try {
-                let uploadedUrls = [...pvPhotosArray];
+                const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
 
-                if (uploadedUrls.length === 0) {
-                    const photosFiles = document.getElementById('photosInput').files;
-                    if (photosFiles && photosFiles.length > 0) {
-                        const maxFotos = Math.min(photosFiles.length, 2);
-                        for (let i = 0; i < maxFotos; i++) {
-                            const base64Data = await fileToBase64(photosFiles[i]);
-                            uploadedUrls.push(base64Data);
-                        }
+                    if (data.pagado === true) {
+                        abrirVistaPreviaConDatos(data, true);
+                    } else {
+                        alert("⚠️ Tu pago aún no se encuentra aprobado en el sistema. Si ya realizaste el pago, espera unos segundos e inténtalo de nuevo.");
                     }
+                } else {
+                    alert("No se encontró el registro de este proyecto.");
                 }
-
-                // Guardar en Firestore con pagado: false
-                const docRef = await db.collection("detalles").add({
-                    nombres: document.getElementById('nombresInput').value.trim() || "Detalle de Amor",
-                    fecha: document.getElementById('fechaInput').value.trim() || "",
-                    mensaje: document.getElementById('mensajeInput').value.trim() || "",
-                    fotos: uploadedUrls,
-                    voiceNoteBase64: recordedAudioBase64 || null,
-                    pagado: false, 
-                    creado: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // Guardar el ID en el almacenamiento local como referencia
-                localStorage.setItem("ultimoDetalleId", docRef.id);
-
-                // Redirigir a Mercado Pago
-                window.location.href = `https://mpago.la/225XuPD`;
-
             } catch (error) {
-                console.error("Error al procesar: ", error);
-                window.location.href = `https://mpago.la/225XuPD`;
+                console.error("Error al verificar:", error);
+                alert("Ocurrió un error al verificar el estado del pago.");
+            } finally {
+                btnRespaldo.innerText = textoOriginal;
             }
         }
 
         function copiarEnlace() {
-            if (generatedUrl) {
-                navigator.clipboard.writeText(generatedUrl).then(() => {
+            if (proyectoActualId) {
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${proyectoActualId}`;
+                navigator.clipboard.writeText(finalLink).then(() => {
                     alert("¡Enlace copiado al portapapeles! ❤️");
                 });
             }
