@@ -385,7 +385,6 @@
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
-                    rawFiles: Array.from(photosFiles).slice(0, 4),
                     voiceNoteBase64: recordedAudioBase64 || null
                 };
 
@@ -520,21 +519,28 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // PROCESO DE SUBIDA SEGURO SIN ALERTAS CONGELANTES Y REDIRECCIÓN A MERCADO PAGO
+        // PROCESO DE PAGO BLINDADO CONTRA ERRORES DE ARCHIVO
         async function procesarPagoMercadoPago() {
             try {
-                const rawFiles = tempFormData.rawFiles || [];
-                const uploadedUrls = [];
+                // Leemos directamente del input de archivos para asegurar que la foto siempre esté presente
+                const photosFiles = document.getElementById('photosInput').files;
+                if (!photosFiles || photosFiles.length === 0) {
+                    alert("Por favor selecciona una fotografía.");
+                    return;
+                }
 
-                // Convertimos las fotos a Base64 localmente si ImgBB llega a fallar o tardar mucho
-                for (let file of rawFiles) {
+                const uploadedUrls = [];
+                const maxFotos = Math.min(photosFiles.length, 4);
+
+                for (let i = 0; i < maxFotos; i++) {
+                    const file = photosFiles[i];
                     try {
                         const formData = new FormData();
                         formData.append("image", file);
 
-                        // Intentamos subir a ImgBB con un límite de tiempo
+                        // Tiempo de espera máximo de 6 segundos para evitar bloqueos
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos máx
+                        const timeoutId = setTimeout(() => controller.abort(), 6000);
 
                         const response = await fetch("https://api.imgbb.com/1/upload?key=6d207488941253245492d2b591b9efb9", {
                             method: "POST",
@@ -548,7 +554,7 @@
                             uploadedUrls.push(data.data.url);
                         }
                     } catch (err) {
-                        // Respaldo automático: si falla ImgBB, convertimos la foto a Base64 para que NUNCA falle
+                        // Respaldo instantáneo en Base64 si ImgBB no responde rápido
                         const base64Fallback = await new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onload = (e) => resolve(e.target.result);
@@ -559,7 +565,7 @@
                 }
 
                 if (uploadedUrls.length === 0) {
-                    alert("Por favor selecciona una foto válida.");
+                    alert("No se pudo procesar la imagen. Inténtalo de nuevo.");
                     return;
                 }
 
@@ -576,12 +582,11 @@
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // REDIRECCIÓN DIRECTA A MERCADO PAGO SIN CONGELARSE
+                // REDIRECCIÓN DIRECTA A MERCADO PAGO SIN INTERRUPCIONES
                 window.location.href = "https://mpago.la/225XuPD";
 
             } catch (error) {
                 console.error("Error al procesar: ", error);
-                // Respaldo final de redirección por si acaso
                 window.location.href = "https://mpago.la/225XuPD";
             }
         }
