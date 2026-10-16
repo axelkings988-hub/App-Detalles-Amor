@@ -229,6 +229,12 @@
             <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                 <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
             </button>
+
+            <!-- BOTÓN DE VERIFICACIÓN MANUAL DE RESPALDO -->
+            <button onclick="verificarPagoManual()" class="w-full py-2.5 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors">
+                ✨ ¿Ya realizaste tu pago? Toca aquí para ver tu QR
+            </button>
+
             <p class="text-[10px] text-rose-300/60">Pago 100% seguro procesado por Mercado Pago.</p>
         </div>
 
@@ -370,7 +376,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
-            const docId = urlParams.get('id');
+            const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
 
             if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
                 document.getElementById('formContainer')?.classList.add('hidden');
@@ -407,6 +413,49 @@
                 }
             }
         });
+
+        // VERIFICACIÓN MANUAL DE RESPALDO
+        async function verificarPagoManual() {
+            let savedId = localStorage.getItem("ultimoDetalleId");
+            
+            if (!savedId) {
+                alert("No encontramos un registro reciente en este dispositivo. Si ya pagaste, contáctanos.");
+                return;
+            }
+
+            document.getElementById('formContainer')?.classList.add('hidden');
+            document.getElementById('previewContainer')?.classList.remove('hidden');
+            document.getElementById('paySection')?.classList.add('hidden');
+            document.getElementById('pv-heart-section')?.classList.add('hidden');
+            document.getElementById('pv-mainContent')?.classList.remove('hidden');
+            document.getElementById('pv-musicPlayerContainer')?.classList.remove('hidden');
+
+            try {
+                const docSnap = await db.collection("detalles").doc(savedId).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
+                    document.getElementById('pv-mainDate').innerText = data.fecha;
+                    document.getElementById('pv-cardMessage').innerText = data.mensaje;
+                    pvPhotosArray = data.fotos || [];
+                    buildPvCarousel();
+                }
+            } catch(e) {}
+
+            const resultBox = document.getElementById('resultBox');
+            if (resultBox) {
+                resultBox.classList.remove('hidden');
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${savedId}`;
+                document.getElementById('finalLink').href = finalLink;
+                
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: finalLink,
+                    width: 160,
+                    height: 160
+                });
+            }
+        }
 
         async function generarVistaPrevia() {
             const photosFiles = document.getElementById('photosInput').files;
@@ -554,7 +603,7 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // GUARDAR DATOS EN FIREBASE Y REDIRIGIR A MERCADO PAGO CON ID DE RETORNO
+        // GUARDAR EN FIREBASE, ALMACENAR ID EN CELULAR Y REDIRIGIR A MERCADO PAGO
         async function procesarPagoMercadoPago() {
             const btnText = document.getElementById('payBtnText');
             btnText.innerText = "Generando pago...";
@@ -571,7 +620,7 @@
                     }
                 }
 
-                // Guardar en Firestore antes de salir a Mercado Pago
+                // Guardar en Firestore
                 const docRef = await db.collection("detalles").add({
                     nombres: document.getElementById('nombresInput').value.trim() || "Detalle de Amor",
                     fecha: document.getElementById('fechaInput').value.trim() || "",
@@ -582,15 +631,15 @@
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // URL de retorno automática a tu propia página con el ID único
-                const retornoUrl = encodeURIComponent(`https://axelkings988-hub.github.io/App-Detalles-Amor/?status=success&id=${docRef.id}`);
-                
-                // Redirigir al link de Mercado Pago agregando la redirección de éxito si lo soporta, o directo a tu link de pago
+                // Guardar el ID en la memoria local del navegador como respaldo
+                localStorage.setItem("ultimoDetalleId", docRef.id);
+
+                // Redirigir a Mercado Pago
                 window.location.href = `https://mpago.la/225XuPD`;
 
             } catch (error) {
                 console.error("Error al procesar: ", error);
-                window.location.href = "https://mpago.la/225XuPD";
+                window.location.href = `https://mpago.la/225XuPD`;
             }
         }
 
