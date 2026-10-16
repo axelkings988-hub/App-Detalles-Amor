@@ -53,9 +53,14 @@
         .candado-animado {
             animation: girarCandado 3s ease-in-out infinite;
         }
+
+        /* Transición suave para el fondo completo */
+        body {
+            transition: background 0.8s ease-in-out;
+        }
     </style>
 </head>
-<body id="bodyBg" class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
+<body id="bodyBg" class="p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
 
     <div id="mainContainer" class="w-full max-w-md backdrop-blur-xl border p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
         
@@ -96,14 +101,14 @@
             <p class="text-[10px] italic opacity-60">🔒 Protegido con candado hasta finalizar el tiempo.</p>
         </div>
 
-        <!-- MODO REVELADO CON FONDO ANIMADO TEMÁTICO -->
+        <!-- MODO REVELADO -->
         <div id="revealedBox" class="hidden space-y-4">
-            <div id="contenidoSorpresaContainer" class="p-5 rounded-3xl border border-white/30 text-center shadow-2xl relative overflow-hidden bg-cover bg-center">
-                <!-- Se inyecta la sorpresa con fondo en movimiento personalizado -->
+            <div id="contenidoSorpresaContainer" class="p-5 rounded-3xl bg-black/60 backdrop-blur-md border border-white/30 text-center shadow-2xl relative overflow-hidden">
+                <!-- Se inyecta la sorpresa elegida -->
             </div>
         </div>
 
-        <!-- LETRERO LED DIGITAL GIGANTE (APARECE SOLO AL FINALIZAR) -->
+        <!-- LETRERO LED DIGITAL GIGANTE -->
         <div id="ledPanelContainer" class="hidden w-full space-y-1">
             <div class="led-panel w-full py-7 px-1 rounded-2xl overflow-hidden shadow-2xl relative border-amber-500/50">
                 <marquee scrollamount="9" scrolldelay="20" class="w-full flex items-center">
@@ -128,10 +133,10 @@
 
         let datosGlobales = {};
 
-        // GIFS ANIMADOS DE FONDO PARA EL CONTENIDO REVELADO SEGÚN EL EVENTO
+        // GIFS ANIMADOS DE FONDO PANTALLA COMPLETA SEGÚN EL EVENTO
         const fondosRevelados = {
             familiar: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bTVhNDk0M3lqcjlybmV1YWphdW9xN3R6a2RmbzN0bXpyeHVqdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26ufdipQqU2lhNA4g/giphy.gif",
-            pareja: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHBpbnljcGJ6a3I1N3M1MnF5OHgybjQ5M2k2NHp3OW1rczVjMmtkciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw5L6w/giphy.gif",
+            pareja: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHBpbnljcGJ6a3I1N3M1MnF5OHgybjQ5M2k2NHp3OW1rczVjMmtkciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L6w/giphy.gif",
             cumpleaños: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGZvdHh6aG55OHpucmdxMXA0ZW9mbnI1M3o5cWJqb3lqMGF4amM5ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g01ZnwAUvutuK8GIQn/giphy.gif"
         };
 
@@ -199,21 +204,22 @@
             document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
-            // Asigna el texto y muestra el letrero LED Gigante
+            // Muestra el letrero LED Gigante
             document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
-            // Asigna el fondo animado predeterminado según el estilo del evento
-            const container = document.getElementById('contenidoSorpresaContainer');
+            // CAMBIA EL FONDO COMPLETO DE LA PÁGINA (BODY) A LA ANIMACIÓN TEMÁTICA
+            const body = document.getElementById('bodyBg');
             const gifFondo = fondosRevelados[data.estilo] || fondosRevelados['familiar'];
-            container.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('${gifFondo}')`;
+            body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${gifFondo}')`;
 
+            const container = document.getElementById('contenidoSorpresaContainer');
             if(data.tipoSorpresa === 'audio') {
                 container.innerHTML = `<p class="text-xs mb-3 font-bold text-amber-300 drop-shadow">🎵 Nota de Voz Recibida</p>
                                        <audio controls class="w-full"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>`;
             } else if(data.tipoSorpresa === 'foto') {
                 container.innerHTML = `<p class="text-xs mb-3 font-bold text-amber-300 drop-shadow">🖼️ Foto Secreta Revelada</p>
-                                       <img src="${data.contenidoSorpresa}" class="w-full max-h-80 object-contain rounded-2xl border-2 border-white/30 mx-auto bg-black/60 shadow-xl">`;
+                                       <img src="${data.contenidoSorpresa}" class="w-full max-h-80 object-contain rounded-2xl border-2 border-white/30 mx-auto bg-black/60 shadow-2xl">`;
             } else if(data.tipoSorpresa === 'cupon') {
                 container.innerHTML = `<p class="text-xs mb-3 font-bold text-amber-300 drop-shadow">🎟️ ¡Premio Desbloqueado!</p>
                                        <div class="p-4 bg-black/70 rounded-2xl border-2 border-dashed border-amber-300 text-base font-extrabold text-amber-100 shadow-xl">${data.contenidoSorpresa}</div>
