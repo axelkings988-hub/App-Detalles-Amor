@@ -226,8 +226,8 @@
             </div>
 
             <!-- BOTÓN DE PAGO MERCADO PAGO -->
-            <button onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                💳 Desbloquear Código QR ($25.00 MXN)
+            <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
             </button>
             <p class="text-[10px] text-rose-300/60">Pago 100% seguro procesado por Mercado Pago.</p>
         </div>
@@ -344,7 +344,7 @@
                 }, 1000);
 
             } catch (e) {
-                alert("No se pudo acceder al micrófono.");
+                console.warn("Acceso a micrófono no otorgado.");
             }
         }
 
@@ -357,11 +357,20 @@
         let pvPhotosArray = [];
         let currentSlide = 0;
 
-        async function generarVistaPrevia() {
-            const fotosFiles = document.getElementById('photosInput').files;
+        // Convierte archivos a Base64 súper ligero sin fallar por CORS o timeout de red
+        function fileToBase64(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => resolve("https://via.placeholder.com/400x500");
+                reader.readAsDataURL(file);
+            });
+        }
 
-            if (!fotosFiles || fotosFiles.length === 0) {
-                alert("Por favor selecciona al menos una fotografía.");
+        async function generarVistaPrevia() {
+            const photosFiles = document.getElementById('photosInput').files;
+
+            if (!photosFiles || photosFiles.length === 0) {
                 return;
             }
 
@@ -370,11 +379,11 @@
 
             try {
                 pvPhotosArray = [];
-                const maxFotos = Math.min(fotosFiles.length, 4);
+                const maxFotos = Math.min(photosFiles.length, 4);
                 
                 for (let i = 0; i < maxFotos; i++) {
-                    const localUrl = URL.createObjectURL(fotosFiles[i]);
-                    pvPhotosArray.push(localUrl);
+                    const base64Data = await fileToBase64(photosFiles[i]);
+                    pvPhotosArray.push(base64Data);
                 }
 
                 document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${document.getElementById('nombresInput').value.trim()}`;
@@ -397,7 +406,6 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Ocurrió un error al procesar las fotografías.");
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -508,55 +516,30 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // PROCESO DE PAGO BLINDADO Y REDIRECCIÓN INMEDIATA A MERCADO PAGO
+        // REDIRECCIÓN DIRECTA A MERCADO PAGO GARANTIZADA SIN INTERRUPCIONES
         async function procesarPagoMercadoPago() {
+            const btnText = document.getElementById('payBtnText');
+            btnText.innerText = "Procesando...";
+
             try {
-                const photosFiles = document.getElementById('photosInput').files;
-                if (!photosFiles || photosFiles.length === 0) {
-                    alert("Por favor selecciona una fotografía.");
-                    return;
-                }
+                // Si la vista previa ya procesó las imágenes, las reocupamos directamente
+                let uploadedUrls = [...pvPhotosArray];
 
-                const uploadedUrls = [];
-                const maxFotos = Math.min(photosFiles.length, 4);
-
-                for (let i = 0; i < maxFotos; i++) {
-                    const file = photosFiles[i];
-                    try {
-                        const formData = new FormData();
-                        formData.append("image", file);
-
-                        // Límite de 5 segundos para que la red móvil no se cuelgue
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-                        const response = await fetch("https://api.imgbb.com/1/upload?key=6d207488941253245492d2b591b9efb9", {
-                            method: "POST",
-                            body: formData,
-                            signal: controller.signal
-                        });
-                        clearTimeout(timeoutId);
-
-                        const data = await response.json();
-                        if (data && data.success) {
-                            uploadedUrls.push(data.data.url);
-                        }
-                    } catch (err) {
-                        // Respaldo Base64 ultrarrápido por si la API de ImgBB falla
-                        const base64Fallback = await new Promise((resolve) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target.result);
-                            reader.readAsDataURL(file);
-                        });
-                        uploadedUrls.push(base64Fallback);
+                // Si por alguna razón la lista está vacía, procesamos los archivos del input
+                if (uploadedUrls.length === 0) {
+                    const photosFiles = document.getElementById('photosInput').files;
+                    if (photosFiles && photosFiles.length > 0) {
+                        const file = photosFiles[0];
+                        const base64Data = await fileToBase64(file);
+                        uploadedUrls.push(base64Data);
                     }
                 }
 
-                // Guardamos en Firebase Firestore con los datos del formulario directamente
+                // Registro en Firebase Firestore
                 const docRef = await db.collection("detalles").add({
-                    nombres: document.getElementById('nombresInput').value.trim(),
-                    fecha: document.getElementById('fechaInput').value.trim(),
-                    mensaje: document.getElementById('mensajeInput').value.trim(),
+                    nombres: document.getElementById('nombresInput').value.trim() || "Detalle de Amor",
+                    fecha: document.getElementById('fechaInput').value.trim() || "",
+                    mensaje: document.getElementById('mensajeInput').value.trim() || "",
                     fotos: uploadedUrls,
                     voiceNoteBase64: recordedAudioBase64 || null,
                     pagado: false, 
@@ -565,11 +548,10 @@
 
                 generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
 
-                // REDIRECCIÓN DIRECTA A TU CUENTA DE MERCADO PAGO
-                window.location.href = "https://mpago.la/225XuPD";
-
             } catch (error) {
-                console.error("Error al procesar: ", error);
+                console.error("Error al guardar registro: ", error);
+            } finally {
+                // REDIRECCIÓN INCONDICIONAL A TU MERCADO PAGO
                 window.location.href = "https://mpago.la/225XuPD";
             }
         }
