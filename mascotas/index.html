@@ -1,1 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Creador - Placa QR de Mascota</title>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+        }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
+
+    <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
+        
+        <!-- ENCABEZADO -->
+        <div class="space-y-1">
+            <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
+            <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
+            <p class="text-xs text-slate-300">Crea el perfil de emergencia para proteger a tu compañero.</p>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div id="formContainer" class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
+                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Especie / Raza</label>
+                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Golden" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono de Contacto *</label>
+                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">URL de la Foto de la Mascota</label>
+                <input type="url" id="fotoMascota" placeholder="https://ejemplo.com/foto.jpg" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                <span class="text-[10px] text-slate-400 mt-1 block">Puedes usar un enlace directo de foto o subida a la red.</span>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Señas Particulares o Medicamentos</label>
+                <textarea id="detallesMascota" rows="2" placeholder="Ej. Mancha blanca en el pecho, alérgico al pollo..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400"></textarea>
+            </div>
+
+            <button onclick="generarPlacaQR()" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg text-sm transition-all active:scale-95">
+                🚀 Generar Placa y Código QR
+            </button>
+        </div>
+
+        <!-- SECCIÓN DE RESULTADO Y QR -->
+        <div id="resultContainer" class="hidden space-y-4 text-center">
+            <div class="p-4 bg-black/50 rounded-2xl border border-white/20 space-y-3">
+                <p class="text-xs font-bold text-emerald-300">✨ ¡Placa generada con éxito!</p>
+                <div id="qrcode" class="bg-white p-3 rounded-xl inline-block shadow-lg"></div>
+                <p class="text-[11px] text-slate-300 break-all select-all" id="txtEnlacePublico"></p>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="copiarEnlace()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs shadow-md">
+                    📋 Copiar Enlace Público
+                </button>
+                <button onclick="descargarQR()" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-md">
+                    📥 Descargar Código QR
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let enlaceGenerado = "";
+
+        async function generarPlacaQR() {
+            const nombre = document.getElementById('nombreMascota').value.trim();
+            const raza = document.getElementById('razaMascota').value.trim();
+            const telefono = document.getElementById('telefonoDuenio').value.trim();
+            const foto = document.getElementById('fotoMascota').value.trim();
+            const detalles = document.getElementById('detallesMascota').value.trim();
+
+            if (!nombre || !telefono) {
+                alert("Por favor ingresa al menos el nombre de la mascota y el teléfono de contacto.");
+                return;
+            }
+
+            try {
+                // Guardar en Firestore bajo la colección "mascotas"
+                const docRef = await db.collection("mascotas").add({
+                    nombre,
+                    raza: raza || "No especificada",
+                    telefono,
+                    foto: foto || "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
+                    detalles: detalles || "Ninguna",
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Construir enlace hacia ver.html
+                const baseUrl = window.location.href.replace('index.html', '');
+                enlaceGenerado = `${baseUrl}ver.html?id=${docRef.id}`;
+
+                // Ocultar formulario y mostrar resultado QR
+                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('resultContainer').classList.remove('hidden');
+                document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
+
+                // Generar QR gráfico
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = "";
+                var qr = qrcode(0, 'M');
+                qr.addData(enlaceGenerado);
+                qr.make();
+                qrContainer.innerHTML = qr.createImgTag(5);
+
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Hubo un error al generar la placa. Intenta de nuevo.");
+            }
+        }
+
+        function copiarEnlace() {
+            navigator.clipboard.writeText(enlaceGenerado);
+            alert("¡Enlace copiado al portapapeles!");
+        }
+
+        function descargarQR() {
+            const img = document.querySelector('#qrcode img');
+            if(!img) return;
+            const link = document.createElement('a');
+            link.download = 'qr-mascota.png';
+            link.href = img.src;
+            link.click();
+        }
+    </script>
+</body>
+</html>
