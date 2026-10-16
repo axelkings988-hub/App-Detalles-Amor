@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sorpresa Programada</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amberCustom: { 800: '#78350F', 900: '#451A03', 950: '#260B02' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #260B02 0%, #451A03 50%, #78350F 100%); color: #FEF3C7; min-height: 100vh; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md bg-amberCustom-900/70 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-6">
+        <h1 id="titleDisplay" class="text-2xl font-bold text-amber-100">Cargando Sorpresa...</h1>
+
+        <!-- MODO TEMPORIZADOR ACTIVO -->
+        <div id="countdownBox" class="space-y-4">
+            <p class="text-xs text-amber-300/80">Esta sorpresa se desbloqueará automáticamente en:</p>
+            <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
+                    <span id="days" class="text-2xl font-bold text-amber-400 block">00</span>
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Días</span>
+                </div>
+                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
+                    <span id="hours" class="text-2xl font-bold text-amber-400 block">00</span>
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Horas</span>
+                </div>
+                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
+                    <span id="minutes" class="text-2xl font-bold text-amber-400 block">00</span>
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Min</span>
+                </div>
+                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
+                    <span id="seconds" class="text-2xl font-bold text-amber-400 block">00</span>
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Seg</span>
+                </div>
+            </div>
+            <div class="p-4 bg-amberCustom-950/40 rounded-2xl border border-amber-500/10 text-xs text-amber-300/60 italic">
+                🔒 Contenido bloqueado hasta completar la cuenta regresiva.
+            </div>
+        </div>
+
+        <!-- MODO REVELADO -->
+        <div id="revealedBox" class="hidden space-y-4 animate-fade-in">
+            <div class="bg-amberCustom-950/80 p-5 rounded-2xl border border-amber-500/30 text-left">
+                <p id="messageDisplay" class="text-xs text-amber-100 leading-relaxed whitespace-pre-line"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let timerInterval = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const docId = urlParams.get('id');
+
+            if (!docId) {
+                document.getElementById('titleDisplay').innerText = "Enlace inválido";
+                return;
+            }
+
+            try {
+                const docSnap = await db.collection("temporizadores").doc(docId).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    document.getElementById('titleDisplay').innerText = data.titulo;
+                    iniciarCuentaRegresiva(data.targetDate, data.mensaje);
+                } else {
+                    document.getElementById('titleDisplay').innerText = "Sorpresa no encontrada";
+                }
+            } catch(e) {
+                document.getElementById('titleDisplay').innerText = "Error de conexión";
+            }
+        });
+
+        function iniciarCuentaRegresiva(targetDateIso, mensaje) {
+            const targetTime = new Date(targetDateIso).getTime();
+
+            timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetTime - now;
+
+                if (distance <= 0) {
+                    clearInterval(timerInterval);
+                    desbloquearMensaje(mensaje);
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+                document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+                document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+                document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+            }, 1000);
+        }
+
+        function desbloquearMensaje(mensaje) {
+            document.getElementById('countdownBox').classList.add('hidden');
+            document.getElementById('messageDisplay').innerText = mensaje;
+            document.getElementById('revealedBox').classList.remove('hidden');
+            if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+    </script>
+</body>
+</html>
 
