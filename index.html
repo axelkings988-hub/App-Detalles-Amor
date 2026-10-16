@@ -233,7 +233,7 @@
                     <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
                 </button>
 
-                <!-- BOTÓN DE VERIFICACIÓN MANUAL DE RESPALDO -->
+                <!-- BOTÓN DE VERIFICACIÓN MANUAL DE RESPALDO (BLOQUEADO HASTA PAGAR) -->
                 <button onclick="verificarPagoManual()" class="w-full py-2.5 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors">
                     ✨ ¿Ya realizaste tu pago? Toca aquí para ver tu QR
                 </button>
@@ -392,50 +392,51 @@
             const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
 
             if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
-                document.getElementById('formContainer')?.classList.add('hidden');
-                document.getElementById('previewContainer')?.classList.remove('hidden');
-                document.getElementById('pv-musicPlayerContainer')?.classList.remove('hidden');
-                document.getElementById('pv-heart-section')?.classList.add('hidden');
-                document.getElementById('pv-mainContent')?.classList.remove('hidden');
-                document.getElementById('paySection')?.classList.add('hidden');
-                
                 try {
                     const docSnap = await db.collection("detalles").doc(docId).get();
-                    if (docSnap.exists) {
-                        const data = docSnap.data();
-                        document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
-                        document.getElementById('pv-mainDate').innerText = data.fecha;
-                        document.getElementById('pv-cardMessage').innerText = data.mensaje;
-                        pvPhotosArray = data.fotos || [];
-                        buildPvCarousel();
+                    if (docSnap.exists && docSnap.data().pagado === true) {
+                        mostrarQrYContenido(docId, docSnap.data());
                     }
                 } catch(e) {}
-
-                const resultBox = document.getElementById('resultBox');
-                if (resultBox) {
-                    resultBox.classList.remove('hidden');
-                    const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docId}`;
-                    document.getElementById('finalLink').href = finalLink;
-                    
-                    document.getElementById('qrcode').innerHTML = "";
-                    new QRCode(document.getElementById("qrcode"), {
-                        text: finalLink,
-                        width: 160,
-                        height: 160
-                    });
-                }
             }
         });
 
-        // VERIFICACIÓN MANUAL DE RESPALDO
+        // VERIFICACIÓN MANUAL DE RESPALDO (CONSULTA FIRESTORE ESTRICTAMENTE)
         async function verificarPagoManual() {
             let savedId = localStorage.getItem("ultimoDetalleId");
             
             if (!savedId) {
-                alert("No encontramos un registro reciente en este dispositivo. Si ya pagaste, contáctanos.");
+                alert("No encontramos un registro reciente en este dispositivo. Por favor, genera tu detalle.");
                 return;
             }
 
+            const btnRespaldo = event?.target || document.activeElement;
+            const textoOriginal = btnRespaldo.innerText;
+            btnRespaldo.innerText = "Verificando pago...";
+
+            try {
+                const docSnap = await db.collection("detalles").doc(savedId).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+
+                    // VALIDACIÓN: Si no está pagado en Firebase, bloquea el acceso
+                    if (data.pagado === true) {
+                        mostrarQrYContenido(savedId, data);
+                    } else {
+                        alert("⚠️ Tu pago aún no se encuentra aprobado en el sistema. Si ya pagaste, espera unos segundos e inténtalo de nuevo.");
+                    }
+                } else {
+                    alert("No se encontró el registro de este detalle.");
+                }
+            } catch (error) {
+                console.error("Error al verificar:", error);
+                alert("Ocurrió un error al verificar el estado del pago.");
+            } finally {
+                btnRespaldo.innerText = textoOriginal;
+            }
+        }
+
+        function mostrarQrYContenido(docId, data) {
             document.getElementById('formContainer')?.classList.add('hidden');
             document.getElementById('previewContainer')?.classList.remove('hidden');
             document.getElementById('paySection')?.classList.add('hidden');
@@ -443,22 +444,16 @@
             document.getElementById('pv-mainContent')?.classList.remove('hidden');
             document.getElementById('pv-musicPlayerContainer')?.classList.remove('hidden');
 
-            try {
-                const docSnap = await db.collection("detalles").doc(savedId).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
-                    document.getElementById('pv-mainDate').innerText = data.fecha;
-                    document.getElementById('pv-cardMessage').innerText = data.mensaje;
-                    pvPhotosArray = data.fotos || [];
-                    buildPvCarousel();
-                }
-            } catch(e) {}
+            document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
+            document.getElementById('pv-mainDate').innerText = data.fecha;
+            document.getElementById('pv-cardMessage').innerText = data.mensaje;
+            pvPhotosArray = data.fotos || [];
+            buildPvCarousel();
 
             const resultBox = document.getElementById('resultBox');
             if (resultBox) {
                 resultBox.classList.remove('hidden');
-                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${savedId}`;
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docId}`;
                 document.getElementById('finalLink').href = finalLink;
                 
                 document.getElementById('qrcode').innerHTML = "";
@@ -617,7 +612,7 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // GUARDAR EN FIREBASE, ALMACENAR ID EN CELULAR Y REDIRIGIR A MERCADO PAGO
+        // GUARDAR EN FIREBASE CON 'pagado: false' Y REDIRIGIR A MERCADO PAGO
         async function procesarPagoMercadoPago() {
             const btnText = document.getElementById('payBtnText');
             btnText.innerText = "Generando pago...";
@@ -636,7 +631,7 @@
                     }
                 }
 
-                // Guardar en Firestore
+                // Guardar en Firestore con pagado: false
                 const docRef = await db.collection("detalles").add({
                     nombres: document.getElementById('nombresInput').value.trim() || "Detalle de Amor",
                     fecha: document.getElementById('fechaInput').value.trim() || "",
@@ -647,7 +642,7 @@
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Guardar el ID en la memoria local del navegador como respaldo
+                // Guardar el ID en el almacenamiento local como referencia
                 localStorage.setItem("ultimoDetalleId", docRef.id);
 
                 // Redirigir a Mercado Pago
