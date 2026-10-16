@@ -1,1 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detalles de Amor - Mis Proyectos</title>
+
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Mercado Pago SDK -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Google AdSense SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: { 800: '#58111A', 900: '#3B0A11', 950: '#230408' },
+                        rose: { 300: '#F472B6', 500: '#EC4899', 600: '#DB2777', 900: '#831843' },
+                        gold: { 400: '#FBBF24', 500: '#F59E0B' }
+                    },
+                    fontFamily: { cursive: ['"Dancing Script"', 'cursive'], sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
+        .font-cursive { font-family: 'Dancing Script', cursive; }
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
+        #pv-heartFill { transition: height 0.25s ease-out; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
+
+    <!-- REPRODUCTOR MÚSICA FLOTANTE VISTA PREVIA -->
+    <div id="pv-musicPlayerContainer" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
+        <div class="bg-burgundy-950/90 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-2xl">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <button id="pv-musicBtn" onclick="togglePvAudio()" class="w-8 h-8 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg active:scale-95 transition-transform">
+                    <i id="pv-playIcon" class="fas fa-play text-xs ml-0.5"></i>
+                </button>
+                <div class="truncate">
+                    <p class="text-[11px] font-semibold text-rose-200 truncate">Música Romántica</p>
+                    <p id="pv-musicStatus" class="text-[9px] text-rose-400/80 truncate">Toca para reproducir</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-volume-up text-xs text-rose-300"></i>
+                <input id="pv-volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustPvVolume(this.value)" class="w-14 h-1 accent-rose-500 bg-rose-950 rounded-lg cursor-pointer">
+            </div>
+        </div>
+    </div>
+
+    <audio id="pv-bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
+
+    <!-- SECCIÓN 1: INICIO / PROYECTOS GUARDADOS PAREJAS -->
+    <div id="homeDashboard" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+        <div class="flex items-center justify-between">
+            <a href="../index.html" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i> Menú
+            </a>
+            <h1 class="text-xl font-bold font-cursive text-rose-100">Detalles de Amor</h1>
+            <div class="w-8"></div>
+        </div>
+
+        <button onclick="mostrarFormularioCreacion()" class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <i class="fas fa-plus-circle"></i> Crear Nuevo Proyecto
+        </button>
+
+        <div class="space-y-3 pt-2">
+            <h3 class="text-xs font-semibold text-rose-200 uppercase tracking-wider"><i class="fas fa-folder-open text-rose-400"></i> Proyectos Guardados:</h3>
+            <div id="listaProyectosContainer" class="space-y-2.5 max-h-64 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: FORMULARIO DE CREACIÓN -->
+    <div id="formContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+        <div class="flex items-center justify-between">
+            <button onclick="volverAlDashboard()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </button>
+            <h1 class="text-xl font-bold font-cursive text-rose-100">Nuevo Proyecto</h1>
+            <div class="w-12"></div>
+        </div>
+
+        <form id="createForm" onsubmit="event.preventDefault(); guardarYVerVistaPrevia();" class="space-y-4">
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">NOMBRE DEL PROYECTO (Para identificarlo):</label>
+                <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">1. NOMBRES EN LA TARJETA:</label>
+                <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">2. FECHA ESPECIAL:</label>
+                <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 2):</label>
+                <input type="file" id="photosInput" accept="image/*" multiple onchange="validarCantidadFotos(this)" required class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
+                <p class="text-[10px] text-rose-300/70 italic">Puedes elegir 1 o hasta 2 imágenes como máximo.</p>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-rose-200">4. CARTA DE AMOR / MENSAJE:</label>
+                <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
+            </div>
+
+            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
+                <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
+                <div class="flex items-center justify-center gap-3 pt-1">
+                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2">
+                        <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Iniciar Grabación</span>
+                    </button>
+                    <span id="timerLabel" class="text-xs font-mono text-rose-300 hidden">00:10</span>
+                </div>
+                <div id="audioPreviewContainer" class="hidden pt-2">
+                    <audio id="audioPreview" controls class="w-full h-8 mt-1"></audio>
+                </div>
+            </div>
+
+            <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                ✨ Guardar y Ver Vista Previa
+            </button>
+        </form>
+
+        <div id="statusBox" class="hidden text-center py-4 space-y-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
+            <p id="statusText" class="text-xs text-rose-300">Guardando tu proyecto...</p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: VISTA PREVIA -->
+    <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-burgundy-950/95 backdrop-blur-2xl overflow-y-auto px-4 py-12 space-y-6">
+        <div class="w-full max-w-lg mx-auto space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="cerrarVistaPrevia()" class="text-xs text-rose-300 bg-burgundy-900 px-3 py-2 rounded-xl border border-rose-500/30 shadow flex items-center gap-1.5">
+                    <i class="fas fa-arrow-left"></i> Volver a Mis Proyectos
+                </button>
+                <div class="bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
+                    👀 VISTA PREVIA
+                </div>
+            </div>
+
+            <!-- JUEGO DEL CORAZÓN -->
+            <section id="pv-heart-section" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl text-center shadow-2xl">
+                <h2 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h2>
+                <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo...</p>
+
+                <div id="pv-heartContainer" onclick="handlePvHeartClick()" class="relative w-28 h-28 mx-auto mb-4 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
+                    <svg class="absolute inset-0 w-full h-full text-burgundy-950 fill-current drop-shadow-lg" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <div id="pv-heartFill" class="absolute bottom-0 left-0 w-full overflow-hidden" style="height: 0%;">
+                        <svg class="w-28 h-28 text-rose-500 fill-current absolute bottom-0 left-0" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                    <span id="pv-clickCounter" class="relative z-10 text-base font-bold text-white">0 / 10</span>
+                </div>
+                <p id="pv-tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Toca aquí!</p>
+            </section>
+
+            <!-- CONTENIDO PRINCIPAL VISTA PREVIA -->
+            <div id="pv-mainContent" class="hidden space-y-6">
+                <div class="text-center space-y-1">
+                    <h2 id="pv-mainTitle" class="text-3xl font-cursive font-bold text-rose-200"></h2>
+                    <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
+                </div>
+
+                <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
+                    <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
+                        <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
+                        <span id="pv-carouselIndicator">1 / 1</span>
+                    </div>
+                    <div id="pv-carouselViewport" class="overflow-hidden rounded-2xl relative w-full">
+                        <div id="pv-carouselTrack" class="carousel-track"></div>
+                        <button onclick="moveCarousel(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button onclick="moveCarousel(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-burgundy-950/80 text-white w-8 h-8 rounded-full flex items-center justify-center border border-rose-500/40 shadow-lg">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-2">
+                    <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-envelope-open-text text-rose-400"></i> Mensaje Especial</h3>
+                    <div class="bg-burgundy-950/70 p-4 rounded-2xl border border-rose-500/10">
+                        <p id="pv-cardMessage" class="text-xs text-rose-200 whitespace-pre-line leading-relaxed"></p>
+                    </div>
+                </section>
+
+                <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja</h3>
+                        <span id="pv-quizScore" class="text-[10px] bg-gold-400/20 text-gold-400 border border-gold-400/30 px-2 py-0.5 rounded-full font-bold">Puntos: 0</span>
+                    </div>
+                    <div id="pv-quizContainer" class="bg-burgundy-950/60 p-4 rounded-2xl border border-rose-500/10 space-y-3">
+                        <p id="pv-quizQuestion" class="text-xs font-semibold text-rose-100">Cargando pregunta...</p>
+                        <div id="pv-quizOptions" class="space-y-2"></div>
+                        <div id="pv-quizFeedback" class="hidden text-xs font-semibold p-2.5 rounded-xl text-center"></div>
+                    </div>
+                </section>
+
+                <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
+                    <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz</h3>
+                    <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
+                </section>
+            </div>
+
+            <!-- SECCIÓN DE PAGO Y DESBLOQUEO DE QR -->
+            <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
+                <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
+                <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial para enviarlo a tu persona especial.</p>
+
+                <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
+                </button>
+
+                <button onclick="verificarPagoManual()" class="w-full py-2.5 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors">
+                    ✨ ¿Ya realizaste tu pago? Toca aquí para ver tu QR
+                </button>
+            </div>
+
+            <!-- RESULTADO QR -->
+            <div id="resultBox" class="hidden bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
+                <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
+                <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
+                    <div id="qrcode"></div>
+                </div>
+                <div class="space-y-2">
+                    <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
+                        Abrir Detalle Público
+                    </a>
+                    <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-950 text-xs text-rose-300 rounded-xl border border-rose-500/30">
+                        <i class="fas fa-copy"></i> Copiar Enlace
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618",
+            measurementId: "G-ZTGDLNQXSF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let generatedUrl = "";
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioBase64 = null;
+        let countdownInterval = null;
+        let audioStream = null;
+        let proyectoActualId = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            renderizarProyectosGuardados();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
+            const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
+
+            if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
+                try {
+                    const docSnap = await db.collection("detalles").doc(docId).get();
+                    if (docSnap.exists && docSnap.data().pagado === true) {
+                        proyectoActualId = docId;
+                        abrirVistaPreviaConDatos(docSnap.data(), true);
+                    }
+                } catch(e) {}
+            }
+        });
+
+        function obtenerProyectosLocales() {
+            try { return JSON.parse(localStorage.getItem("misProyectosAmor") || "[]"); } catch(e) { return []; }
+        }
+
+        function guardarProyectosLocales(proyectos) {
+            localStorage.setItem("misProyectosAmor", JSON.stringify(proyectos));
+        }
+
+        function renderizarProyectosGuardados() {
+            const container = document.getElementById('listaProyectosContainer');
+            const proyectos = obtenerProyectosLocales();
+
+            if (proyectos.length === 0) {
+                container.innerHTML = `<p class="text-xs text-rose-300/60 text-center py-4 italic">No tienes proyectos guardados aún.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            proyectos.forEach((proj) => {
+                const div = document.createElement('div');
+                div.className = 'bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/20 flex items-center justify-between gap-2';
+                div.innerHTML = `
+                    <div class="truncate">
+                        <p class="text-xs font-bold text-rose-100 truncate"><i class="fas fa-heart text-rose-500 mr-1"></i> ${proj.nombreProyecto || 'Sin nombre'}</p>
+                        <p class="text-[10px] text-rose-300/70 truncate">Para: ${proj.nombres}</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
+                            Ver / Pagar
+                        </button>
+                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function mostrarFormularioCreacion() {
+            document.getElementById('homeDashboard').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+            document.getElementById('createForm').reset();
+            recordedAudioBase64 = null;
+            document.getElementById('audioPreviewContainer').classList.add('hidden');
+        }
+
+        function volverAlDashboard() {
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('homeDashboard').classList.remove('hidden');
+            renderizarProyectosGuardados();
+        }
+
+        function cerrarVistaPrevia() {
+            document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('homeDashboard').classList.remove('hidden');
+            renderizarProyectosGuardados();
+        }
+
+        function validarCantidadFotos(input) {
+            if (input.files.length > 2) {
+                alert("⚠️ Solo puedes seleccionar un máximo de 2 fotografías.");
+                input.value = "";
+            }
+        }
+
+        const pvBgMusic = document.getElementById('pv-bgMusic');
+        const pvPlayIcon = document.getElementById('pv-playIcon');
+        const pvMusicStatus = document.getElementById('pv-musicStatus');
+        let isPvMusicPlaying = false;
+        let musicAutoStarted = false;
+
+        function togglePvAudio() {
+            if (isPvMusicPlaying) {
+                pvBgMusic.pause();
+                pvPlayIcon.className = 'fas fa-play text-xs ml-0.5';
+                pvMusicStatus.innerText = 'Pausado';
+            } else {
+                pvBgMusic.play().then(() => {
+                    pvPlayIcon.className = 'fas fa-pause text-xs';
+                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
+                }).catch(() => {});
+            }
+            isPvMusicPlaying = !isPvMusicPlaying;
+        }
+        function adjustPvVolume(val) { pvBgMusic.volume = val; }
+
+        async function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordText = document.getElementById('recordText');
+            const recordIcon = document.getElementById('recordIcon');
+            const timerLabel = document.getElementById('timerLabel');
+
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                detenerGrabacion();
+                return;
+            }
+
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(audioStream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        const preview = document.getElementById('audioPreview');
+                        preview.src = recordedAudioBase64;
+                        document.getElementById('audioPreviewContainer').classList.remove('hidden');
+                    };
+                    recordBtn.className = "px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
+                    recordText.innerText = "Volver a Grabar";
+                    recordIcon.className = "fas fa-microphone";
+                    timerLabel.classList.add('hidden');
+                };
+
+                mediaRecorder.start();
+                recordBtn.className = "px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2 animate-pulse";
+                recordText.innerText = "Detener Grabación";
+                recordIcon.className = "fas fa-square";
+                timerLabel.classList.remove('hidden');
+
+                let timeLeft = 10;
+                timerLabel.innerText = `00:0${timeLeft}`;
+                clearInterval(countdownInterval);
+
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    timerLabel.innerText = `00:0${timeLeft}`;
+                    if (timeLeft <= 0) detenerGrabacion();
+                }, 1000);
+
+            } catch (e) { console.warn("Micrófono no otorgado."); }
+        }
+
+        function detenerGrabacion() {
+            clearInterval(countdownInterval);
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            if (audioStream) audioStream.getTracks().forEach(track => track.stop());
+        }
+
+        let pvPhotosArray = [];
+        let currentSlide = 0;
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function guardarYVerVistaPrevia() {
+            const photosFiles = document.getElementById('photosInput').files;
+            if (!photosFiles || photosFiles.length === 0) return;
+
+            document.getElementById('createForm').classList.add('hidden');
+            document.getElementById('statusBox').classList.remove('hidden');
+
+            try {
+                pvPhotosArray = [];
+                const maxFotos = Math.min(photosFiles.length, 2);
+                for (let i = 0; i < maxFotos; i++) {
+                    const base64Data = await fileToBase64(photosFiles[i]);
+                    pvPhotosArray.push(base64Data);
+                }
+
+                const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
+                const nombres = document.getElementById('nombresInput').value.trim();
+                const fecha = document.getElementById('fechaInput').value.trim();
+                const mensaje = document.getElementById('mensajeInput').value.trim();
+
+                const docRef = await db.collection("detalles").add({
+                    nombreProyecto: nombreProj,
+                    nombres: nombres,
+                    fecha: fecha,
+                    mensaje: mensaje,
+                    fotos: pvPhotosArray,
+                    voiceNoteBase64: recordedAudioBase64 || null,
+                    pagado: false, 
+                    creado: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                proyectoActualId = docRef.id;
+                localStorage.setItem("ultimoDetalleId", proyectoActualId);
+
+                let proyectos = obtenerProyectosLocales();
+                proyectos.unshift({ firebaseId: proyectoActualId, nombreProyecto: nombreProj, nombres: nombres });
+                guardarProyectosLocales(proyectos);
+
+                abrirVistaPreviaConDatos({
+                    nombreProyecto: nombreProj,
+                    nombres: nombres,
+                    fecha: fecha,
+                    mensaje: mensaje,
+                    fotos: pvPhotosArray,
+                    voiceNoteBase64: recordedAudioBase64,
+                    pagado: false
+                }, false);
+
+                document.getElementById('statusBox').classList.add('hidden');
+                document.getElementById('createForm').classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                alert("Error al guardar el proyecto.");
+                document.getElementById('statusBox').classList.add('hidden');
+                document.getElementById('createForm').classList.remove('hidden');
+            }
+        }
+
+        async function cargarProyecto(firebaseId) {
+            proyectoActualId = firebaseId;
+            localStorage.setItem("ultimoDetalleId", firebaseId);
+
+            try {
+                const docSnap = await db.collection("detalles").doc(firebaseId).get();
+                if (docSnap.exists) {
+                    abrirVistaPreviaConDatos(docSnap.data(), docSnap.data().pagado === true);
+                } else { alert("Proyecto no encontrado."); }
+            } catch(e) { alert("Error al cargar el proyecto."); }
+        }
+
+        function eliminarProyecto(firebaseId) {
+            if (confirm("¿Estás seguro de eliminar este proyecto guardado?")) {
+                let proyectos = obtenerProyectosLocales();
+                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                guardarProyectosLocales(proyectos);
+                renderizarProyectosGuardados();
+            }
+        }
+
+        function abrirVistaPreviaConDatos(data, yaPagado) {
+            document.getElementById('homeDashboard').classList.add('hidden');
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('previewContainer').classList.remove('hidden');
+            document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
+
+            document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
+            document.getElementById('pv-mainDate').innerText = data.fecha;
+            document.getElementById('pv-cardMessage').innerText = data.mensaje;
+            pvPhotosArray = data.fotos || [];
+            buildPvCarousel();
+
+            if (data.voiceNoteBase64) {
+                document.getElementById('pv-voicePlayer').src = data.voiceNoteBase64;
+                document.getElementById('pv-voiceSection').classList.remove('hidden');
+            } else {
+                document.getElementById('pv-voiceSection').classList.add('hidden');
+            }
+
+            loadPvQuizQuestion();
+
+            if (yaPagado) {
+                document.getElementById('pv-heart-section').classList.add('hidden');
+                document.getElementById('pv-mainContent').classList.remove('hidden');
+                document.getElementById('paySection').classList.add('hidden');
+                
+                const resultBox = document.getElementById('resultBox');
+                resultBox.classList.remove('hidden');
+                // RUTA PÚBLICA EN LA CARPETA PAREJAS
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                document.getElementById('finalLink').href = finalLink;
+                
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), { text: finalLink, width: 160, height: 160 });
+            } else {
+                document.getElementById('pv-heart-section').classList.remove('hidden');
+                document.getElementById('pv-mainContent').classList.add('hidden');
+                document.getElementById('paySection').classList.remove('hidden');
+                document.getElementById('resultBox').classList.add('hidden');
+            }
+        }
+
+        let pvClicks = 0;
+        function handlePvHeartClick() {
+            if (!musicAutoStarted && !isPvMusicPlaying) {
+                pvBgMusic.play().then(() => {
+                    isPvMusicPlaying = true;
+                    pvPlayIcon.className = 'fas fa-pause text-xs';
+                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
+                    musicAutoStarted = true;
+                }).catch(() => {});
+            }
+
+            if (pvClicks < 10) {
+                pvClicks++;
+                document.getElementById('pv-heartFill').style.height = `${pvClicks * 10}%`;
+                document.getElementById('pv-clickCounter').innerText = `${pvClicks} / 10`;
+
+                if (pvClicks === 10) {
+                    document.getElementById('pv-tapHint').innerText = "¡Desbloqueado! ❤️";
+                    if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60 });
+                    setTimeout(() => {
+                        document.getElementById('pv-heart-section').classList.add('hidden');
+                        document.getElementById('pv-mainContent').classList.remove('hidden');
+                    }, 400);
+                }
+            }
+        }
+
+        function buildPvCarousel() {
+            const track = document.getElementById('pv-carouselTrack');
+            track.innerHTML = '';
+            pvPhotosArray.forEach((photo) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'w-full flex-shrink-0 relative';
+                slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl shadow-lg">`;
+                track.appendChild(slideDiv);
+            });
+            currentSlide = 0;
+            updateCarouselPosition();
+        }
+
+        function moveCarousel(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = pvPhotosArray.length - 1;
+            if (currentSlide >= pvPhotosArray.length) currentSlide = 0;
+            updateCarouselPosition();
+        }
+
+        function updateCarouselPosition() {
+            const track = document.getElementById('pv-carouselTrack');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
+        }
+
+        const pvQuizData = [
+            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2, feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️" },
+            { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
+            { question: "¿Cuál es nuestro pasatiempo favorito en pareja?", options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"], correct: 3, feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨" }
+        ];
+
+        let pvCurrentQuizIndex = 0;
+        let pvQuizScore = 0;
+
+        function loadPvQuizQuestion() {
+            if (pvCurrentQuizIndex >= pvQuizData.length) {
+                document.getElementById('pv-quizContainer').innerHTML = `<div class="text-center py-3 space-y-1"><i class="fas fa-trophy text-2xl text-gold-400 animate-bounce"></i><h4 class="text-xs font-bold text-white">¡Trivia Superada!</h4></div>`;
+                return;
+            }
+            const q = pvQuizData[pvCurrentQuizIndex];
+            document.getElementById('pv-quizQuestion').innerText = `${pvCurrentQuizIndex + 1}. ${q.question}`;
+            const optionsContainer = document.getElementById('pv-quizOptions');
+            optionsContainer.innerHTML = '';
+            document.getElementById('pv-quizFeedback').className = 'hidden';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-2.5 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-rose-400/50"></i>`;
+                btn.onclick = () => checkPvAnswer(idx, q.correct, q.feedback, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkPvAnswer(selected, correct, feedbackText, btnElement) {
+            const options = document.getElementById('pv-quizOptions').children;
+            for (let btn of options) { btn.disabled = true; }
+            const feedback = document.getElementById('pv-quizFeedback');
+            feedback.classList.remove('hidden');
+
+            if (selected === correct) {
+                pvQuizScore++;
+                document.getElementById('pv-quizScore').innerText = `Puntos: ${pvQuizScore}`;
+                btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
+                feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
+                feedback.innerText = feedbackText;
+            } else {
+                btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
+                feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
+                feedback.innerText = "¡Casi! Lo importante es cuánto nos amamos. ❤️";
+            }
+
+            setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
+        }
+
+        async function procesarPagoMercadoPago() {
+            if (!proyectoActualId) { alert("No hay un proyecto activo."); return; }
+            document.getElementById('payBtnText').innerText = "Redirigiendo a pago...";
+            window.location.href = `https://mpago.la/225XuPD`;
+        }
+
+        async function verificarPagoManual() {
+            if (!proyectoActualId) { alert("No hay un proyecto activo."); return; }
+            const btnRespaldo = event?.target || document.activeElement;
+            const textoOriginal = btnRespaldo.innerText;
+            btnRespaldo.innerText = "Verificando pago...";
+
+            try {
+                const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    if (data.pagado === true) {
+                        abrirVistaPreviaConDatos(data, true);
+                    } else {
+                        alert("⚠️ Tu pago aún no se encuentra aprobado. Si ya pagaste, espera unos segundos e inténtalo de nuevo.");
+                    }
+                } else { alert("No se encontró el registro."); }
+            } catch (error) { alert("Error al verificar el estado del pago."); } finally { btnRespaldo.innerText = textoOriginal; }
+        }
+
+        function copiarEnlace() {
+            if (proyectoActualId) {
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                navigator.clipboard.writeText(finalLink).then(() => { alert("¡Enlace copiado al portapapeles! ❤️"); });
+            }
+        }
+    </script>
+</body>
+</html>
 
