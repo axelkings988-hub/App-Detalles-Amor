@@ -25,16 +25,16 @@
             font-family: 'Orbitron', sans-serif;
         }
 
-        /* Marquesina fluida de izquierda a derecha */
-        @keyframes ledMarquee {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        /* Movimiento exacto: entra por la derecha (100%) y sale por la izquierda (-100%) */
+        @keyframes ledScroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
-        .animate-led-marquee {
+        .animate-led-scroll {
             display: inline-block;
             white-space: nowrap;
             will-change: transform;
-            animation: ledMarquee 10s linear infinite;
+            animation: ledScroll 12s linear infinite;
         }
 
         /* Degradado multicolor vibrante con resplandor neón */
@@ -115,10 +115,10 @@
             </div>
         </div>
 
-        <!-- LETRERO LED DIGITAL CON MOVIMIENTO DE IZQUIERDA A DERECHA -->
+        <!-- LETRERO LED DIGITAL CON DESPLAZAMIENTO DE DERECHA A IZQUIERDA -->
         <div class="led-panel w-full py-5 px-3 rounded-2xl overflow-hidden shadow-2xl relative border-amber-500/30">
             <div class="overflow-hidden whitespace-nowrap relative flex items-center">
-                <p id="txtMarquesina" class="animate-led-marquee texto-multicolor-neon text-base font-black tracking-widest uppercase">⚡ CARGANDO LETRERO LED... ⚡</p>
+                <p id="txtMarquesina" class="animate-led-scroll texto-multicolor-neon text-base font-black tracking-widest uppercase">⚡ CARGANDO LETRERO LED... ⚡</p>
             </div>
         </div>
 
