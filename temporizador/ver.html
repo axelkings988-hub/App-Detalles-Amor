@@ -7,7 +7,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Orbitron:wght@900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <!-- Firebase SDKs -->
@@ -15,17 +15,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Estilo de Letrero LED Comercial Ampliado */
+        /* Estilo de Letrero LED Comercial con fuente Gigante */
         .led-panel {
             background-color: #000000;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1.2px, transparent 0);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1.2px, transparent 0);
             background-size: 4px 4px;
-            border: 4px solid #1c1c1e;
-            box-shadow: inset 0 0 16px rgba(0,0,0,0.95), 0 0 25px rgba(255, 0, 128, 0.3);
+            border: 4px solid #222;
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.98), 0 0 25px rgba(255, 0, 128, 0.35);
             font-family: 'Orbitron', sans-serif;
         }
 
-        /* Degradado multicolor vibrante con resplandor neón */
+        /* Degradado multicolor vibrante con resplandor neón intenso */
         .texto-multicolor-neon {
             background: linear-gradient(90deg, #ff0055, #ffae00, #00ffcc, #0066ff, #ff0055);
             background-size: 300% auto;
@@ -103,11 +103,11 @@
             </div>
         </div>
 
-        <!-- LETRERO LED DIGITAL (APARECE SOLO AL FINALIZAR) -->
+        <!-- LETRERO LED DIGITAL (TAMAÑO DE FUENTE GIGANTE Y DESPLAZAMIENTO) -->
         <div id="ledPanelContainer" class="hidden w-full space-y-1">
-            <div class="led-panel w-full py-6 px-2 rounded-2xl overflow-hidden shadow-2xl relative border-amber-500/40">
-                <marquee scrollamount="7" scrolldelay="25" class="w-full flex items-center">
-                    <span id="txtMarquesina" class="texto-multicolor-neon text-xl font-black tracking-widest uppercase"></span>
+            <div class="led-panel w-full py-6 px-1 rounded-2xl overflow-hidden shadow-2xl relative border-amber-500/50">
+                <marquee scrollamount="8" scrolldelay="20" class="w-full flex items-center">
+                    <span id="txtMarquesina" class="texto-multicolor-neon text-3xl sm:text-4xl font-black tracking-wider uppercase leading-none"></span>
                 </marquee>
             </div>
         </div>
@@ -126,8 +126,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let datosGlobales = {};
-
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
@@ -135,12 +133,12 @@
 
             const doc = await db.collection("temporizadores").doc(id).get();
             if(doc.exists) {
-                datosGlobales = doc.data();
-                aplicarEstilo(datosGlobales.estilo);
-                document.getElementById('txtPara').innerText = datosGlobales.para;
-                document.getElementById('txtDe').innerText = datosGlobales.de;
+                const data = doc.data();
+                aplicarEstilo(data.estilo);
+                document.getElementById('txtPara').innerText = data.para;
+                document.getElementById('txtDe').innerText = data.de;
 
-                iniciarReloj(datosGlobales.targetDate, datosGlobales);
+                iniciarReloj(data.targetDate, data);
             }
         });
 
@@ -192,7 +190,7 @@
             document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
-            // Muestra el letrero LED con el texto del usuario abarcando el espacio y con movimiento
+            // Asigna el texto y muestra el letrero LED gigante
             document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
