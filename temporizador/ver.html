@@ -7,65 +7,84 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        amberCustom: { 800: '#78350F', 900: '#451A03', 950: '#260B02' }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #260B02 0%, #451A03 50%, #78350F 100%); color: #FEF3C7; min-height: 100vh; }
+        .font-cursive { font-family: 'Dancing Script', cursive; }
+        /* Marquesina lenta de izquierda a derecha */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 18s linear infinite;
+        }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-center min-h-screen">
+<body id="bodyBg" class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
 
-    <div class="w-full max-w-md bg-amberCustom-900/70 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-6">
-        <h1 id="titleDisplay" class="text-2xl font-bold text-amber-100">Cargando Sorpresa...</h1>
+    <div id="mainContainer" class="w-full max-w-md backdrop-blur-xl border p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
+        
+        <!-- CABECERA: PARA / DE -->
+        <div class="space-y-1">
+            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold">Sorpresa</span>
+            <h2 class="text-sm font-semibold opacity-90">Para: <span id="txtPara" class="font-bold">...</span></h2>
+            <p class="text-xs opacity-75">De parte de: <span id="txtDe" class="font-bold">...</span></p>
+        </div>
 
-        <!-- MODO TEMPORIZADOR ACTIVO -->
-        <div id="countdownBox" class="space-y-4">
-            <p class="text-xs text-amber-300/80">Esta sorpresa se desbloqueará automáticamente en:</p>
-            <div class="grid grid-cols-4 gap-2 text-center">
-                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
-                    <span id="days" class="text-2xl font-bold text-amber-400 block">00</span>
-                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Días</span>
+        <!-- FOTO Y ANIMACIÓN DE REGALO -->
+        <div class="relative w-40 h-40 mx-auto rounded-2xl overflow-hidden shadow-xl border-2 border-white/20">
+            <img id="imgRegalo" src="" alt="Regalo" class="w-full h-full object-cover">
+            <div id="overlayAnimado" class="absolute inset-0 bg-black/40 flex items-center justify-center text-3xl animate-pulse">
+                🎁
+            </div>
+        </div>
+
+        <!-- MODO TEMPORIZADOR -->
+        <div id="countdownBox" class="space-y-3">
+            <p class="text-xs opacity-80">El regalo se abrirá en:</p>
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
+                    <span id="days" class="text-xl font-bold block">00</span>
+                    <span class="text-[8px] uppercase">Días</span>
                 </div>
-                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
-                    <span id="hours" class="text-2xl font-bold text-amber-400 block">00</span>
-                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Horas</span>
+                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
+                    <span id="hours" class="text-xl font-bold block">00</span>
+                    <span class="text-[8px] uppercase">Horas</span>
                 </div>
-                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
-                    <span id="minutes" class="text-2xl font-bold text-amber-400 block">00</span>
-                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Min</span>
+                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
+                    <span id="minutes" class="text-xl font-bold block">00</span>
+                    <span class="text-[8px] uppercase">Min</span>
                 </div>
-                <div class="bg-amberCustom-950/80 p-3 rounded-2xl border border-amber-500/20">
-                    <span id="seconds" class="text-2xl font-bold text-amber-400 block">00</span>
-                    <span class="text-[9px] uppercase tracking-wider text-amber-300">Seg</span>
+                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
+                    <span id="seconds" class="text-xl font-bold block">00</span>
+                    <span class="text-[8px] uppercase">Seg</span>
                 </div>
             </div>
-            <div class="p-4 bg-amberCustom-950/40 rounded-2xl border border-amber-500/10 text-xs text-amber-300/60 italic">
-                🔒 Contenido bloqueado hasta completar la cuenta regresiva.
-            </div>
+            <p class="text-[10px] italic opacity-60">🔒 Contenido protegido hasta que finalice el tiempo.</p>
         </div>
 
         <!-- MODO REVELADO -->
-        <div id="revealedBox" class="hidden space-y-4 animate-fade-in">
-            <div class="bg-amberCustom-950/80 p-5 rounded-2xl border border-amber-500/30 text-left">
-                <p id="messageDisplay" class="text-xs text-amber-100 leading-relaxed whitespace-pre-line"></p>
+        <div id="revealedBox" class="hidden space-y-4">
+            <div id="contenidoSorpresaContainer" class="p-4 bg-black/40 rounded-2xl border border-white/20 text-center">
+                <!-- Se inyecta según sea audio, foto o cupón -->
             </div>
         </div>
+
+        <!-- MARQUESINA DE TEXTO (FONDO NEGRO, IZQUIERDA A DERECHA) -->
+        <div class="w-full bg-black py-2 rounded-xl overflow-hidden border border-white/10">
+            <div class="overflow-hidden whitespace-nowrap relative">
+                <p id="txtMarquesina" class="animate-marquee text-xs font-medium text-amber-200">Cargando dedicatoria...</p>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -80,63 +99,94 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let timerInterval = null;
-
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const docId = urlParams.get('id');
+            const id = urlParams.get('id');
+            if(!id) return;
 
-            if (!docId) {
-                document.getElementById('titleDisplay').innerText = "Enlace inválido";
-                return;
-            }
+            const doc = await db.collection("temporizadores").doc(id).get();
+            if(doc.exists) {
+                const data = doc.data();
+                aplicarEstilo(data.estilo);
+                document.getElementById('txtPara').innerText = data.para;
+                document.getElementById('txtDe').innerText = data.de;
+                document.getElementById('imgRegalo').src = data.fotoUrl;
+                document.getElementById('txtMarquesina').innerText = data.mensaje;
 
-            try {
-                const docSnap = await db.collection("temporizadores").doc(docId).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    document.getElementById('titleDisplay').innerText = data.titulo;
-                    iniciarCuentaRegresiva(data.targetDate, data.mensaje);
-                } else {
-                    document.getElementById('titleDisplay').innerText = "Sorpresa no encontrada";
-                }
-            } catch(e) {
-                document.getElementById('titleDisplay').innerText = "Error de conexión";
+                iniciarReloj(data.targetDate, data);
             }
         });
 
-        function iniciarCuentaRegresiva(targetDateIso, mensaje) {
-            const targetTime = new Date(targetDateIso).getTime();
+        function aplicarEstilo(estilo) {
+            const body = document.getElementById('bodyBg');
+            const container = document.getElementById('mainContainer');
+            const badge = document.getElementById('badgeEstilo');
 
-            timerInterval = setInterval(() => {
+            if(estilo === 'familiar') {
+                body.style.background = "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)";
+                container.className += " bg-slate-900/80 border-cyan-500/30";
+                badge.className += " bg-cyan-600 text-cyan-100";
+                badge.innerText = "✨ Edición Mágica";
+            } else if(estilo === 'pareja') {
+                body.style.background = "linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%)";
+                container.className += " bg-rose-950/80 border-rose-500/30";
+                badge.className += " bg-rose-600 text-rose-100";
+                badge.innerText = "💖 Edición Romántica";
+            } else {
+                body.style.background = "linear-gradient(135deg, #31103F 0%, #4C1D95 50%, #6D28D9 100%)";
+                container.className += " bg-purple-950/80 border-amber-500/30";
+                badge.className += " bg-amber-500 text-amber-950";
+                badge.innerText = "🎉 Edición Cumpleaños";
+            }
+        }
+
+        function iniciarReloj(targetIso, data) {
+            const targetTime = new Date(targetIso).getTime();
+
+            const intervalo = setInterval(() => {
                 const now = new Date().getTime();
-                const distance = targetTime - now;
+                const diff = targetTime - now;
 
-                if (distance <= 0) {
-                    clearInterval(timerInterval);
-                    desbloquearMensaje(mensaje);
+                if(diff <= 0) {
+                    clearInterval(intervalo);
+                    revelarRegalo(data);
                     return;
                 }
 
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById('days').innerText = days < 10 ? '0' + days : days;
-                document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
-                document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
-                document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+                document.getElementById('days').innerText = Math.floor(diff / (1000*60*60*24));
+                document.getElementById('hours').innerText = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+                document.getElementById('minutes').innerText = Math.floor((diff % (1000*60*60)) / (1000*60));
+                document.getElementById('seconds').innerText = Math.floor((diff % (1000*60)) / 1000);
             }, 1000);
         }
 
-        function desbloquearMensaje(mensaje) {
+        function revelarRegalo(data) {
             document.getElementById('countdownBox').classList.add('hidden');
-            document.getElementById('messageDisplay').innerText = mensaje;
+            document.getElementById('overlayAnimado').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
-            if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+            const container = document.getElementById('contenidoSorpresaContainer');
+            if(data.tipoSorpresa === 'audio') {
+                container.innerHTML = `<p class="text-xs mb-2 font-bold text-amber-300">🎵 Nota de Voz Recibida</p>
+                                       <audio controls class="w-full"><source src="${data.contenidoSorpresa}" type="audio/mpeg">Tu navegador no soporta audio.</audio>`;
+            } else if(data.tipoSorpresa === 'foto') {
+                container.innerHTML = `<p class="text-xs mb-2 font-bold text-amber-300">🖼️ Foto Secreta Revelada</p>
+                                       <img src="${data.contenidoSorpresa}" class="w-full h-48 object-cover rounded-xl border border-white/20">`;
+            } else if(data.tipoSorpresa === 'cupon') {
+                container.innerHTML = `<p class="text-xs mb-2 font-bold text-amber-300">🎟️ ¡Premio Desbloqueado!</p>
+                                       <div class="p-3 bg-white/10 rounded-xl border border-dashed border-amber-300 text-sm font-bold">${data.contenidoSorpresa}</div>
+                                       <button onclick="reclamarPremio('${data.de}', '${data.contenidoSorpresa}')" class="mt-3 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg">
+                                           🎁 Reclamar Premio (Enviar a WhatsApp)
+                                       </button>`;
+            }
+
+            if(typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+        }
+
+        function reclamarPremio(remitente, premio) {
+            const texto = `¡Hola ${remitente}! He abierto mi regalo con temporizador y reclamé mi premio: *${premidose = premio}* 🎉 ¡Vengo a canjearlo!`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
     </script>
 </body>
 </html>
-
