@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Estilo de Letrero LED Comercial Gigante */
+        /* Estilo de Letrero LED Comercial Gigante (Se mantiene intacto) */
         .led-panel {
             background-color: #000000;
             background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1.5px, transparent 0);
@@ -54,7 +54,7 @@
             animation: girarCandado 3s ease-in-out infinite;
         }
 
-        /* Transición suave para el fondo completo */
+        /* Transición suave para el fondo de fuegos artificiales */
         body {
             transition: background 0.8s ease-in-out;
         }
@@ -62,53 +62,54 @@
 </head>
 <body id="bodyBg" class="p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
 
-    <div id="mainContainer" class="w-full max-w-md backdrop-blur-xl border p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
+    <!-- CONTENEDOR PRINCIPAL CON TRANSPARENCIA, BORDES BRILLANTES Y SOMBRA NEGRA PROFUNDA -->
+    <div id="mainContainer" class="w-full max-w-md backdrop-blur-md bg-black/35 border border-white/30 p-6 rounded-3xl shadow-[0_0_35px_rgba(0,0,0,0.85)] text-center space-y-5 relative overflow-hidden">
         
         <!-- CABECERA: PARA / DE -->
         <div class="space-y-1">
-            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold">Sorpresa Protegida</span>
-            <h2 class="text-sm font-semibold opacity-90">Para: <span id="txtPara" class="font-bold">...</span></h2>
-            <p class="text-xs opacity-75">De parte de: <span id="txtDe" class="font-bold">...</span></p>
+            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md">Sorpresa Protegida</span>
+            <h2 class="text-sm font-semibold opacity-100 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Para: <span id="txtPara" class="font-extrabold text-amber-200">...</span></h2>
+            <p class="text-xs text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">De parte de: <span id="txtDe" class="font-bold text-white">...</span></p>
         </div>
 
         <!-- CANDADO DE PROTECCIÓN ANIMADO -->
-        <div id="candadoBox" class="relative w-40 h-40 mx-auto rounded-3xl bg-black/30 flex flex-col items-center justify-center p-3 shadow-2xl border-2 border-white/20">
-            <div class="candado-animado text-6xl mb-1">🔐</div>
-            <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider">Bloqueado</span>
+        <div id="candadoBox" class="relative w-40 h-40 mx-auto rounded-3xl bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center p-3 shadow-2xl border-2 border-white/20">
+            <div class="candado-animado text-6xl mb-1 filter drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">🔐</div>
+            <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider drop-shadow">Bloqueado</span>
         </div>
 
-        <!-- MODO TEMPORIZADOR -->
+        <!-- MODO TEMPORIZADOR CON TARJETAS SEMITRANSPARENTES -->
         <div id="countdownBox" class="space-y-3">
-            <p class="text-xs opacity-80">El contenido se desbloqueará en:</p>
+            <p class="text-xs text-amber-100 font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">El contenido se desbloqueará en:</p>
             <div class="grid grid-cols-4 gap-1.5 text-center">
-                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
-                    <span id="days" class="text-xl font-bold block">00</span>
-                    <span class="text-[8px] uppercase">Días</span>
+                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+                    <span id="days" class="text-xl font-extrabold block text-white drop-shadow">00</span>
+                    <span class="text-[8px] uppercase text-amber-200 font-bold">Días</span>
                 </div>
-                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
-                    <span id="hours" class="text-xl font-bold block">00</span>
-                    <span class="text-[8px] uppercase">Horas</span>
+                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+                    <span id="hours" class="text-xl font-extrabold block text-white drop-shadow">00</span>
+                    <span class="text-[8px] uppercase text-amber-200 font-bold">Horas</span>
                 </div>
-                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
-                    <span id="minutes" class="text-xl font-bold block">00</span>
-                    <span class="text-[8px] uppercase">Min</span>
+                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+                    <span id="minutes" class="text-xl font-extrabold block text-white drop-shadow">00</span>
+                    <span class="text-[8px] uppercase text-amber-200 font-bold">Min</span>
                 </div>
-                <div class="bg-black/30 p-2.5 rounded-xl border border-white/10">
-                    <span id="seconds" class="text-xl font-bold block">00</span>
-                    <span class="text-[8px] uppercase">Seg</span>
+                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+                    <span id="seconds" class="text-xl font-extrabold block text-white drop-shadow">00</span>
+                    <span class="text-[8px] uppercase text-amber-200 font-bold">Seg</span>
                 </div>
             </div>
-            <p class="text-[10px] italic opacity-60">🔒 Protegido con candado hasta finalizar el tiempo.</p>
+            <p class="text-[10px] italic text-amber-200/90 drop-shadow">🔒 Protegido con candado hasta finalizar el tiempo.</p>
         </div>
 
-        <!-- MODO REVELADO -->
+        <!-- MODO REVELADO CON TRANSPARENCIA -->
         <div id="revealedBox" class="hidden space-y-4">
-            <div id="contenidoSorpresaContainer" class="p-5 rounded-3xl bg-black/60 backdrop-blur-md border border-white/30 text-center shadow-2xl relative overflow-hidden">
+            <div id="contenidoSorpresaContainer" class="p-4 rounded-3xl bg-black/40 backdrop-blur-md border border-white/30 text-center shadow-[0_0_25px_rgba(0,0,0,0.8)] relative overflow-hidden">
                 <!-- Se inyecta la sorpresa elegida -->
             </div>
         </div>
 
-        <!-- LETRERO LED DIGITAL GIGANTE -->
+        <!-- LETRERO LED DIGITAL GIGANTE (SE MANTIENE IGUAL) -->
         <div id="ledPanelContainer" class="hidden w-full space-y-1">
             <div class="led-panel w-full py-7 px-1 rounded-2xl overflow-hidden shadow-2xl relative border-amber-500/50">
                 <marquee scrollamount="9" scrolldelay="20" class="w-full flex items-center">
@@ -133,11 +134,11 @@
 
         let datosGlobales = {};
 
-        // GIFS ANIMADOS DE FONDO PANTALLA COMPLETA SEGÚN EL EVENTO
-        const fondosRevelados = {
-            familiar: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bTVhNDk0M3lqcjlybmV1YWphdW9xN3R6a2RmbzN0bXpyeHVqdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26ufdipQqU2lhNA4g/giphy.gif",
-            pareja: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHBpbnljcGJ6a3I1N3M1MnF5OHgybjQ5M2k2NHp3OW1rczVjMmtkciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L6w/giphy.gif",
-            cumpleaños: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGZvdHh6aG55OHpucmdxMXA0ZW9mbnI1M3o5cWJqb3lqMGF4amM5ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g01ZnwAUvutuK8GIQn/giphy.gif"
+        // GIFS DE FUEGOS ARTIFICIALES BRILLANTES DE ALTA DEFINICIÓN
+        const fondosFuegosArtificiales = {
+            familiar: "https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif",
+            pareja: "https://media.giphy.com/media/l3d03k1B3b5zPqC2A/giphy.gif",
+            cumpleaños: "https://media.giphy.com/media/3o7tT127O8vXzE2F6U/giphy.gif"
         };
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -163,18 +164,18 @@
 
             if(estilo === 'familiar') {
                 body.style.background = "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)";
-                container.className += " bg-slate-900/80 border-cyan-500/30";
-                badge.className += " bg-cyan-600 text-cyan-100";
+                container.className += " border-cyan-400/40";
+                badge.className += " bg-cyan-500 text-white";
                 badge.innerText = "✨ Edición Mágica";
             } else if(estilo === 'pareja') {
                 body.style.background = "linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%)";
-                container.className += " bg-rose-950/80 border-rose-500/30";
-                badge.className += " bg-rose-600 text-rose-100";
+                container.className += " border-rose-400/40";
+                badge.className += " bg-rose-500 text-white";
                 badge.innerText = "💖 Edición Romántica";
             } else {
                 body.style.background = "linear-gradient(135deg, #31103F 0%, #4C1D95 50%, #6D28D9 100%)";
-                container.className += " bg-purple-950/80 border-amber-500/30";
-                badge.className += " bg-amber-500 text-amber-950";
+                container.className += " border-amber-400/40";
+                badge.className += " bg-amber-400 text-amber-950";
                 badge.innerText = "🎉 Edición Cumpleaños";
             }
         }
@@ -204,26 +205,29 @@
             document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
-            // Muestra el letrero LED Gigante
+            // Asigna el texto y muestra el letrero LED Gigante
             document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
-            // CAMBIA EL FONDO COMPLETO DE LA PÁGINA (BODY) A LA ANIMACIÓN TEMÁTICA
+            // APLICA EL FONDO COMPLETO DE FUEGOS ARTIFICIALES
             const body = document.getElementById('bodyBg');
-            const gifFondo = fondosRevelados[data.estilo] || fondosRevelados['familiar'];
-            body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${gifFondo}')`;
+            const gifFuegos = fondosFuegosArtificiales[data.estilo] || fondosFuegosArtificiales['familiar'];
+            body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${gifFuegos}')`;
 
             const container = document.getElementById('contenidoSorpresaContainer');
             if(data.tipoSorpresa === 'audio') {
-                container.innerHTML = `<p class="text-xs mb-3 font-bold text-amber-300 drop-shadow">🎵 Nota de Voz Recibida</p>
-                                       <audio controls class="w-full"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>`;
+                container.innerHTML = `<p class="text-xs mb-3 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🎵 Nota de Voz Recibida</p>
+                                       <audio controls class="w-full shadow-lg rounded-xl"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>`;
             } else if(data.tipoSorpresa === 'foto') {
-                container.innerHTML = `<p class="text-xs mb-3 font-bold text-amber-300 drop-shadow">🖼️ Foto Secreta Revelada</p>
-                                       <img src="${data.contenidoSorpresa}" class="w-full max-h-80 object-contain rounded-2xl border-2 border-white/30 mx-auto bg-black/60 shadow-2xl">`;
+                /* LA FOTO SE MANTIENE 100% SÓLIDA SIN TRANSPARENCIA NI FILTROS */
+                container.innerHTML = `<p class="text-xs mb-3 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🖼️ Foto Secreta Revelada</p>
+                                       <div class="p-2 bg-black rounded-2xl border border-white/20 shadow-2xl">
+                                           <img src="${data.contenidoSorpresa}" class="w-full max-h-80 object-contain rounded-xl mx-auto block opacity-100">
+                                       </div>`;
             } else if(data.tipoSorpresa === 'cupon') {
-                container.innerHTML = `<p class="text-xs mb-3 font-bold text-amber-300 drop-shadow">🎟️ ¡Premio Desbloqueado!</p>
-                                       <div class="p-4 bg-black/70 rounded-2xl border-2 border-dashed border-amber-300 text-base font-extrabold text-amber-100 shadow-xl">${data.contenidoSorpresa}</div>
-                                       <button onclick="reclamarPremio('${data.de}', '${data.contenidoSorpresa}')" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xl transition-all">
+                container.innerHTML = `<p class="text-xs mb-3 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🎟️ ¡Premio Desbloqueado!</p>
+                                       <div class="p-4 bg-black/80 rounded-2xl border-2 border-dashed border-amber-300 text-base font-extrabold text-amber-100 shadow-2xl drop-shadow">${data.contenidoSorpresa}</div>
+                                       <button onclick="reclamarPremio('${data.de}', '${data.contenidoSorpresa}')" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-2xl transition-all active:scale-95">
                                            🎁 Reclamar Premio (Enviar a WhatsApp)
                                        </button>`;
             }
