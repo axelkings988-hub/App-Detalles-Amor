@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mensaje con Temporizador - Crear</title>
+    <title>Crear Mensaje con Temporizador</title>
 
-    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -15,67 +14,99 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        amberCustom: { 800: '#78350F', 900: '#451A03', 950: '#260B02' }
-                    },
-                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #260B02 0%, #451A03 50%, #78350F 100%); color: #FEF3C7; min-height: 100vh; }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen">
 
-    <!-- DASHBOARD Y FORMULARIO TEMPORIZADOR -->
-    <div id="tempDashboard" class="w-full max-w-md bg-amberCustom-900/60 backdrop-blur-xl border border-amber-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+    <div class="w-full max-w-md bg-amber-950/70 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         <div class="flex items-center justify-between">
-            <a href="../index.html" class="text-xs text-amber-300 bg-amberCustom-950/80 px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center gap-1.5">
+            <a href="../index.html" class="text-xs text-amber-300 bg-amber-900/80 px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center gap-1.5">
                 <i class="fas fa-arrow-left"></i> Menú
             </a>
-            <h1 class="text-lg font-bold text-amber-100">Mensaje Temporizado ⏳</h1>
+            <h1 class="text-sm font-bold text-amber-100">Nuevo Temporizador ⏳</h1>
             <div class="w-8"></div>
         </div>
 
-        <form id="tempForm" onsubmit="event.preventDefault(); guardarProyectoTemporizador();" class="space-y-4">
-            <div class="space-y-1">
-                <label class="text-xs font-semibold text-amber-200">1. NOMBRE DEL PROYECTO:</label>
-                <input type="text" id="nombreProyecto" placeholder="Ej. Cumpleaños de Sofía" required class="w-full px-4 py-2.5 rounded-xl bg-amberCustom-950/80 border border-amber-500/30 text-xs text-amber-100 placeholder-amber-400/50 focus:outline-none">
+        <form id="tempForm" onsubmit="event.preventDefault(); guardarTemporizador();" class="space-y-4 text-xs">
+            <!-- 1. DISEÑO -->
+            <div class="space-y-1.5">
+                <label class="font-semibold text-amber-200">1. SELECCIONA EL DISEÑO:</label>
+                <select id="estiloDiseno" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                    <option value="familiar">✨ Elegante y mágico (Familiar)</option>
+                    <option value="pareja">💖 Romántico con corazones (Pareja)</option>
+                    <option value="cumpleaños">🎉 Divertido y colorido (Cumpleaños)</option>
+                </select>
+            </div>
+
+            <!-- DATOS BÁSICOS -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-1">
+                    <label class="font-semibold text-amber-200">Para:</label>
+                    <input type="text" id="paraQuien" placeholder="Nombre destinatario" required class="w-full px-3 py-2 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="font-semibold text-amber-200">De:</label>
+                    <input type="text" id="deQuien" placeholder="Tu nombre" required class="w-full px-3 py-2 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                </div>
             </div>
 
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-amber-200">2. TITULO DE LA SORPRESA:</label>
-                <input type="text" id="tituloMensaje" placeholder="Ej. ¡Feliz Cumpleaños!" required class="w-full px-4 py-2.5 rounded-xl bg-amberCustom-950/80 border border-amber-500/30 text-xs text-amber-100 placeholder-amber-400/50 focus:outline-none">
+                <label class="font-semibold text-amber-200">Foto principal (URL o enlace):</label>
+                <input type="url" id="fotoUrl" placeholder="https://ejemplo.com/foto.jpg" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
             </div>
 
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-amber-200">3. FECHA Y HORA DE APERTURA:</label>
-                <input type="datetime-local" id="fechaApertura" required class="w-full px-4 py-2.5 rounded-xl bg-amberCustom-950/80 border border-amber-500/30 text-xs text-amber-100 focus:outline-none">
+                <label class="font-semibold text-amber-200">Fecha y hora para abrir el regalo:</label>
+                <input type="datetime-local" id="fechaApertura" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                <p class="text-[10px] text-amber-300/60 italic">💡 Sugerencia: Configura un plazo razonable (ej. máximo 7 a 30 días) para mantener la emoción viva.</p>
             </div>
 
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-amber-200">4. MENSAJE OCULTO:</label>
-                <textarea id="mensajeOculto" rows="4" placeholder="Escribe tu carta o mensaje especial que se revelará cuando el reloj llegue a cero..." required class="w-full px-4 py-2.5 rounded-xl bg-amberCustom-950/80 border border-amber-500/30 text-xs text-amber-100 placeholder-amber-400/50 focus:outline-none resize-none"></textarea>
+                <label class="font-semibold text-amber-200">Mensaje (máx. 50 palabras):</label>
+                <textarea id="mensajeMarquesina" rows="2" placeholder="Escribe tu dedicatoria especial..." required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none resize-none"></textarea>
             </div>
 
-            <button type="submit" id="saveTempBtn" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                ⏳ Guardar y Generar QR
+            <!-- TIPO DE SORPRESA (SOLO UNA OPCIÓN) -->
+            <div class="space-y-2 pt-2 border-t border-amber-500/20">
+                <label class="font-semibold text-amber-200 block">ELIGE UN TIPO DE SORPRESA (Solo una):</label>
+                
+                <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="tipoSorpresa" value="audio" checked onchange="toggleSorpresa('audio')">
+                        <span>🎵 Nota de Voz (URL de audio)</span>
+                    </label>
+                    <input type="url" id="valAudio" placeholder="https://... (enlace de tu audio)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100">
+                </div>
+
+                <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="tipoSorpresa" value="foto" onchange="toggleSorpresa('foto')">
+                        <span>🖼️ Foto Sorpresa Oculta (URL)</span>
+                    </label>
+                    <input type="url" id="valFoto" placeholder="https://... (enlace de foto secreta)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100" disabled>
+                </div>
+
+                <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="tipoSorpresa" value="cupon" onchange="toggleSorpresa('cupon')">
+                        <span>🎟️ Juego de Rasca / Cupón de Premio</span>
+                    </label>
+                    <input type="text" id="valCupon" placeholder="Ej. Vale por una cena romántica / $500" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100" disabled>
+                </div>
+            </div>
+
+            <button type="submit" id="btnGuardar" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform">
+                ⏳ Generar Enlace y QR
             </button>
         </form>
 
-        <div id="tempResultBox" class="hidden bg-amberCustom-950/90 border border-amber-500/30 p-5 rounded-2xl text-center space-y-4">
-            <h3 class="text-xs font-bold text-amber-200">¡Temporizador Creado con Éxito! 🎉</h3>
-            <div class="bg-white p-3 rounded-xl inline-block">
-                <div id="tempQrcode"></div>
-            </div>
-            <a id="tempFinalLink" href="#" target="_blank" class="block w-full py-2 bg-amber-600 text-white text-xs font-semibold rounded-xl truncate">
-                Ver Página del Temporizador
+        <div id="resultBox" class="hidden bg-amber-950 p-4 rounded-2xl border border-amber-500/30 text-center space-y-3">
+            <h3 class="font-bold text-amber-200">¡Regalo Creado con Éxito! 🎉</h3>
+            <div class="bg-white p-2 rounded-xl inline-block" id="qrcode"></div>
+            <a id="linkFinal" href="#" target="_blank" class="block w-full py-2 bg-amber-600 text-white font-semibold rounded-xl truncate">
+                Abrir Enlace del Regalo
             </a>
         </div>
     </div>
@@ -92,37 +123,49 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        async function guardarProyectoTemporizador() {
-            const nombre = document.getElementById('nombreProyecto').value.trim();
-            const titulo = document.getElementById('tituloMensaje').value.trim();
-            const fechaHora = document.getElementById('fechaApertura').value;
-            const mensaje = document.getElementById('mensajeOculto').value.trim();
+        function toggleSorpresa(tipo) {
+            document.getElementById('valAudio').disabled = (tipo !== 'audio');
+            document.getElementById('valFoto').disabled = (tipo !== 'foto');
+            document.getElementById('valCupon').disabled = (tipo !== 'cupon');
+        }
 
-            const btn = document.getElementById('saveTempBtn');
+        async function guardarTemporizador() {
+            const btn = document.getElementById('btnGuardar');
             btn.innerText = "Guardando...";
             btn.disabled = true;
 
+            const tipoSorpresaSeleccionada = document.querySelector('input[name="tipoSorpresa"]:checked').value;
+            let contenidoSorpresa = "";
+            if(tipoSorpresaSeleccionada === 'audio') contenidoSorpresa = document.getElementById('valAudio').value.trim();
+            if(tipoSorpresaSeleccionada === 'foto') contenidoSorpresa = document.getElementById('valFoto').value.trim();
+            if(tipoSorpresaSeleccionada === 'cupon') contenidoSorpresa = document.getElementById('valCupon').value.trim();
+
+            const datos = {
+                estilo: document.getElementById('estiloDiseno').value,
+                para: document.getElementById('paraQuien').value.trim(),
+                de: document.getElementById('deQuien').value.trim(),
+                fotoUrl: document.getElementById('fotoUrl').value.trim(),
+                targetDate: new Date(document.getElementById('fechaApertura').value).toISOString(),
+                mensaje: document.getElementById('mensajeMarquesina').value.trim(),
+                tipoSorpresa: tipoSorpresaSeleccionada,
+                contenidoSorpresa: contenidoSorpresa,
+                creado: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
             try {
-                const docRef = await db.collection("temporizadores").add({
-                    nombreProyecto: nombre,
-                    titulo: titulo,
-                    targetDate: new Date(fechaHora).toISOString(),
-                    mensaje: mensaje,
-                    creado: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                const docRef = await db.collection("temporizadores").add(datos);
+                const urlVer = `https://axelkings988-hub.github.io/App-Detalles-Amor/temporizador/ver.html?id=${docRef.id}`;
+                
+                document.getElementById('linkFinal').href = urlVer;
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById('qrcode'), { text: urlVer, width: 140, height: 140 });
 
-                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/temporizador/ver.html?id=${docRef.id}`;
-                document.getElementById('tempFinalLink').href = finalLink;
-
-                document.getElementById('tempQrcode').innerHTML = "";
-                new QRCode(document.getElementById("tempQrcode"), { text: finalLink, width: 150, height: 150 });
-
-                document.getElementById('tempResultBox').classList.remove('hidden');
-                btn.innerText = "⏳ Guardar y Generar QR";
+                document.getElementById('resultBox').classList.remove('hidden');
+                btn.innerText = "⏳ Generar Enlace y QR";
                 btn.disabled = false;
-            } catch (error) {
-                alert("Error al guardar el temporizador.");
-                btn.innerText = "⏳ Guardar y Generar QR";
+            } catch(e) {
+                alert("Error al guardar en Firebase.");
+                btn.innerText = "⏳ Generar Enlace y QR";
                 btn.disabled = false;
             }
         }
