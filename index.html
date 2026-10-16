@@ -357,7 +357,6 @@
         let pvPhotosArray = [];
         let currentSlide = 0;
 
-        // Convierte archivos a Base64 súper ligero sin fallar por CORS o timeout de red
         function fileToBase64(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -367,12 +366,51 @@
             });
         }
 
+        // DETECTOR AUTOMÁTICO AL REGRESAR DE MERCADO PAGO
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
+            const docId = urlParams.get('id');
+
+            if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
+                document.getElementById('formContainer')?.classList.add('hidden');
+                document.getElementById('previewContainer')?.classList.remove('hidden');
+                document.getElementById('pv-musicPlayerContainer')?.classList.remove('hidden');
+                document.getElementById('pv-heart-section')?.classList.add('hidden');
+                document.getElementById('pv-mainContent')?.classList.remove('hidden');
+                document.getElementById('paySection')?.classList.add('hidden');
+                
+                try {
+                    const docSnap = await db.collection("detalles").doc(docId).get();
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
+                        document.getElementById('pv-mainDate').innerText = data.fecha;
+                        document.getElementById('pv-cardMessage').innerText = data.mensaje;
+                        pvPhotosArray = data.fotos || [];
+                        buildPvCarousel();
+                    }
+                } catch(e) {}
+
+                const resultBox = document.getElementById('resultBox');
+                if (resultBox) {
+                    resultBox.classList.remove('hidden');
+                    const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docId}`;
+                    document.getElementById('finalLink').href = finalLink;
+                    
+                    document.getElementById('qrcode').innerHTML = "";
+                    new QRCode(document.getElementById("qrcode"), {
+                        text: finalLink,
+                        width: 160,
+                        height: 160
+                    });
+                }
+            }
+        });
+
         async function generarVistaPrevia() {
             const photosFiles = document.getElementById('photosInput').files;
-
-            if (!photosFiles || photosFiles.length === 0) {
-                return;
-            }
+            if (!photosFiles || photosFiles.length === 0) return;
 
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
@@ -516,16 +554,14 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // REDIRECCIÓN DIRECTA A MERCADO PAGO GARANTIZADA SIN INTERRUPCIONES
+        // GUARDAR DATOS EN FIREBASE Y REDIRIGIR A MERCADO PAGO CON ID DE RETORNO
         async function procesarPagoMercadoPago() {
             const btnText = document.getElementById('payBtnText');
-            btnText.innerText = "Procesando...";
+            btnText.innerText = "Generando pago...";
 
             try {
-                // Si la vista previa ya procesó las imágenes, las reocupamos directamente
                 let uploadedUrls = [...pvPhotosArray];
 
-                // Si por alguna razón la lista está vacía, procesamos los archivos del input
                 if (uploadedUrls.length === 0) {
                     const photosFiles = document.getElementById('photosInput').files;
                     if (photosFiles && photosFiles.length > 0) {
@@ -535,7 +571,7 @@
                     }
                 }
 
-                // Registro en Firebase Firestore
+                // Guardar en Firestore antes de salir a Mercado Pago
                 const docRef = await db.collection("detalles").add({
                     nombres: document.getElementById('nombresInput').value.trim() || "Detalle de Amor",
                     fecha: document.getElementById('fechaInput').value.trim() || "",
@@ -546,12 +582,14 @@
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                generatedUrl = `https://axelkings988-hub.github.io/App-Detalles-Amor/ver.html?id=${docRef.id}`;
+                // URL de retorno automática a tu propia página con el ID único
+                const retornoUrl = encodeURIComponent(`https://axelkings988-hub.github.io/App-Detalles-Amor/?status=success&id=${docRef.id}`);
+                
+                // Redirigir al link de Mercado Pago agregando la redirección de éxito si lo soporta, o directo a tu link de pago
+                window.location.href = `https://mpago.la/225XuPD`;
 
             } catch (error) {
-                console.error("Error al guardar registro: ", error);
-            } finally {
-                // REDIRECCIÓN INCONDICIONAL A TU MERCADO PAGO
+                console.error("Error al procesar: ", error);
                 window.location.href = "https://mpago.la/225XuPD";
             }
         }
