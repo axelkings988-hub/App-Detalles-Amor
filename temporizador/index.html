@@ -20,7 +20,7 @@
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen">
 
-    <div class="w-full max-w-md bg-amber-950/70 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
+    <div class="w-full max-w-md bg-amber-950/75 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-5 my-6">
         <div class="flex items-center justify-between">
             <a href="../index.html" class="text-xs text-amber-300 bg-amber-900/80 px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center gap-1.5">
                 <i class="fas fa-arrow-left"></i> Menú
@@ -30,14 +30,23 @@
         </div>
 
         <form id="tempForm" onsubmit="event.preventDefault(); guardarTemporizador();" class="space-y-4 text-xs">
-            <!-- 1. DISEÑO -->
+            <!-- 1. SELECCIONAR DISEÑO -->
             <div class="space-y-1.5">
-                <label class="font-semibold text-amber-200">1. SELECCIONA EL DISEÑO:</label>
-                <select id="estiloDiseno" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                <label class="font-semibold text-amber-200">1. SELECCIONA EL DISEÑO TEMÁTICO:</label>
+                <select id="estiloDiseno" required onchange="actualizarVistaPreviaRegalo()" class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
                     <option value="familiar">✨ Elegante y mágico (Familiar)</option>
                     <option value="pareja">💖 Romántico con corazones (Pareja)</option>
                     <option value="cumpleaños">🎉 Divertido y colorido (Cumpleaños)</option>
                 </select>
+            </div>
+
+            <!-- VISTA PREVIA DEL REGALO ANIMADO -->
+            <div class="flex items-center justify-center gap-3 bg-amber-900/30 p-3 rounded-2xl border border-amber-500/20">
+                <img id="gifPreview" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif" class="w-16 h-16 object-cover rounded-xl border border-amber-400/30">
+                <div class="text-left">
+                    <p class="font-bold text-amber-200 text-xs">Portada Animada</p>
+                    <p class="text-[10px] text-amber-300/70">Asignada automáticamente según el diseño.</p>
+                </div>
             </div>
 
             <!-- DATOS BÁSICOS -->
@@ -53,14 +62,9 @@
             </div>
 
             <div class="space-y-1">
-                <label class="font-semibold text-amber-200">Foto principal (URL o enlace):</label>
-                <input type="url" id="fotoUrl" placeholder="https://ejemplo.com/foto.jpg" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
-            </div>
-
-            <div class="space-y-1">
                 <label class="font-semibold text-amber-200">Fecha y hora para abrir el regalo:</label>
                 <input type="datetime-local" id="fechaApertura" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
-                <p class="text-[10px] text-amber-300/60 italic">💡 Sugerencia: Configura un plazo razonable (ej. máximo 7 a 30 días) para mantener la emoción viva.</p>
+                <p class="text-[10px] text-amber-300/60 italic">💡 Sugerencia: Elige un plazo razonable (7 a 30 días) para mantener la emoción.</p>
             </div>
 
             <div class="space-y-1">
@@ -69,29 +73,42 @@
             </div>
 
             <!-- TIPO DE SORPRESA (SOLO UNA OPCIÓN) -->
-            <div class="space-y-2 pt-2 border-t border-amber-500/20">
+            <div class="space-y-2.5 pt-2 border-t border-amber-500/20">
                 <label class="font-semibold text-amber-200 block">ELIGE UN TIPO DE SORPRESA (Solo una):</label>
                 
+                <!-- OPCIÓN 1: AUDIO -->
                 <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="tipoSorpresa" value="audio" checked onchange="toggleSorpresa('audio')">
-                        <span>🎵 Nota de Voz (URL de audio)</span>
+                        <span>🎵 Grabar Nota de Voz (Máx. 20s)</span>
                     </label>
-                    <input type="url" id="valAudio" placeholder="https://... (enlace de tu audio)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100">
+                    <div id="audioSection" class="space-y-2">
+                        <div class="flex gap-2">
+                            <button type="button" id="btnGrabar" onclick="iniciarGrabacion()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow">
+                                <i class="fas fa-microphone"></i> Grabar (<span id="timerGrabacion">20</span>s)
+                            </button>
+                            <button type="button" id="btnDetener" onclick="detenerGrabacion()" class="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-xl shadow" disabled>
+                                <i class="fas fa-stop"></i> Detener
+                            </button>
+                        </div>
+                        <audio id="audioPreview" controls class="w-full hidden mt-1"></audio>
+                    </div>
                 </div>
 
+                <!-- OPCIÓN 2: FOTO -->
                 <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="tipoSorpresa" value="foto" onchange="toggleSorpresa('foto')">
-                        <span>🖼️ Foto Sorpresa Oculta (URL)</span>
+                        <span>🖼️ Seleccionar Foto de Galería</span>
                     </label>
-                    <input type="url" id="valFoto" placeholder="https://... (enlace de foto secreta)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100" disabled>
+                    <input type="file" id="inputFoto" accept="image/*" onchange="cargarFotoGaleria(event)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800" disabled>
                 </div>
 
+                <!-- OPCIÓN 3: CUPÓN -->
                 <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="tipoSorpresa" value="cupon" onchange="toggleSorpresa('cupon')">
-                        <span>🎟️ Juego de Rasca / Cupón de Premio</span>
+                        <span>🎟️ Cupón de Premio (Reclamable)</span>
                     </label>
                     <input type="text" id="valCupon" placeholder="Ej. Vale por una cena romántica / $500" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100" disabled>
                 </div>
@@ -123,28 +140,127 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const gifsRegalos = {
+            familiar: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif",
+            pareja: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGJsaGFnaGVrcTNrcjBweDVzc245eGtrcWF4NHc5MnYzbDgyMXptNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKoWXm3okO1xmLK/giphy.gif",
+            cumpleaños: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc25sOXBsMHJmdTN0a3Y2Z2RyaTRua2dneWFsdXZkY3Nrd3FicWZzOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g5R6IxEXVMJzsS228w/giphy.gif"
+        };
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBase64 = "";
+        let fotoBase64 = "";
+        let timerGrabacionInterval;
+
+        function actualizarVistaPreviaRegalo() {
+            const estilo = document.getElementById('estiloDiseno').value;
+            document.getElementById('gifPreview').src = gifsRegalos[estilo];
+        }
+
         function toggleSorpresa(tipo) {
-            document.getElementById('valAudio').disabled = (tipo !== 'audio');
-            document.getElementById('valFoto').disabled = (tipo !== 'foto');
-            document.getElementById('valCupon').disabled = (tipo !== 'cupon');
+            const audioSec = document.getElementById('audioSection');
+            const fotoInput = document.getElementById('inputFoto');
+            const cuponInput = document.getElementById('valCupon');
+
+            audioSec.style.opacity = (tipo === 'audio') ? '1' : '0.4';
+            fotoInput.disabled = (tipo !== 'foto');
+            cuponInput.disabled = (tipo !== 'cupon');
+        }
+
+        // GRABACIÓN DE AUDIO
+        async function iniciarGrabacion() {
+            audioChunks = [];
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        audioBase64 = reader.result;
+                        const preview = document.getElementById('audioPreview');
+                        preview.src = audioBase64;
+                        preview.classList.remove('hidden');
+                    };
+                };
+
+                mediaRecorder.start();
+                document.getElementById('btnGrabar').disabled = true;
+                document.getElementById('btnGrabar').classList.add('opacity-50');
+                document.getElementById('btnDetener').disabled = false;
+
+                let timeLeft = 20;
+                document.getElementById('timerGrabacion').innerText = timeLeft;
+                timerGrabacionInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timerGrabacion').innerText = timeLeft;
+                    if(timeLeft <= 0) {
+                        detenerGrabacion();
+                    }
+                }, 1000);
+
+            } catch(e) {
+                alert("No se pudo acceder al micrófono. Verifica los permisos de tu navegador.");
+            }
+        }
+
+        function detenerGrabacion() {
+            if(mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            clearInterval(timerGrabacionInterval);
+            document.getElementById('btnGrabar').disabled = false;
+            document.getElementById('btnGrabar').classList.remove('opacity-50');
+            document.getElementById('btnDetener').disabled = true;
+            document.getElementById('timerGrabacion').innerText = "20";
+        }
+
+        // CARGAR FOTO DE GALERÍA
+        function cargarFotoGaleria(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = () => {
+                    fotoBase64 = reader.result;
+                };
+            }
         }
 
         async function guardarTemporizador() {
+            const estilo = document.getElementById('estiloDiseno').value;
+            const tipoSorpresaSeleccionada = document.querySelector('input[name="tipoSorpresa"]:checked').value;
+            
+            let contenidoSorpresa = "";
+            if(tipoSorpresaSeleccionada === 'audio') {
+                if(!audioBase64) { alert("Por favor graba una nota de voz antes de continuar."); return; }
+                contenidoSorpresa = audioBase64;
+            }
+            if(tipoSorpresaSeleccionada === 'foto') {
+                if(!fotoBase64) { alert("Por favor selecciona una foto de tu galería."); return; }
+                contenidoSorpresa = fotoBase64;
+            }
+            if(tipoSorpresaSeleccionada === 'cupon') {
+                contenidoSorpresa = document.getElementById('valCupon').value.trim();
+                if(!contenidoSorpresa) { alert("Escribe el premio del cupón."); return; }
+            }
+
             const btn = document.getElementById('btnGuardar');
             btn.innerText = "Guardando...";
             btn.disabled = true;
 
-            const tipoSorpresaSeleccionada = document.querySelector('input[name="tipoSorpresa"]:checked').value;
-            let contenidoSorpresa = "";
-            if(tipoSorpresaSeleccionada === 'audio') contenidoSorpresa = document.getElementById('valAudio').value.trim();
-            if(tipoSorpresaSeleccionada === 'foto') contenidoSorpresa = document.getElementById('valFoto').value.trim();
-            if(tipoSorpresaSeleccionada === 'cupon') contenidoSorpresa = document.getElementById('valCupon').value.trim();
-
             const datos = {
-                estilo: document.getElementById('estiloDiseno').value,
+                estilo: estilo,
+                fotoUrl: gifsRegalos[estilo],
                 para: document.getElementById('paraQuien').value.trim(),
                 de: document.getElementById('deQuien').value.trim(),
-                fotoUrl: document.getElementById('fotoUrl').value.trim(),
                 targetDate: new Date(document.getElementById('fechaApertura').value).toISOString(),
                 mensaje: document.getElementById('mensajeMarquesina').value.trim(),
                 tipoSorpresa: tipoSorpresaSeleccionada,
@@ -169,6 +285,8 @@
                 btn.disabled = false;
             }
         }
+
+        actualizarVistaPreviaRegalo();
     </script>
 </body>
 </html>
