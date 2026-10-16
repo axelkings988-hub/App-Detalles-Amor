@@ -16,7 +16,6 @@
 
     <style>
         .font-cursive { font-family: 'Dancing Script', cursive; }
-        /* Marquesina lenta de izquierda a derecha */
         @keyframes marquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -39,12 +38,9 @@
             <p class="text-xs opacity-75">De parte de: <span id="txtDe" class="font-bold">...</span></p>
         </div>
 
-        <!-- FOTO Y ANIMACIÓN DE REGALO -->
-        <div class="relative w-40 h-40 mx-auto rounded-2xl overflow-hidden shadow-xl border-2 border-white/20">
-            <img id="imgRegalo" src="" alt="Regalo" class="w-full h-full object-cover">
-            <div id="overlayAnimado" class="absolute inset-0 bg-black/40 flex items-center justify-center text-3xl animate-pulse">
-                🎁
-            </div>
+        <!-- REGALO CON MOVIMIENTO Y MARCO ANIMADO -->
+        <div class="relative w-44 h-44 mx-auto rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20">
+            <img id="imgRegalo" src="" alt="Regalo Animado" class="w-full h-full object-cover">
         </div>
 
         <!-- MODO TEMPORIZADOR -->
@@ -74,12 +70,12 @@
         <!-- MODO REVELADO -->
         <div id="revealedBox" class="hidden space-y-4">
             <div id="contenidoSorpresaContainer" class="p-4 bg-black/40 rounded-2xl border border-white/20 text-center">
-                <!-- Se inyecta según sea audio, foto o cupón -->
+                <!-- Se inyecta la sorpresa elegida -->
             </div>
         </div>
 
         <!-- MARQUESINA DE TEXTO (FONDO NEGRO, IZQUIERDA A DERECHA) -->
-        <div class="w-full bg-black py-2 rounded-xl overflow-hidden border border-white/10">
+        <div class="w-full bg-black py-2.5 rounded-xl overflow-hidden border border-white/10">
             <div class="overflow-hidden whitespace-nowrap relative">
                 <p id="txtMarquesina" class="animate-marquee text-xs font-medium text-amber-200">Cargando dedicatoria...</p>
             </div>
@@ -162,13 +158,12 @@
 
         function revelarRegalo(data) {
             document.getElementById('countdownBox').classList.add('hidden');
-            document.getElementById('overlayAnimado').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
             const container = document.getElementById('contenidoSorpresaContainer');
             if(data.tipoSorpresa === 'audio') {
                 container.innerHTML = `<p class="text-xs mb-2 font-bold text-amber-300">🎵 Nota de Voz Recibida</p>
-                                       <audio controls class="w-full"><source src="${data.contenidoSorpresa}" type="audio/mpeg">Tu navegador no soporta audio.</audio>`;
+                                       <audio controls class="w-full"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>`;
             } else if(data.tipoSorpresa === 'foto') {
                 container.innerHTML = `<p class="text-xs mb-2 font-bold text-amber-300">🖼️ Foto Secreta Revelada</p>
                                        <img src="${data.contenidoSorpresa}" class="w-full h-48 object-cover rounded-xl border border-white/20">`;
@@ -184,7 +179,7 @@
         }
 
         function reclamarPremio(remitente, premio) {
-            const texto = `¡Hola ${remitente}! He abierto mi regalo con temporizador y reclamé mi premio: *${premidose = premio}* 🎉 ¡Vengo a canjearlo!`;
+            const texto = `¡Hola ${remitente}! He abierto mi regalo con temporizador y reclamé mi premio: *${premio}* 🎉 ¡Vengo a canjearlo!`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
     </script>
