@@ -19,9 +19,10 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
         }
+        /* Estilo visual al seleccionar una opción */
         .selector-modelo:checked + div, .selector-color:checked + div {
-            border-color: #38bdf8;
-            background-color: rgba(6, 182, 212, 0.2);
+            border-color: #38bdf8 !important;
+            background-color: rgba(6, 182, 212, 0.25) !important;
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
         }
     </style>
@@ -34,42 +35,42 @@
         <div class="space-y-1">
             <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
             <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
-            <p class="text-xs text-slate-300">Personaliza la forma y la paleta de colores neón de tu medalla.</p>
+            <p class="text-xs text-slate-300">Personaliza la forma y los colores neón de tu medalla.</p>
         </div>
 
         <!-- FORMULARIO -->
         <div id="formContainer" class="space-y-4 text-left">
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
-                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
+                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Especie / Raza</label>
-                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Pitbull" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
+                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Pitbull" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
-                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
+                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Colonia / Sector (Seguro)</label>
-                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
+                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-amber-300 mb-1">💰 Recompensa (Opcional)</label>
                     <div class="relative flex items-center">
                         <span class="absolute left-3 text-amber-300 font-bold text-sm">$</span>
-                        <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400 focus:placeholder:opacity-0">
+                        <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400">
                     </div>
                 </div>
             </div>
 
-            <!-- SELECCIÓN DE DISEÑO (FORMA) -->
+            <!-- 1. SELECCIÓN DE DISEÑO (FORMA) -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-2">💎 1. Elige la Forma de la Placa</label>
                 <div class="grid grid-cols-3 gap-2 text-center">
@@ -97,7 +98,7 @@
                 </div>
             </div>
 
-            <!-- SELECCIÓN DE LAS 5 PALETAS DE COLORES NEÓN -->
+            <!-- 2. SELECCIÓN DE LAS 5 PALETAS DE COLORES NEÓN -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-2">🎨 2. Elige la Paleta de Colores Neón</label>
                 <div class="grid grid-cols-5 gap-1.5 text-center">
@@ -151,7 +152,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Mensaje para quien lo encuentre / Señas</label>
-                <textarea id="detallesMascota" rows="2" placeholder="Ej. Es muy asustadizo, por favor háblale con calma..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0"></textarea>
+                <textarea id="detallesMascota" rows="2" placeholder="Ej. Es muy asustadizo, por favor háblale con calma..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400"></textarea>
             </div>
 
             <button onclick="generarPlacaQR()" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg text-sm transition-all active:scale-95">
@@ -200,7 +201,7 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        // Referencia a los archivos subidos en la carpeta mascotas/
+        // Rutas corregidas con los nombres exactos que subiste a GitHub: escudo.jpg, circulo.jpg, hueso.jpg
         const PLACAS_BLANCAS = {
             escudo:  "escudo.jpg",
             circulo: "circulo.jpg",
@@ -299,10 +300,10 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                // 1. Dibujar la placa base limpia
+                // 1. Dibujar la placa base limpia desde tus archivos (escudo.jpg, circulo.jpg, hueso.jpg)
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. Aplicar color diagonal respetando relieves y bordes 3D
+                // 2. Aplicar color diagonal respetando los relieves y bordes 3D
                 ctx.globalCompositeOperation = 'source-atop';
                 
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
@@ -364,7 +365,7 @@
             };
 
             baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen base de la placa.");
+                alert("No se pudo cargar la imagen de la placa. Verifica que el archivo '" + PLACAS_BLANCAS[estilo] + "' esté en la carpeta 'mascotas'.");
             };
 
             baseImg.src = PLACAS_BLANCAS[estilo] || PLACAS_BLANCAS.escudo;
