@@ -84,20 +84,27 @@
             </button>
         </div>
 
-        <!-- SECCIÓN DE RESULTADO Y QR -->
+        <!-- SECCIÓN DE RESULTADO Y TARJETA VISUAL DE PLACA -->
         <div id="resultContainer" class="hidden space-y-4 text-center">
-            <div class="p-4 bg-black/50 rounded-2xl border border-white/20 space-y-3">
-                <p class="text-xs font-bold text-emerald-300">✨ ¡Placa generada con éxito!</p>
-                <div id="qrcode" class="bg-white p-3 rounded-xl inline-block shadow-lg"></div>
-                <p class="text-[11px] text-slate-300 break-all select-all" id="txtEnlacePublico"></p>
+            <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
+                <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
+                
+                <!-- CANVAS DONDE SE DIBUJA LA MEDALLA / PLACA PARA COLLAR -->
+                <div class="flex justify-center my-2">
+                    <canvas id="placaCanvas" width="340" height="420" class="rounded-2xl shadow-2xl border border-white/20 max-w-full h-auto"></canvas>
+                </div>
+
+                <div id="qrcodeHidden" class="hidden"></div>
+                <p class="text-[11px] text-slate-300 break-all select-all mt-2" id="txtEnlacePublico"></p>
             </div>
 
             <div class="space-y-2">
                 <button onclick="copiarEnlace()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs shadow-md">
                     📋 Copiar Enlace Público
                 </button>
-                <button onclick="descargarQR()" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-md">
-                    📥 Descargar Código QR
+                <button onclick="descargarPlacaImagen()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-xl text-xs shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Descargar Imagen de Placa HD</span>
                 </button>
             </div>
         </div>
@@ -166,12 +173,20 @@
                 document.getElementById('resultContainer').classList.remove('hidden');
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
-                const qrContainer = document.getElementById('qrcode');
+                // Generar código QR oculto para extraer imagen
+                const qrContainer = document.getElementById('qrcodeHidden');
                 qrContainer.innerHTML = "";
                 var qr = qrcode(0, 'M');
                 qr.addData(enlaceGenerado);
                 qr.make();
-                qrContainer.innerHTML = qr.createImgTag(5);
+                qrContainer.innerHTML = qr.createImgTag(6);
+
+                const qrImg = qrContainer.querySelector('img');
+                
+                // Renderizar diseño de medalla de collar en Canvas
+                setTimeout(() => {
+                    dibujarMedallaPlaca(nombre, raza, qrImg.src);
+                }, 150);
 
             } catch (error) {
                 console.error("Error al guardar:", error);
@@ -179,17 +194,87 @@
             }
         }
 
+        /* DIBUJAR PLACA VISUAL DE COLLAR TIPO MEDALLA */
+        function dibujarMedallaPlaca(nombre, raza, qrDataUrl) {
+            const canvas = document.getElementById('placaCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Fondo oscuro metálico
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#0f172a');
+            grad.addColorStop(0.5, '#1e293b');
+            grad.addColorStop(1, '#0284c7');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Borde cromado brillante con resplandor neón
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+            // Orificio simulado para colgar de la medalla
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, 30, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Título de la medalla
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'extrabold 12px Plus Jakarta Sans, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', canvas.width / 2, 60);
+
+            // Nombre de la Mascota
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 26px Plus Jakarta Sans, sans-serif';
+            ctx.fillText(nombre.toUpperCase(), canvas.width / 2, 95);
+
+            // Raza / Especie
+            ctx.fillStyle = '#fde047';
+            ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
+            ctx.fillText(raza.toUpperCase(), canvas.width / 2, 115);
+
+            // Renderizar Código QR al centro con marco blanco
+            const qrImg = new Image();
+            qrImg.onload = function() {
+                const qrSize = 200;
+                const qrX = (canvas.width - qrSize) / 2;
+                const qrY = 135;
+
+                // Marco blanco rodeando el QR
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 16);
+                ctx.fill();
+
+                // Dibujar el QR
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+                // Pie de foto guía
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
+                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', canvas.width / 2, qrY + qrSize + 28);
+                
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px Plus Jakarta Sans, sans-serif';
+                ctx.fillText('Soluciones QR • Protección de Mascota', canvas.width / 2, canvas.height - 22);
+            };
+            qrImg.src = qrDataUrl;
+        }
+
         function copiarEnlace() {
             navigator.clipboard.writeText(enlaceGenerado);
             alert("¡Enlace copiado al portapapeles!");
         }
 
-        function descargarQR() {
-            const img = document.querySelector('#qrcode img');
-            if(!img) return;
+        function descargarPlacaImagen() {
+            const canvas = document.getElementById('placaCanvas');
             const link = document.createElement('a');
-            link.download = 'qr-mascota.png';
-            link.href = img.src;
+            link.download = 'placa-collar-mascota.png';
+            link.href = canvas.toDataURL('image/png');
             link.click();
         }
     </script>
