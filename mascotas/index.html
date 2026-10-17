@@ -200,10 +200,11 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
+        // Si guardaste los archivos como PNG, asegúrate de colocar las extensiones correctas aquí:
         const PLACAS = {
-            escudo:  "escudo.jpg",
-            circulo: "circulo.jpg",
-            hueso:   "hueso.jpg"
+            escudo:  "escudo.png",
+            circulo: "circulo.png",
+            hueso:   "hueso.png"
         };
 
         const PALETAS = {
@@ -287,31 +288,6 @@
             }
         }
 
-        // Trazado de contornos vectoriales para aplicar el borde resplandeciente
-        function trazarContornoModelo(ctx, estilo) {
-            ctx.beginPath();
-            if (estilo === 'escudo') {
-                ctx.moveTo(512, 360);
-                ctx.lineTo(730, 415);
-                ctx.bezierCurveTo(810, 445, 825, 710, 825, 825);
-                ctx.bezierCurveTo(825, 935, 680, 955, 512, 960);
-                ctx.bezierCurveTo(344, 955, 199, 935, 199, 825);
-                ctx.bezierCurveTo(199, 710, 214, 445, 294, 415);
-                ctx.closePath();
-            } else if (estilo === 'circulo') {
-                ctx.arc(512, 650, 310, 0, Math.PI * 2);
-            } else if (estilo === 'hueso') {
-                ctx.moveTo(350, 390);
-                ctx.bezierCurveTo(190, 390, 160, 520, 250, 580);
-                ctx.bezierCurveTo(160, 640, 190, 770, 350, 770);
-                ctx.bezierCurveTo(410, 890, 614, 890, 674, 770);
-                ctx.bezierCurveTo(834, 770, 864, 640, 774, 580);
-                ctx.bezierCurveTo(864, 520, 834, 390, 674, 390);
-                ctx.bezierCurveTo(614, 270, 410, 270, 350, 390);
-                ctx.closePath();
-            }
-        }
-
         function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
@@ -323,12 +299,12 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                // 1. DIBUJAR IMAGEN BASE EN BLANCO
+                // 1. DIBUJAR LA IMAGEN PNG TRANSPARENTE
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. APLICAR COLOR NEÓN DIAGONAL MANTENIENDO SOMBRAS Y VOLUMEN 3D
+                // 2. APLICAR EL COLOREADO DIAGONAL EXCLUSIVAMENTE SOBRE LA SILUETA PNG
                 ctx.save();
-                ctx.globalCompositeOperation = 'multiply';
+                ctx.globalCompositeOperation = 'source-atop';
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
                 const gradiente = ctx.createLinearGradient(0, 0, size, size);
                 gradiente.addColorStop(0, colores[0]);
@@ -339,57 +315,47 @@
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 3. APLICAR BORDE NEÓN RESPLANDECIENTE AL CONTORNO EXTERIOR
-                ctx.save();
-                trazarContornoModelo(ctx, estilo);
-                ctx.lineWidth = 12;
-                ctx.strokeStyle = colores[1] || '#38bdf8'; // Usar tono secundario de la paleta
-                ctx.shadowColor = colores[1] || '#38bdf8';
-                ctx.shadowBlur = 25;
-                ctx.stroke();
-                ctx.restore();
-
-                // 4. CONFIGURAR TEXTOS Y TAMAÑO DE QR MÁS GRANDE
+                // 3. POSICIONES PERFECTAMENTE CENTRADAS Y MÁS ALTAS
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                let headerY = size * 0.38;
-                let nombreY = size * 0.43;
-                let razaY = size * 0.48;
-                let qrY = size * 0.50;
-                let qrSize = 310; // ← Aumentado para mayor legibilidad
-                let footerText1Y = qrY + qrSize + 35;
-                let footerText2Y = qrY + qrSize + 60;
+                let headerY = size * 0.25;
+                let nombreY = size * 0.31;
+                let razaY = size * 0.37;
+                let qrY = size * 0.41;
+                let qrSize = 340; 
+                let footerText1Y = qrY + qrSize + 32;
+                let footerText2Y = qrY + qrSize + 58;
 
                 if (estilo === 'circulo') {
-                    headerY = size * 0.37;
-                    nombreY = size * 0.42;
-                    razaY = size * 0.47;
-                    qrY = size * 0.49;
+                    headerY = size * 0.24;
+                    nombreY = size * 0.30;
+                    razaY = size * 0.36;
+                    qrY = size * 0.40;
                 } else if (estilo === 'hueso') {
-                    headerY = size * 0.37;
-                    nombreY = size * 0.42;
-                    razaY = size * 0.47;
-                    qrY = size * 0.49;
-                    qrSize = 280;
-                    footerText1Y = qrY + qrSize + 30;
-                    footerText2Y = qrY + qrSize + 52;
+                    headerY = size * 0.24;
+                    nombreY = size * 0.30;
+                    razaY = size * 0.36;
+                    qrY = size * 0.40;
+                    qrSize = 300;
+                    footerText1Y = qrY + qrSize + 28;
+                    footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 5. TEXTOS
+                // 4. TEXTOS SUPERIORES
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
 
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = '900 54px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.font = '900 56px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
 
                 ctx.fillStyle = '#F59E0B';
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 6. CÓDIGO QR Y RECUADRO PROTECTOR
+                // 5. CÓDIGO QR Y RECUADRO
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
@@ -406,7 +372,7 @@
 
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                    // Textos inferiores
+                    // TEXTOS INFERIORES
                     ctx.fillStyle = '#FFFFFF';
                     ctx.font = '800 16px Plus Jakarta Sans, Arial, sans-serif';
                     ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
