@@ -34,7 +34,7 @@
         <div class="space-y-1">
             <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
             <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
-            <p class="text-xs text-slate-300">Personaliza la forma y los colores neón de tu medalla.</p>
+            <p class="text-xs text-slate-300">Selecciona el modelo de medalla 3D y crea el perfil de emergencia.</p>
         </div>
 
         <!-- FORMULARIO -->
@@ -69,71 +69,29 @@
                 </div>
             </div>
 
-            <!-- 1. SELECCIÓN DE DISEÑO (FORMA) -->
+            <!-- SELECCIÓN DE MODELO DE MEDALLA 3D -->
             <div>
-                <label class="block text-xs font-bold text-cyan-300 mb-2">💎 1. Elige la Forma de la Placa</label>
+                <label class="block text-xs font-bold text-cyan-300 mb-2">💎 Selecciona el Estilo de Medalla 3D</label>
                 <div class="grid grid-cols-3 gap-2 text-center">
                     <label class="cursor-pointer">
                         <input type="radio" name="estiloPlaca" value="escudo" checked class="selector-modelo hidden">
                         <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
                             <span class="text-xl block">🛡️</span>
-                            <span class="text-[10px] font-bold text-slate-200">Escudo</span>
+                            <span class="text-[10px] font-bold text-slate-200">Escudo Neón</span>
                         </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="estiloPlaca" value="circulo" class="selector-modelo hidden">
                         <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
-                            <span class="text-xl block">⚪</span>
-                            <span class="text-[10px] font-bold text-slate-200">Círculo</span>
+                            <span class="text-xl block">🔵</span>
+                            <span class="text-[10px] font-bold text-slate-200">Círculo Naranja</span>
                         </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="estiloPlaca" value="hueso" class="selector-modelo hidden">
                         <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
                             <span class="text-xl block">🦴</span>
-                            <span class="text-[10px] font-bold text-slate-200">Huesito</span>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <!-- 2. SELECCIÓN DE LAS 5 PALETAS DE COLORES NEÓN -->
-            <div>
-                <label class="block text-xs font-bold text-cyan-300 mb-2">🎨 2. Elige la Paleta de Colores Neón</label>
-                <div class="grid grid-cols-5 gap-1.5 text-center">
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paletaColor" value="paleta1" checked class="selector-color hidden">
-                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#0F0F1A] via-[#FF00BF] to-[#99FF00]"></div>
-                            <span class="text-[8px] font-bold text-slate-200">Lima</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paletaColor" value="paleta2" class="selector-color hidden">
-                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#2B2B33] via-[#B57EDC] to-[#FF6600]"></div>
-                            <span class="text-[8px] font-bold text-slate-200">Cálida</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paletaColor" value="paleta3" class="selector-color hidden">
-                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#001C3D] via-[#FFFFFF] to-[#00FFFF]"></div>
-                            <span class="text-[8px] font-bold text-slate-200">Cian</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paletaColor" value="paleta4" class="selector-color hidden">
-                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#3B1F4A] via-[#A8E6CF] to-[#FF1493]"></div>
-                            <span class="text-[8px] font-bold text-slate-200">Fucsia</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="paletaColor" value="paleta5" class="selector-color hidden">
-                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#455A64] via-[#FFF9C4] to-[#1DE9B6]"></div>
-                            <span class="text-[8px] font-bold text-slate-200">Tropical</span>
+                            <span class="text-[10px] font-bold text-slate-200">Huesito 3D</span>
                         </div>
                     </label>
                 </div>
@@ -165,7 +123,7 @@
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
                 
                 <div class="flex justify-center my-2">
-                    <canvas id="placaCanvas" width="512" height="512" class="max-w-full h-auto rounded-xl"></canvas>
+                    <canvas id="placaCanvas" width="1024" height="1024" class="max-w-full h-auto rounded-xl shadow-2xl"></canvas>
                 </div>
 
                 <div id="qrcodeHidden" class="hidden"></div>
@@ -200,18 +158,10 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        const PLACAS_BLANCAS = {
+        const PLACAS = {
             escudo:  "escudo.jpg",
             circulo: "circulo.jpg",
             hueso:   "hueso.jpg"
-        };
-
-        const PALETAS = {
-            paleta1: ['#0F0F1A', '#FF00BF', '#99FF00'],
-            paleta2: ['#2B2B33', '#B57EDC', '#FF6600'],
-            paleta3: ['#001C3D', '#FFFFFF', '#00FFFF'],
-            paleta4: ['#3B1F4A', '#A8E6CF', '#FF1493'],
-            paleta5: ['#455A64', '#FFF9C4', '#1DE9B6']
         };
 
         function previewImagen(event) {
@@ -236,7 +186,6 @@
             const detalles = document.getElementById('detallesMascota').value.trim();
             
             const estiloSeleccionado = document.querySelector('input[name="estiloPlaca"]:checked').value;
-            const paletaSeleccionada = document.querySelector('input[name="paletaColor"]:checked').value;
 
             if (!nombre || !telefono) {
                 alert("Por favor ingresa al menos el nombre de la mascota y el teléfono/WhatsApp de contacto.");
@@ -255,7 +204,6 @@
                     foto: fotoBase64,
                     detalles: detalles || "Sin notas adicionales.",
                     estilo: estiloSeleccionado,
-                    paleta: paletaSeleccionada,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -278,7 +226,7 @@
                 const qrImg = qrContainer.querySelector('img');
                 
                 setTimeout(() => {
-                    procesarImagenYColorear(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
+                    dibujarPlacaHiperrealista(nombre, raza || "", qrImg.src, estiloSeleccionado);
                 }, 200);
 
             } catch (error) {
@@ -287,10 +235,10 @@
             }
         }
 
-        function procesarImagenYColorear(nombre, raza, qrDataUrl, estilo, paletaKey) {
+        function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
-            const size = 512;
+            const size = 1024; // Resolución HD 1024x1024
 
             ctx.clearRect(0, 0, size, size);
 
@@ -298,91 +246,86 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                // 1. Dibujar la imagen rectangular original temporalmente en el canvas
+                // 1. Renderizar la imagen limpia 3D de la medalla completa
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. MAGIA DE PIXELES: Volver transparente el fondo blanco y pintar la medalla
-                const imgData = ctx.getImageData(0, 0, size, size);
-                const data = imgData.data;
-
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i];
-                    const g = data[i + 1];
-                    const b = data[i + 2];
-
-                    // Si el píxel es blanco o gris muy claro (fondo de la imagen cuadrada)
-                    if (r > 230 && g > 230 && b > 230) {
-                        data[i + 3] = 0; // Hacerlo totalmente transparente
-                    }
-                }
-                ctx.putImageData(imgData, 0, 0);
-
-                // 3. APLICAR COLOR DIAGONAL SOLO SOBRE LA PLACA LIMPIA
-                ctx.globalCompositeOperation = 'source-in';
-                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
-                const gradienteDiagonal = ctx.createLinearGradient(0, 0, size, size);
-                gradienteDiagonal.addColorStop(0, colores[0]);
-                gradienteDiagonal.addColorStop(0.5, colores[1]);
-                gradienteDiagonal.addColorStop(1, colores[2]);
-
-                ctx.fillStyle = gradienteDiagonal;
-                ctx.fillRect(0, 0, size, size);
-
-                // Volver al modo normal para superponer textos y QR
-                ctx.globalCompositeOperation = 'source-over';
-
-                // 4. PANEL CENTRAL OSCURO TRANSLÚCIDO PARA DATOS Y QR
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
-                ctx.beginPath();
-                ctx.roundRect(size * 0.18, size * 0.18, size * 0.64, size * 0.64, 24);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // 5. TEXTO DE NOMBRE
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'extrabold 32px Plus Jakarta Sans, Arial, sans-serif';
+                // Configuración general de alineación
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.25);
 
-                // 6. TEXTO DE RAZA
-                ctx.fillStyle = '#fbbf24';
-                ctx.font = 'bold 16px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText(raza.toUpperCase().substring(0, 20), size / 2, size * 0.32);
+                // Posicionamiento dinámico según el estilo
+                let headerY = size * 0.21;
+                let nombreY = size * 0.28;
+                let razaY = size * 0.34;
+                let qrY = size * 0.38;
+                let qrSize = 380;
+                let footerText1Y = qrY + qrSize + 55;
+                let footerText2Y = qrY + qrSize + 95;
 
-                // 7. CÓDIGO QR
+                if (estilo === 'circulo') {
+                    headerY = size * 0.24;
+                    nombreY = size * 0.30;
+                    razaY = size * 0.36;
+                    qrY = size * 0.39;
+                } else if (estilo === 'hueso') {
+                    headerY = size * 0.25;
+                    nombreY = size * 0.31;
+                    razaY = size * 0.37;
+                    qrY = size * 0.40;
+                    qrSize = 340;
+                }
+
+                // 2. ENCABEZADO "🐾 PLACA QR DE EMERGENCIA 🐾"
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 22px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
+
+                // 3. NOMBRE DE LA MASCOTA (Blanco grande e imponente)
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '900 78px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
+
+                // 4. RAZA (Dorado brillante)
+                ctx.fillStyle = '#F59E0B';
+                ctx.font = '800 40px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
+
+                // 5. CÓDIGO QR SOBRE FONDO BLANCO LIMPIO
                 const qrImg = new Image();
                 qrImg.onload = function() {
-                    const qrSize = 160;
                     const qrX = (size - qrSize) / 2;
-                    const qrY = size * 0.37;
 
-                    ctx.fillStyle = '#ffffff';
+                    // Cuadro blanco protector con bordes redondeados y sombra
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowOffsetY = 10;
+                    ctx.fillStyle = '#FFFFFF';
                     ctx.beginPath();
-                    ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+                    ctx.roundRect(qrX - 20, qrY - 20, qrSize + 40, qrSize + 40, 32);
                     ctx.fill();
+                    ctx.restore();
 
+                    // Dibujar el código QR
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                    // Textos de pie
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.font = 'bold 10px Plus Jakarta Sans, Arial, sans-serif';
-                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, qrY + qrSize + 22);
+                    // 6. TEXTOS INFERIORES DE CONTACTO Y MARCA
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = '800 24px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
 
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '9px Plus Jakarta Sans, Arial, sans-serif';
-                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, qrY + qrSize + 38);
+                    ctx.fillStyle = '#E2E8F0';
+                    ctx.font = '600 20px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
                 };
                 qrImg.src = qrDataUrl;
             };
 
             baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa: " + PLACAS_BLANCAS[estilo]);
+                alert("No se pudo cargar la imagen de la placa. Revisa que '"+ PLACAS[estilo] +"' esté subida a la carpeta 'mascotas'.");
             };
 
-            baseImg.src = PLACAS_BLANCAS[estilo] || PLACAS_BLANCAS.escudo;
+            baseImg.src = PLACAS[estilo] || PLACAS.escudo;
         }
 
         function copiarEnlace() {
