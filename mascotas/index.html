@@ -239,7 +239,7 @@
         }
 
         /* ============================================================
-           DIBUJO PROFESIONAL - QR AJUSTADO PARA QUE NO SE SALGA
+           DIBUJO PROFESIONAL - QR MÁS ARRIBA
            ============================================================ */
         function dibujarPlacaProfesional(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
@@ -277,12 +277,12 @@
                 ctx.font = 'bold 22px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.397);
 
-                // 4. Dibujar el QR real (tamaño reducido para que no se salga)
+                // 4. Dibujar el QR real (más arriba)
                 const qrImg = new Image();
                 qrImg.onload = function() {
-                    const qrSize = 175;                    // ← tamaño reducido
+                    const qrSize = 175;
                     const qrX = (size - qrSize) / 2;
-                    const qrY = size * 0.455;              // ← posición ajustada
+                    const qrY = size * 0.42;              // ← posición más arriba
 
                     // Fondo blanco redondeado
                     ctx.fillStyle = '#ffffff';
