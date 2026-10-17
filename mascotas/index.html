@@ -241,69 +241,69 @@
         /* ============================================================
            DIBUJO PROFESIONAL USANDO TUS 3 DISEÑOS
            ============================================================ */
-        function dibujarPlacaProfesional(nombre, raza, qrDataUrl, estilo) {
-            const canvas = document.getElementById('placaCanvas');
-            const ctx = canvas.getContext('2d');
-            const size = 512;
+         function dibujarPlacaProfesional(nombre, raza, qrDataUrl, estilo) {
+    const canvas = document.getElementById('placaCanvas');
+    const ctx = canvas.getContext('2d');
+    const size = 512;
 
-            ctx.clearRect(0, 0, size, size);
+    ctx.clearRect(0, 0, size, size);
 
-            const baseImg = new Image();
-            baseImg.crossOrigin = "anonymous";
+    const baseImg = new Image();
+    baseImg.crossOrigin = "anonymous";
 
-            baseImg.onload = function() {
-                // 1. Dibujar la placa profesional de fondo
-                ctx.drawImage(baseImg, 0, 0, size, size);
+    baseImg.onload = function() {
+        // 1. Dibujar la placa profesional de fondo
+        ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. Cubrir el nombre de ejemplo y escribir el real
-                ctx.globalAlpha = 0.92;
-                ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
-                ctx.fillRect(size * 0.22, size * 0.28, size * 0.56, size * 0.09);
-                ctx.globalAlpha = 1.0;
+        // 2. Cubrir el nombre de ejemplo y escribir el real
+        ctx.globalAlpha = 0.92;
+        ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
+        ctx.fillRect(size * 0.22, size * 0.28, size * 0.56, size * 0.09);
+        ctx.globalAlpha = 1.0;
 
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 42px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.325);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 42px Plus Jakarta Sans, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.325);
 
-                // 3. Cubrir la raza de ejemplo y escribir la real
-                ctx.globalAlpha = 0.92;
-                ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
-                ctx.fillRect(size * 0.25, size * 0.37, size * 0.50, size * 0.055);
-                ctx.globalAlpha = 1.0;
+        // 3. Cubrir la raza de ejemplo y escribir la real
+        ctx.globalAlpha = 0.92;
+        ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
+        ctx.fillRect(size * 0.25, size * 0.37, size * 0.50, size * 0.055);
+        ctx.globalAlpha = 1.0;
 
-                ctx.fillStyle = '#fbbf24';
-                ctx.font = 'bold 22px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.397);
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 22px Plus Jakarta Sans, Arial, sans-serif';
+        ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.397);
 
-                // 4. Dibujar el QR real encima del QR de ejemplo
-                const qrImg = new Image();
-                qrImg.onload = function() {
-                    const qrSize = 210;
-                    const qrX = (size - qrSize) / 2;
-                    const qrY = size * 0.45;
+        // 4. Dibujar el QR real (más pequeño y centrado)
+        const qrImg = new Image();
+        qrImg.onload = function() {
+            // Tamaño más pequeño para que no se salga
+            const qrSize = 175;                    // ← reducido
+            const qrX = (size - qrSize) / 2;
+            const qrY = size * 0.455;              // ← posición ajustada
 
-                    // Fondo blanco redondeado
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 18);
-                    ctx.fill();
+            // Fondo blanco redondeado
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
+            ctx.fill();
 
-                    // El QR
-                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-                };
-                qrImg.src = qrDataUrl;
-            };
+            // El QR
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        };
+        qrImg.src = qrDataUrl;
+    };
 
-            baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa.\n\nVerifica que estos archivos estén en la carpeta mascotas:\n• grok_1792202097759.jpg (Escudo)\n• grok_1792202092522.jpg (Círculo)\n• grok_1792202087456.jpg (Huesito)");
-            };
+    baseImg.onerror = function() {
+        alert("No se pudo cargar la imagen de la placa.\n\nVerifica que estos archivos estén en la carpeta mascotas:\n• grok_1792202097759.jpg (Escudo)\n• grok_1792202092522.jpg (Círculo)\n• grok_1792202087456.jpg (Huesito)");
+    };
 
-            // Cargar la imagen según el estilo elegido
-            baseImg.src = PLACAS[estilo] || PLACAS.escudo;
-        }
-
+    // Cargar la imagen según el estilo elegido
+    baseImg.src = PLACAS[estilo] || PLACAS.escudo;
+}
         function copiarEnlace() {
             navigator.clipboard.writeText(enlaceGenerado).then(() => {
                 alert("¡Enlace copiado al portapapeles!");
