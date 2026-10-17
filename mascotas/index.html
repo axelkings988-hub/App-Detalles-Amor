@@ -36,28 +36,31 @@
         <div id="formContainer" class="space-y-4 text-left">
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
-                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Especie / Raza</label>
-                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Golden" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Golden" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
-                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Colonia / Sector (Seguro)</label>
-                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-amber-300 mb-1">💰 Recompensa (Opcional)</label>
-                    <input type="text" id="recompensaMascota" placeholder="Ej. $1,000 MXN / Se ofrece" class="w-full p-3 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400">
+                    <div class="relative flex items-center">
+                        <span class="absolute left-3 text-amber-300 font-bold text-sm">$</span>
+                        <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400 focus:placeholder:opacity-0">
+                    </div>
                 </div>
             </div>
 
@@ -72,8 +75,8 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-cyan-300 mb-1">Señas Particulares / Medicamentos</label>
-                <textarea id="detallesMascota" rows="2" placeholder="Ej. Mancha blanca en el pecho, alérgico al pollo..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400"></textarea>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Mensaje para quien lo encuentre / Señas</label>
+                <textarea id="detallesMascota" rows="2" placeholder="Ej. Es muy asustadizo, por favor háblale con calma..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0"></textarea>
             </div>
 
             <button onclick="generarPlacaQR()" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg text-sm transition-all active:scale-95">
@@ -116,7 +119,6 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        // Previsualizar la foto subida desde archivos y convertir a Base64
         function previewImagen(event) {
             const file = event.target.files[0];
             if (file) {
@@ -135,7 +137,7 @@
             const raza = document.getElementById('razaMascota').value.trim();
             const telefono = document.getElementById('telefonoDuenio').value.trim();
             const colonia = document.getElementById('coloniaMascota').value.trim();
-            const recompensa = document.getElementById('recompensaMascota').value.trim();
+            const recompensaInput = document.getElementById('recompensaMascota').value.trim();
             const detalles = document.getElementById('detallesMascota').value.trim();
 
             if (!nombre || !telefono) {
@@ -143,29 +145,27 @@
                 return;
             }
 
+            const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
+
             try {
-                // Guardar en Firestore bajo la colección "mascotas"
                 const docRef = await db.collection("mascotas").add({
                     nombre,
                     raza: raza || "No especificada",
                     telefono,
                     colonia: colonia || "No especificada",
-                    recompensa: recompensa || "",
+                    recompensa: recompensaFinal,
                     foto: fotoBase64,
-                    detalles: detalles || "Ninguna",
+                    detalles: detalles || "Sin notas adicionales.",
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Construir enlace hacia ver.html
                 const baseUrl = window.location.href.replace('index.html', '');
                 enlaceGenerado = `${baseUrl}ver.html?id=${docRef.id}`;
 
-                // Ocultar formulario y mostrar resultado QR
                 document.getElementById('formContainer').classList.add('hidden');
                 document.getElementById('resultContainer').classList.remove('hidden');
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
-                // Generar QR gráfico
                 const qrContainer = document.getElementById('qrcode');
                 qrContainer.innerHTML = "";
                 var qr = qrcode(0, 'M');
