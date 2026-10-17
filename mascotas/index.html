@@ -200,6 +200,12 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
+        const PLACAS_BLANCAS = {
+            escudo:  "escudo.jpg",
+            circulo: "circulo.jpg",
+            hueso:   "hueso.jpg"
+        };
+
         const PALETAS = {
             paleta1: ['#0F0F1A', '#FF00BF', '#99FF00'],
             paleta2: ['#2B2B33', '#B57EDC', '#FF6600'],
@@ -272,7 +278,7 @@
                 const qrImg = qrContainer.querySelector('img');
                 
                 setTimeout(() => {
-                    dibujarPlacaVectorial(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
+                    procesarImagenYColorear(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
                 }, 200);
 
             } catch (error) {
@@ -281,111 +287,102 @@
             }
         }
 
-        function trazarSiluetaPlaca(ctx, estilo) {
-            ctx.beginPath();
-            if (estilo === 'escudo') {
-                ctx.moveTo(256, 35);
-                ctx.lineTo(410, 70);
-                ctx.bezierCurveTo(470, 90, 480, 280, 480, 410);
-                ctx.bezierCurveTo(480, 490, 360, 500, 256, 505);
-                ctx.bezierCurveTo(152, 500, 32, 490, 32, 410);
-                ctx.bezierCurveTo(32, 280, 42, 90, 102, 70);
-                ctx.closePath();
-            } else if (estilo === 'circulo') {
-                ctx.arc(256, 265, 210, 0, Math.PI * 2);
-            } else if (estilo === 'hueso') {
-                ctx.moveTo(160, 110);
-                ctx.bezierCurveTo(60, 110, 40, 200, 100, 240);
-                ctx.bezierCurveTo(40, 280, 60, 370, 160, 370);
-                ctx.bezierCurveTo(200, 460, 312, 460, 352, 370);
-                ctx.bezierCurveTo(452, 370, 472, 280, 412, 240);
-                ctx.bezierCurveTo(472, 200, 452, 110, 352, 110);
-                ctx.bezierCurveTo(312, 30, 200, 30, 160, 110);
-                ctx.closePath();
-            }
-        }
-
-        function dibujarPlacaVectorial(nombre, raza, qrDataUrl, estilo, paletaKey) {
+        function procesarImagenYColorear(nombre, raza, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
             const size = 512;
 
             ctx.clearRect(0, 0, size, size);
 
-            // 1. DIBUJAR CUERPO DE LA PLACA CON GRADIENTE DIAGONAL
-            ctx.save();
-            trazarSiluetaPlaca(ctx, estilo);
-            
-            const colores = PALETAS[paletaKey] || PALETAS.paleta1;
-            const gradienteDiagonal = ctx.createLinearGradient(0, 0, size, size);
-            gradienteDiagonal.addColorStop(0, colores[0]);
-            gradienteDiagonal.addColorStop(0.5, colores[1]);
-            gradienteDiagonal.addColorStop(1, colores[2]);
+            const baseImg = new Image();
+            baseImg.crossOrigin = "anonymous";
 
-            ctx.fillStyle = gradienteDiagonal;
-            ctx.fill();
+            baseImg.onload = function() {
+                // 1. Dibujar la imagen rectangular original temporalmente en el canvas
+                ctx.drawImage(baseImg, 0, 0, size, size);
 
-            // Borde metálico exterior brillante
-            ctx.lineWidth = 10;
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.stroke();
-            ctx.restore();
+                // 2. MAGIA DE PIXELES: Volver transparente el fondo blanco y pintar la medalla
+                const imgData = ctx.getImageData(0, 0, size, size);
+                const data = imgData.data;
 
-            // 2. ORIFICIO DE LA ARGOLLA SUPERIOR
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(256, estilo === 'circulo' ? 42 : 45, 18, 0, Math.PI * 2);
-            ctx.fillStyle = '#0f172a';
-            ctx.fill();
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = '#94a3b8';
-            ctx.stroke();
-            ctx.restore();
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
 
-            // 3. PANEL CENTRAL OSCURO PARA DATOS Y QR
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
-            ctx.beginPath();
-            ctx.roundRect(size * 0.18, size * 0.18, size * 0.64, size * 0.64, 24);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+                    // Si el píxel es blanco o gris muy claro (fondo de la imagen cuadrada)
+                    if (r > 230 && g > 230 && b > 230) {
+                        data[i + 3] = 0; // Hacerlo totalmente transparente
+                    }
+                }
+                ctx.putImageData(imgData, 0, 0);
 
-            // 4. TEXTOS
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'extrabold 32px Plus Jakarta Sans, Arial, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.25);
+                // 3. APLICAR COLOR DIAGONAL SOLO SOBRE LA PLACA LIMPIA
+                ctx.globalCompositeOperation = 'source-in';
+                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+                const gradienteDiagonal = ctx.createLinearGradient(0, 0, size, size);
+                gradienteDiagonal.addColorStop(0, colores[0]);
+                gradienteDiagonal.addColorStop(0.5, colores[1]);
+                gradienteDiagonal.addColorStop(1, colores[2]);
 
-            ctx.fillStyle = '#fbbf24';
-            ctx.font = 'bold 16px Plus Jakarta Sans, Arial, sans-serif';
-            ctx.fillText(raza.toUpperCase().substring(0, 20), size / 2, size * 0.32);
+                ctx.fillStyle = gradienteDiagonal;
+                ctx.fillRect(0, 0, size, size);
 
-            // 5. CÓDIGO QR
-            const qrImg = new Image();
-            qrImg.onload = function() {
-                const qrSize = 160;
-                const qrX = (size - qrSize) / 2;
-                const qrY = size * 0.37;
+                // Volver al modo normal para superponer textos y QR
+                ctx.globalCompositeOperation = 'source-over';
 
-                ctx.fillStyle = '#ffffff';
+                // 4. PANEL CENTRAL OSCURO TRANSLÚCIDO PARA DATOS Y QR
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
                 ctx.beginPath();
-                ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+                ctx.roundRect(size * 0.18, size * 0.18, size * 0.64, size * 0.64, 24);
                 ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
 
-                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                // 5. TEXTO DE NOMBRE
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'extrabold 32px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.25);
 
-                // Textos de pie
-                ctx.fillStyle = '#38bdf8';
-                ctx.font = 'bold 10px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, qrY + qrSize + 22);
+                // 6. TEXTO DE RAZA
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = 'bold 16px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText(raza.toUpperCase().substring(0, 20), size / 2, size * 0.32);
 
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = '9px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, qrY + qrSize + 38);
+                // 7. CÓDIGO QR
+                const qrImg = new Image();
+                qrImg.onload = function() {
+                    const qrSize = 160;
+                    const qrX = (size - qrSize) / 2;
+                    const qrY = size * 0.37;
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+                    ctx.fill();
+
+                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+                    // Textos de pie
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = 'bold 10px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, qrY + qrSize + 22);
+
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '9px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, qrY + qrSize + 38);
+                };
+                qrImg.src = qrDataUrl;
             };
-            qrImg.src = qrDataUrl;
+
+            baseImg.onerror = function() {
+                alert("No se pudo cargar la imagen de la placa: " + PLACAS_BLANCAS[estilo]);
+            };
+
+            baseImg.src = PLACAS_BLANCAS[estilo] || PLACAS_BLANCAS.escudo;
         }
 
         function copiarEnlace() {
