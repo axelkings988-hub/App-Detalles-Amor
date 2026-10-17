@@ -300,21 +300,7 @@
             baseImg.onload = function() {
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-                // 1. APLICAR EFECTO DE RESPLANDOR NEÓN (BRILLO EXTERIOR EXACTO AL CONTORNO PNG)
-                ctx.save();
-                ctx.shadowColor = colores[1]; // Color secundario de la paleta para el brillo neón
-                ctx.shadowBlur = 35;         // Intensidad del resplandor
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                ctx.drawImage(baseImg, 0, 0, size, size);
-                ctx.restore();
-
-                // 2. DIBUJAR LA IMAGEN PNG ORIGINAL ENCIMA (Mantiene los detalles nítidos)
-                ctx.drawImage(baseImg, 0, 0, size, size);
-
-                // 3. APLICAR EL COLOR NEÓN DIAGONAL EXCLUSIVAMENTE SOBRE LA MEDALLA
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-atop';
+                // 1. DIBUJAR LA BASE DE COLOR NEÓN (DEGRADADO DIAGONAL)
                 const gradiente = ctx.createLinearGradient(0, 0, size, size);
                 gradiente.addColorStop(0, colores[0]);
                 gradiente.addColorStop(0.5, colores[1]);
@@ -322,9 +308,20 @@
 
                 ctx.fillStyle = gradiente;
                 ctx.fillRect(0, 0, size, size);
-                ctx.restore();
 
-                // 4. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                // 2. RECORTAR CON LA SILUETA DE LA IMAGEN PNG PARA QUE EL COLOR SOLO ESTÉ DENTRO DE LA PLACA
+                ctx.globalCompositeOperation = 'destination-in';
+                ctx.drawImage(baseImg, 0, 0, size, size);
+
+                // 3. VOLVER AL MODO NORMAL Y SUPERPONER EL PNG ORIGINAL CON FUSIÓN 'MULTIPLY'
+                // Esto permite que los surcos, bordes y relieves originales resalten con el color elegido
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.drawImage(baseImg, 0, 0, size, size);
+
+                // 4. RESTAURAR MODO NORMAL PARA TEXTOS Y QR
+                ctx.globalCompositeOperation = 'source-over';
+
+                // 5. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -351,7 +348,7 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 5. TEXTOS SUPERIORES
+                // 6. TEXTOS SUPERIORES
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
@@ -364,7 +361,7 @@
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 6. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                // 7. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
