@@ -124,7 +124,7 @@
                 
                 <!-- CANVAS DONDE SE DIBUJA EL DISEÑO ELEGIDO -->
                 <div class="flex justify-center my-2">
-                    <canvas id="placaCanvas" width="340" height="420" class="rounded-2xl shadow-2xl border border-white/20 max-w-full h-auto"></canvas>
+                    <canvas id="placaCanvas" width="340" height="420" class="rounded-2xl shadow-2xl max-w-full h-auto bg-transparent"></canvas>
                 </div>
 
                 <div id="qrcodeHidden" class="hidden"></div>
@@ -180,7 +180,6 @@
             const recompensaInput = document.getElementById('recompensaMascota').value.trim();
             const detalles = document.getElementById('detallesMascota').value.trim();
             
-            // Obtener el estilo seleccionado
             const estiloSeleccionado = document.querySelector('input[name="estiloPlaca"]:checked').value;
 
             if (!nombre || !telefono) {
@@ -229,117 +228,139 @@
             }
         }
 
-        /* DIBUJAR EL DISEÑO DE LA PLACA SELECCIONADA EN EL CANVAS */
+        /* DIBUJAR FORMAS ORGÁNICAS EXACTAS EN EL CANVAS */
         function dibujarMedallaPlaca(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
 
-            // 1. DIBUJAR FORMA Y FONDO SEGÚN EL ESTILO
+            // 1. DEFINIR LA RUTA DE CORTE (CLIPPING PATH) SEGÚN LA FORMA ELEGIDA
+            ctx.beginPath();
             if (estilo === 'escudo') {
-                // Fondo Escudo Ejecutivo Azul Oscuro con marco dorado
+                // Forma de Escudo Ejecutivo con pestaña de argolla superior
+                ctx.moveTo(170, 15);
+                ctx.lineTo(280, 45);
+                ctx.bezierCurveTo(320, 50, 325, 200, 325, 300);
+                ctx.bezierCurveTo(325, 370, 240, 410, 170, 415);
+                ctx.bezierCurveTo(100, 410, 15, 370, 15, 300);
+                ctx.bezierCurveTo(15, 200, 20, 50, 60, 45);
+                ctx.closePath();
+            } else if (estilo === 'circulo') {
+                // Forma de Círculo con argolla superior
+                ctx.arc(170, 230, 150, 0, Math.PI * 2);
+            } else if (estilo === 'hueso') {
+                // Forma de Huesito Orgánico
+                ctx.moveTo(90, 80);
+                ctx.bezierCurveTo(30, 80, 20, 150, 70, 180);
+                ctx.bezierCurveTo(20, 210, 30, 280, 90, 280);
+                ctx.bezierCurveTo(120, 340, 220, 340, 250, 280);
+                ctx.bezierCurveTo(310, 280, 320, 210, 270, 180);
+                ctx.bezierCurveTo(320, 150, 310, 80, 250, 80);
+                ctx.bezierCurveTo(220, 30, 120, 30, 90, 80);
+                ctx.closePath();
+            }
+            ctx.clip(); // Recorta todo el canvas a la forma exacta de la medalla
+
+            // 2. LLENAR EL FONDO SEGÚN EL ESTILO
+            if (estilo === 'escudo') {
                 const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
                 grad.addColorStop(0, '#0a192f');
                 grad.addColorStop(1, '#020617');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Marco Dorado
-                ctx.strokeStyle = '#d97706';
-                ctx.lineWidth = 5;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-                // Anillo superior para colgar
-                ctx.fillStyle = '#0a192f';
-                ctx.beginPath();
-                ctx.arc(canvas.width / 2, 22, 9, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#d97706';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
             } else if (estilo === 'circulo') {
-                // Fondo Gradiente Radial Azul a Naranja (Círculo Cósmico)
                 const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
                 grad.addColorStop(0, '#1e3a8a');
                 grad.addColorStop(0.5, '#020617');
                 grad.addColorStop(1, '#c2410c');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Borde exterior brillante
-                ctx.strokeStyle = '#fb923c';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-                // Anillo superior
-                ctx.fillStyle = '#020617';
-                ctx.beginPath();
-                ctx.arc(canvas.width / 2, 22, 9, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#fb923c';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-            } else if (estilo === 'hueso') {
-                // Estilo Huesito / Neón Azul
+            } else {
                 const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
                 grad.addColorStop(0, '#0f172a');
                 grad.addColorStop(1, '#1e3a8a');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Borde Neón
-                ctx.strokeStyle = '#38bdf8';
-                ctx.lineWidth = 5;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-                // Anillo superior
-                ctx.fillStyle = '#0f172a';
-                ctx.beginPath();
-                ctx.arc(canvas.width / 2, 22, 9, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#38bdf8';
-                ctx.lineWidth = 3;
-                ctx.stroke();
             }
 
-            // Textos comunes en la placa
+            ctx.restore(); // Restaurar el contexto fuera del recorte para dibujar bordes y elementos
+
+            // 3. DIBUJAR BORDE METÁLICO EXTERIOR
+            ctx.save();
+            ctx.lineWidth = 6;
+            if (estilo === 'escudo') {
+                ctx.strokeStyle = '#d97706';
+                ctx.beginPath();
+                ctx.moveTo(170, 18);
+                ctx.lineTo(275, 47);
+                ctx.bezierCurveTo(315, 52, 320, 200, 320, 295);
+                ctx.bezierCurveTo(320, 360, 235, 400, 170, 405);
+                ctx.bezierCurveTo(105, 400, 20, 360, 20, 295);
+                ctx.bezierCurveTo(20, 200, 25, 52, 65, 47);
+                ctx.closePath();
+                ctx.stroke();
+            } else if (estilo === 'circulo') {
+                ctx.strokeStyle = '#fb923c';
+                ctx.beginPath();
+                ctx.arc(170, 230, 146, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.strokeStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(170, 230, 140, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // 4. ORIFICIO DE LA ARGOLLA SUPERIOR (PARA COLGAR)
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(170, 32, 9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = estilo === 'escudo' ? '#d97706' : (estilo === 'circulo' ? '#fb923c' : '#38bdf8');
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 5. TEXTOS Y DATOS EN LA PLACA
             ctx.fillStyle = '#38bdf8';
             ctx.font = 'extrabold 11px Plus Jakarta Sans, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', canvas.width / 2, 55);
+            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', 170, 72);
 
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 24px Plus Jakarta Sans, sans-serif';
-            ctx.fillText(nombre.toUpperCase(), canvas.width / 2, 88);
+            ctx.fillText(nombre.toUpperCase(), 170, 102);
 
             ctx.fillStyle = estilo === 'escudo' ? '#d97706' : '#fde047';
             ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
-            ctx.fillText(raza.toUpperCase(), canvas.width / 2, 108);
+            ctx.fillText(raza.toUpperCase(), 170, 122);
 
-            // Renderizar Código QR
+            // 6. RENDERIZAR CÓDIGO QR AL CENTRO
             const qrImg = new Image();
             qrImg.onload = function() {
-                const qrSize = 200;
+                const qrSize = 185;
                 const qrX = (canvas.width - qrSize) / 2;
-                const qrY = 125;
+                const qrY = 138;
 
+                // Marco blanco redondeado para el QR
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
-                ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 16);
+                ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
                 ctx.fill();
 
+                // Dibujar imagen del QR
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
+                // Pie de página de la placa
                 ctx.fillStyle = '#38bdf8';
-                ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
-                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', canvas.width / 2, qrY + qrSize + 25);
+                ctx.font = 'bold 10px Plus Jakarta Sans, sans-serif';
+                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', 170, qrY + qrSize + 24);
                 
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = '10px Plus Jakarta Sans, sans-serif';
-                ctx.fillText('Soluciones QR • Protección de Mascota', canvas.width / 2, canvas.height - 20);
+                ctx.font = '9px Plus Jakarta Sans, sans-serif';
+                ctx.fillText('Soluciones QR • Protección de Mascota', 170, canvas.height - 20);
             };
             qrImg.src = qrDataUrl;
         }
