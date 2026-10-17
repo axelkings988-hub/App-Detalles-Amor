@@ -158,11 +158,11 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        // Rutas de las 3 placas (están en la misma carpeta que index.html)
+        // Rutas de las 3 placas
         const PLACAS = {
-            escudo:  "grok_1792202097759.jpg",   // Escudo
-            circulo: "grok_1792202092522.jpg",   // Círculo
-            hueso:   "grok_1792202087456.jpg"    // Huesito
+            escudo:  "grok_1792202097759.jpg",
+            circulo: "grok_1792202092522.jpg",
+            hueso:   "grok_1792202087456.jpg"
         };
 
         function previewImagen(event) {
@@ -208,7 +208,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Generación correcta del enlace
                 let baseUrl = window.location.href.split('?')[0];
                 baseUrl = baseUrl.replace(/index\.html$/i, '');
                 baseUrl = baseUrl.replace(/\/$/, '') + '/';
@@ -218,7 +217,6 @@
                 document.getElementById('resultContainer').classList.remove('hidden');
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
-                // Generar QR
                 const qrContainer = document.getElementById('qrcodeHidden');
                 qrContainer.innerHTML = "";
                 var qr = qrcode(0, 'M');
@@ -238,9 +236,6 @@
             }
         }
 
-        /* ============================================================
-           DIBUJO PROFESIONAL - QR MÁS ARRIBA
-           ============================================================ */
         function dibujarPlacaProfesional(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
@@ -252,37 +247,37 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                // 1. Dibujar la placa profesional de fondo
+                // 1. Fondo de la placa
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. Cubrir el nombre de ejemplo y escribir el real
-                ctx.globalAlpha = 0.92;
+                // 2. Cubrir nombre original + escribir el nuevo
+                ctx.globalAlpha = 0.95;
                 ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
-                ctx.fillRect(size * 0.22, size * 0.28, size * 0.56, size * 0.09);
+                ctx.fillRect(size * 0.20, size * 0.27, size * 0.60, size * 0.10);
                 ctx.globalAlpha = 1.0;
 
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 42px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.325);
+                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.32);
 
-                // 3. Cubrir la raza de ejemplo y escribir la real
-                ctx.globalAlpha = 0.92;
+                // 3. Cubrir raza original + escribir la nueva
+                ctx.globalAlpha = 0.95;
                 ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
-                ctx.fillRect(size * 0.25, size * 0.37, size * 0.50, size * 0.055);
+                ctx.fillRect(size * 0.22, size * 0.36, size * 0.56, size * 0.06);
                 ctx.globalAlpha = 1.0;
 
                 ctx.fillStyle = '#fbbf24';
                 ctx.font = 'bold 22px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.397);
+                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.39);
 
-                // 4. Dibujar el QR real (más arriba)
+                // 4. QR más arriba para cubrir mejor el texto original
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrSize = 175;
                     const qrX = (size - qrSize) / 2;
-                    const qrY = size * 0.42;              // ← posición más arriba
+                    const qrY = size * 0.395;          // ← subido más
 
                     // Fondo blanco redondeado
                     ctx.fillStyle = '#ffffff';
@@ -290,17 +285,15 @@
                     ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
                     ctx.fill();
 
-                    // El QR
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
                 };
                 qrImg.src = qrDataUrl;
             };
 
             baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa.\n\nVerifica que estos archivos estén en la carpeta mascotas:\n• grok_1792202097759.jpg (Escudo)\n• grok_1792202092522.jpg (Círculo)\n• grok_1792202087456.jpg (Huesito)");
+                alert("No se pudo cargar la imagen de la placa.");
             };
 
-            // Cargar la imagen según el estilo elegido
             baseImg.src = PLACAS[estilo] || PLACAS.escudo;
         }
 
