@@ -200,7 +200,6 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        // Si guardaste los archivos como PNG, asegúrate de colocar las extensiones correctas aquí:
         const PLACAS = {
             escudo:  "escudo.png",
             circulo: "circulo.png",
@@ -288,6 +287,31 @@
             }
         }
 
+        // Trazado del contorno exterior para generar el doble borde resplandeciente
+        function trazarContornoExterior(ctx, estilo) {
+            ctx.beginPath();
+            if (estilo === 'escudo') {
+                ctx.moveTo(512, 35);
+                ctx.lineTo(820, 110);
+                ctx.bezierCurveTo(940, 150, 960, 560, 960, 820);
+                ctx.bezierCurveTo(960, 980, 720, 1000, 512, 1010);
+                ctx.bezierCurveTo(304, 1000, 64, 980, 64, 820);
+                ctx.bezierCurveTo(64, 560, 84, 150, 204, 110);
+                ctx.closePath();
+            } else if (estilo === 'circulo') {
+                ctx.arc(512, 530, 445, 0, Math.PI * 2);
+            } else if (estilo === 'hueso') {
+                ctx.moveTo(320, 220);
+                ctx.bezierCurveTo(120, 220, 80, 400, 200, 480);
+                ctx.bezierCurveTo(80, 560, 120, 740, 320, 740);
+                ctx.bezierCurveTo(400, 920, 624, 920, 704, 740);
+                ctx.bezierCurveTo(904, 740, 944, 560, 824, 480);
+                ctx.bezierCurveTo(944, 400, 904, 220, 704, 220);
+                ctx.bezierCurveTo(624, 40, 400, 40, 320, 220);
+                ctx.closePath();
+            }
+        }
+
         function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
@@ -299,10 +323,10 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                // 1. DIBUJAR LA IMAGEN PNG TRANSPARENTE
+                // 1. DIBUJAR LA IMAGEN PNG ORIGINAL (Mantiene su bisel e interior intactos)
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. APLICAR EL COLOREADO DIAGONAL EXCLUSIVAMENTE SOBRE LA SILUETA PNG
+                // 2. APLICAR COLOR NEÓN DIAGONAL SOBRE LA PLACA
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-atop';
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
@@ -315,34 +339,51 @@
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 3. POSICIONES PERFECTAMENTE CENTRADAS Y MÁS ALTAS
+                // 3. APLICAR EL DOBLE BORDE (CONTORNO EXTERIOR RESPLANDECIENTE + LÍNEA INTERIOR)
+                ctx.save();
+                trazarContornoExterior(ctx, estilo);
+                // Borde exterior con brillo neón
+                ctx.lineWidth = 10;
+                ctx.strokeStyle = colores[1];
+                ctx.shadowColor = colores[1];
+                ctx.shadowBlur = 24;
+                ctx.stroke();
+                
+                // Segundo borde interior para acentuar el relieve metálico
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.shadowBlur = 0; // Sin sombra para el trazo interno
+                ctx.stroke();
+                ctx.restore();
+
+                // 4. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                let headerY = size * 0.25;
-                let nombreY = size * 0.31;
-                let razaY = size * 0.37;
-                let qrY = size * 0.41;
+                let headerY = size * 0.26;
+                let nombreY = size * 0.32;
+                let razaY = size * 0.38;
+                let qrY = size * 0.42;
                 let qrSize = 340; 
                 let footerText1Y = qrY + qrSize + 32;
                 let footerText2Y = qrY + qrSize + 58;
 
                 if (estilo === 'circulo') {
-                    headerY = size * 0.24;
-                    nombreY = size * 0.30;
-                    razaY = size * 0.36;
-                    qrY = size * 0.40;
+                    headerY = size * 0.25;
+                    nombreY = size * 0.31;
+                    razaY = size * 0.37;
+                    qrY = size * 0.41;
                 } else if (estilo === 'hueso') {
-                    headerY = size * 0.24;
-                    nombreY = size * 0.30;
-                    razaY = size * 0.36;
-                    qrY = size * 0.40;
+                    headerY = size * 0.25;
+                    nombreY = size * 0.31;
+                    razaY = size * 0.37;
+                    qrY = size * 0.41;
                     qrSize = 300;
                     footerText1Y = qrY + qrSize + 28;
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 4. TEXTOS SUPERIORES
+                // 5. TEXTOS SUPERIORES
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
@@ -355,7 +396,7 @@
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 5. CÓDIGO QR Y RECUADRO
+                // 6. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
