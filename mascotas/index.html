@@ -97,7 +97,7 @@
                 </div>
             </div>
 
-            <!-- SUBIR FOTO DESDE GALERÍA/ARCHIVOS -->
+            <!-- SUBIR FOTO -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Foto de la Mascota (1 Imagen)</label>
                 <input type="file" id="inputFotoArchivo" accept="image/*" onchange="previewImagen(event)" class="w-full p-2 bg-black/40 border border-white/20 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
@@ -117,12 +117,11 @@
             </button>
         </div>
 
-        <!-- SECCIÓN DE RESULTADO Y TARJETA VISUAL DE PLACA -->
+        <!-- RESULTADO -->
         <div id="resultContainer" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
                 
-                <!-- CANVAS CON FONDO TRANSPARENTE REAL -->
                 <div class="flex justify-center my-2">
                     <canvas id="placaCanvas" width="360" height="440" class="max-w-full h-auto"></canvas>
                 </div>
@@ -202,8 +201,14 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                const baseUrl = window.location.href.replace('index.html', '');
-                enlaceGenerado = `\( {baseUrl}ver.html?id= \){docRef.id}`;
+                // ========== GENERACIÓN CORRECTA DEL ENLACE ==========
+                // Funciona en GitHub Pages y en cualquier ruta
+                let baseUrl = window.location.href.split('?')[0];          // quita parámetros
+                baseUrl = baseUrl.replace(/index\.html$/i, '');            // quita index.html si existe
+                baseUrl = baseUrl.replace(/\/$/, '') + '/';                // asegura que termine en /
+
+                enlaceGenerado = baseUrl + "ver.html?id=" + docRef.id;
+                // ====================================================
 
                 document.getElementById('formContainer').classList.add('hidden');
                 document.getElementById('resultContainer').classList.remove('hidden');
@@ -228,19 +233,18 @@
             }
         }
 
-        /* DIBUJAR MEDALLA CON TRANSPARENCIA Y CORTE VECTORIAL REAL */
+        /* ========== DIBUJO DE LA PLACA CON FORMA CORRECTA ========== */
         function dibujarMedallaPlaca(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Limpia todo el canvas → fondo 100 % transparente
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Función auxiliar que dibuja la silueta exacta según el estilo
+            // Función que traza la silueta exacta
             function trazarSilueta() {
                 ctx.beginPath();
                 if (estilo === 'escudo') {
-                    // Escudo con orejeta superior
+                    // Escudo con orejeta
                     ctx.moveTo(180, 20);
                     ctx.arc(180, 30, 16, -Math.PI / 2, Math.PI / 2, true);
                     ctx.lineTo(290, 50);
@@ -250,13 +254,13 @@
                     ctx.bezierCurveTo(20, 210, 25, 65, 70, 50);
                     ctx.closePath();
                 } else if (estilo === 'circulo') {
-                    // Círculo con orejeta superior
+                    // Círculo con orejeta
                     ctx.moveTo(180, 20);
                     ctx.arc(180, 35, 20, -Math.PI / 2, Math.PI / 2, true);
                     ctx.arc(180, 230, 160, -Math.PI / 3, (4 * Math.PI) / 3);
                     ctx.closePath();
                 } else { // hueso
-                    // Huesito orgánico
+                    // Huesito
                     ctx.moveTo(100, 85);
                     ctx.bezierCurveTo(30, 85, 20, 155, 70, 185);
                     ctx.bezierCurveTo(20, 215, 30, 285, 100, 285);
@@ -268,12 +272,11 @@
                 }
             }
 
-            // 1. Recortar solo la zona de la medalla
+            // 1. Relleno con gradiente (solo dentro de la silueta)
             ctx.save();
             trazarSilueta();
             ctx.clip();
 
-            // 2. Gradiente interno (solo dentro de la silueta)
             let grad;
             if (estilo === 'escudo') {
                 grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -293,7 +296,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.restore();
 
-            // 3. Borde metalizado (misma silueta exacta)
+            // 2. Borde metalizado (misma silueta)
             ctx.save();
             ctx.lineWidth = 6;
             ctx.strokeStyle = estilo === 'escudo' ? '#d97706' :
@@ -302,7 +305,7 @@
             ctx.stroke();
             ctx.restore();
 
-            // 4. Orificio de la argolla (superior)
+            // 3. Orificio de la argolla
             ctx.save();
             ctx.fillStyle = '#0f172a';
             ctx.beginPath();
@@ -314,7 +317,7 @@
             ctx.stroke();
             ctx.restore();
 
-            // 5. Textos
+            // 4. Textos
             ctx.fillStyle = '#38bdf8';
             ctx.font = 'extrabold 11px Plus Jakarta Sans, sans-serif';
             ctx.textAlign = 'center';
@@ -328,14 +331,13 @@
             ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
             ctx.fillText(raza.toUpperCase(), 180, 122);
 
-            // 6. Código QR centrado
+            // 5. QR centrado
             const qrImg = new Image();
             qrImg.onload = function () {
                 const qrSize = 185;
                 const qrX = (canvas.width - qrSize) / 2;
                 const qrY = 138;
 
-                // Fondo blanco redondeado detrás del QR
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
@@ -355,8 +357,9 @@
         }
 
         function copiarEnlace() {
-            navigator.clipboard.writeText(enlaceGenerado);
-            alert("¡Enlace copiado al portapapeles!");
+            navigator.clipboard.writeText(enlaceGenerado).then(() => {
+                alert("¡Enlace copiado al portapapeles!");
+            });
         }
 
         function descargarPlacaImagen() {
