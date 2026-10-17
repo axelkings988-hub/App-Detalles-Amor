@@ -19,6 +19,11 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
         }
+        .selector-modelo:checked + div {
+            border-color: #38bdf8;
+            background-color: rgba(6, 182, 212, 0.2);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
@@ -29,7 +34,7 @@
         <div class="space-y-1">
             <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
             <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
-            <p class="text-xs text-slate-300">Crea el perfil de emergencia para proteger a tu compañero.</p>
+            <p class="text-xs text-slate-300">Selecciona el diseño de tu medalla y crea el perfil de emergencia.</p>
         </div>
 
         <!-- FORMULARIO -->
@@ -42,7 +47,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Especie / Raza</label>
-                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Golden" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
+                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Pitbull" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 focus:placeholder:opacity-0">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
@@ -61,6 +66,34 @@
                         <span class="absolute left-3 text-amber-300 font-bold text-sm">$</span>
                         <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400 focus:placeholder:opacity-0">
                     </div>
+                </div>
+            </div>
+
+            <!-- SELECCIÓN DE DISEÑO DE PLACA -->
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-2">💎 Elige el Estilo de tu Placa</label>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="estiloPlaca" value="escudo" checked class="selector-modelo hidden">
+                        <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
+                            <span class="text-xl block">🛡️</span>
+                            <span class="text-[10px] font-bold text-slate-200">Escudo</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="estiloPlaca" value="circulo" class="selector-modelo hidden">
+                        <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
+                            <span class="text-xl block">🟠</span>
+                            <span class="text-[10px] font-bold text-slate-200">Neón Azul/Naranja</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="estiloPlaca" value="hueso" class="selector-modelo hidden">
+                        <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
+                            <span class="text-xl block">🦴</span>
+                            <span class="text-[10px] font-bold text-slate-200">Huesito</span>
+                        </div>
+                    </label>
                 </div>
             </div>
 
@@ -89,7 +122,7 @@
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
                 
-                <!-- CANVAS DONDE SE DIBUJA LA MEDALLA / PLACA PARA COLLAR -->
+                <!-- CANVAS DONDE SE DIBUJA EL DISEÑO ELEGIDO -->
                 <div class="flex justify-center my-2">
                     <canvas id="placaCanvas" width="340" height="420" class="rounded-2xl shadow-2xl border border-white/20 max-w-full h-auto"></canvas>
                 </div>
@@ -146,6 +179,9 @@
             const colonia = document.getElementById('coloniaMascota').value.trim();
             const recompensaInput = document.getElementById('recompensaMascota').value.trim();
             const detalles = document.getElementById('detallesMascota').value.trim();
+            
+            // Obtener el estilo seleccionado
+            const estiloSeleccionado = document.querySelector('input[name="estiloPlaca"]:checked').value;
 
             if (!nombre || !telefono) {
                 alert("Por favor ingresa al menos el nombre de la mascota y el teléfono/WhatsApp de contacto.");
@@ -163,6 +199,7 @@
                     recompensa: recompensaFinal,
                     foto: fotoBase64,
                     detalles: detalles || "Sin notas adicionales.",
+                    estilo: estiloSeleccionado,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -173,7 +210,6 @@
                 document.getElementById('resultContainer').classList.remove('hidden');
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
-                // Generar código QR oculto para extraer imagen
                 const qrContainer = document.getElementById('qrcodeHidden');
                 qrContainer.innerHTML = "";
                 var qr = qrcode(0, 'M');
@@ -183,9 +219,8 @@
 
                 const qrImg = qrContainer.querySelector('img');
                 
-                // Renderizar diseño de medalla de collar en Canvas
                 setTimeout(() => {
-                    dibujarMedallaPlaca(nombre, raza, qrImg.src);
+                    dibujarMedallaPlaca(nombre, raza, qrImg.src, estiloSeleccionado);
                 }, 150);
 
             } catch (error) {
@@ -194,73 +229,117 @@
             }
         }
 
-        /* DIBUJAR PLACA VISUAL DE COLLAR TIPO MEDALLA */
-        function dibujarMedallaPlaca(nombre, raza, qrDataUrl) {
+        /* DIBUJAR EL DISEÑO DE LA PLACA SELECCIONADA EN EL CANVAS */
+        function dibujarMedallaPlaca(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Fondo oscuro metálico
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#0f172a');
-            grad.addColorStop(0.5, '#1e293b');
-            grad.addColorStop(1, '#0284c7');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Borde cromado brillante con resplandor neón
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 6;
-            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+            // 1. DIBUJAR FORMA Y FONDO SEGÚN EL ESTILO
+            if (estilo === 'escudo') {
+                // Fondo Escudo Ejecutivo Azul Oscuro con marco dorado
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, '#0a192f');
+                grad.addColorStop(1, '#020617');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Orificio simulado para colgar de la medalla
-            ctx.fillStyle = '#0f172a';
-            ctx.beginPath();
-            ctx.arc(canvas.width / 2, 30, 8, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 3;
-            ctx.stroke();
+                // Marco Dorado
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 5;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
 
-            // Título de la medalla
+                // Anillo superior para colgar
+                ctx.fillStyle = '#0a192f';
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, 22, 9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+            } else if (estilo === 'circulo') {
+                // Fondo Gradiente Radial Azul a Naranja (Círculo Cósmico)
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, '#1e3a8a');
+                grad.addColorStop(0.5, '#020617');
+                grad.addColorStop(1, '#c2410c');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Borde exterior brillante
+                ctx.strokeStyle = '#fb923c';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+                // Anillo superior
+                ctx.fillStyle = '#020617';
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, 22, 9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#fb923c';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+            } else if (estilo === 'hueso') {
+                // Estilo Huesito / Neón Azul
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, '#0f172a');
+                grad.addColorStop(1, '#1e3a8a');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Borde Neón
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 5;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+                // Anillo superior
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, 22, 9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            // Textos comunes en la placa
             ctx.fillStyle = '#38bdf8';
-            ctx.font = 'extrabold 12px Plus Jakarta Sans, sans-serif';
+            ctx.font = 'extrabold 11px Plus Jakarta Sans, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', canvas.width / 2, 60);
+            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', canvas.width / 2, 55);
 
-            // Nombre de la Mascota
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 26px Plus Jakarta Sans, sans-serif';
-            ctx.fillText(nombre.toUpperCase(), canvas.width / 2, 95);
+            ctx.font = 'bold 24px Plus Jakarta Sans, sans-serif';
+            ctx.fillText(nombre.toUpperCase(), canvas.width / 2, 88);
 
-            // Raza / Especie
-            ctx.fillStyle = '#fde047';
+            ctx.fillStyle = estilo === 'escudo' ? '#d97706' : '#fde047';
             ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
-            ctx.fillText(raza.toUpperCase(), canvas.width / 2, 115);
+            ctx.fillText(raza.toUpperCase(), canvas.width / 2, 108);
 
-            // Renderizar Código QR al centro con marco blanco
+            // Renderizar Código QR
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrSize = 200;
                 const qrX = (canvas.width - qrSize) / 2;
-                const qrY = 135;
+                const qrY = 125;
 
-                // Marco blanco rodeando el QR
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 16);
                 ctx.fill();
 
-                // Dibujar el QR
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                // Pie de foto guía
                 ctx.fillStyle = '#38bdf8';
                 ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
-                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', canvas.width / 2, qrY + qrSize + 28);
+                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', canvas.width / 2, qrY + qrSize + 25);
                 
                 ctx.fillStyle = '#94a3b8';
                 ctx.font = '10px Plus Jakarta Sans, sans-serif';
-                ctx.fillText('Soluciones QR • Protección de Mascota', canvas.width / 2, canvas.height - 22);
+                ctx.fillText('Soluciones QR • Protección de Mascota', canvas.width / 2, canvas.height - 20);
             };
             qrImg.src = qrDataUrl;
         }
