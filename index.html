@@ -3,89 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plataforma de Soluciones QR</title>
+    <title>Creador - Placa QR de Mascota</title>
 
-    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 
-    <!-- Google AdSense SDK -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+        }
+        .selector-modelo:checked + div, .selector-color:checked + div {
+            border-color: #38bdf8 !important;
+            background-color: rgba(6, 182, 212, 0.25) !important;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
+
+    <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
+        
+        <!-- ENCABEZADO -->
+        <div class="space-y-1">
+            <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
+            <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
+            <p class="text-xs text-slate-300">Personaliza la forma y los colores neón de tu medalla.</p>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div id="formContainer" class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
+                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Especie / Raza</label>
+                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Pitbull" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
+                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Colonia / Sector (Seguro)</label>
+                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-300 mb-1">💰 Recompensa (Opcional)</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-3 text-amber-300 font-bold text-sm">$</span>
+                        <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. SELECCIÓN DE DISEÑO (FORMA) -->
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-2">💎 1. Elige la Forma de la Placa</label>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="estiloPlaca" value="escudo" checked class="selector-modelo hidden">
+                        <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
+                            <span class="text-xl block">🛡️</span>
+                            <span class="text-[10px] font-bold text-slate-200">Escudo</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="estiloPlaca" value="circulo" class="selector-modelo hidden">
+                        <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
+                            <span class="text-xl block">⚪</span>
+                            <span class="text-[10px] font-bold text-slate-200">Círculo</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="estiloPlaca" value="hueso" class="selector-modelo hidden">
+                        <div class="p-2.5 bg-black/50 border border-white/20 rounded-xl transition-all">
+                            <span class="text-xl block">🦴</span>
+                            <span class="text-[10px] font-bold text-slate-200">Huesito</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 2. SELECCIÓN DE PALETAS DE COLORES NEÓN -->
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-2">🎨 2. Elige la Paleta de Colores Neón</label>
+                <div class="grid grid-cols-5 gap-1.5 text-center">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="paletaColor" value="paleta1" checked class="selector-color hidden">
+                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#0F0F1A] via-[#FF00BF] to-[#99FF00]"></div>
+                            <span class="text-[8px] font-bold text-slate-200">Lima</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="paletaColor" value="paleta2" class="selector-color hidden">
+                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#2B2B33] via-[#B57EDC] to-[#FF6600]"></div>
+                            <span class="text-[8px] font-bold text-slate-200">Cálida</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="paletaColor" value="paleta3" class="selector-color hidden">
+                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#001C3D] via-[#00FFFF] to-[#FFFFFF]"></div>
+                            <span class="text-[8px] font-bold text-slate-200">Cian</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="paletaColor" value="paleta4" class="selector-color hidden">
+                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#3B1F4A] via-[#A8E6CF] to-[#FF1493]"></div>
+                            <span class="text-[8px] font-bold text-slate-200">Fucsia</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="paletaColor" value="paleta5" class="selector-color hidden">
+                        <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#455A64] via-[#FFF9C4] to-[#1DE9B6]"></div>
+                            <span class="text-[8px] font-bold text-slate-200">Tropical</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- FOTO -->
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Foto de la Mascota (1 Imagen)</label>
+                <input type="file" id="inputFotoArchivo" accept="image/*" onchange="previewImagen(event)" class="w-full p-2 bg-black/40 border border-white/20 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
+                
+                <div id="boxPreview" class="hidden mt-3 relative w-28 h-28 mx-auto rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-md">
+                    <img id="imgPreview" src="" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Mensaje para quien lo encuentre / Señas</label>
+                <textarea id="detallesMascota" rows="2" placeholder="Ej. Es muy asustadizo, por favor háblale con calma..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400"></textarea>
+            </div>
+
+            <button onclick="generarPlacaQR()" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg text-sm transition-all active:scale-95">
+                🚀 Generar Placa y Código QR
+            </button>
+        </div>
+
+        <!-- RESULTADO -->
+        <div id="resultContainer" class="hidden space-y-4 text-center">
+            <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
+                <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
+                
+                <div class="flex justify-center my-2">
+                    <canvas id="placaCanvas" width="1024" height="1024" class="max-w-full h-auto rounded-xl shadow-2xl"></canvas>
+                </div>
+
+                <div id="qrcodeHidden" class="hidden"></div>
+                <p class="text-[11px] text-slate-300 break-all select-all mt-2" id="txtEnlacePublico"></p>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="copiarEnlace()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs shadow-md">
+                    📋 Copiar Enlace Público
+                </button>
+                <button onclick="descargarPlacaImagen()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-xl text-xs shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Descargar Imagen de Placa HD</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        burgundy: { 800: '#58111A', 900: '#3B0A11', 950: '#230408' },
-                        rose: { 300: '#F472B6', 500: '#EC4899', 600: '#DB2777', 900: '#831843' },
-                        gold: { 400: '#FBBF24', 500: '#F59E0B' }
-                    },
-                    fontFamily: { cursive: ['"Dancing Script"', 'cursive'], sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
-                }
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let enlaceGenerado = "";
+        let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
+
+        const PLACAS = {
+            escudo:  "escudo.png",
+            circulo: "circulo.png",
+            hueso:   "hueso.png"
+        };
+
+        const PALETAS = {
+            paleta1: ['#0F0F1A', '#FF00BF', '#99FF00'], // Lima
+            paleta2: ['#2B2B33', '#B57EDC', '#FF6600'], // Cálida
+            paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'], // Cian
+            paleta4: ['#3B1F4A', '#A8E6CF', '#FF1493'], // Fucsia
+            paleta5: ['#455A64', '#FFF9C4', '#1DE9B6']  // Tropical
+        };
+
+        function previewImagen(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoBase64 = e.target.result;
+                    document.getElementById('imgPreview').src = fotoBase64;
+                    document.getElementById('boxPreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
             }
         }
+
+        async function generarPlacaQR() {
+            const nombre = document.getElementById('nombreMascota').value.trim();
+            const raza = document.getElementById('razaMascota').value.trim();
+            const telefono = document.getElementById('telefonoDuenio').value.trim();
+            const colonia = document.getElementById('coloniaMascota').value.trim();
+            const recompensaInput = document.getElementById('recompensaMascota').value.trim();
+            const detalles = document.getElementById('detallesMascota').value.trim();
+            
+            const estiloSeleccionado = document.querySelector('input[name="estiloPlaca"]:checked').value;
+            const paletaSeleccionada = document.querySelector('input[name="paletaColor"]:checked').value;
+
+            if (!nombre || !telefono) {
+                alert("Por favor ingresa al menos el nombre de la mascota y el teléfono/WhatsApp de contacto.");
+                return;
+            }
+
+            const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
+
+            try {
+                const docRef = await db.collection("mascotas").add({
+                    nombre,
+                    raza: raza || "No especificada",
+                    telefono,
+                    colonia: colonia || "No especificada",
+                    recompensa: recompensaFinal,
+                    foto: fotoBase64,
+                    detalles: detalles || "Sin notas adicionales.",
+                    estilo: estiloSeleccionado,
+                    paleta: paletaSeleccionada,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                let baseUrl = window.location.href.split('?')[0];
+                baseUrl = baseUrl.replace(/index\.html$/i, '');
+                baseUrl = baseUrl.replace(/\/$/, '') + '/';
+                enlaceGenerado = baseUrl + "ver.html?id=" + docRef.id;
+
+                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('resultContainer').classList.remove('hidden');
+                document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
+
+                const qrContainer = document.getElementById('qrcodeHidden');
+                qrContainer.innerHTML = "";
+                var qr = qrcode(0, 'M');
+                qr.addData(enlaceGenerado);
+                qr.make();
+                qrContainer.innerHTML = qr.createImgTag(8);
+
+                const qrImg = qrContainer.querySelector('img');
+                
+                setTimeout(() => {
+                    dibujarPlacaHiperrealista(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
+                }, 200);
+
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Hubo un error al generar la placa. Intenta de nuevo.");
+            }
+        }
+
+        function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo, paletaKey) {
+            const canvas = document.getElementById('placaCanvas');
+            const ctx = canvas.getContext('2d');
+            const size = 1024;
+
+            ctx.clearRect(0, 0, size, size);
+
+            const baseImg = new Image();
+            baseImg.crossOrigin = "anonymous";
+
+            baseImg.onload = function() {
+                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+
+                // 1. DIBUJAR LA BASE DE COLOR NEÓN (DEGRADADO DIAGONAL)
+                const gradiente = ctx.createLinearGradient(0, 0, size, size);
+                gradiente.addColorStop(0, colores[0]);
+                gradiente.addColorStop(0.5, colores[1]);
+                gradiente.addColorStop(1, colores[2]);
+
+                ctx.fillStyle = gradiente;
+                ctx.fillRect(0, 0, size, size);
+
+                // 2. RECORTAR CON LA SILUETA DE LA IMAGEN PNG PARA QUE EL COLOR SOLO ESTÉ DENTRO DE LA PLACA
+                ctx.globalCompositeOperation = 'destination-in';
+                ctx.drawImage(baseImg, 0, 0, size, size);
+
+                // 3. VOLVER AL MODO NORMAL Y SUPERPONER EL PNG ORIGINAL CON FUSIÓN 'MULTIPLY'
+                // Esto permite que los surcos, bordes y relieves originales resalten con el color elegido
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.drawImage(baseImg, 0, 0, size, size);
+
+                // 4. RESTAURAR MODO NORMAL PARA TEXTOS Y QR
+                ctx.globalCompositeOperation = 'source-over';
+
+                // 5. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                let headerY = size * 0.26;
+                let nombreY = size * 0.32;
+                let razaY = size * 0.38;
+                let qrY = size * 0.42;
+                let qrSize = 340; 
+                let footerText1Y = qrY + qrSize + 32;
+                let footerText2Y = qrY + qrSize + 58;
+
+                if (estilo === 'circulo') {
+                    headerY = size * 0.25;
+                    nombreY = size * 0.31;
+                    razaY = size * 0.37;
+                    qrY = size * 0.41;
+                } else if (estilo === 'hueso') {
+                    headerY = size * 0.25;
+                    nombreY = size * 0.31;
+                    razaY = size * 0.37;
+                    qrY = size * 0.41;
+                    qrSize = 300;
+                    footerText1Y = qrY + qrSize + 28;
+                    footerText2Y = qrY + qrSize + 50;
+                }
+
+                // 6. TEXTOS SUPERIORES
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '900 56px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
+
+                ctx.fillStyle = '#F59E0B';
+                ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
+
+                // 7. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                const qrImg = new Image();
+                qrImg.onload = function() {
+                    const qrX = (size - qrSize) / 2;
+
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetY = 8;
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.beginPath();
+                    ctx.roundRect(qrX - 14, qrY - 14, qrSize + 28, qrSize + 28, 22);
+                    ctx.fill();
+                    ctx.restore();
+
+                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+                    // TEXTOS INFERIORES
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.font = '800 16px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
+
+                    ctx.fillStyle = '#E2E8F0';
+                    ctx.font = '600 13px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
+                };
+                qrImg.src = qrDataUrl;
+            };
+
+            baseImg.onerror = function() {
+                alert("No se pudo cargar la imagen de la placa. Revisa que '"+ PLACAS[estilo] +"' esté subida a la carpeta 'mascotas'.");
+            };
+
+            baseImg.src = PLACAS[estilo] || PLACAS.escudo;
+        }
+
+        function copiarEnlace() {
+            navigator.clipboard.writeText(enlaceGenerado).then(() => {
+                alert("¡Enlace copiado al portapapeles!");
+            });
+        }
+
+        function descargarPlacaImagen() {
+            const canvas = document.getElementById('placaCanvas');
+            const link = document.createElement('a');
+            link.download = 'placa-collar-mascota.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
     </script>
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
-        .font-cursive { font-family: 'Dancing Script', cursive; }
-    </style>
-    <link rel="manifest" href="./manifest.json">
-</head>
-<body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
-
-    <!-- MENÚ PRINCIPAL (HUB DE BIENVENIDA) -->
-    <div class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
-        <div class="text-center space-y-1">
-            <h1 class="text-3xl font-bold font-cursive text-rose-100">Soluciones QR</h1>
-            <p class="text-xs text-rose-300/80">Selecciona el tipo de experiencia digital que deseas crear</p>
-        </div>
-
-        <!-- TARJETAS DE NAVEGACIÓN -->
-        <div class="space-y-3.5">
-            <!-- CATEGORÍA 1: PAREJAS -->
-            <a href="./parejas/index.html" class="w-full p-4 bg-burgundy-950/80 hover:bg-burgundy-950 border border-rose-500/30 rounded-2xl flex items-center justify-between text-left transition-all active:scale-95 shadow-lg group block">
-                <div class="flex items-center space-x-3.5">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 flex items-center justify-center text-white text-xl shadow-md">
-                        ❤️
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-rose-100 group-hover:text-rose-300">Detalles de Amor</h3>
-                        <p class="text-[10px] text-rose-300/70">Tarjeta interactiva, fotos, nota de voz y trivia</p>
-                    </div>
-                </div>
-                <i class="fas fa-chevron-right text-xs text-rose-400"></i>
-            </a>
-
-            <!-- CATEGORÍA 2: MENSAJE CON TEMPORIZADOR -->
-            <a href="./temporizador/index.html" class="w-full p-4 bg-burgundy-950/80 hover:bg-burgundy-950 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition-all active:scale-95 shadow-lg group block">
-                <div class="flex items-center space-x-3.5">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-xl shadow-md">
-                        ⏳
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-100 group-hover:text-amber-300">Mensaje con Temporizador</h3>
-                        <p class="text-[10px] text-amber-300/70">Cuenta regresiva previa al desbloqueo de sorpresa</p>
-                    </div>
-                </div>
-                <i class="fas fa-chevron-right text-xs text-amber-400"></i>
-            </a>
-
-            <!-- CATEGORÍA 3: MASCOTAS (HUELLA QR) -->
-            <a href="./mascotas/index.html" class="w-full p-4 bg-burgundy-950/80 hover:bg-burgundy-950 border border-emerald-500/30 rounded-2xl flex items-center justify-between text-left transition-all active:scale-95 shadow-lg group block">
-                <div class="flex items-center space-x-3.5">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white text-xl shadow-md">
-                        🐾
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-emerald-100 group-hover:text-emerald-300">Huella QR (Mascotas)</h3>
-                        <p class="text-[10px] text-emerald-300/70">Placa digital con datos de contacto de emergencia</p>
-                    </div>
-                </div>
-                <i class="fas fa-chevron-right text-xs text-emerald-400"></i>
-            </a>
-        </div>
-    </div>
 </body>
 </html>
