@@ -158,7 +158,6 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        // Rutas de las 3 placas
         const PLACAS = {
             escudo:  "grok_1792202097759.jpg",
             circulo: "grok_1792202092522.jpg",
@@ -250,42 +249,50 @@
                 // 1. Fondo de la placa
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. Cubrir nombre original + escribir el nuevo
-                ctx.globalAlpha = 0.95;
-                ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
-                ctx.fillRect(size * 0.20, size * 0.27, size * 0.60, size * 0.10);
+                // Color de fondo según el estilo
+                const bgColor = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
+
+                // 2. Cubrir TODO el área de texto + QR original (nombre + raza + QR + textos inferiores)
+                ctx.globalAlpha = 0.97;
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(size * 0.12, size * 0.22, size * 0.76, size * 0.58);
                 ctx.globalAlpha = 1.0;
 
+                // 3. Escribir nombre
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 42px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.font = 'bold 40px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.32);
+                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.29);
 
-                // 3. Cubrir raza original + escribir la nueva
-                ctx.globalAlpha = 0.95;
-                ctx.fillStyle = estilo === 'circulo' ? '#1e3a8a' : '#0f172a';
-                ctx.fillRect(size * 0.22, size * 0.36, size * 0.56, size * 0.06);
-                ctx.globalAlpha = 1.0;
-
+                // 4. Escribir raza
                 ctx.fillStyle = '#fbbf24';
-                ctx.font = 'bold 22px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.39);
+                ctx.font = 'bold 20px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, size * 0.355);
 
-                // 4. QR más arriba para cubrir mejor el texto original
+                // 5. QR centrado
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrSize = 175;
                     const qrX = (size - qrSize) / 2;
-                    const qrY = size * 0.34;          // ← subido más
+                    const qrY = size * 0.39;
 
-                    // Fondo blanco redondeado
+                    // Fondo blanco del QR
                     ctx.fillStyle = '#ffffff';
                     ctx.beginPath();
-                    ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 14);
+                    ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 16);
                     ctx.fill();
 
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+                    // Texto inferior limpio
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = 'bold 11px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, qrY + qrSize + 28);
+
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '10px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, qrY + qrSize + 48);
                 };
                 qrImg.src = qrDataUrl;
             };
