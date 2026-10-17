@@ -287,31 +287,6 @@
             }
         }
 
-        // Trazado del contorno exterior para generar el doble borde resplandeciente
-        function trazarContornoExterior(ctx, estilo) {
-            ctx.beginPath();
-            if (estilo === 'escudo') {
-                ctx.moveTo(512, 35);
-                ctx.lineTo(820, 110);
-                ctx.bezierCurveTo(940, 150, 960, 560, 960, 820);
-                ctx.bezierCurveTo(960, 980, 720, 1000, 512, 1010);
-                ctx.bezierCurveTo(304, 1000, 64, 980, 64, 820);
-                ctx.bezierCurveTo(64, 560, 84, 150, 204, 110);
-                ctx.closePath();
-            } else if (estilo === 'circulo') {
-                ctx.arc(512, 530, 445, 0, Math.PI * 2);
-            } else if (estilo === 'hueso') {
-                ctx.moveTo(320, 220);
-                ctx.bezierCurveTo(120, 220, 80, 400, 200, 480);
-                ctx.bezierCurveTo(80, 560, 120, 740, 320, 740);
-                ctx.bezierCurveTo(400, 920, 624, 920, 704, 740);
-                ctx.bezierCurveTo(904, 740, 944, 560, 824, 480);
-                ctx.bezierCurveTo(944, 400, 904, 220, 704, 220);
-                ctx.bezierCurveTo(624, 40, 400, 40, 320, 220);
-                ctx.closePath();
-            }
-        }
-
         function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
@@ -323,13 +298,23 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                // 1. DIBUJAR LA IMAGEN PNG ORIGINAL (Mantiene su bisel e interior intactos)
+                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+
+                // 1. APLICAR EFECTO DE RESPLANDOR NEÓN (BRILLO EXTERIOR EXACTO AL CONTORNO PNG)
+                ctx.save();
+                ctx.shadowColor = colores[1]; // Color secundario de la paleta para el brillo neón
+                ctx.shadowBlur = 35;         // Intensidad del resplandor
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.drawImage(baseImg, 0, 0, size, size);
+                ctx.restore();
+
+                // 2. DIBUJAR LA IMAGEN PNG ORIGINAL ENCIMA (Mantiene los detalles nítidos)
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. APLICAR COLOR NEÓN DIAGONAL SOBRE LA PLACA
+                // 3. APLICAR EL COLOR NEÓN DIAGONAL EXCLUSIVAMENTE SOBRE LA MEDALLA
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-atop';
-                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
                 const gradiente = ctx.createLinearGradient(0, 0, size, size);
                 gradiente.addColorStop(0, colores[0]);
                 gradiente.addColorStop(0.5, colores[1]);
@@ -337,23 +322,6 @@
 
                 ctx.fillStyle = gradiente;
                 ctx.fillRect(0, 0, size, size);
-                ctx.restore();
-
-                // 3. APLICAR EL DOBLE BORDE (CONTORNO EXTERIOR RESPLANDECIENTE + LÍNEA INTERIOR)
-                ctx.save();
-                trazarContornoExterior(ctx, estilo);
-                // Borde exterior con brillo neón
-                ctx.lineWidth = 10;
-                ctx.strokeStyle = colores[1];
-                ctx.shadowColor = colores[1];
-                ctx.shadowBlur = 24;
-                ctx.stroke();
-                
-                // Segundo borde interior para acentuar el relieve metálico
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.shadowBlur = 0; // Sin sombra para el trazo interno
-                ctx.stroke();
                 ctx.restore();
 
                 // 4. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
