@@ -200,12 +200,6 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        const PLACAS_BLANCAS = {
-            escudo:  "escudo.jpg",
-            circulo: "circulo.jpg",
-            hueso:   "hueso.jpg"
-        };
-
         const PALETAS = {
             paleta1: ['#0F0F1A', '#FF00BF', '#99FF00'],
             paleta2: ['#2B2B33', '#B57EDC', '#FF6600'],
@@ -278,7 +272,7 @@
                 const qrImg = qrContainer.querySelector('img');
                 
                 setTimeout(() => {
-                    dibujarPlacaConColorDiagonal(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
+                    dibujarPlacaVectorial(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
                 }, 200);
 
             } catch (error) {
@@ -287,7 +281,7 @@
             }
         }
 
-        function definirSiluetaVectorial(ctx, estilo) {
+        function trazarSiluetaPlaca(ctx, estilo) {
             ctx.beginPath();
             if (estilo === 'escudo') {
                 ctx.moveTo(256, 35);
@@ -298,7 +292,7 @@
                 ctx.bezierCurveTo(32, 280, 42, 90, 102, 70);
                 ctx.closePath();
             } else if (estilo === 'circulo') {
-                ctx.arc(256, 280, 215, 0, Math.PI * 2);
+                ctx.arc(256, 265, 210, 0, Math.PI * 2);
             } else if (estilo === 'hueso') {
                 ctx.moveTo(160, 110);
                 ctx.bezierCurveTo(60, 110, 40, 200, 100, 240);
@@ -311,89 +305,87 @@
             }
         }
 
-        function dibujarPlacaConColorDiagonal(nombre, raza, qrDataUrl, estilo, paletaKey) {
+        function dibujarPlacaVectorial(nombre, raza, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
             const size = 512;
 
             ctx.clearRect(0, 0, size, size);
 
-            const baseImg = new Image();
-            baseImg.crossOrigin = "anonymous";
+            // 1. DIBUJAR CUERPO DE LA PLACA CON GRADIENTE DIAGONAL
+            ctx.save();
+            trazarSiluetaPlaca(ctx, estilo);
+            
+            const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+            const gradienteDiagonal = ctx.createLinearGradient(0, 0, size, size);
+            gradienteDiagonal.addColorStop(0, colores[0]);
+            gradienteDiagonal.addColorStop(0.5, colores[1]);
+            gradienteDiagonal.addColorStop(1, colores[2]);
 
-            baseImg.onload = function() {
-                // 1. RECORTAR CON LA SILUETA SELECCIONADA
-                ctx.save();
-                definirSiluetaVectorial(ctx, estilo);
-                ctx.clip();
+            ctx.fillStyle = gradienteDiagonal;
+            ctx.fill();
 
-                // Dibujar imagen base dentro de la forma
-                ctx.drawImage(baseImg, 0, 0, size, size);
+            // Borde metálico exterior brillante
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.stroke();
+            ctx.restore();
 
-                // 2. APLICAR COLOR DIAGONAL SOBRE LOS RELIEVES METÁLICOS
-                ctx.globalCompositeOperation = 'source-atop';
-                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
-                const gradienteDiagonal = ctx.createLinearGradient(0, 0, size, size);
-                gradienteDiagonal.addColorStop(0, colores[0]);
-                gradienteDiagonal.addColorStop(0.5, colores[1]);
-                gradienteDiagonal.addColorStop(1, colores[2]);
+            // 2. ORIFICIO DE LA ARGOLLA SUPERIOR
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(256, estilo === 'circulo' ? 42 : 45, 18, 0, Math.PI * 2);
+            ctx.fillStyle = '#0f172a';
+            ctx.fill();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#94a3b8';
+            ctx.stroke();
+            ctx.restore();
 
-                ctx.fillStyle = gradienteDiagonal;
-                ctx.fillRect(0, 0, size, size);
-                ctx.restore(); // Fin del recorte de silueta
+            // 3. PANEL CENTRAL OSCURO PARA DATOS Y QR
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+            ctx.beginPath();
+            ctx.roundRect(size * 0.18, size * 0.18, size * 0.64, size * 0.64, 24);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
-                // 3. PANEL CENTRAL OSCURO TRANSLÚCIDO PARA LOS DATOS
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-                ctx.beginPath();
-                ctx.roundRect(size * 0.18, size * 0.22, size * 0.64, size * 0.58, 22);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+            // 4. TEXTOS
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'extrabold 32px Plus Jakarta Sans, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.25);
 
-                // 4. NOMBRE
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 16px Plus Jakarta Sans, Arial, sans-serif';
+            ctx.fillText(raza.toUpperCase().substring(0, 20), size / 2, size * 0.32);
+
+            // 5. CÓDIGO QR
+            const qrImg = new Image();
+            qrImg.onload = function() {
+                const qrSize = 160;
+                const qrX = (size - qrSize) / 2;
+                const qrY = size * 0.37;
+
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'extrabold 32px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, size * 0.29);
+                ctx.beginPath();
+                ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+                ctx.fill();
 
-                // 5. RAZA
-                ctx.fillStyle = '#fbbf24';
-                ctx.font = 'bold 15px Plus Jakarta Sans, Arial, sans-serif';
-                ctx.fillText(raza.toUpperCase().substring(0, 20), size / 2, size * 0.35);
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                // 6. CÓDIGO QR
-                const qrImg = new Image();
-                qrImg.onload = function() {
-                    const qrSize = 145;
-                    const qrX = (size - qrSize) / 2;
-                    const qrY = size * 0.39;
+                // Textos de pie
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = 'bold 10px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, qrY + qrSize + 22);
 
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
-                    ctx.fill();
-
-                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-
-                    // Textos de pie
-                    ctx.fillStyle = '#38bdf8';
-                    ctx.font = 'bold 10px Plus Jakarta Sans, Arial, sans-serif';
-                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, qrY + qrSize + 20);
-
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '9px Plus Jakarta Sans, Arial, sans-serif';
-                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, qrY + qrSize + 36);
-                };
-                qrImg.src = qrDataUrl;
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '9px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, qrY + qrSize + 38);
             };
-
-            baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa. Verifica el archivo '" + PLACAS_BLANCAS[estilo] + "'.");
-            };
-
-            baseImg.src = PLACAS_BLANCAS[estilo] || PLACAS_BLANCAS.escudo;
+            qrImg.src = qrDataUrl;
         }
 
         function copiarEnlace() {
