@@ -45,19 +45,34 @@
                     <input type="text" id="razaMascota" placeholder="Ej. Perro / Golden" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono de Contacto *</label>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
                     <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
                 </div>
             </div>
 
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-cyan-300 mb-1">Colonia / Sector (Seguro)</label>
+                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-amber-300 mb-1">💰 Recompensa (Opcional)</label>
+                    <input type="text" id="recompensaMascota" placeholder="Ej. $1,000 MXN / Se ofrece" class="w-full p-3 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <!-- SUBIR FOTO DESDE GALERÍA/ARCHIVOS -->
             <div>
-                <label class="block text-xs font-bold text-cyan-300 mb-1">URL de la Foto de la Mascota</label>
-                <input type="url" id="fotoMascota" placeholder="https://ejemplo.com/foto.jpg" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
-                <span class="text-[10px] text-slate-400 mt-1 block">Puedes usar un enlace directo de foto o subida a la red.</span>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Foto de la Mascota (1 Imagen)</label>
+                <input type="file" id="inputFotoArchivo" accept="image/*" onchange="previewImagen(event)" class="w-full p-2 bg-black/40 border border-white/20 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
+                
+                <div id="boxPreview" class="hidden mt-3 relative w-28 h-28 mx-auto rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-md">
+                    <img id="imgPreview" src="" class="w-full h-full object-cover">
+                </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-cyan-300 mb-1">Señas Particulares o Medicamentos</label>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Señas Particulares / Medicamentos</label>
                 <textarea id="detallesMascota" rows="2" placeholder="Ej. Mancha blanca en el pecho, alérgico al pollo..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400"></textarea>
             </div>
 
@@ -99,16 +114,32 @@
         const db = firebase.firestore();
 
         let enlaceGenerado = "";
+        let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
+
+        // Previsualizar la foto subida desde archivos y convertir a Base64
+        function previewImagen(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fotoBase64 = e.target.result;
+                    document.getElementById('imgPreview').src = fotoBase64;
+                    document.getElementById('boxPreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
         async function generarPlacaQR() {
             const nombre = document.getElementById('nombreMascota').value.trim();
             const raza = document.getElementById('razaMascota').value.trim();
             const telefono = document.getElementById('telefonoDuenio').value.trim();
-            const foto = document.getElementById('fotoMascota').value.trim();
+            const colonia = document.getElementById('coloniaMascota').value.trim();
+            const recompensa = document.getElementById('recompensaMascota').value.trim();
             const detalles = document.getElementById('detallesMascota').value.trim();
 
             if (!nombre || !telefono) {
-                alert("Por favor ingresa al menos el nombre de la mascota y el teléfono de contacto.");
+                alert("Por favor ingresa al menos el nombre de la mascota y el teléfono/WhatsApp de contacto.");
                 return;
             }
 
@@ -118,7 +149,9 @@
                     nombre,
                     raza: raza || "No especificada",
                     telefono,
-                    foto: foto || "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
+                    colonia: colonia || "No especificada",
+                    recompensa: recompensa || "",
+                    foto: fotoBase64,
                     detalles: detalles || "Ninguna",
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
