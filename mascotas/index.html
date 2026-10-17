@@ -122,9 +122,9 @@
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
                 
-                <!-- CANVAS DONDE SE DIBUJA EL DISEÑO ELEGIDO CON SILUETA EXACTA -->
+                <!-- CANVAS CON FONDO TRANSPARENTE REAL -->
                 <div class="flex justify-center my-2">
-                    <canvas id="placaCanvas" width="360" height="420" class="max-w-full h-auto bg-transparent"></canvas>
+                    <canvas id="placaCanvas" width="360" height="440" class="max-w-full h-auto"></canvas>
                 </div>
 
                 <div id="qrcodeHidden" class="hidden"></div>
@@ -228,47 +228,50 @@
             }
         }
 
-        /* DIBUJAR SILUETA VECTORIAL PERFECTA EN CANVAS */
+        /* DIBUJAR MEDALLA CON TRANSPARENCIA Y CORTE VECTORIAL REAL */
         function dibujarMedallaPlaca(nombre, raza, qrDataUrl, estilo) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
 
+            // Limpia todo el canvas para garantizar fondo 100% transparente
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // FUNCIÓN AUXILIAR PARA TRAZAR LA RUTA DE CADA SILUETA
-            function trazarRutaSilueta() {
-                ctx.beginPath();
-                if (estilo === 'escudo') {
-                    // SILUETA ESCUDO
-                    ctx.moveTo(180, 25);
-                    ctx.lineTo(290, 50);
-                    ctx.bezierCurveTo(330, 65, 335, 210, 335, 305);
-                    ctx.bezierCurveTo(335, 375, 250, 410, 180, 415);
-                    ctx.bezierCurveTo(110, 410, 25, 375, 25, 305);
-                    ctx.bezierCurveTo(25, 210, 30, 65, 70, 50);
-                    ctx.closePath();
-                } else if (estilo === 'circulo') {
-                    // SILUETA CÍRCULO CON ARGOLLA
-                    ctx.arc(180, 230, 155, 0, Math.PI * 2);
-                } else if (estilo === 'hueso') {
-                    // SILUETA HUESITO
-                    ctx.moveTo(100, 85);
-                    ctx.bezierCurveTo(40, 85, 30, 155, 80, 185);
-                    ctx.bezierCurveTo(30, 215, 40, 285, 100, 285);
-                    ctx.bezierCurveTo(130, 345, 230, 345, 260, 285);
-                    ctx.bezierCurveTo(320, 285, 330, 215, 280, 185);
-                    ctx.bezierCurveTo(330, 155, 320, 85, 260, 85);
-                    ctx.bezierCurveTo(230, 35, 130, 35, 100, 85);
-                    ctx.closePath();
-                }
+            ctx.save();
+
+            // 1. TRAZAR LA SILUETA EXACTA SEGÚN LA MEDALLA SELECCIONADA
+            ctx.beginPath();
+            if (estilo === 'escudo') {
+                // Silueta de Escudo con curva superior para la argolla
+                ctx.moveTo(180, 20);
+                ctx.arc(180, 30, 16, -Math.PI / 2, Math.PI / 2, true);
+                ctx.lineTo(290, 50);
+                ctx.bezierCurveTo(335, 65, 340, 210, 340, 310);
+                ctx.bezierCurveTo(340, 385, 250, 420, 180, 425);
+                ctx.bezierCurveTo(110, 420, 20, 385, 20, 310);
+                ctx.bezierCurveTo(20, 210, 25, 65, 70, 50);
+                ctx.closePath();
+            } else if (estilo === 'circulo') {
+                // Silueta de Círculo con orejeta para la argolla
+                ctx.moveTo(180, 20);
+                ctx.arc(180, 35, 20, -Math.PI/2, Math.PI/2, true);
+                ctx.arc(180, 230, 160, -Math.PI/3, (4 * Math.PI) / 3);
+                ctx.closePath();
+            } else if (estilo === 'hueso') {
+                // Silueta de Huesito Orgánico
+                ctx.moveTo(100, 85);
+                ctx.bezierCurveTo(30, 85, 20, 155, 70, 185);
+                ctx.bezierCurveTo(20, 215, 30, 285, 100, 285);
+                ctx.bezierCurveTo(130, 355, 230, 355, 260, 285);
+                ctx.bezierCurveTo(330, 285, 340, 215, 290, 185);
+                ctx.bezierCurveTo(340, 155, 330, 85, 260, 85);
+                ctx.bezierCurveTo(230, 25, 130, 25, 100, 85);
+                ctx.closePath();
             }
 
-            // 1. APLICAR CORTE RESTRINGIDO A LA SILUETA (CLIPPING)
-            ctx.save();
-            trazarRutaSilueta();
+            // 2. RECORTAR ÚNICAMENTE LA ZONA DE LA MEDALLA
             ctx.clip();
 
-            // 2. RELLENAR FONDO DE LA SILUETA RECORTADA
+            // 3. PINTAR EL GRADIENTE INTERNO (SÓLO DENTRO DE LA SILUETA)
             if (estilo === 'escudo') {
                 const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
                 grad.addColorStop(0, '#0a192f');
@@ -278,7 +281,7 @@
                 const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
                 grad.addColorStop(0, '#1e3a8a');
                 grad.addColorStop(0.5, '#020617');
-                grad.addColorStop(1, '#c2410c');
+                grad.addColorStop(1, '#ea580c');
                 ctx.fillStyle = grad;
             } else {
                 const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -288,45 +291,67 @@
             }
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 3. RESTAURAR MÁSCARA Y DIBUJAR BORDES METALIZADOS
+            // RESTAURAR CONTEXTO PARA DIBUJAR BORDES Y TEXTOS
             ctx.restore();
 
-            trazarRutaSilueta();
+            // 4. DIBUJAR BORDES METALIZADOS
+            ctx.save();
             ctx.lineWidth = 6;
             ctx.strokeStyle = estilo === 'escudo' ? '#d97706' : (estilo === 'circulo' ? '#fb923c' : '#38bdf8');
-            ctx.stroke();
+            
+            // Re-trazar el borde para trazar el contorno exterior
+            if (estilo === 'escudo') {
+                ctx.beginPath();
+                ctx.moveTo(180, 20);
+                ctx.lineTo(290, 50);
+                ctx.bezierCurveTo(335, 65, 340, 210, 340, 310);
+                ctx.bezierCurveTo(340, 385, 250, 420, 180, 425);
+                ctx.bezierCurveTo(110, 420, 20, 385, 20, 310);
+                ctx.bezierCurveTo(20, 210, 25, 65, 70, 50);
+                ctx.closePath();
+                ctx.stroke();
+            } else if (estilo === 'circulo') {
+                ctx.beginPath();
+                ctx.arc(180, 230, 158, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.beginPath();
+                ctx.arc(180, 230, 150, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.restore();
 
-            // 4. ORIFICIO DE LA ARGOLLA SUPERIOR
+            // 5. ORIFICIO DE LA ARGOLLA METALIZADA (SUPERIOR)
             ctx.save();
             ctx.fillStyle = '#0f172a';
             ctx.beginPath();
-            ctx.arc(180, 35, 10, 0, Math.PI * 2);
+            ctx.arc(180, 32, 9, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = estilo === 'escudo' ? '#d97706' : (estilo === 'circulo' ? '#fb923c' : '#38bdf8');
             ctx.lineWidth = 3;
             ctx.stroke();
             ctx.restore();
 
-            // 5. TEXTOS Y CONTENIDO
+            // 6. TEXTOS Y FECHA EN LA PLACA
             ctx.fillStyle = '#38bdf8';
             ctx.font = 'extrabold 11px Plus Jakarta Sans, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', 180, 75);
+            ctx.fillText('🐾 PLACA QR DE EMERGENCIA 🐾', 180, 72);
 
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 24px Plus Jakarta Sans, sans-serif';
-            ctx.fillText(nombre.toUpperCase(), 180, 105);
+            ctx.fillText(nombre.toUpperCase(), 180, 102);
 
             ctx.fillStyle = estilo === 'escudo' ? '#d97706' : '#fde047';
             ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
-            ctx.fillText(raza.toUpperCase(), 180, 125);
+            ctx.fillText(raza.toUpperCase(), 180, 122);
 
-            // 6. DIBUJAR CÓDIGO QR
+            // 7. RENDERIZAR CÓDIGO QR AL CENTRO
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrSize = 185;
                 const qrX = (canvas.width - qrSize) / 2;
-                const qrY = 140;
+                const qrY = 138;
 
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
