@@ -300,10 +300,26 @@
             baseImg.onload = function() {
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-                // 1. Dibujar la imagen base (forma + borde dorado + relieve)
+                // ============================================
+                // 1. BORDE BLANCO (guía de recorte)
+                // Se dibuja una versión ligeramente más grande en blanco
+                // ============================================
+                const marginScale = 1.038; // ≈ 3.8% más grande (ajusta si quieres más o menos margen)
+                const offset = (size * (marginScale - 1)) / 2;
+
+                ctx.save();
+                ctx.drawImage(baseImg, -offset, -offset, size * marginScale, size * marginScale);
+                ctx.globalCompositeOperation = 'source-atop';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, size, size);
+                ctx.restore();
+
+                // ============================================
+                // 2. DIBUJAR LA PLACA NORMAL ENCIMA
+                // ============================================
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. Crear un gradiente hermoso (similar a la imagen de referencia)
+                // 3. Crear gradiente según la paleta
                 const grad = ctx.createLinearGradient(0, 0, size, size);
                 
                 if (paletaKey === 'paleta1') { // Lima
@@ -321,7 +337,7 @@
                     grad.addColorStop(0.4,  colores[0]);
                     grad.addColorStop(0.8,  '#00e0ff');
                     grad.addColorStop(1,   '#ffffff');
-                } else if (paletaKey === 'paleta4') { // Fucsia (la más parecida a tu imagen)
+                } else if (paletaKey === 'paleta4') { // Fucsia
                     grad.addColorStop(0,   '#2b0a3d');
                     grad.addColorStop(0.35, '#5c1a7a');
                     grad.addColorStop(0.7,  '#c71585');
@@ -333,14 +349,14 @@
                     grad.addColorStop(1,   colores[1]);
                 }
 
-                // 3. Aplicar el gradiente SOLO dentro de la forma del PNG
+                // 4. Aplicar el gradiente solo dentro de la forma
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-atop';
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 4. Añadir un poco de brillo / luz interior (efecto metálico sutil)
+                // 5. Brillo sutil (efecto metálico)
                 ctx.save();
                 ctx.globalCompositeOperation = 'soft-light';
                 const highlight = ctx.createRadialGradient(
@@ -354,7 +370,7 @@
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 5. Posiciones de textos y QR
+                // 6. Posiciones de textos y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -381,27 +397,27 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 6. Textos superiores
+                // 7. Textos superiores
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
 
-                // Nombre grande
+                // Nombre
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = '900 56px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
 
-                // Raza en dorado
+                // Raza
                 ctx.fillStyle = '#F59E0B';
                 ctx.font = '800 28px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 7. Código QR con fondo blanco redondeado
+                // 8. Código QR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
 
-                    // Fondo blanco con sombra
+                    // Fondo blanco del QR
                     ctx.save();
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
                     ctx.shadowBlur = 18;
@@ -412,7 +428,7 @@
                     ctx.fill();
                     ctx.restore();
 
-                    // QR
+                    // Dibujar QR
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
                     // Textos inferiores
