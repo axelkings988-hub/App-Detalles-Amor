@@ -207,11 +207,11 @@
         };
 
         const PALETAS = {
-            paleta1: ['#0F0F1A', '#FF00BF', '#99FF00'], // Lima
-            paleta2: ['#2B2B33', '#B57EDC', '#FF6600'], // Cálida
+            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima (Color principal oscuro, Color resaltado neón)
+            paleta2: ['#2B2B33', '#FF6600', '#B57EDC'], // Cálida
             paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'], // Cian
-            paleta4: ['#3B1F4A', '#A8E6CF', '#FF1493'], // Fucsia
-            paleta5: ['#455A64', '#FFF9C4', '#1DE9B6']  // Tropical
+            paleta4: ['#3B1F4A', '#FF1493', '#A8E6CF'], // Fucsia
+            paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']  // Tropical
         };
 
         function previewImagen(event) {
@@ -299,32 +299,34 @@
 
             baseImg.onload = function() {
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+                const colorFondoOscuro = colores[0]; // Color base profundo
+                const colorLuzResaltada = colores[1]; // Color neón para la ranura interior
 
-                // 1. CREAR UN CAPA DE COLOR NEÓN CON FUSIÓN SUAVE (MULTIPLY)
-                // Esto pinta únicamente las partes blancas o claras de la imagen original con el degradado,
-                // respetando y manteniendo intactos los bordes oscuros, biseles y argolla metálica.
+                // 1. DIBUJAR LA IMAGEN PNG ORIGINAL BASE
+                ctx.drawImage(baseImg, 0, 0, size, size);
+
+                // 2. TINTAR EL CUERPO CON EL COLOR BASE OSCURO DE LA PALETA
                 ctx.save();
-                const gradiente = ctx.createLinearGradient(0, 0, size, size);
-                gradiente.addColorStop(0, colores[0]);
-                gradiente.addColorStop(0.5, colores[1]);
-                gradiente.addColorStop(1, colores[2]);
-
-                ctx.fillStyle = gradiente;
+                ctx.globalCompositeOperation = 'source-atop';
+                ctx.fillStyle = colorFondoOscuro;
                 ctx.fillRect(0, 0, size, size);
+                ctx.restore();
 
-                // Aplicar la imagen original con multiply para que el color neón se funda dentro del cuerpo blanco
+                // 3. EFECTO DE LUZ INTERIOR (Simulando la ranura brillante de la referencia)
+                // Usamos la imagen original de nuevo con modo 'screen' o 'color-dodge' para que solo las zonas claras/relieves absorban el color neón seleccionado
+                ctx.save();
+                ctx.globalCompositeOperation = 'screen'; 
+                ctx.fillStyle = colorLuzResaltada;
+                ctx.fillRect(0, 0, size, size);
+                ctx.restore();
+
+                // Asegurar que la opacidad general mantenga los contrastes 3D oscuros originales
+                ctx.save();
                 ctx.globalCompositeOperation = 'multiply';
                 ctx.drawImage(baseImg, 0, 0, size, size);
                 ctx.restore();
 
-                // 2. DIBUJAR LA IMAGEN ORIGINAL ENCIMA CON CIERTA TRANSPARENCIA O SCREEN
-                // Esto garantiza que los bordes metálicos, la argolla y los relieves conserven su textura y color original.
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.drawImage(baseImg, 0, 0, size, size);
-                ctx.restore();
-
-                // 3. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                // 4. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -351,7 +353,7 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 4. TEXTOS SUPERIORES
+                // 5. TEXTOS SUPERIORES
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
@@ -364,7 +366,7 @@
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 5. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                // 6. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
