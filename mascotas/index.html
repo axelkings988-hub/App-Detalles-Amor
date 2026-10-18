@@ -104,14 +104,14 @@
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta1" checked class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#0F0F1A] via-[#99FF00] to-[#FF00BF]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#0F0F1A] via-[#FF00BF] to-[#99FF00]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Lima</span>
                         </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta2" class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#2B2B33] via-[#FF6600] to-[#B57EDC]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#2B2B33] via-[#B57EDC] to-[#FF6600]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Cálida</span>
                         </div>
                     </label>
@@ -125,14 +125,14 @@
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta4" class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#3B1F4A] via-[#FF1493] to-[#A8E6CF]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#3B1F4A] via-[#A8E6CF] to-[#FF1493]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Fucsia</span>
                         </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta5" class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#455A64] via-[#1DE9B6] to-[#FFF9C4]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#455A64] via-[#FFF9C4] to-[#1DE9B6]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Tropical</span>
                         </div>
                     </label>
@@ -201,17 +201,17 @@
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
         const PLACAS = {
-            escudo:  "escudo.png",
-            circulo: "circulo.png",
-            hueso:   "hueso.png"
+            escudo:  "escudo.jpg",
+            circulo: "circulo.jpg",
+            hueso:   "hueso.jpg"
         };
 
         const PALETAS = {
-            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima
-            paleta2: ['#2B2B33', '#FF6600', '#B57EDC'], // Cálida
+            paleta1: ['#0F0F1A', '#FF00BF', '#99FF00'], // Lima
+            paleta2: ['#2B2B33', '#B57EDC', '#FF6600'], // Cálida
             paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'], // Cian
-            paleta4: ['#3B1F4A', '#FF1493', '#A8E6CF'], // Fucsia
-            paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']  // Tropical
+            paleta4: ['#3B1F4A', '#A8E6CF', '#FF1493'], // Fucsia
+            paleta5: ['#455A64', '#FFF9C4', '#1DE9B6']  // Tropical
         };
 
         function previewImagen(event) {
@@ -287,6 +287,31 @@
             }
         }
 
+        // Trazado ajustado exactamente al borde exterior real de cada silueta
+        function trazarContornoExterior(ctx, estilo) {
+            ctx.beginPath();
+            if (estilo === 'escudo') {
+                ctx.moveTo(512, 35);
+                ctx.lineTo(820, 110);
+                ctx.bezierCurveTo(940, 150, 960, 560, 960, 820);
+                ctx.bezierCurveTo(960, 980, 720, 1000, 512, 1010);
+                ctx.bezierCurveTo(304, 1000, 64, 980, 64, 820);
+                ctx.bezierCurveTo(64, 560, 84, 150, 204, 110);
+                ctx.closePath();
+            } else if (estilo === 'circulo') {
+                ctx.arc(512, 530, 445, 0, Math.PI * 2);
+            } else if (estilo === 'hueso') {
+                ctx.moveTo(320, 220);
+                ctx.bezierCurveTo(120, 220, 80, 400, 200, 480);
+                ctx.bezierCurveTo(80, 560, 120, 740, 320, 740);
+                ctx.bezierCurveTo(400, 920, 624, 920, 704, 740);
+                ctx.bezierCurveTo(904, 740, 944, 560, 824, 480);
+                ctx.bezierCurveTo(944, 400, 904, 220, 704, 220);
+                ctx.bezierCurveTo(624, 40, 400, 40, 320, 220);
+                ctx.closePath();
+            }
+        }
+
         function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
@@ -298,62 +323,60 @@
             baseImg.crossOrigin = "anonymous";
 
             baseImg.onload = function() {
-                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
-                const colorFondoOscuro = colores[0]; // Color base profundo
-                const colorLuzResaltada = colores[1]; // Color neón para la ranura interior
-
-                // 1. CREAR MÁSCARA ESTRICTA USANDO LA SILUETA DEL PNG TRANSPARENTE
-                // Esto garantiza que CUALQUIER dibujo posterior ocurra ÚNICAMENTE dentro de la medalla y NUNCA en el fondo cuadrado.
-                ctx.save();
+                // 1. DIBUJAR IMAGEN BASE EN BLANCO
                 ctx.drawImage(baseImg, 0, 0, size, size);
-                ctx.globalCompositeOperation = 'source-in';
 
-                // 2. APLICAR EL COLOR OSCURO BASE DENTRO DE LA SILUETA
-                ctx.fillStyle = colorFondoOscuro;
-                ctx.fillRect(0, 0, size, size);
-                
-                // 3. APLICAR EL BRILLO NEÓN SOLO EN LAS ZONAS DE LA RANURA INTERIOR
-                ctx.globalCompositeOperation = 'screen';
-                ctx.fillStyle = colorLuzResaltada;
-                ctx.fillRect(0, 0, size, size);
-                
-                ctx.restore();
-
-                // 4. RESTAURAR TEXTURAS Y SOMBRAS 3D ORIGINALES DEL PNG CON MULTIPLY SUAVE
+                // 2. APLICAR COLOR NEÓN DIAGONAL MANTENIENDO SOMBRAS Y VOLUMEN 3D
                 ctx.save();
                 ctx.globalCompositeOperation = 'multiply';
-                ctx.globalAlpha = 0.65;
-                ctx.drawImage(baseImg, 0, 0, size, size);
+                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+                const gradiente = ctx.createLinearGradient(0, 0, size, size);
+                gradiente.addColorStop(0, colores[0]);
+                gradiente.addColorStop(0.5, colores[1]);
+                gradiente.addColorStop(1, colores[2]);
+
+                ctx.fillStyle = gradiente;
+                ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 5. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                // 3. APLICAR BORDE NEÓN EXCLUSIVAMENTE EN EL CONTORNO EXTERIOR
+                ctx.save();
+                trazarContornoExterior(ctx, estilo);
+                ctx.lineWidth = 14;
+                ctx.strokeStyle = colores[1] || '#38bdf8';
+                ctx.shadowColor = colores[1] || '#38bdf8';
+                ctx.shadowBlur = 28;
+                ctx.stroke();
+                ctx.restore();
+
+                // 4. CONFIGURAR TEXTOS Y TAMAÑO DE QR ÓPTIMO (MÁS GRANDE Y CENTRADO)
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                let headerY = size * 0.26;
-                let nombreY = size * 0.32;
-                let razaY = size * 0.38;
-                let qrY = size * 0.42;
-                let qrSize = 340; 
-                let footerText1Y = qrY + qrSize + 32;
-                let footerText2Y = qrY + qrSize + 58;
+                let headerY = size * 0.38;
+                let nombreY = size * 0.43;
+                let razaY = size * 0.48;
+                let qrY = size * 0.51;
+                let qrSize = 340; // Tamaño optimizado para encajar perfectamente
+                let footerText1Y = qrY + qrSize + 35;
+                let footerText2Y = qrY + qrSize + 60;
 
                 if (estilo === 'circulo') {
-                    headerY = size * 0.25;
-                    nombreY = size * 0.31;
-                    razaY = size * 0.37;
-                    qrY = size * 0.41;
+                    headerY = size * 0.36;
+                    nombreY = size * 0.41;
+                    razaY = size * 0.46;
+                    qrY = size * 0.48;
                 } else if (estilo === 'hueso') {
-                    headerY = size * 0.25;
-                    nombreY = size * 0.31;
-                    razaY = size * 0.37;
-                    qrY = size * 0.41;
+                    headerY = size * 0.36;
+                    nombreY = size * 0.41;
+                    razaY = size * 0.46;
+                    qrY = size * 0.48;
                     qrSize = 300;
-                    footerText1Y = qrY + qrSize + 28;
-                    footerText2Y = qrY + qrSize + 50;
+                    footerText1Y = qrY + qrSize + 30;
+                    footerText2Y = qrY + qrSize + 52;
                 }
 
-                // 6. TEXTOS SUPERIORES
+                // 5. TEXTOS
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
@@ -366,7 +389,7 @@
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 7. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                // 6. CÓDIGO QR Y RECUADRO PROTECTOR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
@@ -383,7 +406,7 @@
 
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                    // TEXTOS INFERIORES
+                    // Textos inferiores
                     ctx.fillStyle = '#FFFFFF';
                     ctx.font = '800 16px Plus Jakarta Sans, Arial, sans-serif';
                     ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
