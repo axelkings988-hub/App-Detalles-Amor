@@ -300,7 +300,10 @@
             baseImg.onload = function() {
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-                // 1. DIBUJAR LA BASE DE COLOR NEÓN (DEGRADADO DIAGONAL)
+                // 1. CREAR UN CAPA DE COLOR NEÓN CON FUSIÓN SUAVE (MULTIPLY)
+                // Esto pinta únicamente las partes blancas o claras de la imagen original con el degradado,
+                // respetando y manteniendo intactos los bordes oscuros, biseles y argolla metálica.
+                ctx.save();
                 const gradiente = ctx.createLinearGradient(0, 0, size, size);
                 gradiente.addColorStop(0, colores[0]);
                 gradiente.addColorStop(0.5, colores[1]);
@@ -309,19 +312,19 @@
                 ctx.fillStyle = gradiente;
                 ctx.fillRect(0, 0, size, size);
 
-                // 2. RECORTAR CON LA SILUETA DE LA IMAGEN PNG PARA QUE EL COLOR SOLO ESTÉ DENTRO DE LA PLACA
-                ctx.globalCompositeOperation = 'destination-in';
-                ctx.drawImage(baseImg, 0, 0, size, size);
-
-                // 3. VOLVER AL MODO NORMAL Y SUPERPONER EL PNG ORIGINAL CON FUSIÓN 'MULTIPLY'
-                // Esto permite que los surcos, bordes y relieves originales resalten con el color elegido
+                // Aplicar la imagen original con multiply para que el color neón se funda dentro del cuerpo blanco
                 ctx.globalCompositeOperation = 'multiply';
                 ctx.drawImage(baseImg, 0, 0, size, size);
+                ctx.restore();
 
-                // 4. RESTAURAR MODO NORMAL PARA TEXTOS Y QR
+                // 2. DIBUJAR LA IMAGEN ORIGINAL ENCIMA CON CIERTA TRANSPARENCIA O SCREEN
+                // Esto garantiza que los bordes metálicos, la argolla y los relieves conserven su textura y color original.
+                ctx.save();
                 ctx.globalCompositeOperation = 'source-over';
+                ctx.drawImage(baseImg, 0, 0, size, size);
+                ctx.restore();
 
-                // 5. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                // 3. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -348,7 +351,7 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 6. TEXTOS SUPERIORES
+                // 4. TEXTOS SUPERIORES
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
@@ -361,7 +364,7 @@
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 7. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                // 5. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
