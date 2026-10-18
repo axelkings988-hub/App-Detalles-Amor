@@ -207,7 +207,7 @@
         };
 
         const PALETAS = {
-            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima (Color principal oscuro, Color resaltado neón)
+            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima
             paleta2: ['#2B2B33', '#FF6600', '#B57EDC'], // Cálida
             paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'], // Cian
             paleta4: ['#3B1F4A', '#FF1493', '#A8E6CF'], // Fucsia
@@ -243,7 +243,7 @@
                 return;
             }
 
-            const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
+            const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('\( ') ? recompensaInput : ' \)' + recompensaInput) : "";
 
             try {
                 const docRef = await db.collection("mascotas").add({
@@ -299,34 +299,62 @@
 
             baseImg.onload = function() {
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
-                const colorFondoOscuro = colores[0]; // Color base profundo
-                const colorLuzResaltada = colores[1]; // Color neón para la ranura interior
 
-                // 1. DIBUJAR LA IMAGEN PNG ORIGINAL BASE
+                // 1. Dibujar la imagen base (forma + borde dorado + relieve)
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. TINTAR EL CUERPO CON EL COLOR BASE OSCURO DE LA PALETA
+                // 2. Crear un gradiente hermoso (similar a la imagen de referencia)
+                const grad = ctx.createLinearGradient(0, 0, size, size);
+                
+                if (paletaKey === 'paleta1') { // Lima
+                    grad.addColorStop(0,   '#1a0a2e');
+                    grad.addColorStop(0.35, colores[0]);
+                    grad.addColorStop(0.7,  colores[2]);
+                    grad.addColorStop(1,   colores[1]);
+                } else if (paletaKey === 'paleta2') { // Cálida
+                    grad.addColorStop(0,   '#1a1025');
+                    grad.addColorStop(0.4,  colores[0]);
+                    grad.addColorStop(0.75, colores[2]);
+                    grad.addColorStop(1,   colores[1]);
+                } else if (paletaKey === 'paleta3') { // Cian
+                    grad.addColorStop(0,   '#001428');
+                    grad.addColorStop(0.4,  colores[0]);
+                    grad.addColorStop(0.8,  '#00e0ff');
+                    grad.addColorStop(1,   '#ffffff');
+                } else if (paletaKey === 'paleta4') { // Fucsia (la más parecida a tu imagen)
+                    grad.addColorStop(0,   '#2b0a3d');
+                    grad.addColorStop(0.35, '#5c1a7a');
+                    grad.addColorStop(0.7,  '#c71585');
+                    grad.addColorStop(1,   '#ff1493');
+                } else { // Tropical
+                    grad.addColorStop(0,   '#1a2a30');
+                    grad.addColorStop(0.4,  colores[0]);
+                    grad.addColorStop(0.75, colores[2]);
+                    grad.addColorStop(1,   colores[1]);
+                }
+
+                // 3. Aplicar el gradiente SOLO dentro de la forma del PNG
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-atop';
-                ctx.fillStyle = colorFondoOscuro;
+                ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 3. EFECTO DE LUZ INTERIOR (Simulando la ranura brillante de la referencia)
-                // Usamos la imagen original de nuevo con modo 'screen' o 'color-dodge' para que solo las zonas claras/relieves absorban el color neón seleccionado
+                // 4. Añadir un poco de brillo / luz interior (efecto metálico sutil)
                 ctx.save();
-                ctx.globalCompositeOperation = 'screen'; 
-                ctx.fillStyle = colorLuzResaltada;
+                ctx.globalCompositeOperation = 'soft-light';
+                const highlight = ctx.createRadialGradient(
+                    size * 0.35, size * 0.3, 0,
+                    size * 0.5, size * 0.5, size * 0.7
+                );
+                highlight.addColorStop(0, 'rgba(255,255,255,0.35)');
+                highlight.addColorStop(0.5, 'rgba(255,255,255,0.08)');
+                highlight.addColorStop(1, 'rgba(0,0,0,0.15)');
+                ctx.fillStyle = highlight;
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // Asegurar que la opacidad general mantenga los contrastes 3D oscuros originales
-                ctx.save();
-                ctx.globalCompositeOperation = 'multiply';
-                ctx.drawImage(baseImg, 0, 0, size, size);
-                ctx.restore();
-
-                // 4. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                // 5. Posiciones de textos y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -334,7 +362,7 @@
                 let nombreY = size * 0.32;
                 let razaY = size * 0.38;
                 let qrY = size * 0.42;
-                let qrSize = 340; 
+                let qrSize = 340;
                 let footerText1Y = qrY + qrSize + 32;
                 let footerText2Y = qrY + qrSize + 58;
 
@@ -353,50 +381,54 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 5. TEXTOS SUPERIORES
+                // 6. Textos superiores
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.font = 'bold 17px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
 
+                // Nombre grande
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = '900 56px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.font = '900 56px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
 
+                // Raza en dorado
                 ctx.fillStyle = '#F59E0B';
-                ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
+                ctx.font = '800 28px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 6. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                // 7. Código QR con fondo blanco redondeado
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
 
+                    // Fondo blanco con sombra
                     ctx.save();
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-                    ctx.shadowBlur = 15;
-                    ctx.shadowOffsetY = 8;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                    ctx.shadowBlur = 18;
+                    ctx.shadowOffsetY = 10;
                     ctx.fillStyle = '#FFFFFF';
                     ctx.beginPath();
                     ctx.roundRect(qrX - 14, qrY - 14, qrSize + 28, qrSize + 28, 22);
                     ctx.fill();
                     ctx.restore();
 
+                    // QR
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                    // TEXTOS INFERIORES
+                    // Textos inferiores
                     ctx.fillStyle = '#FFFFFF';
-                    ctx.font = '800 16px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.font = '800 16px "Plus Jakarta Sans", Arial, sans-serif';
                     ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
 
                     ctx.fillStyle = '#E2E8F0';
-                    ctx.font = '600 13px Plus Jakarta Sans, Arial, sans-serif';
+                    ctx.font = '600 13px "Plus Jakarta Sans", Arial, sans-serif';
                     ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
                 };
                 qrImg.src = qrDataUrl;
             };
 
             baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa. Revisa que '"+ PLACAS[estilo] +"' esté subida a la carpeta 'mascotas'.");
+                alert("No se pudo cargar la imagen de la placa. Revisa que '" + PLACAS[estilo] + "' esté en la carpeta correcta.");
             };
 
             baseImg.src = PLACAS[estilo] || PLACAS.escudo;
