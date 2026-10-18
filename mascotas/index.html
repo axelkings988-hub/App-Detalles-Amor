@@ -104,7 +104,7 @@
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta1" checked class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#0F0F1A] via-[#FF00BF] to-[#99FF00]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#0F0F1A] via-[#99FF00] to-[#FF00BF]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Lima</span>
                         </div>
                     </label>
@@ -302,27 +302,31 @@
                 const colorFondoOscuro = colores[0]; // Color base profundo
                 const colorLuzResaltada = colores[1]; // Color neón para la ranura interior
 
-                // 1. DIBUJAR IMAGEN BASE PNG (Mantiene transparencia exterior intacta)
-                ctx.drawImage(baseImg, 0, 0, size, size);
-
-                // 2. APLICAR COLOR OSCURO BASE EXCLUSIVAMENTE SOBRE LA SILUETA DE LA MEDALLA
+                // 1. CREAR MÁSCARA ESTRICTA USANDO LA SILUETA DEL PNG TRANSPARENTE
+                // Esto garantiza que CUALQUIER dibujo posterior ocurra ÚNICAMENTE dentro de la medalla y NUNCA en el fondo cuadrado.
                 ctx.save();
-                ctx.globalCompositeOperation = 'source-atop';
+                ctx.drawImage(baseImg, 0, 0, size, size);
+                ctx.globalCompositeOperation = 'source-in';
+
+                // 2. APLICAR EL COLOR OSCURO BASE DENTRO DE LA SILUETA
                 ctx.fillStyle = colorFondoOscuro;
                 ctx.fillRect(0, 0, size, size);
-                ctx.restore();
-
-                // 3. APLICAR EL BRILLO NEÓN SOLO EN LAS ZONAS CLARAS DE LA RANURA INTERIOR
-                ctx.save();
+                
+                // 3. APLICAR EL BRILLO NEÓN SOLO EN LAS ZONAS DE LA RANURA INTERIOR
                 ctx.globalCompositeOperation = 'screen';
                 ctx.fillStyle = colorLuzResaltada;
                 ctx.fillRect(0, 0, size, size);
-                // Restringir el brillo neón estrictamente a la silueta usando source-atop combinando con la imagen original
-                ctx.globalCompositeOperation = 'source-in';
+                
+                ctx.restore();
+
+                // 4. RESTAURAR TEXTURAS Y SOMBRAS 3D ORIGINALES DEL PNG CON MULTIPLY SUAVE
+                ctx.save();
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.globalAlpha = 0.65;
                 ctx.drawImage(baseImg, 0, 0, size, size);
                 ctx.restore();
 
-                // 4. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
+                // 5. POSICIONES PERFECTAMENTE CENTRADAS Y ALTAS PARA TEXTOS Y QR
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -349,7 +353,7 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 5. TEXTOS SUPERIORES
+                // 6. TEXTOS SUPERIORES
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
@@ -362,7 +366,7 @@
                 ctx.font = '800 28px Plus Jakarta Sans, Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 6. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
+                // 7. CÓDIGO QR Y RECUADRO BLANCO PROTECTOR
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
