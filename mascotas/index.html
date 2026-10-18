@@ -30,14 +30,12 @@
 
     <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
         
-        <!-- ENCABEZADO -->
         <div class="space-y-1">
             <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
             <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
             <p class="text-xs text-slate-300">Personaliza la forma y los colores neón de tu medalla.</p>
         </div>
 
-        <!-- FORMULARIO -->
         <div id="formContainer" class="space-y-4 text-left">
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
@@ -69,7 +67,6 @@
                 </div>
             </div>
 
-            <!-- 1. SELECCIÓN DE DISEÑO (FORMA) -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-2">💎 1. Elige la Forma de la Placa</label>
                 <div class="grid grid-cols-3 gap-2 text-center">
@@ -97,7 +94,6 @@
                 </div>
             </div>
 
-            <!-- 2. SELECCIÓN DE PALETAS DE COLORES NEÓN -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-2">🎨 2. Elige la Paleta de Colores Neón</label>
                 <div class="grid grid-cols-5 gap-1.5 text-center">
@@ -139,7 +135,6 @@
                 </div>
             </div>
 
-            <!-- FOTO -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Foto de la Mascota (1 Imagen)</label>
                 <input type="file" id="inputFotoArchivo" accept="image/*" onchange="previewImagen(event)" class="w-full p-2 bg-black/40 border border-white/20 rounded-xl text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
@@ -159,7 +154,6 @@
             </button>
         </div>
 
-        <!-- RESULTADO -->
         <div id="resultContainer" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
@@ -182,7 +176,6 @@
                 </button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -207,11 +200,11 @@
         };
 
         const PALETAS = {
-            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima
-            paleta2: ['#2B2B33', '#FF6600', '#B57EDC'], // Cálida
-            paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'], // Cian
-            paleta4: ['#3B1F4A', '#FF1493', '#A8E6CF'], // Fucsia
-            paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']  // Tropical
+            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'],
+            paleta2: ['#2B2B33', '#FF6600', '#B57EDC'],
+            paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'],
+            paleta4: ['#3B1F4A', '#FF1493', '#A8E6CF'],
+            paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']
         };
 
         function previewImagen(event) {
@@ -300,61 +293,67 @@
             baseImg.onload = function() {
                 const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-                // 1. Dibujar la imagen base (forma + borde dorado + relieve)
+                // 1. Dibujar el PNG original (conserva el borde metálico y el relieve)
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. Crear un gradiente hermoso (similar a la imagen de referencia)
+                // 2. Crear el gradiente de la cara
                 const grad = ctx.createLinearGradient(0, 0, size, size);
                 
-                if (paletaKey === 'paleta1') { // Lima
+                if (paletaKey === 'paleta1') {
                     grad.addColorStop(0,   '#1a0a2e');
                     grad.addColorStop(0.35, colores[0]);
                     grad.addColorStop(0.7,  colores[2]);
                     grad.addColorStop(1,   colores[1]);
-                } else if (paletaKey === 'paleta2') { // Cálida
+                } else if (paletaKey === 'paleta2') {
                     grad.addColorStop(0,   '#1a1025');
                     grad.addColorStop(0.4,  colores[0]);
                     grad.addColorStop(0.75, colores[2]);
                     grad.addColorStop(1,   colores[1]);
-                } else if (paletaKey === 'paleta3') { // Cian
+                } else if (paletaKey === 'paleta3') {
                     grad.addColorStop(0,   '#001428');
                     grad.addColorStop(0.4,  colores[0]);
                     grad.addColorStop(0.8,  '#00e0ff');
                     grad.addColorStop(1,   '#ffffff');
-                } else if (paletaKey === 'paleta4') { // Fucsia (la más parecida a tu imagen)
+                } else if (paletaKey === 'paleta4') {
                     grad.addColorStop(0,   '#2b0a3d');
                     grad.addColorStop(0.35, '#5c1a7a');
                     grad.addColorStop(0.7,  '#c71585');
                     grad.addColorStop(1,   '#ff1493');
-                } else { // Tropical
+                } else {
                     grad.addColorStop(0,   '#1a2a30');
                     grad.addColorStop(0.4,  colores[0]);
                     grad.addColorStop(0.75, colores[2]);
                     grad.addColorStop(1,   colores[1]);
                 }
 
-                // 3. Aplicar el gradiente SOLO dentro de la forma del PNG
+                // 3. Aplicar el color SOLO a la zona de la cara (protege mejor el borde)
+                // Usamos 'source-atop' + opacidad controlada + un segundo paso suave
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-atop';
+                ctx.globalAlpha = 0.92;
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 4. Añadir un poco de brillo / luz interior (efecto metálico sutil)
+                // 4. Refuerzo de profundidad (mantiene el relieve del PNG)
+                ctx.save();
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.globalAlpha = 0.25;
+                ctx.drawImage(baseImg, 0, 0, size, size);
+                ctx.restore();
+
+                // 5. Brillo sutil para que el metal del borde se vea más vivo
                 ctx.save();
                 ctx.globalCompositeOperation = 'soft-light';
-                const highlight = ctx.createRadialGradient(
-                    size * 0.35, size * 0.3, 0,
-                    size * 0.5, size * 0.5, size * 0.7
-                );
-                highlight.addColorStop(0, 'rgba(255,255,255,0.35)');
-                highlight.addColorStop(0.5, 'rgba(255,255,255,0.08)');
-                highlight.addColorStop(1, 'rgba(0,0,0,0.15)');
+                const highlight = ctx.createRadialGradient(size*0.35, size*0.28, 0, size*0.5, size*0.5, size*0.75);
+                highlight.addColorStop(0, 'rgba(255,255,255,0.28)');
+                highlight.addColorStop(0.5, 'rgba(255,255,255,0.06)');
+                highlight.addColorStop(1, 'rgba(0,0,0,0.12)');
                 ctx.fillStyle = highlight;
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 5. Posiciones de textos y QR
+                // ===== TEXTOS Y QR =====
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -381,41 +380,34 @@
                     footerText2Y = qrY + qrSize + 50;
                 }
 
-                // 6. Textos superiores
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = 'bold 17px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
 
-                // Nombre grande
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = '900 56px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
 
-                // Raza en dorado
                 ctx.fillStyle = '#F59E0B';
                 ctx.font = '800 28px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-                // 7. Código QR con fondo blanco redondeado
                 const qrImg = new Image();
                 qrImg.onload = function() {
                     const qrX = (size - qrSize) / 2;
 
-                    // Fondo blanco con sombra
                     ctx.save();
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-                    ctx.shadowBlur = 18;
-                    ctx.shadowOffsetY = 10;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetY = 8;
                     ctx.fillStyle = '#FFFFFF';
                     ctx.beginPath();
                     ctx.roundRect(qrX - 14, qrY - 14, qrSize + 28, qrSize + 28, 22);
                     ctx.fill();
                     ctx.restore();
 
-                    // QR
                     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                    // Textos inferiores
                     ctx.fillStyle = '#FFFFFF';
                     ctx.font = '800 16px "Plus Jakarta Sans", Arial, sans-serif';
                     ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
@@ -428,7 +420,7 @@
             };
 
             baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa. Revisa que '" + PLACAS[estilo] + "' esté en la carpeta correcta.");
+                alert("No se pudo cargar la imagen de la placa. Asegúrate de que '" + PLACAS[estilo] + "' esté en la misma carpeta.");
             };
 
             baseImg.src = PLACAS[estilo] || PLACAS.escudo;
