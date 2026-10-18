@@ -111,7 +111,7 @@
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta2" class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#2B2B33] via-[#B57EDC] to-[#FF6600]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#2B2B33] via-[#FF6600] to-[#B57EDC]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Cálida</span>
                         </div>
                     </label>
@@ -125,14 +125,14 @@
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta4" class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#3B1F4A] via-[#A8E6CF] to-[#FF1493]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#3B1F4A] via-[#FF1493] to-[#A8E6CF]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Fucsia</span>
                         </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="paletaColor" value="paleta5" class="selector-color hidden">
                         <div class="p-1.5 bg-black/50 border border-white/20 rounded-xl transition-all flex flex-col items-center">
-                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#455A64] via-[#FFF9C4] to-[#1DE9B6]"></div>
+                            <div class="w-full h-4 rounded-md mb-1 bg-gradient-to-tr from-[#455A64] via-[#1DE9B6] to-[#FFF9C4]"></div>
                             <span class="text-[8px] font-bold text-slate-200">Tropical</span>
                         </div>
                     </label>
@@ -207,7 +207,7 @@
         };
 
         const PALETAS = {
-            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima (Color principal oscuro, Color resaltado neón)
+            paleta1: ['#0F0F1A', '#99FF00', '#FF00BF'], // Lima
             paleta2: ['#2B2B33', '#FF6600', '#B57EDC'], // Cálida
             paleta3: ['#001C3D', '#00FFFF', '#FFFFFF'], // Cian
             paleta4: ['#3B1F4A', '#FF1493', '#A8E6CF'], // Fucsia
@@ -302,27 +302,23 @@
                 const colorFondoOscuro = colores[0]; // Color base profundo
                 const colorLuzResaltada = colores[1]; // Color neón para la ranura interior
 
-                // 1. DIBUJAR LA IMAGEN PNG ORIGINAL BASE
+                // 1. DIBUJAR IMAGEN BASE PNG (Mantiene transparencia exterior intacta)
                 ctx.drawImage(baseImg, 0, 0, size, size);
 
-                // 2. TINTAR EL CUERPO CON EL COLOR BASE OSCURO DE LA PALETA
+                // 2. APLICAR COLOR OSCURO BASE EXCLUSIVAMENTE SOBRE LA SILUETA DE LA MEDALLA
                 ctx.save();
                 ctx.globalCompositeOperation = 'source-atop';
                 ctx.fillStyle = colorFondoOscuro;
                 ctx.fillRect(0, 0, size, size);
                 ctx.restore();
 
-                // 3. EFECTO DE LUZ INTERIOR (Simulando la ranura brillante de la referencia)
-                // Usamos la imagen original de nuevo con modo 'screen' o 'color-dodge' para que solo las zonas claras/relieves absorban el color neón seleccionado
+                // 3. APLICAR EL BRILLO NEÓN SOLO EN LAS ZONAS CLARAS DE LA RANURA INTERIOR
                 ctx.save();
-                ctx.globalCompositeOperation = 'screen'; 
+                ctx.globalCompositeOperation = 'screen';
                 ctx.fillStyle = colorLuzResaltada;
                 ctx.fillRect(0, 0, size, size);
-                ctx.restore();
-
-                // Asegurar que la opacidad general mantenga los contrastes 3D oscuros originales
-                ctx.save();
-                ctx.globalCompositeOperation = 'multiply';
+                // Restringir el brillo neón estrictamente a la silueta usando source-atop combinando con la imagen original
+                ctx.globalCompositeOperation = 'source-in';
                 ctx.drawImage(baseImg, 0, 0, size, size);
                 ctx.restore();
 
