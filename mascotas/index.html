@@ -201,7 +201,7 @@
         const PLACAS = {
             escudo:  { cara: "escudo.png", borde: "escudo borde.png" },
             circulo: { cara: "circulo.png", borde: "circulo borde.png" },
-            hueso:   { cara: "Hueso.png", borde: "Hueso borde.png" }
+            hueso:   { cara: "hueso.png", borde: "hueso borde.png" }
         };
 
         const PALETAS = {
@@ -225,7 +225,6 @@
             }
         }
 
-        // FUNCIÓN PARA VOLVER AL FORMULARIO Y EDITAR
         function volverAlFormulario() {
             document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
@@ -374,7 +373,7 @@
             // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // 3. PARÁMETROS Y COORDENADAS POR CADA FORMA
+            // 3. PARÁMETROS Y COORDENADAS PERFECTAMENTE CENTRADAS
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
@@ -385,15 +384,10 @@
             let footerText1Y = qrY + qrSize + 28;
             let footerText2Y = qrY + qrSize + 52;
 
-            let labelX = size * 0.21;
-            let labelY = size * 0.52;
-
             if (estilo === 'circulo') {
                 nombreY = size * 0.27;
                 razaY = size * 0.34;
                 qrY = size * 0.39;
-                labelX = size * 0.20;
-                labelY = size * 0.50;
             } else if (estilo === 'hueso') {
                 nombreY = size * 0.27;
                 razaY = size * 0.34;
@@ -401,22 +395,9 @@
                 qrSize = 290;
                 footerText1Y = qrY + qrSize + 26;
                 footerText2Y = qrY + qrSize + 48;
-                labelX = size * 0.25;
-                labelY = size * 0.50;
             }
 
-            // 4. TEXTO LATERAL VERTICAL ADAPTATIVO
-            ctx.save();
-            ctx.translate(labelX, labelY);
-            ctx.rotate(-Math.PI / 2);
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-            ctx.shadowBlur = 6;
-            ctx.fillStyle = colores[1];
-            ctx.font = '800 13px "Plus Jakarta Sans", Arial, sans-serif';
-            ctx.fillText('• PLACA DE EMERGENCIA •', 0, 0);
-            ctx.restore();
-
-            // 5. NOMBRE Y RAZA CENTRADOS
+            // 4. NOMBRE Y RAZA CENTRADOS Y LIBRES DEL ORIFICIO
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
             ctx.shadowBlur = 8;
@@ -430,7 +411,7 @@
             ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
             ctx.restore();
 
-            // 6. CÓDIGO QR Y RECUADRO CON SOMBRA
+            // 5. CÓDIGO QR Y RECUADRO CON SOMBRA
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
@@ -446,6 +427,21 @@
                 ctx.restore();
 
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+                // 6. TEXTO DE EMERGENCIA VERTICAL AJUSTADO SOBRE LA LATERAL IZQUIERDA DEL QR
+                ctx.save();
+                // Se posiciona a la izquierda del cuadro blanco del QR
+                let qrLeftX = qrX - 25;
+                let qrCenterY = qrY + (qrSize / 2);
+
+                ctx.translate(qrLeftX, qrCenterY);
+                ctx.rotate(-Math.PI / 2); // Rotación vertical de 90°
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+                ctx.shadowBlur = 6;
+                ctx.fillStyle = colores[1]; // Color neón coordinado de la paleta
+                ctx.font = '800 12px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.fillText('• PLACA DE EMERGENCIA •', 0, 0);
+                ctx.restore();
 
                 // TEXTOS INFERIORES
                 ctx.save();
