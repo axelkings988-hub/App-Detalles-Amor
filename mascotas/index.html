@@ -154,6 +154,7 @@
             </button>
         </div>
 
+        <!-- RESULTADO CON BOTÓN DE RETROCESO -->
         <div id="resultContainer" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
@@ -167,6 +168,10 @@
             </div>
 
             <div class="space-y-2">
+                <button onclick="volverAlFormulario()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs shadow-md border border-cyan-500/30 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>← Editar Datos o Cambiar Diseño</span>
+                </button>
                 <button onclick="copiarEnlace()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs shadow-md">
                     📋 Copiar Enlace Público
                 </button>
@@ -218,6 +223,13 @@
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        // FUNCIÓN PARA VOLVER AL FORMULARIO Y EDITAR
+        function volverAlFormulario() {
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function generarPlacaQR() {
@@ -321,7 +333,7 @@
 
             const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO DE ALTA GAMA
+            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO
             ctx.drawImage(imgCara, 0, 0, size, size);
 
             const grad = ctx.createLinearGradient(0, 0, size, size);
@@ -362,7 +374,7 @@
             // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // ===== DISTRIBUCIÓN Y LAYOUT DEL TEXTO =====
+            // 3. PARÁMETROS Y COORDENADAS POR CADA FORMA
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
@@ -373,31 +385,38 @@
             let footerText1Y = qrY + qrSize + 28;
             let footerText2Y = qrY + qrSize + 52;
 
+            let labelX = size * 0.21;
+            let labelY = size * 0.52;
+
             if (estilo === 'circulo') {
                 nombreY = size * 0.27;
                 razaY = size * 0.34;
                 qrY = size * 0.39;
+                labelX = size * 0.20;
+                labelY = size * 0.50;
             } else if (estilo === 'hueso') {
                 nombreY = size * 0.27;
                 razaY = size * 0.34;
                 qrY = size * 0.39;
-                qrSize = 300;
+                qrSize = 290;
                 footerText1Y = qrY + qrSize + 26;
                 footerText2Y = qrY + qrSize + 48;
+                labelX = size * 0.25;
+                labelY = size * 0.50;
             }
 
-            // 3. ETIQUETA / MARCA LATERAL VERTICAL (ROTADA A UN COSTADO)
+            // 4. TEXTO LATERAL VERTICAL ADAPTATIVO
             ctx.save();
-            ctx.translate(size * 0.22, size * 0.52); // Posición lateral izquierda limpia
-            ctx.rotate(-Math.PI / 2); // Rotación vertical de 90°
+            ctx.translate(labelX, labelY);
+            ctx.rotate(-Math.PI / 2);
             ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
             ctx.shadowBlur = 6;
-            ctx.fillStyle = colores[1]; // Color neón brillante coordinado
+            ctx.fillStyle = colores[1];
             ctx.font = '800 13px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText('• PLACA DE EMERGENCIA •', 0, 0);
             ctx.restore();
 
-            // 4. NOMBRE Y RAZA CENTRADOS Y MÁS AMPLIOS EN LA PARTE SUPERIOR
+            // 5. NOMBRE Y RAZA CENTRADOS
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
             ctx.shadowBlur = 8;
@@ -411,7 +430,7 @@
             ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
             ctx.restore();
 
-            // 5. CÓDIGO QR Y RECUADRO PROTECTOR CON SOMBRA
+            // 6. CÓDIGO QR Y RECUADRO CON SOMBRA
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
