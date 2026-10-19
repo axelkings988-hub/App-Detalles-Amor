@@ -193,10 +193,11 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
+        // CONFIGURACIÓN DE RUTA SEGÚN LOS NOMBRES EXACTOS DE TU REPOSOTORIO EN GITHUB
         const PLACAS = {
-            escudo:  "escudo.png",
-            circulo: "circulo.png",
-            hueso:   "hueso.png"
+            escudo:  { cara: "escudo.png", borde: "escudo borde.png" },
+            circulo: { cara: "circulo.png", borde: "circulo borde.png" },
+            hueso:   { cara: "Hueso.png", borde: "Hueso borde.png" }
         };
 
         const PALETAS = {
@@ -236,7 +237,7 @@
                 return;
             }
 
-            const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('\( ') ? recompensaInput : ' \)' + recompensaInput) : "";
+            const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
 
             try {
                 const docRef = await db.collection("mascotas").add({
@@ -287,143 +288,145 @@
 
             ctx.clearRect(0, 0, size, size);
 
-            const baseImg = new Image();
-            baseImg.crossOrigin = "anonymous";
+            const rutas = PLACAS[estilo];
+            
+            const imgCara = new Image();
+            imgCara.crossOrigin = "anonymous";
+            
+            const imgBorde = new Image();
+            imgBorde.crossOrigin = "anonymous";
 
-            baseImg.onload = function() {
-                const colores = PALETAS[paletaKey] || PALETAS.paleta1;
-
-                // 1. Dibujar el PNG original (conserva el borde metálico y el relieve)
-                ctx.drawImage(baseImg, 0, 0, size, size);
-
-                // 2. Crear el gradiente de la cara
-                const grad = ctx.createLinearGradient(0, 0, size, size);
-                
-                if (paletaKey === 'paleta1') {
-                    grad.addColorStop(0,   '#1a0a2e');
-                    grad.addColorStop(0.35, colores[0]);
-                    grad.addColorStop(0.7,  colores[2]);
-                    grad.addColorStop(1,   colores[1]);
-                } else if (paletaKey === 'paleta2') {
-                    grad.addColorStop(0,   '#1a1025');
-                    grad.addColorStop(0.4,  colores[0]);
-                    grad.addColorStop(0.75, colores[2]);
-                    grad.addColorStop(1,   colores[1]);
-                } else if (paletaKey === 'paleta3') {
-                    grad.addColorStop(0,   '#001428');
-                    grad.addColorStop(0.4,  colores[0]);
-                    grad.addColorStop(0.8,  '#00e0ff');
-                    grad.addColorStop(1,   '#ffffff');
-                } else if (paletaKey === 'paleta4') {
-                    grad.addColorStop(0,   '#2b0a3d');
-                    grad.addColorStop(0.35, '#5c1a7a');
-                    grad.addColorStop(0.7,  '#c71585');
-                    grad.addColorStop(1,   '#ff1493');
-                } else {
-                    grad.addColorStop(0,   '#1a2a30');
-                    grad.addColorStop(0.4,  colores[0]);
-                    grad.addColorStop(0.75, colores[2]);
-                    grad.addColorStop(1,   colores[1]);
+            let cargadas = 0;
+            function verificarCarga() {
+                cargadas++;
+                if (cargadas === 2) {
+                    renderizarCanvasCompleto(imgCara, imgBorde, nombre, raza, qrDataUrl, estilo, paletaKey);
                 }
+            }
 
-                // 3. Aplicar el color SOLO a la zona de la cara (protege mejor el borde)
-                // Usamos 'source-atop' + opacidad controlada + un segundo paso suave
-                ctx.save();
-                ctx.globalCompositeOperation = 'source-atop';
-                ctx.globalAlpha = 0.92;
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, size, size);
-                ctx.restore();
+            imgCara.onload = verificarCarga;
+            imgBorde.onload = verificarCarga;
 
-                // 4. Refuerzo de profundidad (mantiene el relieve del PNG)
-                ctx.save();
-                ctx.globalCompositeOperation = 'multiply';
-                ctx.globalAlpha = 0.25;
-                ctx.drawImage(baseImg, 0, 0, size, size);
-                ctx.restore();
-
-                // 5. Brillo sutil para que el metal del borde se vea más vivo
-                ctx.save();
-                ctx.globalCompositeOperation = 'soft-light';
-                const highlight = ctx.createRadialGradient(size*0.35, size*0.28, 0, size*0.5, size*0.5, size*0.75);
-                highlight.addColorStop(0, 'rgba(255,255,255,0.28)');
-                highlight.addColorStop(0.5, 'rgba(255,255,255,0.06)');
-                highlight.addColorStop(1, 'rgba(0,0,0,0.12)');
-                ctx.fillStyle = highlight;
-                ctx.fillRect(0, 0, size, size);
-                ctx.restore();
-
-                // ===== TEXTOS Y QR =====
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                let headerY = size * 0.26;
-                let nombreY = size * 0.32;
-                let razaY = size * 0.38;
-                let qrY = size * 0.42;
-                let qrSize = 340;
-                let footerText1Y = qrY + qrSize + 32;
-                let footerText2Y = qrY + qrSize + 58;
-
-                if (estilo === 'circulo') {
-                    headerY = size * 0.25;
-                    nombreY = size * 0.31;
-                    razaY = size * 0.37;
-                    qrY = size * 0.41;
-                } else if (estilo === 'hueso') {
-                    headerY = size * 0.25;
-                    nombreY = size * 0.31;
-                    razaY = size * 0.37;
-                    qrY = size * 0.41;
-                    qrSize = 300;
-                    footerText1Y = qrY + qrSize + 28;
-                    footerText2Y = qrY + qrSize + 50;
-                }
-
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 17px "Plus Jakarta Sans", Arial, sans-serif';
-                ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
-
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = '900 56px "Plus Jakarta Sans", Arial, sans-serif';
-                ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
-
-                ctx.fillStyle = '#F59E0B';
-                ctx.font = '800 28px "Plus Jakarta Sans", Arial, sans-serif';
-                ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
-
-                const qrImg = new Image();
-                qrImg.onload = function() {
-                    const qrX = (size - qrSize) / 2;
-
-                    ctx.save();
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-                    ctx.shadowBlur = 15;
-                    ctx.shadowOffsetY = 8;
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.beginPath();
-                    ctx.roundRect(qrX - 14, qrY - 14, qrSize + 28, qrSize + 28, 22);
-                    ctx.fill();
-                    ctx.restore();
-
-                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.font = '800 16px "Plus Jakarta Sans", Arial, sans-serif';
-                    ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
-
-                    ctx.fillStyle = '#E2E8F0';
-                    ctx.font = '600 13px "Plus Jakarta Sans", Arial, sans-serif';
-                    ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
-                };
-                qrImg.src = qrDataUrl;
+            imgCara.onerror = imgBorde.onerror = function() {
+                alert("No se pudieron cargar las capas de la placa. Revisa que las imágenes existan en el repositorio.");
             };
 
-            baseImg.onerror = function() {
-                alert("No se pudo cargar la imagen de la placa. Asegúrate de que '" + PLACAS[estilo] + "' esté en la misma carpeta.");
-            };
+            imgCara.src = rutas.cara;
+            imgBorde.src = rutas.borde;
+        }
 
-            baseImg.src = PLACAS[estilo] || PLACAS.escudo;
+        function renderizarCanvasCompleto(imgCara, imgBorde, nombre, raza, qrDataUrl, estilo, paletaKey) {
+            const canvas = document.getElementById('placaCanvas');
+            const ctx = canvas.getContext('2d');
+            const size = 1024;
+
+            const colores = PALETAS[paletaKey] || PALETAS.paleta1;
+
+            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO DE ALTA GAMA
+            ctx.drawImage(imgCara, 0, 0, size, size);
+
+            const grad = ctx.createLinearGradient(0, 0, size, size);
+            if (paletaKey === 'paleta1') {
+                grad.addColorStop(0,   '#1a0a2e');
+                grad.addColorStop(0.35, colores[0]);
+                grad.addColorStop(0.7,  colores[2]);
+                grad.addColorStop(1,   colores[1]);
+            } else if (paletaKey === 'paleta2') {
+                grad.addColorStop(0,   '#1a1025');
+                grad.addColorStop(0.4,  colores[0]);
+                grad.addColorStop(0.75, colores[2]);
+                grad.addColorStop(1,   colores[1]);
+            } else if (paletaKey === 'paleta3') {
+                grad.addColorStop(0,   '#001428');
+                grad.addColorStop(0.4,  colores[0]);
+                grad.addColorStop(0.8,  '#00e0ff');
+                grad.addColorStop(1,   '#ffffff');
+            } else if (paletaKey === 'paleta4') {
+                grad.addColorStop(0,   '#2b0a3d');
+                grad.addColorStop(0.35, '#5c1a7a');
+                grad.addColorStop(0.7,  '#c71585');
+                grad.addColorStop(1,   '#ff1493');
+            } else {
+                grad.addColorStop(0,   '#1a2a30');
+                grad.addColorStop(0.4,  colores[0]);
+                grad.addColorStop(0.75, colores[2]);
+                grad.addColorStop(1,   colores[1]);
+            }
+
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-atop';
+            ctx.globalAlpha = 0.92;
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+            ctx.restore();
+
+            // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA (QUEDA INTACTO Y NÍTIDO)
+            ctx.drawImage(imgBorde, 0, 0, size, size);
+
+            // ===== TEXTOS Y QR =====
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            let headerY = size * 0.23;
+            let nombreY = size * 0.30;
+            let razaY = size * 0.37;
+            let qrY = size * 0.41;
+            let qrSize = 400;
+            let footerText1Y = qrY + qrSize + 35;
+            let footerText2Y = qrY + qrSize + 62;
+
+            if (estilo === 'circulo') {
+                headerY = size * 0.22;
+                nombreY = size * 0.29;
+                razaY = size * 0.36;
+                qrY = size * 0.40;
+            } else if (estilo === 'hueso') {
+                headerY = size * 0.22;
+                nombreY = size * 0.29;
+                razaY = size * 0.36;
+                qrY = size * 0.40;
+                qrSize = 360;
+                footerText1Y = qrY + qrSize + 30;
+                footerText2Y = qrY + qrSize + 55;
+            }
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 20px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '900 68px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
+
+            ctx.fillStyle = '#F59E0B';
+            ctx.font = '800 34px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
+
+            const qrImg = new Image();
+            qrImg.onload = function() {
+                const qrX = (size - qrSize) / 2;
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 8;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.roundRect(qrX - 16, qrY - 16, qrSize + 32, qrSize + 32, 26);
+                ctx.fill();
+                ctx.restore();
+
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '800 18px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
+
+                ctx.fillStyle = '#E2E8F0';
+                ctx.font = '600 15px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
+            };
+            qrImg.src = qrDataUrl;
         }
 
         function copiarEnlace() {
