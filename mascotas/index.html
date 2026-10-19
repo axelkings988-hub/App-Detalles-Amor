@@ -321,7 +321,7 @@
 
             const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO
+            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO DE ALTA GAMA
             ctx.drawImage(imgCara, 0, 0, size, size);
 
             const grad = ctx.createLinearGradient(0, 0, size, size);
@@ -362,51 +362,56 @@
             // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // ===== TEXTOS Y QR OPTIMIZADOS =====
+            // ===== DISTRIBUCIÓN Y LAYOUT DEL TEXTO =====
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            let headerY = size * 0.25;
-            let nombreY = size * 0.31;
-            let razaY = size * 0.37;
-            let qrY = size * 0.41;
-            let qrSize = 320; // Reducido ligeramente para evitar que sobresalga abajo
+            let nombreY = size * 0.28;
+            let razaY = size * 0.35;
+            let qrY = size * 0.40;
+            let qrSize = 330;
             let footerText1Y = qrY + qrSize + 28;
             let footerText2Y = qrY + qrSize + 52;
 
             if (estilo === 'circulo') {
-                headerY = size * 0.24;
-                nombreY = size * 0.30;
-                razaY = size * 0.36;
-                qrY = size * 0.40;
+                nombreY = size * 0.27;
+                razaY = size * 0.34;
+                qrY = size * 0.39;
             } else if (estilo === 'hueso') {
-                headerY = size * 0.24;
-                nombreY = size * 0.30;
-                razaY = size * 0.36;
-                qrY = size * 0.40;
-                qrSize = 290;
+                nombreY = size * 0.27;
+                razaY = size * 0.34;
+                qrY = size * 0.39;
+                qrSize = 300;
                 footerText1Y = qrY + qrSize + 26;
                 footerText2Y = qrY + qrSize + 48;
             }
 
-            // TEXTO SUPERIOR CON EL COLOR SECUNDARIO DE LA PALETA (BRILLO NEÓN) + SOMBRA DE CONTRASTE
+            // 3. ETIQUETA / MARCA LATERAL VERTICAL (ROTADA A UN COSTADO)
             ctx.save();
+            ctx.translate(size * 0.22, size * 0.52); // Posición lateral izquierda limpia
+            ctx.rotate(-Math.PI / 2); // Rotación vertical de 90°
             ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-            ctx.shadowBlur = 8;
-            ctx.fillStyle = colores[1]; // Color dinámico visible en todas las paletas
-            ctx.font = 'bold 18px "Plus Jakarta Sans", Arial, sans-serif';
-            ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
+            ctx.shadowBlur = 6;
+            ctx.fillStyle = colores[1]; // Color neón brillante coordinado
+            ctx.font = '800 13px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.fillText('• PLACA DE EMERGENCIA •', 0, 0);
             ctx.restore();
 
+            // 4. NOMBRE Y RAZA CENTRADOS Y MÁS AMPLIOS EN LA PARTE SUPERIOR
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            ctx.shadowBlur = 8;
+            
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '900 60px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.font = '900 64px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
 
             ctx.fillStyle = '#F59E0B';
-            ctx.font = '800 30px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.font = '800 32px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
+            ctx.restore();
 
-            // CÓDIGO QR Y RECUADRO BLANCO CON SOMBRA
+            // 5. CÓDIGO QR Y RECUADRO PROTECTOR CON SOMBRA
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
@@ -423,7 +428,7 @@
 
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                // TEXTOS INFERIORES CON SOMBRA DE ALTO CONTRASTE
+                // TEXTOS INFERIORES
                 ctx.save();
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
                 ctx.shadowBlur = 6;
