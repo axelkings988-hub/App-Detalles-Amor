@@ -370,7 +370,7 @@
             let nombreY = size * 0.31;
             let razaY = size * 0.37;
             let qrY = size * 0.41;
-            let qrSize = 340; // Tamaño ajustado para no rebasar los bordes inferiores
+            let qrSize = 320; // Reducido ligeramente para evitar que sobresalga abajo
             let footerText1Y = qrY + qrSize + 28;
             let footerText2Y = qrY + qrSize + 52;
 
@@ -384,14 +384,19 @@
                 nombreY = size * 0.30;
                 razaY = size * 0.36;
                 qrY = size * 0.40;
-                qrSize = 310;
+                qrSize = 290;
                 footerText1Y = qrY + qrSize + 26;
                 footerText2Y = qrY + qrSize + 48;
             }
 
-            ctx.fillStyle = '#FFFFFF';
+            // TEXTO SUPERIOR CON EL COLOR SECUNDARIO DE LA PALETA (BRILLO NEÓN) + SOMBRA DE CONTRASTE
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            ctx.shadowBlur = 8;
+            ctx.fillStyle = colores[1]; // Color dinámico visible en todas las paletas
             ctx.font = 'bold 18px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
+            ctx.restore();
 
             ctx.fillStyle = '#FFFFFF';
             ctx.font = '900 60px "Plus Jakarta Sans", Arial, sans-serif';
@@ -401,7 +406,7 @@
             ctx.font = '800 30px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
-            // CÓDIGO QR Y RECUADRO BLANCO CON SOMBRA Y ESQUINAS PROPORCIONADAS
+            // CÓDIGO QR Y RECUADRO BLANCO CON SOMBRA
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
@@ -418,17 +423,17 @@
 
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
-                // TEXTOS INFERIORES CON SOMBRA DE ALTO CONTRASTE PARA MÁXIMA LEGIBILIDAD
+                // TEXTOS INFERIORES CON SOMBRA DE ALTO CONTRASTE
                 ctx.save();
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
                 ctx.shadowBlur = 6;
 
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = '800 16px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.font = '800 15px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
 
                 ctx.fillStyle = '#F1F5F9';
-                ctx.font = '700 13px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.font = '700 12px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
                 ctx.restore();
             };
