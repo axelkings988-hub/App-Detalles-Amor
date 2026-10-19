@@ -42,7 +42,6 @@
                 <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
             </div>
 
-            <!-- Se eliminó el campo de especie/raza del formulario para simplificar -->
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
                 <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
@@ -366,34 +365,34 @@
             // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // 3. CONFIGURACIÓN DE POSICIÓN Y QR MÁS GRANDE (CENTRADO SIN SALIRSE)
+            // 3. CONFIGURACIÓN DE POSICIÓN REAJUSTADA (QR LIGERAMENTE MÁS PEQUEÑO Y CENTRADO)
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            let nombreY = size * 0.33;  // Ubicación perfecta en la parte superior libre del orificio
-            let qrY = size * 0.42;      // Centrado verticalmente
-            let qrSize = 390;           // QR más grande y optimizado
+            let nombreY = size * 0.32;  
+            let qrY = size * 0.40;      // Subido ligeramente para dar margen abajo
+            let qrSize = 350;           // Tamaño equilibrado y seguro
 
             if (estilo === 'circulo') {
-                nombreY = size * 0.32;
-                qrY = size * 0.41;
+                nombreY = size * 0.31;
+                qrY = size * 0.39;
             } else if (estilo === 'hueso') {
-                nombreY = size * 0.32;
-                qrY = size * 0.41;
-                qrSize = 360;
+                nombreY = size * 0.31;
+                qrY = size * 0.39;
+                qrSize = 320;
             }
 
-            // 4. NOMBRE DE LA MASCOTA GRANDE Y DESTACADO
+            // 4. NOMBRE DE LA MASCOTA
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
             ctx.shadowBlur = 10;
             
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '900 76px "Plus Jakarta Sans", Arial, sans-serif'; // Letra grande y limpia
+            ctx.font = '900 76px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
             ctx.restore();
 
-            // 5. CÓDIGO QR Y RECUADRO BLANCO AMPLIADO CON SOMBRA
+            // 5. CÓDIGO QR Y RECUADRO BLANCO CON MARGEN DE SEGURIDAD
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
