@@ -193,7 +193,6 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
 
-        // CONFIGURACIÓN DE RUTA SEGÚN LOS NOMBRES EXACTOS DE TU REPOSOTORIO EN GITHUB
         const PLACAS = {
             escudo:  { cara: "escudo.png", borde: "escudo borde.png" },
             circulo: { cara: "circulo.png", borde: "circulo borde.png" },
@@ -322,7 +321,7 @@
 
             const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO DE ALTA GAMA
+            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO
             ctx.drawImage(imgCara, 0, 0, size, size);
 
             const grad = ctx.createLinearGradient(0, 0, size, size);
@@ -360,71 +359,78 @@
             ctx.fillRect(0, 0, size, size);
             ctx.restore();
 
-            // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA (QUEDA INTACTO Y NÍTIDO)
+            // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // ===== TEXTOS Y QR =====
+            // ===== TEXTOS Y QR OPTIMIZADOS =====
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            let headerY = size * 0.23;
-            let nombreY = size * 0.30;
+            let headerY = size * 0.25;
+            let nombreY = size * 0.31;
             let razaY = size * 0.37;
             let qrY = size * 0.41;
-            let qrSize = 400;
-            let footerText1Y = qrY + qrSize + 35;
-            let footerText2Y = qrY + qrSize + 62;
+            let qrSize = 340; // Tamaño ajustado para no rebasar los bordes inferiores
+            let footerText1Y = qrY + qrSize + 28;
+            let footerText2Y = qrY + qrSize + 52;
 
             if (estilo === 'circulo') {
-                headerY = size * 0.22;
-                nombreY = size * 0.29;
+                headerY = size * 0.24;
+                nombreY = size * 0.30;
                 razaY = size * 0.36;
                 qrY = size * 0.40;
             } else if (estilo === 'hueso') {
-                headerY = size * 0.22;
-                nombreY = size * 0.29;
+                headerY = size * 0.24;
+                nombreY = size * 0.30;
                 razaY = size * 0.36;
                 qrY = size * 0.40;
-                qrSize = 360;
-                footerText1Y = qrY + qrSize + 30;
-                footerText2Y = qrY + qrSize + 55;
+                qrSize = 310;
+                footerText1Y = qrY + qrSize + 26;
+                footerText2Y = qrY + qrSize + 48;
             }
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 20px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.font = 'bold 18px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText('🐾  PLACA QR DE EMERGENCIA  🐾', size / 2, headerY);
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '900 68px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.font = '900 60px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
 
             ctx.fillStyle = '#F59E0B';
-            ctx.font = '800 34px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.font = '800 30px "Plus Jakarta Sans", Arial, sans-serif';
             ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
 
+            // CÓDIGO QR Y RECUADRO BLANCO CON SOMBRA Y ESQUINAS PROPORCIONADAS
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
 
                 ctx.save();
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-                ctx.shadowBlur = 18;
-                ctx.shadowOffsetY = 8;
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 6;
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
-                ctx.roundRect(qrX - 16, qrY - 16, qrSize + 32, qrSize + 32, 26);
+                ctx.roundRect(qrX - 14, qrY - 14, qrSize + 28, qrSize + 28, 20);
                 ctx.fill();
                 ctx.restore();
 
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
+                // TEXTOS INFERIORES CON SOMBRA DE ALTO CONTRASTE PARA MÁXIMA LEGIBILIDAD
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+                ctx.shadowBlur = 6;
+
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = '800 18px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.font = '800 16px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
 
-                ctx.fillStyle = '#E2E8F0';
-                ctx.font = '600 15px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.fillStyle = '#F1F5F9';
+                ctx.font = '700 13px "Plus Jakarta Sans", Arial, sans-serif';
                 ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
+                ctx.restore();
             };
             qrImg.src = qrDataUrl;
         }
