@@ -42,15 +42,10 @@
                 <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-cyan-300 mb-1">Especie / Raza</label>
-                    <input type="text" id="razaMascota" placeholder="Ej. Perro / Pitbull" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
-                    <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
-                </div>
+            <!-- Se eliminó el campo de especie/raza del formulario para simplificar -->
+            <div>
+                <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
+                <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -233,7 +228,6 @@
 
         async function generarPlacaQR() {
             const nombre = document.getElementById('nombreMascota').value.trim();
-            const raza = document.getElementById('razaMascota').value.trim();
             const telefono = document.getElementById('telefonoDuenio').value.trim();
             const colonia = document.getElementById('coloniaMascota').value.trim();
             const recompensaInput = document.getElementById('recompensaMascota').value.trim();
@@ -252,7 +246,6 @@
             try {
                 const docRef = await db.collection("mascotas").add({
                     nombre,
-                    raza: raza || "No especificada",
                     telefono,
                     colonia: colonia || "No especificada",
                     recompensa: recompensaFinal,
@@ -282,7 +275,7 @@
                 const qrImg = qrContainer.querySelector('img');
                 
                 setTimeout(() => {
-                    dibujarPlacaHiperrealista(nombre, raza || "", qrImg.src, estiloSeleccionado, paletaSeleccionada);
+                    dibujarPlacaHiperrealista(nombre, qrImg.src, estiloSeleccionado, paletaSeleccionada);
                 }, 200);
 
             } catch (error) {
@@ -291,7 +284,7 @@
             }
         }
 
-        function dibujarPlacaHiperrealista(nombre, raza, qrDataUrl, estilo, paletaKey) {
+        function dibujarPlacaHiperrealista(nombre, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
             const size = 1024;
@@ -310,7 +303,7 @@
             function verificarCarga() {
                 cargadas++;
                 if (cargadas === 2) {
-                    renderizarCanvasCompleto(imgCara, imgBorde, nombre, raza, qrDataUrl, estilo, paletaKey);
+                    renderizarCanvasCompleto(imgCara, imgBorde, nombre, qrDataUrl, estilo, paletaKey);
                 }
             }
 
@@ -325,7 +318,7 @@
             imgBorde.src = rutas.borde;
         }
 
-        function renderizarCanvasCompleto(imgCara, imgBorde, nombre, raza, qrDataUrl, estilo, paletaKey) {
+        function renderizarCanvasCompleto(imgCara, imgBorde, nombre, qrDataUrl, estilo, paletaKey) {
             const canvas = document.getElementById('placaCanvas');
             const ctx = canvas.getContext('2d');
             const size = 1024;
@@ -373,89 +366,49 @@
             // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // 3. PARÁMETROS Y COORDENADAS PERFECTAMENTE CENTRADAS
+            // 3. CONFIGURACIÓN DE POSICIÓN Y QR MÁS GRANDE (CENTRADO SIN SALIRSE)
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            let nombreY = size * 0.28;
-            let razaY = size * 0.35;
-            let qrY = size * 0.40;
-            let qrSize = 330;
-            let footerText1Y = qrY + qrSize + 28;
-            let footerText2Y = qrY + qrSize + 52;
+            let nombreY = size * 0.33;  // Ubicación perfecta en la parte superior libre del orificio
+            let qrY = size * 0.42;      // Centrado verticalmente
+            let qrSize = 390;           // QR más grande y optimizado
 
             if (estilo === 'circulo') {
-                nombreY = size * 0.27;
-                razaY = size * 0.34;
-                qrY = size * 0.39;
+                nombreY = size * 0.32;
+                qrY = size * 0.41;
             } else if (estilo === 'hueso') {
-                nombreY = size * 0.27;
-                razaY = size * 0.34;
-                qrY = size * 0.39;
-                qrSize = 290;
-                footerText1Y = qrY + qrSize + 26;
-                footerText2Y = qrY + qrSize + 48;
+                nombreY = size * 0.32;
+                qrY = size * 0.41;
+                qrSize = 360;
             }
 
-            // 4. NOMBRE Y RAZA CENTRADOS Y LIBRES DEL ORIFICIO
+            // 4. NOMBRE DE LA MASCOTA GRANDE Y DESTACADO
             ctx.save();
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+            ctx.shadowBlur = 10;
             
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '900 64px "Plus Jakarta Sans", Arial, sans-serif';
+            ctx.font = '900 76px "Plus Jakarta Sans", Arial, sans-serif'; // Letra grande y limpia
             ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
-
-            ctx.fillStyle = '#F59E0B';
-            ctx.font = '800 32px "Plus Jakarta Sans", Arial, sans-serif';
-            ctx.fillText(raza.toUpperCase().substring(0, 18), size / 2, razaY);
             ctx.restore();
 
-            // 5. CÓDIGO QR Y RECUADRO CON SOMBRA
+            // 5. CÓDIGO QR Y RECUADRO BLANCO AMPLIADO CON SOMBRA
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
 
                 ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 18;
                 ctx.shadowOffsetY = 6;
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
-                ctx.roundRect(qrX - 14, qrY - 14, qrSize + 28, qrSize + 28, 20);
+                ctx.roundRect(qrX - 16, qrY - 16, qrSize + 32, qrSize + 32, 22);
                 ctx.fill();
                 ctx.restore();
 
                 ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-
-                // 6. TEXTO DE EMERGENCIA VERTICAL AJUSTADO SOBRE LA LATERAL IZQUIERDA DEL QR
-                ctx.save();
-                // Se posiciona a la izquierda del cuadro blanco del QR
-                let qrLeftX = qrX - 25;
-                let qrCenterY = qrY + (qrSize / 2);
-
-                ctx.translate(qrLeftX, qrCenterY);
-                ctx.rotate(-Math.PI / 2); // Rotación vertical de 90°
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                ctx.shadowBlur = 6;
-                ctx.fillStyle = colores[1]; // Color neón coordinado de la paleta
-                ctx.font = '800 12px "Plus Jakarta Sans", Arial, sans-serif';
-                ctx.fillText('• PLACA DE EMERGENCIA •', 0, 0);
-                ctx.restore();
-
-                // TEXTOS INFERIORES
-                ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                ctx.shadowBlur = 6;
-
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = '800 15px "Plus Jakarta Sans", Arial, sans-serif';
-                ctx.fillText('SCAN ME / ESCANÉAME PARA CONTACTO', size / 2, footerText1Y);
-
-                ctx.fillStyle = '#F1F5F9';
-                ctx.font = '700 12px "Plus Jakarta Sans", Arial, sans-serif';
-                ctx.fillText('Soluciones QR • Protección de Mascota', size / 2, footerText2Y);
-                ctx.restore();
             };
             qrImg.src = qrDataUrl;
         }
