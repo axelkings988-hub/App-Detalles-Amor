@@ -10,9 +10,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 
+    <!-- Mercado Pago SDK -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Google AdSense SDK con tu ID Real -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
 
     <style>
         body {
@@ -28,7 +34,7 @@
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
 
-    <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden">
+    <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden my-6">
         
         <div class="space-y-1">
             <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
@@ -36,27 +42,28 @@
             <p class="text-xs text-slate-300">Personaliza la forma y los colores neón de tu medalla.</p>
         </div>
 
+        <!-- FORMULARIO DE REGISTRO DE MASCOTA -->
         <div id="formContainer" class="space-y-4 text-left">
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
-                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-white">
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Teléfono / WhatsApp *</label>
-                <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                <input type="tel" id="telefonoDuenio" placeholder="Ej. 8112345678" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-white">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-bold text-cyan-300 mb-1">Colonia / Sector (Seguro)</label>
-                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400">
+                    <input type="text" id="coloniaMascota" placeholder="Ej. Col. Cumbres" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-white">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-amber-300 mb-1">💰 Recompensa (Opcional)</label>
                     <div class="relative flex items-center">
                         <span class="absolute left-3 text-amber-300 font-bold text-sm">$</span>
-                        <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400">
+                        <input type="text" id="recompensaMascota" placeholder="1000 MXN" class="w-full p-3 pl-7 bg-black/40 border border-amber-400/40 rounded-xl text-sm focus:outline-none focus:border-amber-400 text-white">
                     </div>
                 </div>
             </div>
@@ -140,18 +147,63 @@
 
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Mensaje para quien lo encuentre / Señas</label>
-                <textarea id="detallesMascota" rows="2" placeholder="Ej. Es muy asustadizo, por favor háblale con calma..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400"></textarea>
+                <textarea id="detallesMascota" rows="2" placeholder="Ej. Es muy asustadizo, por favor háblale con calma..." class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-white"></textarea>
             </div>
 
             <button onclick="generarPlacaQR()" class="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg text-sm transition-all active:scale-95">
-                🚀 Generar Placa y Código QR
+                🚀 Diseñar y Guardar Placa
             </button>
         </div>
 
-        <!-- RESULTADO CON BOTÓN DE RETROCESO -->
+        <!-- PANTALLA DE PAGO / CÓDIGO MAESTRO -->
+        <div id="paySection" class="hidden space-y-4 text-center">
+            <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
+                <h3 class="text-base font-bold text-white">🔒 Placa Diseñada con Éxito</h3>
+                <p class="text-xs text-slate-300">Desbloquea la versión HD y el código QR oficial de contacto para imprimir tu medalla.</p>
+
+                <!-- ANUNCIO ADSENSE INTERMEDIO -->
+                <div class="bg-slate-950 p-3 rounded-2xl border border-cyan-500/10 min-h-[90px] flex items-center justify-center">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-2082458944224549"
+                         data-ad-slot="2222222222"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <!-- BOTÓN DE PAGO MERCADO PAGO -->
+                <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <span>💳 Desbloquear Código y Placa HD ($25.00 MXN)</span>
+                </button>
+
+                <!-- CAMPO PARA CÓDIGO MAESTRO ESPECIAL -->
+                <div class="pt-3 border-t border-white/10 space-y-2">
+                    <label class="text-[11px] font-semibold text-cyan-300 block">¿Tienes un código de acceso especial?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="codigoMaestroInput" placeholder="Ej. REAF940906HHGYNR" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-cyan-500/30 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-cyan-400">
+                        <button onclick="validarCodigoMaestro()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
+                            Canjear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BOTÓN DE VERIFICACIÓN MANUAL -->
+                <button onclick="verificarPagoManual()" class="w-full py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-white/10 hover:bg-slate-700 transition-colors">
+                    ✨ ¿Ya realizaste tu pago? Verificar Estado
+                </button>
+            </div>
+
+            <button onclick="volverAlFormulario()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs shadow-md border border-cyan-500/30 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>← Editar Datos o Cambiar Diseño</span>
+            </button>
+        </div>
+
+        <!-- CONTENEDOR DE RESULTADO (DESBLOQUEADO) -->
         <div id="resultContainer" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
-                <p class="text-xs font-bold text-emerald-300">✨ ¡Diseño de Placa Listo para Impresión!</p>
+                <p class="text-xs font-bold text-emerald-300">✨ ¡Placa Desbloqueada y Lista para Impresión!</p>
                 
                 <div class="flex justify-center my-2">
                     <canvas id="placaCanvas" width="1024" height="1024" class="max-w-full h-auto rounded-xl shadow-2xl"></canvas>
@@ -189,8 +241,10 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906HHGYNR";
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
+        let proyectoMascotaId = localStorage.getItem("ultimoMascotaId") || "";
 
         const PLACAS = {
             escudo:  { cara: "escudo.png", borde: "escudo borde.png" },
@@ -220,6 +274,7 @@
         }
 
         function volverAlFormulario() {
+            document.getElementById('paySection').classList.add('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -252,16 +307,18 @@
                     detalles: detalles || "Sin notas adicionales.",
                     estilo: estiloSeleccionado,
                     paleta: paletaSeleccionada,
+                    pagado: false,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
+                proyectoMascotaId = docRef.id;
+                localStorage.setItem("ultimoMascotaId", proyectoMascotaId);
 
                 let baseUrl = window.location.href.split('?')[0];
                 baseUrl = baseUrl.replace(/index\.html$/i, '');
                 baseUrl = baseUrl.replace(/\/$/, '') + '/';
-                enlaceGenerado = baseUrl + "ver.html?id=" + docRef.id;
+                enlaceGenerado = baseUrl + "ver.html?id=" + proyectoMascotaId;
 
-                document.getElementById('formContainer').classList.add('hidden');
-                document.getElementById('resultContainer').classList.remove('hidden');
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
                 const qrContainer = document.getElementById('qrcodeHidden');
@@ -273,13 +330,60 @@
 
                 const qrImg = qrContainer.querySelector('img');
                 
+                // Dibujar el canvas con anticipación
                 setTimeout(() => {
                     dibujarPlacaHiperrealista(nombre, qrImg.src, estiloSeleccionado, paletaSeleccionada);
                 }, 200);
 
+                // Ocultar formulario y mostrar pantalla de pago por defecto
+                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('paySection').classList.remove('hidden');
+
             } catch (error) {
                 console.error("Error al guardar:", error);
                 alert("Hubo un error al generar la placa. Intenta de nuevo.");
+            }
+        }
+
+        function validarCodigoMaestro() {
+            const inputVal = document.getElementById('codigoMaestroInput').value.trim().toUpperCase();
+
+            if (inputVal === CÓDIGO_ESPECIAL_MAESTRO) {
+                alert("✨ ¡Código maestro validado con éxito! Placa desbloqueada.");
+                desbloquearPlacaVisual();
+                
+                if (proyectoMascotaId) {
+                    db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true }).catch(() => {});
+                }
+            } else {
+                alert("❌ El código ingresado es incorrecto.");
+            }
+        }
+
+        function desbloquearPlacaVisual() {
+            document.getElementById('paySection').classList.add('hidden');
+            document.getElementById('resultContainer').classList.remove('hidden');
+        }
+
+        async function procesarPagoMercadoPago() {
+            window.location.href = `https://mpago.la/225XuPD`;
+        }
+
+        async function verificarPagoManual() {
+            if (!proyectoMascotaId) {
+                alert("No hay una placa registrada activa.");
+                return;
+            }
+
+            try {
+                const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
+                if (docSnap.exists && docSnap.data().pagado === true) {
+                    desbloquearPlacaVisual();
+                } else {
+                    alert("⚠️ Tu pago aún no se registra como aprobado. Puedes ingresar tu código maestro de acceso.");
+                }
+            } catch (e) {
+                alert("Error al verificar el estado del pago.");
             }
         }
 
@@ -370,8 +474,8 @@
             ctx.textBaseline = 'middle';
 
             let nombreY = size * 0.32;  
-            let qrY = size * 0.40;      // Subido ligeramente para dar margen abajo
-            let qrSize = 350;           // Tamaño equilibrado y seguro
+            let qrY = size * 0.40;      
+            let qrSize = 350;           
 
             if (estilo === 'circulo') {
                 nombreY = size * 0.31;
