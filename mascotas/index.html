@@ -298,12 +298,13 @@
             const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
 
             try {
+                // Asegurar que se guarde la foto actual seleccionada (convertida a base64 de manera segura)
                 const docRef = await db.collection("mascotas").add({
                     nombre,
                     telefono,
                     colonia: colonia || "No especificada",
                     recompensa: recompensaFinal,
-                    foto: fotoBase64,
+                    foto: fotoBase64, // Garantiza que la foto cargada por el usuario viaje a Firestore
                     detalles: detalles || "Sin notas adicionales.",
                     estilo: estiloSeleccionado,
                     paleta: paletaSeleccionada,
@@ -330,12 +331,10 @@
 
                 const qrImg = qrContainer.querySelector('img');
                 
-                // Dibujar el canvas con anticipación
                 setTimeout(() => {
                     dibujarPlacaHiperrealista(nombre, qrImg.src, estiloSeleccionado, paletaSeleccionada);
                 }, 200);
 
-                // Ocultar formulario y mostrar pantalla de pago por defecto
                 document.getElementById('formContainer').classList.add('hidden');
                 document.getElementById('paySection').classList.remove('hidden');
 
@@ -428,7 +427,6 @@
 
             const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-            // 1. DIBUJAR LA CARA INTERIOR Y APLICAR EL DEGRADADO
             ctx.drawImage(imgCara, 0, 0, size, size);
 
             const grad = ctx.createLinearGradient(0, 0, size, size);
@@ -466,10 +464,8 @@
             ctx.fillRect(0, 0, size, size);
             ctx.restore();
 
-            // 2. DIBUJAR EL BORDE Y RELIEVE METÁLICO POR ENCIMA
             ctx.drawImage(imgBorde, 0, 0, size, size);
 
-            // 3. CONFIGURACIÓN DE POSICIÓN REAJUSTADA (QR LIGERAMENTE MÁS PEQUEÑO Y CENTRADO)
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
@@ -486,7 +482,6 @@
                 qrSize = 320;
             }
 
-            // 4. NOMBRE DE LA MASCOTA
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
             ctx.shadowBlur = 10;
@@ -496,7 +491,6 @@
             ctx.fillText(nombre.toUpperCase().substring(0, 12), size / 2, nombreY);
             ctx.restore();
 
-            // 5. CÓDIGO QR Y RECUADRO BLANCO CON MARGEN DE SEGURIDAD
             const qrImg = new Image();
             qrImg.onload = function() {
                 const qrX = (size - qrSize) / 2;
