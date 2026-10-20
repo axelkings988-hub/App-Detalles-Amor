@@ -58,6 +58,16 @@
             transform: translateY(-3px);
         }
 
+        .card-green {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.9) 100%);
+            border: 2px solid #22C55E;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), inset 0 0 15px rgba(34, 197, 94, 0.2);
+        }
+        .card-green:hover {
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.8), inset 0 0 20px rgba(34, 197, 94, 0.3);
+            transform: translateY(-3px);
+        }
+
         .card-transition {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -108,6 +118,17 @@
                 <div class="flex-1 pr-2">
                     <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-cyan-600 transition-colors">Placa QR de Mascota</h2>
                     <p class="text-[11px] text-slate-600 font-medium leading-tight">Genera medallas con colores neón y perfil de emergencia.</p>
+                </div>
+            </a>
+
+            <!-- MÓDULO 4: ATENCIÓN AL CLIENTE / SOPORTE WHATSAPP -->
+            <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-green-600 transition-colors">Atención al Cliente</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte por WhatsApp.</p>
                 </div>
             </a>
 
