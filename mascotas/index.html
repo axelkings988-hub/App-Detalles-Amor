@@ -303,7 +303,28 @@
             paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']
         };
 
-        window.addEventListener('DOMContentLoaded', () => {
+        // Detector de retorno de pago y carga inicial
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status') || urlParams.get('collection_status');
+            const idGuardado = localStorage.getItem("ultimoMascotaId");
+
+            if ((status === 'approved' || status === 'accredited') && idGuardado) {
+                try {
+                    await db.collection("mascotas").doc(idGuardado).update({ pagado: true });
+                    let lista = obtenerProyectosLocales();
+                    let proyecto = lista.find(p => p.id === idGuardado);
+                    if (proyecto) {
+                        guardarProyectoLocalmente(idGuardado, proyecto.nombreProyecto, proyecto.nombreMascota, true);
+                    }
+                    alert("🎉 ¡Pago confirmado exitosamente! Tu placa ha sido desbloqueada.");
+                    cargarProyectoExistente(idGuardado);
+                    return;
+                } catch (error) {
+                    console.error("Error actualizando el pago:", error);
+                }
+            }
+
             renderizarListaProyectos();
         });
 
@@ -492,7 +513,6 @@
                 const qrBase64 = qr.createDataURL(8, 0);
                 
                 setTimeout(() => {
-                    // Renderizamos con difuminado (true) ya que aún no está pagado
                     dibujarPlacaHiperrealista('placaCanvasPay', nombre, qrBase64, estiloSeleccionado, paletaSeleccionada, true);
                 }, 200);
 
@@ -517,7 +537,6 @@
                     const nombreProyectoVal = document.getElementById('nombreProyecto').value.trim() || ("Placa " + nombreMascotaVal);
                     guardarProyectoLocalmente(proyectoMascotaId, nombreProyectoVal, nombreMascotaVal, true);
 
-                    // Re-renderizamos nítido para la pantalla final
                     cargarProyectoExistente(proyectoMascotaId);
                 }
                 desbloquearPlacaVisual();
@@ -532,6 +551,11 @@
         }
 
         async function procesarPagoMercadoPago() {
+            if (!proyectoMascotaId) {
+                alert("No hay un proyecto activo para procesar el pago.");
+                return;
+            }
+            localStorage.setItem("ultimoMascotaId", proyectoMascotaId);
             window.location.href = `https://mpago.la/225XuPD`;
         }
 
@@ -547,7 +571,6 @@
                     const data = docSnap.data();
                     guardarProyectoLocalmente(proyectoMascotaId, data.nombreProyecto || ("Placa " + data.nombre), data.nombre, true);
                     
-                    // Renderizamos nítido
                     var qr = qrcode(0, 'M');
                     qr.addData(enlaceGenerado);
                     qr.make();
@@ -555,7 +578,7 @@
 
                     desbloquearPlacaVisual();
                 } else {
-                    alert("⚠️ Tu pago aún no se registra como aprobado. Puedes ingresar tu código maestro de acceso.");
+                    alert("⚠️ Tu pago aún no se registra como aprobado en la base de datos. Si ya pagaste, puedes usar tu código maestro para desbloquearlo instantáneamente.");
                 }
             } catch (e) {
                 alert("Error al verificar el estado del pago.");
@@ -703,7 +726,6 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Aplicar difuminado (blur) si blurQr es true
                 if (blurQr) {
                     ctx.save();
                     ctx.filter = 'blur(14px)';
