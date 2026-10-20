@@ -7,77 +7,110 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+            background-color: #05050a;
+            /* Fondo de fuegos artificiales y luces festivas */
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 40%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%23FFFFFF' stroke-width='1' opacity='0.08'%3E%3Cpath d='M400 100 L400 300 M300 200 L500 200 M330 130 L470 270 M330 270 L470 130'/%3E%3Cpath d='M150 500 L150 650 M80 575 L220 575'/%3E%3Cpath d='M650 500 L650 650 M580 575 L720 575'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: cover;
         }
-        .card-menu {
-            transition: all 0.3s ease;
+
+        /* Efectos Glow Neón para las Tarjetas */
+        .card-pink {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 241, 242, 0.9) 100%);
+            border: 2px solid #EC4899;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.6), inset 0 0 15px rgba(236, 72, 153, 0.2);
         }
-        .card-menu:hover {
-            transform: translateY(-4px);
-            border-color: rgba(56, 189, 248, 0.6);
-            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.2);
+        .card-pink:hover {
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.8), inset 0 0 20px rgba(236, 72, 153, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .card-gold {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 252, 232, 0.9) 100%);
+            border: 2px solid #F59E0B;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), inset 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+        .card-gold:hover {
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.8), inset 0 0 20px rgba(245, 158, 11, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .card-cyan {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 254, 255, 0.9) 100%);
+            border: 2px solid #06B6D4;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.6), inset 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+        .card-cyan:hover {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.8), inset 0 0 20px rgba(6, 182, 212, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .card-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
+<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white relative overflow-x-hidden">
 
-    <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/85 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-6 relative overflow-hidden">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="w-full max-w-sm text-center space-y-6 my-auto">
         
         <!-- ENCABEZADO -->
-        <div class="space-y-2">
-            <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3.5 py-1 rounded-full uppercase tracking-widest font-extrabold shadow-md">✨ Centro de Utilidades</span>
-            <h1 class="text-2xl font-extrabold text-white">App Detalles & Amor</h1>
-            <p class="text-xs text-slate-300">Selecciona una herramienta para comenzar.</p>
+        <div class="space-y-1.5">
+            <span class="text-[10px] text-slate-300 uppercase tracking-[0.25em] font-semibold">Centro de Utilidades</span>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">App Detalles & Amor</h1>
+            <p class="text-xs text-slate-300 font-medium">Selecciona una herramienta para comenzar.</p>
         </div>
 
-        <!-- LISTA DE MENÚS / MÓDULOS -->
-        <div class="space-y-3.5 text-left">
+        <!-- LISTA DE MÓDULOS -->
+        <div class="space-y-4 text-left pt-2">
 
             <!-- MÓDULO 1: PAREJAS -->
-            <a href="parejas/" class="card-menu flex items-center p-4 bg-black/40 border border-white/15 rounded-2xl group">
-                <div class="w-12 h-12 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400 text-xl mr-4 group-hover:scale-110 transition-transform">
+            <a href="parejas/" class="card-pink card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-heart"></i>
                 </div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white group-hover:text-pink-300 transition-colors">Minisitio de Parejas</h2>
-                    <p class="text-[11px] text-slate-400">Sorprende a tu pareja con detalles románticos.</p>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-pink-600 transition-colors">Minisitio de Parejas</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Sorprende a tu pareja con detalles románticos.</p>
                 </div>
-                <i class="fa-solid fa-chevron-right text-slate-500 text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
 
             <!-- MÓDULO 2: MENSAJE TEMPORIZADOR -->
-            <a href="temporizador/" class="card-menu flex items-center p-4 bg-black/40 border border-white/15 rounded-2xl group">
-                <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl mr-4 group-hover:scale-110 transition-transform">
+            <a href="temporizador/" class="card-gold card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-clock"></i>
                 </div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Mensaje Temporizador</h2>
-                    <p class="text-[11px] text-slate-400">Envía mensajes con cuenta regresiva especial.</p>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-amber-600 transition-colors">Mensaje Temporizador</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Envía mensajes con cuenta regresiva especial.</p>
                 </div>
-                <i class="fa-solid fa-chevron-right text-slate-500 text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
 
-            <!-- MÓDULO 3: MASCOTAS (PLACA QR INTELIGENTE) -->
-            <a href="mascotas/" class="card-menu flex items-center p-4 bg-black/40 border border-white/15 rounded-2xl group">
-                <div class="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 text-xl mr-4 group-hover:scale-110 transition-transform">
+            <!-- MÓDULO 3: MASCOTAS -->
+            <a href="mascotas/" class="card-cyan card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-paw"></i>
                 </div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">Placa QR de Mascota</h2>
-                    <p class="text-[11px] text-slate-400">Genera medallas con colores neón y perfil de emergencia.</p>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-cyan-600 transition-colors">Placa QR de Mascota</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Genera medallas con colores neón y perfil de emergencia.</p>
                 </div>
-                <i class="fa-solid fa-chevron-right text-slate-500 text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
 
         </div>
 
         <!-- PIE DE PÁGINA -->
-        <div class="pt-2 text-[10px] text-slate-500 border-t border-white/10">
+        <div class="pt-4 text-[10px] text-slate-400 font-medium">
             Desarrollado con pasión • Protección y Detalles
         </div>
 
