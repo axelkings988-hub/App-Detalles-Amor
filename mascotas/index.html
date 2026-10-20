@@ -38,12 +38,33 @@
         
         <div class="space-y-1">
             <span class="text-[10px] bg-cyan-600 text-cyan-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">🐶 Placa QR Inteligente</span>
-            <h1 class="text-xl font-extrabold text-white">Registro de Mascota</h1>
-            <p class="text-xs text-slate-300">Personaliza la forma y los colores neón de tu medalla.</p>
+            <h1 class="text-xl font-extrabold text-white">Gestor de Placas de Mascota</h1>
+            <p class="text-xs text-slate-300">Crea o administra tus proyectos de placas neón.</p>
         </div>
 
-        <!-- FORMULARIO DE REGISTRO DE MASCOTA -->
-        <div id="formContainer" class="space-y-4 text-left">
+        <!-- 0. MENÚ PRINCIPAL DE INICIO -->
+        <div id="mainMenuContainer" class="space-y-4">
+            <button onclick="mostrarFormularioNuevo()" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-extrabold rounded-2xl shadow-lg text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus-circle text-lg"></i>
+                <span>Crear Nuevo Proyecto</span>
+            </button>
+
+            <div class="pt-2 text-left">
+                <h3 class="text-xs font-bold text-cyan-300 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-folder-open"></i> Proyectos guardados en este dispositivo
+                </h3>
+                <div id="listaProyectosGuardados" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. FORMULARIO DE REGISTRO DE MASCOTA -->
+        <div id="formContainer" class="hidden space-y-4 text-left">
+            <button onclick="mostrarMenuPrincipal()" class="text-xs text-cyan-400 font-bold hover:underline mb-2 flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Volver al Menú Principal
+            </button>
+
             <div>
                 <label class="block text-xs font-bold text-cyan-300 mb-1">Nombre de la Mascota *</label>
                 <input type="text" id="nombreMascota" placeholder="Ej. Max" class="w-full p-3 bg-black/40 border border-white/20 rounded-xl text-sm focus:outline-none focus:border-cyan-400 text-white">
@@ -155,7 +176,7 @@
             </button>
         </div>
 
-        <!-- PANTALLA DE PAGO / CÓDIGO MAESTRO -->
+        <!-- 2. PANTALLA DE PAGO / CÓDIGO MAESTRO -->
         <div id="paySection" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <h3 class="text-base font-bold text-white">🔒 Placa Diseñada con Éxito</h3>
@@ -194,13 +215,13 @@
                 </button>
             </div>
 
-            <button onclick="volverAlFormulario()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs shadow-md border border-cyan-500/30 flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>← Editar Datos o Cambiar Diseño</span>
+            <button onclick="mostrarMenuPrincipal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs shadow-md border border-cyan-500/30 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-house"></i>
+                <span>Volver al Menú Principal</span>
             </button>
         </div>
 
-        <!-- CONTENEDOR DE RESULTADO (DESBLOQUEADO) -->
+        <!-- 3. CONTENEDOR DE RESULTADO (DESBLOQUEADO) -->
         <div id="resultContainer" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <p class="text-xs font-bold text-emerald-300">✨ ¡Placa Desbloqueada y Lista para Impresión!</p>
@@ -214,9 +235,9 @@
             </div>
 
             <div class="space-y-2">
-                <button onclick="volverAlFormulario()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs shadow-md border border-cyan-500/30 flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>← Editar Datos o Cambiar Diseño</span>
+                <button onclick="mostrarMenuPrincipal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs shadow-md border border-cyan-500/30 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Volver al Menú Principal</span>
                 </button>
                 <button onclick="copiarEnlace()" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs shadow-md">
                     📋 Copiar Enlace Público
@@ -260,6 +281,34 @@
             paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']
         };
 
+        // Cargar lista al iniciar
+        window.addEventListener('DOMContentLoaded', () => {
+            renderizarListaProyectos();
+        });
+
+        function mostrarMenuPrincipal() {
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('paySection').classList.add('hidden');
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('mainMenuContainer').classList.remove('hidden');
+            renderizarListaProyectos();
+        }
+
+        function mostrarFormularioNuevo() {
+            // Limpiar campos
+            document.getElementById('nombreMascota').value = '';
+            document.getElementById('telefonoDuenio').value = '';
+            document.getElementById('coloniaMascota').value = '';
+            document.getElementById('recompensaMascota').value = '';
+            document.getElementById('detallesMascota').value = '';
+            document.getElementById('inputFotoArchivo').value = '';
+            document.getElementById('boxPreview').classList.add('hidden');
+            fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
+
+            document.getElementById('mainMenuContainer').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+        }
+
         function previewImagen(event) {
             const file = event.target.files[0];
             if (file) {
@@ -273,11 +322,85 @@
             }
         }
 
-        function volverAlFormulario() {
-            document.getElementById('paySection').classList.add('hidden');
-            document.getElementById('resultContainer').classList.add('hidden');
-            document.getElementById('formContainer').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function obtenerProyectosLocales() {
+            return JSON.parse(localStorage.getItem('proyectosMascotasList') || '[]');
+        }
+
+        function guardarProyectoLocalmente(id, nombre, pagado = false) {
+            let lista = obtenerProyectosLocales();
+            // Filtrar si ya existe
+            lista = lista.filter(item => item.id !== id);
+            lista.unshift({ id, nombre, pagado, fecha: new Date().toLocaleDateString() });
+            localStorage.setItem('proyectosMascotasList', JSON.stringify(lista));
+        }
+
+        function renderizarListaProyectos() {
+            const listaContainer = document.getElementById('listaProyectosGuardados');
+            const lista = obtenerProyectosLocales();
+
+            if (lista.length === 0) {
+                listaContainer.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center bg-black/30 rounded-xl border border-white/5">No tienes proyectos guardados aún.</p>`;
+                return;
+            }
+
+            listaContainer.innerHTML = lista.map(p => `
+                <div class="p-3 bg-black/40 border border-white/10 hover:border-cyan-500/40 rounded-xl flex items-center justify-between transition-all">
+                    <div class="text-left">
+                        <span class="text-xs font-bold text-white block">🐾 ${p.nombre}</span>
+                        <span class="text-[10px] text-slate-400">${p.fecha} • ${p.pagado ? '✅ Desbloqueado' : '🔒 Pendiente de Pago'}</span>
+                    </div>
+                    <button onclick="cargarProyectoExistente('${p.id}')" class="px-3 py-1.5 bg-cyan-600/80 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg shadow">
+                        ${p.pagado ? 'Ver' : 'Pagar/Ver'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function cargarProyectoExistente(id) {
+            proyectoMascotaId = id;
+            localStorage.setItem("ultimoMascotaId", proyectoMascotaId);
+
+            try {
+                const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
+                if (!docSnap.exists) {
+                    alert("El proyecto ya no se encuentra registrado en el sistema.");
+                    return;
+                }
+
+                const data = docSnap.data();
+
+                let baseUrl = window.location.href.split('?')[0];
+                baseUrl = baseUrl.replace(/index\.html$/i, '');
+                baseUrl = baseUrl.replace(/\/$/, '') + '/';
+                enlaceGenerado = baseUrl + "ver.html?id=" + proyectoMascotaId;
+
+                document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
+
+                const qrContainer = document.getElementById('qrcodeHidden');
+                qrContainer.innerHTML = "";
+                var qr = qrcode(0, 'M');
+                qr.addData(enlaceGenerado);
+                qr.make();
+                qrContainer.innerHTML = qr.createImgTag(8);
+
+                const qrImg = qrContainer.querySelector('img');
+
+                setTimeout(() => {
+                    dibujarPlacaHiperrealista(data.nombre, qrImg.src, data.estilo || 'escudo', data.paleta || 'paleta1');
+                }, 200);
+
+                document.getElementById('mainMenuContainer').classList.add('hidden');
+
+                if (data.pagado) {
+                    desbloquearPlacaVisual();
+                } else {
+                    document.getElementById('paySection').classList.remove('hidden');
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert("Error al recuperar los datos del proyecto.");
+            }
         }
 
         async function generarPlacaQR() {
@@ -298,13 +421,12 @@
             const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
 
             try {
-                // Asegurar que se guarde la foto actual seleccionada (convertida a base64 de manera segura)
                 const docRef = await db.collection("mascotas").add({
                     nombre,
                     telefono,
                     colonia: colonia || "No especificada",
                     recompensa: recompensaFinal,
-                    foto: fotoBase64, // Garantiza que la foto cargada por el usuario viaje a Firestore
+                    foto: fotoBase64,
                     detalles: detalles || "Sin notas adicionales.",
                     estilo: estiloSeleccionado,
                     paleta: paletaSeleccionada,
@@ -314,6 +436,7 @@
 
                 proyectoMascotaId = docRef.id;
                 localStorage.setItem("ultimoMascotaId", proyectoMascotaId);
+                guardarProyectoLocalmente(proyectoMascotaId, nombre, false);
 
                 let baseUrl = window.location.href.split('?')[0];
                 baseUrl = baseUrl.replace(/index\.html$/i, '');
@@ -353,6 +476,8 @@
                 
                 if (proyectoMascotaId) {
                     db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true }).catch(() => {});
+                    const nombreActual = document.getElementById('nombreMascota').value.trim() || "Mascota";
+                    guardarProyectoLocalmente(proyectoMascotaId, nombreActual, true);
                 }
             } else {
                 alert("❌ El código ingresado es incorrecto.");
@@ -377,6 +502,8 @@
             try {
                 const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
                 if (docSnap.exists && docSnap.data().pagado === true) {
+                    const data = docSnap.data();
+                    guardarProyectoLocalmente(proyectoMascotaId, data.nombre, true);
                     desbloquearPlacaVisual();
                 } else {
                     alert("⚠️ Tu pago aún no se registra como aprobado. Puedes ingresar tu código maestro de acceso.");
