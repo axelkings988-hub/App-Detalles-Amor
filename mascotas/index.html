@@ -374,17 +374,16 @@
 
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
-                const qrContainer = document.getElementById('qrcodeHidden');
-                qrContainer.innerHTML = "";
+                // Generar QR de forma limpia con qrcode-generator
                 var qr = qrcode(0, 'M');
                 qr.addData(enlaceGenerado);
                 qr.make();
-                qrContainer.innerHTML = qr.createImgTag(8);
-
-                const qrImg = qrContainer.querySelector('img');
+                
+                // Creamos imagen QR en Base64 para evitar fallos de DOM internos
+                const qrBase64 = qr.createDataURL(8, 0);
 
                 setTimeout(() => {
-                    dibujarPlacaHiperrealista(data.nombre, qrImg.src, data.estilo || 'escudo', data.paleta || 'paleta1');
+                    dibujarPlacaHiperrealista(data.nombre, qrBase64, data.estilo || 'escudo', data.paleta || 'paleta1');
                 }, 200);
 
                 document.getElementById('mainMenuContainer').classList.add('hidden');
@@ -443,17 +442,14 @@
 
                 document.getElementById('txtEnlacePublico').innerText = enlaceGenerado;
 
-                const qrContainer = document.getElementById('qrcodeHidden');
-                qrContainer.innerHTML = "";
+                // Generar QR de forma limpia con qrcode-generator
                 var qr = qrcode(0, 'M');
                 qr.addData(enlaceGenerado);
                 qr.make();
-                qrContainer.innerHTML = qr.createImgTag(8);
-
-                const qrImg = qrContainer.querySelector('img');
+                const qrBase64 = qr.createDataURL(8, 0);
                 
                 setTimeout(() => {
-                    dibujarPlacaHiperrealista(nombre, qrImg.src, estiloSeleccionado, paletaSeleccionada);
+                    dibujarPlacaHiperrealista(nombre, qrBase64, estiloSeleccionado, paletaSeleccionada);
                 }, 200);
 
                 document.getElementById('formContainer').classList.add('hidden');
@@ -537,8 +533,17 @@
             imgCara.onload = verificarCarga;
             imgBorde.onload = verificarCarga;
 
-            imgCara.onerror = imgBorde.onerror = function() {
-                alert("No se pudieron cargar las capas de la placa. Revisa que las imágenes existan en el repositorio.");
+            // Manejo de error por si las imágenes de la placa no cargan o fallan
+            imgCara.onerror = function() {
+                console.warn("No se encontró la imagen de fondo: " + rutas.cara + ". Usando lienzo base.");
+                cargadas++;
+                if (cargadas === 2) renderizarCanvasCompleto(null, imgBorde, nombre, qrDataUrl, estilo, paletaKey);
+            };
+
+            imgBorde.onerror = function() {
+                console.warn("No se encontró la imagen de borde: " + rutas.borde + ". Usando lienzo base.");
+                cargadas++;
+                if (cargadas === 2) renderizarCanvasCompleto(imgCara, null, nombre, qrDataUrl, estilo, paletaKey);
             };
 
             imgCara.src = rutas.cara;
@@ -552,7 +557,12 @@
 
             const colores = PALETAS[paletaKey] || PALETAS.paleta1;
 
-            ctx.drawImage(imgCara, 0, 0, size, size);
+            if (imgCara) {
+                ctx.drawImage(imgCara, 0, 0, size, size);
+            } else {
+                ctx.fillStyle = "#1e293b";
+                ctx.fillRect(0, 0, size, size);
+            }
 
             const grad = ctx.createLinearGradient(0, 0, size, size);
             if (paletaKey === 'paleta1') {
@@ -589,7 +599,9 @@
             ctx.fillRect(0, 0, size, size);
             ctx.restore();
 
-            ctx.drawImage(imgBorde, 0, 0, size, size);
+            if (imgBorde) {
+                ctx.drawImage(imgBorde, 0, 0, size, size);
+            }
 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
