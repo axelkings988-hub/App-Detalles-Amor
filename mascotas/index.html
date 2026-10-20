@@ -37,7 +37,7 @@
     <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden my-6">
         
         <div class="space-y-1 relative">
-            <!-- BOTÓN MENÚ PRINCIPAL DEL SITIO (Arriba a la izquierda) -->
+            <!-- BOTÓN MENÚ PRINCIPAL DEL SITIO -->
             <a href="../index.html" class="absolute left-0 top-0 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold rounded-xl border border-cyan-500/30 flex items-center gap-1.5 transition-all">
                 <i class="fa-solid fa-arrow-left"></i> Menú
             </a>
@@ -191,7 +191,12 @@
         <div id="paySection" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <h3 class="text-base font-bold text-white">🔒 Placa Diseñada con Éxito</h3>
-                <p class="text-xs text-slate-300">Desbloquea la versión HD y el código QR oficial de contacto para imprimir tu medalla.</p>
+                <p class="text-xs text-slate-300">El código QR está difuminado por seguridad. Desbloquea la versión HD para impresión.</p>
+
+                <!-- VISTA PREVIA DE LA PLACA CON QR DIFUMINADO -->
+                <div class="flex justify-center my-2">
+                    <canvas id="placaCanvasPay" width="1024" height="1024" class="max-w-[220px] h-auto rounded-xl shadow-2xl border border-cyan-500/30"></canvas>
+                </div>
 
                 <!-- ANUNCIO ADSENSE INTERMEDIO -->
                 <div class="bg-slate-950 p-3 rounded-2xl border border-cyan-500/10 min-h-[90px] flex items-center justify-center">
@@ -223,6 +228,12 @@
                 <!-- BOTÓN DE VERIFICACIÓN MANUAL -->
                 <button onclick="verificarPagoManual()" class="w-full py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-white/10 hover:bg-slate-700 transition-colors">
                     ✨ ¿Ya realizaste tu pago? Verificar Estado
+                </button>
+
+                <!-- BOTÓN DE PREVISUALIZACIÓN DE DATOS -->
+                <button onclick="previsualizarDatosMascota()" class="w-full py-2.5 bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 text-xs font-bold rounded-xl border border-cyan-500/40 flex items-center justify-center gap-2 transition-colors">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>👁️ Previsualizar página de contacto (Datos QR)</span>
                 </button>
             </div>
 
@@ -406,7 +417,11 @@
                 const qrBase64 = qr.createDataURL(8, 0);
 
                 setTimeout(() => {
-                    dibujarPlacaHiperrealista(data.nombre, qrBase64, data.estilo || 'escudo', data.paleta || 'paleta1');
+                    if (data.pagado) {
+                        dibujarPlacaHiperrealista('placaCanvas', data.nombre, qrBase64, data.estilo || 'escudo', data.paleta || 'paleta1', false);
+                    } else {
+                        dibujarPlacaHiperrealista('placaCanvasPay', data.nombre, qrBase64, data.estilo || 'escudo', data.paleta || 'paleta1', true);
+                    }
                 }, 200);
 
                 document.getElementById('mainMenuContainer').classList.add('hidden');
@@ -477,7 +492,8 @@
                 const qrBase64 = qr.createDataURL(8, 0);
                 
                 setTimeout(() => {
-                    dibujarPlacaHiperrealista(nombre, qrBase64, estiloSeleccionado, paletaSeleccionada);
+                    // Renderizamos con difuminado (true) ya que aún no está pagado
+                    dibujarPlacaHiperrealista('placaCanvasPay', nombre, qrBase64, estiloSeleccionado, paletaSeleccionada, true);
                 }, 200);
 
                 document.getElementById('formContainer').classList.add('hidden');
@@ -494,14 +510,17 @@
 
             if (inputVal === CÓDIGO_ESPECIAL_MAESTRO) {
                 alert("✨ ¡Código maestro validado con éxito! Placa desbloqueada.");
-                desbloquearPlacaVisual();
                 
                 if (proyectoMascotaId) {
                     db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true }).catch(() => {});
                     const nombreMascotaVal = document.getElementById('nombreMascota').value.trim() || "Mascota";
                     const nombreProyectoVal = document.getElementById('nombreProyecto').value.trim() || ("Placa " + nombreMascotaVal);
                     guardarProyectoLocalmente(proyectoMascotaId, nombreProyectoVal, nombreMascotaVal, true);
+
+                    // Re-renderizamos nítido para la pantalla final
+                    cargarProyectoExistente(proyectoMascotaId);
                 }
+                desbloquearPlacaVisual();
             } else {
                 alert("❌ El código ingresado es incorrecto.");
             }
@@ -527,6 +546,13 @@
                 if (docSnap.exists && docSnap.data().pagado === true) {
                     const data = docSnap.data();
                     guardarProyectoLocalmente(proyectoMascotaId, data.nombreProyecto || ("Placa " + data.nombre), data.nombre, true);
+                    
+                    // Renderizamos nítido
+                    var qr = qrcode(0, 'M');
+                    qr.addData(enlaceGenerado);
+                    qr.make();
+                    dibujarPlacaHiperrealista('placaCanvas', data.nombre, qr.createDataURL(8, 0), data.estilo || 'escudo', data.paleta || 'paleta1', false);
+
                     desbloquearPlacaVisual();
                 } else {
                     alert("⚠️ Tu pago aún no se registra como aprobado. Puedes ingresar tu código maestro de acceso.");
@@ -536,8 +562,17 @@
             }
         }
 
-        function dibujarPlacaHiperrealista(nombre, qrDataUrl, estilo, paletaKey) {
-            const canvas = document.getElementById('placaCanvas');
+        function previsualizarDatosMascota() {
+            if (enlaceGenerado) {
+                window.open(enlaceGenerado, '_blank');
+            } else {
+                alert("No hay un enlace de previsualización disponible aún.");
+            }
+        }
+
+        function dibujarPlacaHiperrealista(canvasId, nombre, qrDataUrl, estilo, paletaKey, blurQr = false) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             const ctx = canvas.getContext('2d');
             const size = 1024;
 
@@ -555,7 +590,7 @@
             function verificarCarga() {
                 cargadas++;
                 if (cargadas === 2) {
-                    renderizarCanvasCompleto(imgCara, imgBorde, nombre, qrDataUrl, estilo, paletaKey);
+                    renderizarCanvasCompleto(canvasId, imgCara, imgBorde, nombre, qrDataUrl, estilo, paletaKey, blurQr);
                 }
             }
 
@@ -564,20 +599,20 @@
 
             imgCara.onerror = function() {
                 cargadas++;
-                if (cargadas === 2) renderizarCanvasCompleto(null, imgBorde, nombre, qrDataUrl, estilo, paletaKey);
+                if (cargadas === 2) renderizarCanvasCompleto(canvasId, null, imgBorde, nombre, qrDataUrl, estilo, paletaKey, blurQr);
             };
 
             imgBorde.onerror = function() {
                 cargadas++;
-                if (cargadas === 2) renderizarCanvasCompleto(imgCara, null, nombre, qrDataUrl, estilo, paletaKey);
+                if (cargadas === 2) renderizarCanvasCompleto(canvasId, imgCara, null, nombre, qrDataUrl, estilo, paletaKey, blurQr);
             };
 
             imgCara.src = rutas.cara;
             imgBorde.src = rutas.borde;
         }
 
-        function renderizarCanvasCompleto(imgCara, imgBorde, nombre, qrDataUrl, estilo, paletaKey) {
-            const canvas = document.getElementById('placaCanvas');
+        function renderizarCanvasCompleto(canvasId, imgCara, imgBorde, nombre, qrDataUrl, estilo, paletaKey, blurQr) {
+            const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
             const size = 1024;
 
@@ -668,7 +703,15 @@
                 ctx.fill();
                 ctx.restore();
 
-                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                // Aplicar difuminado (blur) si blurQr es true
+                if (blurQr) {
+                    ctx.save();
+                    ctx.filter = 'blur(14px)';
+                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                }
             };
             qrImg.src = qrDataUrl;
         }
