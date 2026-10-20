@@ -299,6 +299,7 @@
         let audioStream = null;
         let proyectoActualId = null;
 
+        // Detector automático de retorno de pago exitoso desde Mercado Pago
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
 
@@ -306,7 +307,22 @@
             const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
             const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
 
-            if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
+            if ((paymentStatus === 'approved' || paymentStatus === 'success' || paymentStatus === 'accredited') && docId) {
+                try {
+                    // Actualizar directamente en Firestore que el proyecto ya está pagado
+                    await db.collection("detalles").doc(docId).update({ pagado: true });
+                    
+                    const docSnap = await db.collection("detalles").doc(docId).get();
+                    if (docSnap.exists) {
+                        proyectoActualId = docId;
+                        alert("🎉 ¡Pago confirmado exitosamente! Tu código QR ha sido desbloqueado.");
+                        abrirVistaPreviaConDatos(docSnap.data(), true);
+                    }
+                } catch(e) {
+                    console.error("Error al actualizar el estado de pago:", e);
+                }
+            } else if (docId) {
+                // Si hay un ID guardado pero no viene de pasarela de pago, comprobar estado actual en base de datos
                 try {
                     const docSnap = await db.collection("detalles").doc(docId).get();
                     if (docSnap.exists && docSnap.data().pagado === true) {
@@ -811,6 +827,8 @@
                 alert("No hay un proyecto activo seleccionado.");
                 return;
             }
+            // Guardamos el ID actual para recuperarlo al retornar de la pasarela de pago
+            localStorage.setItem("ultimoDetalleId", proyectoActualId);
             window.location.href = `https://mpago.la/225XuPD`;
         }
 
