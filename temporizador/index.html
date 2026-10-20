@@ -1,142 +1,131 @@
+Index temporizador 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cápsulas de Tiempo y Mensajes con Temporizador</title>
+    <title>Crear Mensaje con Temporizador</title>
 
-    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-    <!-- Mercado Pago SDK -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Google AdSense SDK con tu ID Real -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        burgundy: { 800: '#58111A', 900: '#3B0A11', 950: '#230408' },
-                        rose: { 300: '#F472B6', 500: '#EC4899', 600: '#DB2777', 900: '#831843' },
-                        gold: { 400: '#FBBF24', 500: '#F59E0B' }
-                    },
-                    fontFamily: { cursive: ['"Dancing Script"', 'cursive'], sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; min-height: 100vh; overflow-x: hidden; }
-        .font-cursive { font-family: 'Dancing Script', cursive; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #260B02 0%, #451A03 50%, #78350F 100%); color: #FEF3C7; min-height: 100vh; }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
+<body class="p-4 flex flex-col items-center justify-center min-h-screen">
 
-    <!-- SECCIÓN 1: CREACIÓN DE MENSAJE CON TEMPORIZADOR / CÁPSULA -->
-    <div id="formContainer" class="w-full max-w-md bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
-        <div class="text-center space-y-1">
-            <span class="text-[10px] bg-rose-600 text-rose-100 px-3 py-1 rounded-full uppercase tracking-widest font-bold">⏳ Cápsula del Tiempo</span>
-            <h1 class="text-2xl font-bold font-cursive text-rose-100">Mensaje Programado</h1>
-            <p class="text-xs text-rose-300/80">Escribe un mensaje de amor y programa cuándo podrá abrirse.</p>
+    <div class="w-full max-w-md bg-amber-950/75 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-5 my-6">
+        <div class="flex items-center justify-between">
+            <a href="../index.html" class="text-xs text-amber-300 bg-amber-900/80 px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i> Menú
+            </a>
+            <h1 class="text-sm font-bold text-amber-100">Nuevo Temporizador ⏳</h1>
+            <div class="w-8"></div>
         </div>
 
-        <form id="timerForm" onsubmit="event.preventDefault(); guardarMensajeTemporizador();" class="space-y-4 text-left">
-            <div>
-                <label class="block text-xs font-semibold text-rose-200 mb-1">Título de la Cápsula *</label>
-                <input type="text" id="tituloMensaje" placeholder="Ej. Para nuestro primer aniversario" required class="w-full p-3 bg-burgundy-950/80 border border-rose-500/30 rounded-xl text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+        <form id="tempForm" onsubmit="event.preventDefault(); guardarTemporizador();" class="space-y-4 text-xs">
+            <!-- 1. SELECCIONAR DISEÑO -->
+            <div class="space-y-1.5">
+                <label class="font-semibold text-amber-200">1. SELECCIONA EL DISEÑO TEMÁTICO:</label>
+                <select id="estiloDiseno" required onchange="actualizarVistaPreviaRegalo()" class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                    <option value="familiar">✨ Elegante y mágico (Familiar)</option>
+                    <option value="pareja">💖 Romántico con corazones (Pareja)</option>
+                    <option value="cumpleaños">🎉 Divertido y colorido (Cumpleaños)</option>
+                </select>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold text-rose-200 mb-1">Para (Nombre) *</label>
-                    <input type="text" id="destinatarioMensaje" placeholder="Ej. Valentina" required class="w-full p-3 bg-burgundy-950/80 border border-rose-500/30 rounded-xl text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            <!-- VISTA PREVIA DEL REGALO ANIMADO -->
+            <div class="flex items-center justify-center gap-3 bg-amber-900/30 p-3 rounded-2xl border border-amber-500/20">
+                <img id="gifPreview" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif" class="w-16 h-16 object-cover rounded-xl border border-amber-400/30">
+                <div class="text-left">
+                    <p class="font-bold text-amber-200 text-xs">Portada Animada</p>
+                    <p class="text-[10px] text-amber-300/70">Asignada automáticamente según el diseño.</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-rose-200 mb-1">Fecha de Apertura *</label>
-                    <input type="datetime-local" id="fechaApertura" required class="w-full p-3 bg-burgundy-950/80 border border-rose-500/30 rounded-xl text-xs text-rose-100 focus:outline-none focus:border-rose-500">
+            </div>
+
+            <!-- DATOS BÁSICOS -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-1">
+                    <label class="font-semibold text-amber-200">Para:</label>
+                    <input type="text" id="paraQuien" placeholder="Nombre destinatario" required class="w-full px-3 py-2 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="font-semibold text-amber-200">De:</label>
+                    <input type="text" id="deQuien" placeholder="Tu nombre" required class="w-full px-3 py-2 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
                 </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-rose-200 mb-1">Mensaje Secreto / Carta *</label>
-                <textarea id="contenidoMensaje" rows="4" placeholder="Escribe aquí todo lo que sientes y que se revelará cuando llegue el momento..." required class="w-full p-3 bg-burgundy-950/80 border border-rose-500/30 rounded-xl text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
+            <div class="space-y-1">
+                <label class="font-semibold text-amber-200">Fecha y hora para abrir el regalo:</label>
+                <input type="datetime-local" id="fechaApertura" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
+                <p class="text-[10px] text-amber-300/60 italic">💡 Sugerencia: Elige un plazo razonable (7 a 30 días) para mantener la emoción.</p>
             </div>
 
-            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                🚀 Crear Cápsula y Generar QR
+            <div class="space-y-1">
+                <label class="font-semibold text-amber-200">Mensaje (máx. 50 palabras):</label>
+                <textarea id="mensajeMarquesina" rows="2" placeholder="Escribe tu dedicatoria especial..." required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none resize-none"></textarea>
+            </div>
+
+            <!-- TIPO DE SORPRESA (SOLO UNA OPCIÓN) -->
+            <div class="space-y-2.5 pt-2 border-t border-amber-500/20">
+                <label class="font-semibold text-amber-200 block">ELIGE UN TIPO DE SORPRESA (Solo una):</label>
+                
+                <!-- OPCIÓN 1: AUDIO -->
+                <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="tipoSorpresa" value="audio" checked onchange="toggleSorpresa('audio')">
+                        <span>🎵 Grabar Nota de Voz (Máx. 20s)</span>
+                    </label>
+                    <div id="audioSection" class="space-y-2">
+                        <div class="flex gap-2">
+                            <button type="button" id="btnGrabar" onclick="iniciarGrabacion()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow">
+                                <i class="fas fa-microphone"></i> Grabar (<span id="timerGrabacion">20</span>s)
+                            </button>
+                            <button type="button" id="btnDetener" onclick="detenerGrabacion()" class="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-xl shadow" disabled>
+                                <i class="fas fa-stop"></i> Detener
+                            </button>
+                        </div>
+                        <audio id="audioPreview" controls class="w-full hidden mt-1"></audio>
+                    </div>
+                </div>
+
+                <!-- OPCIÓN 2: FOTO -->
+                <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="tipoSorpresa" value="foto" onchange="toggleSorpresa('foto')">
+                        <span>🖼️ Seleccionar Foto de Galería</span>
+                    </label>
+                    <input type="file" id="inputFoto" accept="image/*" onchange="cargarFotoGaleria(event)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800" disabled>
+                </div>
+
+                <!-- OPCIÓN 3: CUPÓN -->
+                <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="tipoSorpresa" value="cupon" onchange="toggleSorpresa('cupon')">
+                        <span>🎟️ Cupón de Premio (Reclamable)</span>
+                    </label>
+                    <input type="text" id="valCupon" placeholder="Ej. Vale por una cena romántica / $500" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100" disabled>
+                </div>
+            </div>
+
+            <button type="submit" id="btnGuardar" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform">
+                ⏳ Generar Enlace y QR
             </button>
         </form>
-    </div>
 
-    <!-- SECCIÓN 2: PANTALLA DE PAGO / CÓDIGO MAESTRO -->
-    <div id="paySection" class="hidden w-full max-w-md bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4 my-6">
-        <h3 class="text-base font-bold text-rose-100">🔒 Cápsula Protegida</h3>
-        <p class="text-xs text-rose-300/80">Realiza el pago o ingresa tu código de acceso especial para desbloquear el código QR oficial de tu mensaje con temporizador.</p>
-
-        <!-- ANUNCIO ADSENSE INTERMEDIO -->
-        <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/10 min-h-[90px] flex items-center justify-center">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-2082458944224549"
-                 data-ad-slot="2222222222"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-
-        <!-- BOTÓN DE PAGO MERCADO PAGO -->
-        <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <span>💳 Desbloquear Cápsula ($25.00 MXN)</span>
-        </button>
-
-        <!-- CAMPO PARA EL CÓDIGO MAESTRO ESPECIAL -->
-        <div class="pt-3 border-t border-rose-500/20 space-y-2">
-            <label class="text-[11px] font-semibold text-rose-200 block">¿Tienes un código de acceso especial?</label>
-            <div class="flex gap-2">
-                <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
-                <button onclick="validarCodigoMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
-                    Canjear
-                </button>
-            </div>
-        </div>
-
-        <!-- VERIFICACIÓN MANUAL DE RESPALDO -->
-        <button onclick="verificarPagoManual()" class="w-full py-2 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors">
-            ✨ Verificar Estado de Pago
-        </button>
-
-        <button onclick="volverAlFormulario()" class="w-full py-2 bg-burgundy-950/60 text-rose-300 text-xs font-semibold rounded-xl border border-rose-500/20">
-            ← Editar Mensaje
-        </button>
-    </div>
-
-    <!-- SECCIÓN 3: RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
-    <div id="resultContainer" class="hidden w-full max-w-md bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4 my-6">
-        <h3 class="text-sm font-bold text-rose-200">¡Cápsula de Tiempo Creada con Éxito! 🎉</h3>
-        <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
-            <div id="qrcode"></div>
-        </div>
-        <div class="space-y-2">
-            <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
-                Abrir Enlace de la Cápsula
+        <div id="resultBox" class="hidden bg-amber-950 p-4 rounded-2xl border border-amber-500/30 text-center space-y-3">
+            <h3 class="font-bold text-amber-200">¡Regalo Creado con Éxito! 🎉</h3>
+            <div class="bg-white p-2 rounded-xl inline-block" id="qrcode"></div>
+            <a id="linkFinal" href="#" target="_blank" class="block w-full py-2 bg-amber-600 text-white font-semibold rounded-xl truncate">
+                Abrir Enlace del Regalo
             </a>
-            <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-950 text-xs text-rose-300 rounded-xl border border-rose-500/30">
-                <i class="fas fa-copy"></i> Copiar Enlace
-            </button>
-            <button onclick="volverAlFormulario()" class="w-full py-2 bg-burgundy-950/60 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/20">
-                Crear Otra Cápsula
-            </button>
         </div>
     </div>
 
@@ -147,120 +136,158 @@
             projectId: "appdetallesamor",
             storageBucket: "appdetallesamor.firebasestorage.app",
             messagingSenderId: "917968456649",
-            appId: "1:917968456649:web:32261e841942825685b618",
-            measurementId: "G-ZTGDLNQXSF"
+            appId: "1:917968456649:web:32261e841942825685b618"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906HHGYNR";
-        let mensajeActualId = localStorage.getItem("ultimoMensajeId") || "";
-        let enlaceGeneradoFinal = "";
+        const gifsRegalos = {
+            familiar: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif",
+            pareja: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGJsaGFnaGVrcTNrcjBweDVzc245eGtrcWF4NHc5MnYzbDgyMXptNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKoWXm3okO1xmLK/giphy.gif",
+            cumpleaños: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc25sOXBsMHJmdTN0a3Y2Z2RyaTRua2dneWFsdXZkY3Nrd3FicWZzOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/g5R6IxEXVMJzsS228w/giphy.gif"
+        };
 
-        function volverAlFormulario() {
-            document.getElementById('paySection').classList.add('hidden');
-            document.getElementById('resultContainer').classList.add('hidden');
-            document.getElementById('formContainer').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBase64 = "";
+        let fotoBase64 = "";
+        let timerGrabacionInterval;
+
+        function actualizarVistaPreviaRegalo() {
+            const estilo = document.getElementById('estiloDiseno').value;
+            document.getElementById('gifPreview').src = gifsRegalos[estilo];
         }
 
-        async function guardarMensajeTemporizador() {
-            const titulo = document.getElementById('tituloMensaje').value.trim();
-            const destinatario = document.getElementById('destinatarioMensaje').value.trim();
-            const fechaApertura = document.getElementById('fechaApertura').value;
-            const contenido = document.getElementById('contenidoMensaje').value.trim();
+        function toggleSorpresa(tipo) {
+            const audioSec = document.getElementById('audioSection');
+            const fotoInput = document.getElementById('inputFoto');
+            const cuponInput = document.getElementById('valCupon');
 
-            if (!titulo || !destinatario || !fechaApertura || !contenido) {
-                alert("Por favor completa todos los campos.");
-                return;
+            audioSec.style.opacity = (tipo === 'audio') ? '1' : '0.4';
+            fotoInput.disabled = (tipo !== 'foto');
+            cuponInput.disabled = (tipo !== 'cupon');
+        }
+
+        // GRABACIÓN DE AUDIO
+        async function iniciarGrabacion() {
+            audioChunks = [];
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        audioBase64 = reader.result;
+                        const preview = document.getElementById('audioPreview');
+                        preview.src = audioBase64;
+                        preview.classList.remove('hidden');
+                    };
+                };
+
+                mediaRecorder.start();
+                document.getElementById('btnGrabar').disabled = true;
+                document.getElementById('btnGrabar').classList.add('opacity-50');
+                document.getElementById('btnDetener').disabled = false;
+
+                let timeLeft = 20;
+                document.getElementById('timerGrabacion').innerText = timeLeft;
+                timerGrabacionInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timerGrabacion').innerText = timeLeft;
+                    if(timeLeft <= 0) {
+                        detenerGrabacion();
+                    }
+                }, 1000);
+
+            } catch(e) {
+                alert("No se pudo acceder al micrófono. Verifica los permisos de tu navegador.");
             }
+        }
+
+        function detenerGrabacion() {
+            if(mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            clearInterval(timerGrabacionInterval);
+            document.getElementById('btnGrabar').disabled = false;
+            document.getElementById('btnGrabar').classList.remove('opacity-50');
+            document.getElementById('btnDetener').disabled = true;
+            document.getElementById('timerGrabacion').innerText = "20";
+        }
+
+        // CARGAR FOTO DE GALERÍA
+        function cargarFotoGaleria(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = () => {
+                    fotoBase64 = reader.result;
+                };
+            }
+        }
+
+        async function guardarTemporizador() {
+            const estilo = document.getElementById('estiloDiseno').value;
+            const tipoSorpresaSeleccionada = document.querySelector('input[name="tipoSorpresa"]:checked').value;
+            
+            let contenidoSorpresa = "";
+            if(tipoSorpresaSeleccionada === 'audio') {
+                if(!audioBase64) { alert("Por favor graba una nota de voz antes de continuar."); return; }
+                contenidoSorpresa = audioBase64;
+            }
+            if(tipoSorpresaSeleccionada === 'foto') {
+                if(!fotoBase64) { alert("Por favor selecciona una foto de tu galería."); return; }
+                contenidoSorpresa = fotoBase64;
+            }
+            if(tipoSorpresaSeleccionada === 'cupon') {
+                contenidoSorpresa = document.getElementById('valCupon').value.trim();
+                if(!contenidoSorpresa) { alert("Escribe el premio del cupón."); return; }
+            }
+
+            const btn = document.getElementById('btnGuardar');
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+
+            const datos = {
+                estilo: estilo,
+                fotoUrl: gifsRegalos[estilo],
+                para: document.getElementById('paraQuien').value.trim(),
+                de: document.getElementById('deQuien').value.trim(),
+                targetDate: new Date(document.getElementById('fechaApertura').value).toISOString(),
+                mensaje: document.getElementById('mensajeMarquesina').value.trim(),
+                tipoSorpresa: tipoSorpresaSeleccionada,
+                contenidoSorpresa: contenidoSorpresa,
+                creado: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
             try {
-                const docRef = await db.collection("mensajes_temporizador").add({
-                    titulo,
-                    destinatario,
-                    fechaApertura,
-                    contenido,
-                    pagado: false,
-                    creado: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                const docRef = await db.collection("temporizadores").add(datos);
+                const urlVer = `https://axelkings988-hub.github.io/App-Detalles-Amor/temporizador/ver.html?id=${docRef.id}`;
+                
+                document.getElementById('linkFinal').href = urlVer;
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById('qrcode'), { text: urlVer, width: 140, height: 140 });
 
-                mensajeActualId = docRef.id;
-                localStorage.setItem("ultimoMensajeId", mensajeActualId);
-
-                let baseUrl = window.location.href.split('?')[0];
-                baseUrl = baseUrl.replace(/index\.html$/i, '');
-                baseUrl = baseUrl.replace(/\/$/, '') + '/';
-                enlaceGeneradoFinal = baseUrl + "ver_mensaje.html?id=" + mensajeActualId;
-
-                // Ocultar formulario y mostrar pantalla de pago / código maestro por defecto
-                document.getElementById('formContainer').classList.add('hidden');
-                document.getElementById('paySection').classList.remove('hidden');
-
-            } catch (error) {
-                console.error("Error al guardar mensaje:", error);
-                alert("Hubo un error al guardar la cápsula. Intenta de nuevo.");
+                document.getElementById('resultBox').classList.remove('hidden');
+                btn.innerText = "⏳ Generar Enlace y QR";
+                btn.disabled = false;
+            } catch(e) {
+                alert("Error al guardar en Firebase.");
+                btn.innerText = "⏳ Generar Enlace y QR";
+                btn.disabled = false;
             }
         }
 
-        function validarCodigoMaestro() {
-            const inputVal = document.getElementById('codigoMaestroInput').value.trim().toUpperCase();
-
-            if (inputVal === CÓDIGO_ESPECIAL_MAESTRO) {
-                alert("✨ ¡Código maestro validado con éxito! Cápsula desbloqueada.");
-                desbloquearVisualmente();
-
-                if (mensajeActualId) {
-                    db.collection("mensajes_temporizador").doc(mensajeActualId).update({ pagado: true }).catch(() => {});
-                }
-            } else {
-                alert("❌ El código ingresado es incorrecto.");
-            }
-        }
-
-        function desbloquearVisualmente() {
-            document.getElementById('paySection').classList.add('hidden');
-            document.getElementById('resultContainer').classList.remove('hidden');
-
-            document.getElementById('finalLink').href = enlaceGeneradoFinal;
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), {
-                text: enlaceGeneradoFinal,
-                width: 160,
-                height: 160
-            });
-        }
-
-        async function procesarPagoMercadoPago() {
-            window.location.href = `https://mpago.la/225XuPD`;
-        }
-
-        async function verificarPagoManual() {
-            if (!mensajeActualId) {
-                alert("No hay una cápsula activa seleccionada.");
-                return;
-            }
-
-            try {
-                const docSnap = await db.collection("mensajes_temporizador").doc(mensajeActualId).get();
-                if (docSnap.exists && docSnap.data().pagado === true) {
-                    let baseUrl = window.location.href.split('?')[0];
-                    baseUrl = baseUrl.replace(/index\.html$/i, '').replace(/\/$/, '') + '/';
-                    enlaceGeneradoFinal = baseUrl + "ver_mensaje.html?id=" + mensajeActualId;
-                    desbloquearVisualmente();
-                } else {
-                    alert("⚠️ El pago aún no se registra como aprobado. Puedes usar tu código maestro de acceso.");
-                }
-            } catch (e) {
-                alert("Error al verificar el estado del pago.");
-            }
-        }
-
-        function copiarEnlace() {
-            navigator.clipboard.writeText(enlaceGeneradoFinal).then(() => {
-                alert("¡Enlace copiado al portapapeles! ❤️");
-            });
-        }
+        actualizarVistaPreviaRegalo();
     </script>
 </body>
 </html>
