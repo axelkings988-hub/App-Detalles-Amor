@@ -254,7 +254,7 @@
         const db = firebase.firestore();
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906HHGYNR";
-        let proyectoActualId = null;
+        let proyectoActualId = localStorage.getItem("ultimoTemporizadorId") || null;
 
         const gifsRegalos = {
             familiar: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif",
@@ -275,15 +275,23 @@
             const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
             const docId = urlParams.get('id') || localStorage.getItem("ultimoTemporizadorId");
 
-            if ((paymentStatus === 'approved' || paymentStatus === 'success') && docId) {
+            if ((paymentStatus === 'approved' || paymentStatus === 'success' || paymentStatus === 'accredited') && docId) {
                 try {
-                    const docSnap = await db.collection("temporizadores").doc(docId).get();
-                    if (docSnap.exists) {
-                        proyectoActualId = docId;
-                        await db.collection("temporizadores").doc(docId).update({ pagado: true }).catch(() => {});
-                        abrirVistaPrevia(docId, true);
+                    proyectoActualId = docId;
+                    await db.collection("temporizadores").doc(docId).update({ pagado: true });
+                    
+                    let proyectos = obtenerProyectosLocales();
+                    let proj = proyectos.find(p => p.firebaseId === docId);
+                    if (proj) {
+                        guardarProyectosLocales(proyectos);
                     }
-                } catch(e) {}
+
+                    alert("🎉 ¡Pago confirmado exitosamente! Tu temporizador ha sido desbloqueado.");
+                    abrirVistaPrevia(docId, true);
+                    return;
+                } catch(e) {
+                    console.error("Error al actualizar el pago en Firebase:", e);
+                }
             }
         });
 
@@ -327,7 +335,6 @@
         }
 
         function mostrarFormularioCreacion() {
-            // Muestra la pantalla de transición brevemente
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('adTransitionScreen').classList.remove('hidden');
 
@@ -341,7 +348,7 @@
                 proyectoActualId = null;
                 document.getElementById('audioPreview').classList.add('hidden');
                 actualizarVistaPreviaRegalo();
-            }, 1200); // 1.2 segundos para dar tiempo a mostrar el anuncio sin desesperar al usuario
+            }, 1200);
         }
 
         function volverAlDashboard() {
@@ -468,7 +475,6 @@
                 if(!contenidoSorpresa) { alert("Escribe el premio del cupón."); return; }
             }
 
-            // Oculta el formulario y muestra la pantalla de carga con publicidad 2
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('saveLoadingScreen').classList.remove('hidden');
 
@@ -505,7 +511,6 @@
                 });
                 guardarProyectosLocales(proyectos);
 
-                // Espera breve para asegurar visibilidad del anuncio antes de pasar a la vista previa
                 setTimeout(() => {
                     document.getElementById('saveLoadingScreen').classList.add('hidden');
                     abrirVistaPrevia(proyectoActualId, false);
@@ -601,6 +606,7 @@
                 alert("No hay un proyecto activo seleccionado.");
                 return;
             }
+            localStorage.setItem("ultimoTemporizadorId", proyectoActualId);
             window.location.href = `https://mpago.la/225XuPD`;
         }
 
@@ -617,7 +623,7 @@
                     if (data.pagado === true) {
                         abrirVistaPrevia(proyectoActualId, true);
                     } else {
-                        alert("⚠️ El pago aún no se encuentra aprobado. Puedes canjear tu código especial maestro.");
+                        alert("⚠️ El pago aún no se encuentra aprobado. Si ya pagaste, puedes canjear tu código especial maestro.");
                     }
                 } else {
                     alert("No se encontró el registro de este proyecto.");
