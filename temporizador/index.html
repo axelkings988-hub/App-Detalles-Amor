@@ -15,6 +15,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+    <!-- Google AdSense SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #260B02 0%, #451A03 50%, #78350F 100%); color: #FEF3C7; min-height: 100vh; }
     </style>
@@ -40,6 +43,23 @@
             <div id="listaProyectosContainer" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                 <p class="text-xs text-amber-300/60 text-center py-4 italic">No tienes proyectos guardados aún.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA TRANSITORIA / PUBLICIDAD 1: AL DAR CLIC EN "CREAR NUEVO TEMPORIZADOR" -->
+    <div id="adTransitionScreen" class="hidden w-full max-w-md bg-amber-950/90 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-4 my-6 text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto"></div>
+        <p class="text-xs font-semibold text-amber-200">Cargando editor del temporizador...</p>
+
+        <div class="bg-amber-950/80 p-3 rounded-2xl border border-amber-500/10 min-h-[100px] flex flex-col justify-center items-center">
+            <span class="text-[9px] text-amber-300/40 uppercase tracking-widest mb-1">Publicidad</span>
+            <ins class="adsbygoogle"
+                 style="display:block; width:100%;"
+                 data-ad-client="ca-pub-2082458944224549"
+                 data-ad-slot="1000000003"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
         </div>
     </div>
 
@@ -93,7 +113,6 @@
             <div class="space-y-1">
                 <label class="font-semibold text-amber-200">Fecha y hora para abrir el regalo:</label>
                 <input type="datetime-local" id="fechaApertura" required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none">
-                <p class="text-[10px] text-amber-300/60 italic">💡 Sugerencia: Elige un plazo razonable (7 a 30 días) para mantener la emoción.</p>
             </div>
 
             <div class="space-y-1">
@@ -147,6 +166,23 @@
                 ⏳ Guardar y Ver Vista Previa
             </button>
         </form>
+    </div>
+
+    <!-- PANTALLA DE CARGA / PUBLICIDAD 2: AL DAR CLIC EN "GUARDAR Y VER VISTA PREVIA" -->
+    <div id="saveLoadingScreen" class="hidden w-full max-w-md bg-amber-950/90 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-4 my-6 text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto"></div>
+        <p class="text-xs font-semibold text-amber-200">Guardando tu temporizador y generando vista previa...</p>
+
+        <div class="bg-amber-950/80 p-3 rounded-2xl border border-amber-500/10 min-h-[100px] flex flex-col justify-center items-center">
+            <span class="text-[9px] text-amber-300/40 uppercase tracking-widest mb-1">Publicidad</span>
+            <ins class="adsbygoogle"
+                 style="display:block; width:100%;"
+                 data-ad-client="ca-pub-2082458944224549"
+                 data-ad-slot="1000000004"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
     </div>
 
     <!-- SECCIÓN 3: VISTA PREVIA Y PAGO -->
@@ -291,20 +327,28 @@
         }
 
         function mostrarFormularioCreacion() {
+            // Muestra la pantalla de transición brevemente
             document.getElementById('homeDashboard').classList.add('hidden');
-            document.getElementById('formContainer').classList.remove('hidden');
-            document.getElementById('tempForm').reset();
-            document.getElementById('formTitleHeader').innerText = "Nuevo Temporizador ⏳";
-            audioBase64 = "";
-            fotoBase64 = "";
-            proyectoActualId = null;
-            document.getElementById('audioPreview').classList.add('hidden');
-            actualizarVistaPreviaRegalo();
+            document.getElementById('adTransitionScreen').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('adTransitionScreen').classList.add('hidden');
+                document.getElementById('formContainer').classList.remove('hidden');
+                document.getElementById('tempForm').reset();
+                document.getElementById('formTitleHeader').innerText = "Nuevo Temporizador ⏳";
+                audioBase64 = "";
+                fotoBase64 = "";
+                proyectoActualId = null;
+                document.getElementById('audioPreview').classList.add('hidden');
+                actualizarVistaPreviaRegalo();
+            }, 1200); // 1.2 segundos para dar tiempo a mostrar el anuncio sin desesperar al usuario
         }
 
         function volverAlDashboard() {
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('saveLoadingScreen').classList.add('hidden');
+            document.getElementById('adTransitionScreen').classList.add('hidden');
             document.getElementById('homeDashboard').classList.remove('hidden');
             renderizarProyectosGuardados();
         }
@@ -339,7 +383,6 @@
             cuponInput.disabled = (tipo !== 'cupon');
         }
 
-        // GRABACIÓN DE AUDIO
         async function iniciarGrabacion() {
             audioChunks = [];
             try {
@@ -394,7 +437,6 @@
             document.getElementById('timerGrabacion').innerText = "20";
         }
 
-        // CARGAR FOTO DE GALERÍA
         function cargarFotoGaleria(event) {
             const file = event.target.files[0];
             if(file) {
@@ -426,9 +468,9 @@
                 if(!contenidoSorpresa) { alert("Escribe el premio del cupón."); return; }
             }
 
-            const btn = document.getElementById('btnGuardar');
-            btn.innerText = "Guardando...";
-            btn.disabled = true;
+            // Oculta el formulario y muestra la pantalla de carga con publicidad 2
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('saveLoadingScreen').classList.remove('hidden');
 
             const datos = {
                 nombreProyecto: nombreProj,
@@ -463,14 +505,16 @@
                 });
                 guardarProyectosLocales(proyectos);
 
-                btn.innerText = "⏳ Guardar y Ver Vista Previa";
-                btn.disabled = false;
+                // Espera breve para asegurar visibilidad del anuncio antes de pasar a la vista previa
+                setTimeout(() => {
+                    document.getElementById('saveLoadingScreen').classList.add('hidden');
+                    abrirVistaPrevia(proyectoActualId, false);
+                }, 1500);
 
-                abrirVistaPrevia(proyectoActualId, false);
             } catch(e) {
                 alert("Error al guardar en Firebase.");
-                btn.innerText = "⏳ Guardar y Ver Vista Previa";
-                btn.disabled = false;
+                document.getElementById('saveLoadingScreen').classList.add('hidden');
+                document.getElementById('formContainer').classList.remove('hidden');
             }
         }
 
