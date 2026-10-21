@@ -299,7 +299,7 @@
         let audioStream = null;
         let proyectoActualId = null;
 
-        // Detector automático de retorno de pago exitoso desde Mercado Pago
+        // Detector automático de retorno de pago exitoso o carga inicial limpia
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
 
@@ -309,9 +309,7 @@
 
             if ((paymentStatus === 'approved' || paymentStatus === 'success' || paymentStatus === 'accredited') && docId) {
                 try {
-                    // Actualizar directamente en Firestore que el proyecto ya está pagado
                     await db.collection("detalles").doc(docId).update({ pagado: true });
-                    
                     const docSnap = await db.collection("detalles").doc(docId).get();
                     if (docSnap.exists) {
                         proyectoActualId = docId;
@@ -321,16 +319,9 @@
                 } catch(e) {
                     console.error("Error al actualizar el estado de pago:", e);
                 }
-            } else if (docId) {
-                // Si hay un ID guardado pero no viene de pasarela de pago, comprobar estado actual en base de datos
-                try {
-                    const docSnap = await db.collection("detalles").doc(docId).get();
-                    if (docSnap.exists && docSnap.data().pagado === true) {
-                        proyectoActualId = docId;
-                        abrirVistaPreviaConDatos(docSnap.data(), true);
-                    }
-                } catch(e) {}
-            }
+            } 
+            // NOTA: Se removió la carga automática del último detalle al iniciar en celular 
+            // para que siempre muestre el menú principal ("Mis Detalles de Amor") por defecto.
         });
 
         function obtenerProyectosLocales() {
@@ -435,6 +426,7 @@
             }
         }
 
+        // Compresión optimizada y más ligera para dispositivos móviles
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -444,7 +436,7 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let maxDimension = 800;
+                        let maxDimension = 600; // Reducido para evitar bloqueos en celulares
                         let width = img.width;
                         let height = img.height;
 
@@ -461,7 +453,7 @@
 
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.72));
+                        resolve(canvas.toDataURL('image/jpeg', 0.65)); // Calidad optimizada para móviles
                     };
                 };
             });
@@ -625,8 +617,8 @@
                 document.getElementById('formContainer').classList.add('hidden');
 
             } catch (error) {
-                console.error(error);
-                alert("Ocurrió un error al guardar el proyecto. Inténtalo de nuevo.");
+                console.error("Error al guardar:", error);
+                alert("⚠️ Ocurrió un error al guardar el proyecto en el celular: " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -827,7 +819,6 @@
                 alert("No hay un proyecto activo seleccionado.");
                 return;
             }
-            // Guardamos el ID actual para recuperarlo al retornar de la pasarela de pago
             localStorage.setItem("ultimoDetalleId", proyectoActualId);
             window.location.href = `https://mpago.la/225XuPD`;
         }
