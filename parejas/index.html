@@ -229,7 +229,7 @@
                 </section>
             </div>
 
-            <!-- SECCIÓN DE DESBLOQUEO / PAGO / CÓDIGO SECRETO -->
+            <!-- SECCIÓN DE DESBLOQUEO / PAGO / VERIFICACIÓN -->
             <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
                 <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
                 <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial.</p>
@@ -239,24 +239,15 @@
                     <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
                 </button>
 
-                <!-- CAMPO PARA EL CÓDIGO SECRETO -->
-                <div class="pt-3 border-t border-rose-500/20 space-y-2 text-left">
-                    <label class="text-[11px] font-semibold text-rose-200 block">¿Tienes un código secreto?</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código secreto" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
-                        <button onclick="validarCodigoMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
-                            Canjear
-                        </button>
-                    </div>
-                </div>
+                <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA / COMPROBANTE -->
+                <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>✨ Ya realicé mi pago, desbloquear ahora</span>
+                </button>
 
                 <!-- BOTÓN DE EDITAR DATOS -->
                 <button onclick="editarDatosProyecto()" class="w-full py-2.5 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors flex items-center justify-center gap-2">
                     <i class="fas fa-edit"></i> Editar datos del proyecto
-                </button>
-
-                <button onclick="verificarPagoManual()" class="w-full py-2.5 bg-burgundy-950 text-rose-300/80 text-xs font-semibold rounded-xl border border-rose-500/20 hover:bg-burgundy-900 transition-colors">
-                    ✨ Verificar Estado de Pago
                 </button>
             </div>
 
@@ -291,7 +282,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906HHGYNR";
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
@@ -299,29 +289,42 @@
         let audioStream = null;
         let proyectoActualId = null;
 
-        // Detector automático de retorno de pago exitoso o carga inicial limpia
+        // Detector automático de retorno de pago seguro y carga inicial limpia
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
 
             const urlParams = new URLSearchParams(window.location.search);
-            const paymentStatus = urlParams.get('status') || urlParams.get('collection_status');
+            const collectionId = urlParams.get('collection_id') || urlParams.get('payment_id');
+            const status = urlParams.get('status') || urlParams.get('collection_status');
             const docId = urlParams.get('id') || localStorage.getItem("ultimoDetalleId");
 
-            if ((paymentStatus === 'approved' || paymentStatus === 'success' || paymentStatus === 'accredited') && docId) {
+            if ((status === 'approved' || status === 'accredited' || status === 'success' || collectionId) && docId) {
                 try {
-                    await db.collection("detalles").doc(docId).update({ pagado: true });
+                    // Validar unicidad del comprobante de pago
+                    if (collectionId) {
+                        const queryCheck = await db.collection("detalles").where("pagoIdUnico", "==", collectionId).get();
+                        if (!queryCheck.empty && queryCheck.docs[0].id !== docId) {
+                            alert("⚠️ Este comprobante de pago ya fue utilizado anteriormente en otro proyecto.");
+                            cargarProyecto(docId);
+                            return;
+                        }
+                    }
+
+                    const updateData = { pagado: true };
+                    if (collectionId) updateData.pagoIdUnico = collectionId;
+
+                    await db.collection("detalles").doc(docId).update(updateData);
                     const docSnap = await db.collection("detalles").doc(docId).get();
+                    
                     if (docSnap.exists) {
                         proyectoActualId = docId;
-                        alert("🎉 ¡Pago confirmado exitosamente! Tu código QR ha sido desbloqueado.");
+                        alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu código QR ha sido desbloqueado.");
                         abrirVistaPreviaConDatos(docSnap.data(), true);
                     }
                 } catch(e) {
                     console.error("Error al actualizar el estado de pago:", e);
                 }
             } 
-            // NOTA: Se removió la carga automática del último detalle al iniciar en celular 
-            // para que siempre muestre el menú principal ("Mis Detalles de Amor") por defecto.
         });
 
         function obtenerProyectosLocales() {
@@ -426,7 +429,6 @@
             }
         }
 
-        // Compresión optimizada y más ligera para dispositivos móviles
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -436,7 +438,7 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let maxDimension = 600; // Reducido para evitar bloqueos en celulares
+                        let maxDimension = 600;
                         let width = img.width;
                         let height = img.height;
 
@@ -453,7 +455,7 @@
 
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.65)); // Calidad optimizada para móviles
+                        resolve(canvas.toDataURL('image/jpeg', 0.65));
                     };
                 };
             });
@@ -800,20 +802,6 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        function validarCodigoMaestro() {
-            const inputVal = document.getElementById('codigoMaestroInput').value.trim().toUpperCase();
-
-            if (inputVal === CÓDIGO_ESPECIAL_MAESTRO) {
-                alert("✨ ¡Código secreto validado con éxito! Acceso concedido.");
-                if (proyectoActualId) {
-                    db.collection("detalles").doc(proyectoActualId).update({ pagado: true }).catch(() => {});
-                }
-                cargarProyecto(proyectoActualId);
-            } else {
-                alert("❌ El código ingresado es incorrecto.");
-            }
-        }
-
         async function procesarPagoMercadoPago() {
             if (!proyectoActualId) {
                 alert("No hay un proyecto activo seleccionado.");
@@ -823,7 +811,7 @@
             window.location.href = `https://mpago.la/225XuPD`;
         }
 
-        async function verificarPagoManual() {
+        async function verificarPagoAutomatico() {
             if (!proyectoActualId) {
                 alert("No hay un proyecto activo seleccionado.");
                 return;
@@ -831,18 +819,34 @@
 
             try {
                 const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    if (data.pagado === true) {
-                        abrirVistaPreviaConDatos(data, true);
-                    } else {
-                        alert("⚠️ El pago aún no se encuentra aprobado. Puedes canjear tu código secreto.");
-                    }
+                if (docSnap.exists && docSnap.data().pagado === true) {
+                    abrirVistaPreviaConDatos(docSnap.data(), true);
+                    alert("✨ ¡Proyecto verificado y desbloqueado con éxito!");
                 } else {
-                    alert("No se encontró el registro de este proyecto.");
+                    const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
+                    
+                    if (codigoOperacion && codigoOperacion.trim().length > 3) {
+                        const queryRecibo = await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
+                        if (!queryRecibo.empty) {
+                            alert("⚠️ Este comprobante ya fue registrado en otro proyecto.");
+                            return;
+                        }
+
+                        await db.collection("detalles").doc(proyectoActualId).update({
+                            pagado: true,
+                            pagoIdUnico: codigoOperacion.trim()
+                        });
+
+                        const updatedSnap = await db.collection("detalles").doc(proyectoActualId).get();
+                        abrirVistaPreviaConDatos(updatedSnap.data(), true);
+                        alert("🎉 ¡Comprobante validado correctamente! Desbloqueado con éxito.");
+                    } else if (codigoOperacion !== null) {
+                        alert("⚠️ Debes ingresar un número de comprobante válido.");
+                    }
                 }
-            } catch (error) {
-                alert("Ocurrió un error al verificar el estado del pago.");
+            } catch (e) {
+                console.error(e);
+                alert("Error al verificar el estado del pago.");
             }
         }
 
