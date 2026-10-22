@@ -239,6 +239,17 @@
                     <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
                 </button>
 
+                <!-- CAMPO PARA EL CUPÓN O CÓDIGO -->
+                <div class="pt-3 border-t border-rose-500/20 space-y-2 text-left">
+                    <label class="text-[11px] font-semibold text-rose-200 block">Agrega cupón de regalo:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
+                        <button onclick="validarCuponOMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
+                            Canjear
+                        </button>
+                    </div>
+                </div>
+
                 <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA / COMPROBANTE -->
                 <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check-circle"></i>
@@ -282,6 +293,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8"; // Código maestro permanente
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
@@ -289,7 +301,6 @@
         let audioStream = null;
         let proyectoActualId = null;
 
-        // Detector automático de retorno de pago seguro y carga inicial limpia
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
 
@@ -300,7 +311,6 @@
 
             if ((status === 'approved' || status === 'accredited' || status === 'success' || collectionId) && docId) {
                 try {
-                    // Validar unicidad del comprobante de pago
                     if (collectionId) {
                         const queryCheck = await db.collection("detalles").where("pagoIdUnico", "==", collectionId).get();
                         if (!queryCheck.empty && queryCheck.docs[0].id !== docId) {
@@ -800,6 +810,66 @@
             }
 
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
+        }
+
+        // FUNCIÓN UNIFICADA PARA VALIDAR CÓDIGO MAESTRO O CUPÓN DE REGALO DE UN SOLO USO
+        async function validarCuponOMaestro() {
+            const inputVal = document.getElementById('codigoMaestroInput').value.trim();
+            const codigoMayus = inputVal.toUpperCase();
+
+            if (!inputVal) {
+                alert("⚠️ Por favor ingresa un código o cupón.");
+                return;
+            }
+
+            if (!proyectoActualId) {
+                alert("No hay un proyecto activo seleccionado.");
+                return;
+            }
+
+            // 1. Validar si es el Código Maestro (ilimitado y nunca expira)
+            if (codigoMayus === CÓDIGO_ESPECIAL_MAESTRO) {
+                try {
+                    await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
+                    alert("✨ ¡Código canjeado con éxito! Acceso concedido.");
+                    cargarProyecto(proyectoActualId);
+                    return;
+                } catch(e) {
+                    alert("Error al aplicar el código.");
+                    return;
+                }
+            }
+
+            // 2. Validar si es un Cupón de un solo uso en Firebase (colección 'cupones')
+            try {
+                const cuponRef = db.collection("cupones").doc(inputVal); // Respeta mayúsculas/minúsculas del cupón según lo crees en FB
+                const cuponSnap = await cuponRef.get();
+
+                if (!cuponSnap.exists) {
+                    alert("❌ El cupón ingresado no es válido o no existe.");
+                    return;
+                }
+
+                const cuponData = cuponSnap.data();
+
+                if (cuponData.usado === true) {
+                    alert("⚠️ Este cupón de regalo ya fue utilizado anteriormente.");
+                    return;
+                }
+
+                // Marcar el cupón como usado para que no vuelva a servir
+                await cuponRef.update({ usado: true });
+
+                // Desbloquear el proyecto actual
+                await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
+
+                alert("🎉 ¡Cupón de regalo canjeado con éxito! Tu proyecto ha sido desbloqueado.");
+                cargarProyecto(proyectoActualId);
+
+            } catch (error) {
+                console.error("Error al validar cupón:", error);
+                alert("Hubo un error al verificar el cupón. Inténtalo de nuevo.");
+            }
         }
 
         async function procesarPagoMercadoPago() {
