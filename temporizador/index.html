@@ -207,10 +207,21 @@
                     <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
                 </button>
 
-                <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA / COMPROBANTE -->
+                <!-- CAMPO PARA EL CUPÓN O CÓDIGO -->
+                <div class="pt-3 border-t border-amber-500/20 space-y-2 text-left">
+                    <label class="text-[11px] font-semibold text-amber-200 block">Agrega cupón de regalo</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-amber-950 border border-amber-500/30 text-xs text-amber-100 uppercase tracking-widest focus:outline-none focus:border-amber-500">
+                        <button onclick="canjearCuponRegalo()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
+                            Canjear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA -->
                 <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check-circle"></i>
-                    <span>✨ Ya realicé mi pago, desbloquear ahora</span>
+                    <span>✨ Ya realicé mi pago, verificar</span>
                 </button>
             </div>
 
@@ -244,6 +255,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const CODIGO_MAESTRO_SECRETO = "REAF940906SW8";
         let proyectoActualId = localStorage.getItem("ultimoTemporizadorId") || null;
 
         const gifsRegalos = {
@@ -598,6 +610,68 @@
             }
             localStorage.setItem("ultimoTemporizadorId", proyectoActualId);
             window.location.href = `https://mpago.la/225XuPD`;
+        }
+
+        // Función para validar tanto el código maestro como los cupones de un solo uso en Firebase
+        async function canjearCuponRegalo() {
+            if (!proyectoActualId) {
+                alert("No hay un proyecto activo seleccionado.");
+                return;
+            }
+
+            const inputVal = document.getElementById('codigoMaestroInput').value.trim();
+            if (!inputVal) {
+                alert("⚠️ Por favor ingresa un código o cupón.");
+                return;
+            }
+
+            // 1. Validar si es el Código Maestro (Uso ilimitado y nunca expira)
+            if (inputVal === CODIGO_MAESTRO_SECRETO) {
+                try {
+                    await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true });
+                    alert("✨ ¡Código canjeado con éxito! Acceso concedido.");
+                    abrirVistaPrevia(proyectoActualId, true);
+                } catch (e) {
+                    alert("Error al actualizar el estado del proyecto.");
+                }
+                return;
+            }
+
+            // 2. Si no es el maestro, buscar en la colección de cupones de un solo uso en Firebase
+            try {
+                const cuponRef = db.collection("cupones").doc(inputVal);
+                const cuponDoc = await cuponRef.get();
+
+                if (!cuponDoc.exists) {
+                    alert("❌ El código o cupón ingresado no es válido.");
+                    return;
+                }
+
+                const cuponData = cuponDoc.data();
+
+                // Verificar si ya fue usado
+                if (cuponData.usado === true) {
+                    alert("⚠️ Este cupón ya ha sido utilizado anteriormente y ya no está disponible.");
+                    return;
+                }
+
+                // Marcar el cupón como usado en Firebase (transacción de un solo uso)
+                await cuponRef.update({ 
+                    usado: true,
+                    usadoEnProyecto: proyectoActualId,
+                    fechaUso: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Desbloquear el temporizador actual
+                await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true });
+
+                alert("🎉 ¡Cupón de regalo aplicado con éxito! Proyecto desbloqueado.");
+                abrirVistaPrevia(proyectoActualId, true);
+
+            } catch (error) {
+                console.error("Error al canjear el cupón:", error);
+                alert("Ocurrió un error al verificar el cupón en la base de datos.");
+            }
         }
 
         async function verificarPagoAutomatico() {
