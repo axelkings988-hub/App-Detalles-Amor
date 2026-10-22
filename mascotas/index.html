@@ -187,7 +187,7 @@
             </button>
         </div>
 
-        <!-- 2. PANTALLA DE PAGO / CÓDIGO MAESTRO -->
+        <!-- 2. PANTALLA DE PAGO / CUPÓN -->
         <div id="paySection" class="hidden space-y-4 text-center">
             <div class="p-4 bg-black/60 rounded-3xl border border-cyan-400/40 space-y-3 shadow-2xl">
                 <h3 class="text-base font-bold text-white">🔒 Placa Diseñada con Éxito</h3>
@@ -218,6 +218,23 @@
                 <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check-circle"></i>
                     <span>✨ Ya realicé mi pago, desbloquear ahora</span>
+                </button>
+
+                <!-- CAMPO PARA CUPÓN DE REGALO -->
+                <div class="pt-3 border-t border-white/10 space-y-2 text-left">
+                    <label class="text-[11px] font-semibold text-cyan-300 block">Agrega cupón de regalo</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="inputCuponRegalo" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-cyan-500/30 text-xs text-white uppercase tracking-widest focus:outline-none focus:border-cyan-400">
+                        <button onclick="canjearCuponRegalo()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
+                            Canjear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BOTÓN DE EDITAR DATOS -->
+                <button onclick="editarDatosMascota()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>✏️ Editar Datos de la Mascota</span>
                 </button>
 
                 <!-- BOTÓN DE PREVISUALIZACIÓN DE DATOS -->
@@ -274,9 +291,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const CODIGO_SECRETO_PERSONAL = "REAF940906SW8";
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
         let proyectoMascotaId = localStorage.getItem("ultimoMascotaId") || "";
+        let esModoEdicion = false; // Bandera para saber si estamos editando un proyecto existente
 
         const PLACAS = {
             escudo:  { cara: "escudo.png", borde: "escudo%20borde.png" },
@@ -301,7 +320,6 @@
 
             if ((status === 'approved' || status === 'accredited' || collectionId) && idGuardado) {
                 try {
-                    // Verificamos si este comprobante de pago ya fue utilizado en otra placa por seguridad
                     if (collectionId) {
                         const queryCheck = await db.collection("mascotas").where("pagoIdUnico", "==", collectionId).get();
                         if (!queryCheck.empty && queryCheck.docs[0].id !== idGuardado) {
@@ -311,7 +329,6 @@
                         }
                     }
 
-                    // Actualizamos el proyecto actual como pagado y guardamos el ID del pago
                     const updateData = { pagado: true };
                     if (collectionId) updateData.pagoIdUnico = collectionId;
 
@@ -338,10 +355,12 @@
             document.getElementById('paySection').classList.add('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('mainMenuContainer').classList.remove('hidden');
+            esModoEdicion = false;
             renderizarListaProyectos();
         }
 
         function mostrarFormularioNuevo() {
+            esModoEdicion = false;
             document.getElementById('nombreProyecto').value = '';
             document.getElementById('nombreMascota').value = '';
             document.getElementById('telefonoDuenio').value = '';
@@ -354,6 +373,57 @@
 
             document.getElementById('mainMenuContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
+        }
+
+        async function editarDatosMascota() {
+            if (!proyectoMascotaId) {
+                alert("No hay ningún proyecto activo para editar.");
+                return;
+            }
+
+            try {
+                const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
+                if (!docSnap.exists) {
+                    alert("No se encontraron los datos del proyecto.");
+                    return;
+                }
+
+                const data = docSnap.data();
+
+                // Llenamos el formulario con los datos actuales
+                document.getElementById('nombreProyecto').value = data.nombreProyecto || '';
+                document.getElementById('nombreMascota').value = data.nombre || '';
+                document.getElementById('telefonoDuenio').value = data.telefono || '';
+                document.getElementById('coloniaMascota').value = data.colonia !== "No especificada" ? data.colonia : '';
+                document.getElementById('recompensaMascota').value = data.recompensa ? data.recompensa.replace('$', '') : '';
+                document.getElementById('detallesMascota').value = data.detalles !== "Sin notas adicionales." ? data.detalles : '';
+                
+                if (data.foto) {
+                    fotoBase64 = data.foto;
+                    document.getElementById('imgPreview').src = fotoBase64;
+                    document.getElementById('boxPreview').classList.remove('hidden');
+                }
+
+                if (data.estilo) {
+                    const radioEstilo = document.querySelector(`input[name="estiloPlaca"][value="${data.estilo}"]`);
+                    if (radioEstilo) radioEstilo.checked = true;
+                }
+
+                if (data.paleta) {
+                    const radioPaleta = document.querySelector(`input[name="paletaColor"][value="${data.paleta}"]`);
+                    if (radioPaleta) radioPaleta.checked = true;
+                }
+
+                esModoEdicion = true;
+
+                // Ocultamos la sección de pago y mostramos el formulario
+                document.getElementById('paySection').classList.add('hidden');
+                document.getElementById('formContainer').classList.remove('hidden');
+
+            } catch (e) {
+                console.error(e);
+                alert("Error al cargar los datos para edición.");
+            }
         }
 
         function previewImagen(event) {
@@ -487,23 +557,43 @@
             const recompensaFinal = recompensaInput ? (recompensaInput.startsWith('$') ? recompensaInput : '$' + recompensaInput) : "";
 
             try {
-                const docRef = await db.collection("mascotas").add({
-                    nombreProyecto: nombreProyectoVal,
-                    nombre,
-                    telefono,
-                    colonia: colonia || "No especificada",
-                    recompensa: recompensaFinal,
-                    foto: fotoBase64,
-                    detalles: detalles || "Sin notas adicionales.",
-                    estilo: estiloSeleccionado,
-                    paleta: paletaSeleccionada,
-                    pagado: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                if (esModoEdicion && proyectoMascotaId) {
+                    // Actualizamos el proyecto existente
+                    await db.collection("mascotas").doc(proyectoMascotaId).update({
+                        nombreProyecto: nombreProyectoVal,
+                        nombre,
+                        telefono,
+                        colonia: colonia || "No especificada",
+                        recompensa: recompensaFinal,
+                        foto: fotoBase64,
+                        detalles: detalles || "Sin notas adicionales.",
+                        estilo: estiloSeleccionado,
+                        paleta: paletaSeleccionada
+                    });
+                    guardarProyectoLocalmente(proyectoMascotaId, nombreProyectoVal, nombre, false);
+                    alert("✨ ¡Datos actualizados con éxito!");
+                } else {
+                    // Creamos un proyecto nuevo
+                    const docRef = await db.collection("mascotas").add({
+                        nombreProyecto: nombreProyectoVal,
+                        nombre,
+                        telefono,
+                        colonia: colonia || "No especificada",
+                        recompensa: recompensaFinal,
+                        foto: fotoBase64,
+                        detalles: detalles || "Sin notas adicionales.",
+                        estilo: estiloSeleccionado,
+                        paleta: paletaSeleccionada,
+                        pagado: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
 
-                proyectoMascotaId = docRef.id;
-                localStorage.setItem("ultimoMascotaId", proyectoMascotaId);
-                guardarProyectoLocalmente(proyectoMascotaId, nombreProyectoVal, nombre, false);
+                    proyectoMascotaId = docRef.id;
+                    localStorage.setItem("ultimoMascotaId", proyectoMascotaId);
+                    guardarProyectoLocalmente(proyectoMascotaId, nombreProyectoVal, nombre, false);
+                }
+
+                esModoEdicion = false;
 
                 let baseUrl = window.location.href.split('?')[0];
                 baseUrl = baseUrl.replace(/index\.html$/i, '');
@@ -526,7 +616,71 @@
 
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("Hubo un error al generar la placa. Intenta de nuevo.");
+                alert("Hubo un error al guardar los datos. Intenta de nuevo.");
+            }
+        }
+
+        async function canjearCuponRegalo() {
+            const inputVal = document.getElementById('inputCuponRegalo').value.trim().toUpperCase();
+
+            if (!inputVal) {
+                alert("Por favor ingresa un código de cupón.");
+                return;
+            }
+
+            try {
+                // 1. Verificamos si es tu código secreto personal permanente (nunca expira)
+                if (inputVal === CODIGO_SECRETO_PERSONAL) {
+                    await db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true });
+                    const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
+                    const data = docSnap.data();
+                    guardarProyectoLocalmente(proyectoMascotaId, data.nombreProyecto || ("Placa " + data.nombre), data.nombre, true);
+                    
+                    var qr = qrcode(0, 'M');
+                    qr.addData(enlaceGenerado);
+                    qr.make();
+                    dibujarPlacaHiperrealista('placaCanvas', data.nombre, qr.createDataURL(8, 0), data.estilo || 'escudo', data.paleta || 'paleta1', false);
+
+                    desbloquearPlacaVisual();
+                    alert("✨ ¡Código personal validado con éxito! Placa desbloqueada.");
+                    return;
+                }
+
+                // 2. Si no es el personal, buscamos en la colección de cupones de un solo uso en Firebase
+                const cuponRef = db.collection("cupones").doc(inputVal);
+                const cuponSnap = await cuponRef.get();
+
+                if (cuponSnap.exists && cuponSnap.data().usado === false) {
+                    // Quemamos el cupón para que no se vuelva a usar
+                    await cuponRef.update({ 
+                        usado: true, 
+                        fechaUso: firebase.firestore.FieldValue.serverTimestamp(),
+                        proyectoIdUsado: proyectoMascotaId 
+                    });
+
+                    // Desbloqueamos la placa
+                    await db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true });
+
+                    const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
+                    const data = docSnap.data();
+                    guardarProyectoLocalmente(proyectoMascotaId, data.nombreProyecto || ("Placa " + data.nombre), data.nombre, true);
+
+                    var qr = qrcode(0, 'M');
+                    qr.addData(enlaceGenerado);
+                    qr.make();
+                    dibujarPlacaHiperrealista('placaCanvas', data.nombre, qr.createDataURL(8, 0), data.estilo || 'escudo', data.paleta || 'paleta1', false);
+
+                    desbloquearPlacaVisual();
+                    alert("🎁 ¡Cupón de regalo válido! Tu placa ha sido desbloqueada.");
+                } else if (cuponSnap.exists && cuponSnap.data().usado === true) {
+                    alert("⚠️ Este cupón de regalo ya fue utilizado anteriormente.");
+                } else {
+                    alert("❌ El código de cupón ingresado no existe o no es válido.");
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert("Error al validar el cupón.");
             }
         }
 
@@ -564,19 +718,15 @@
                     desbloquearPlacaVisual();
                     alert("✨ ¡Placa verificada y desbloqueada con éxito!");
                 } else {
-                    // Si el usuario acaba de pagar y Mercado Pago no pasó los parámetros automáticamente en la URL, 
-                    // le permitimos ingresar su número de recibo u operación de Mercado Pago para validarlo una sola vez.
                     const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago para verificarlo y desbloquear tu placa:");
                     
                     if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        // Comprobamos que este número de recibo no haya sido usado antes
                         const queryRecibo = await db.collection("mascotas").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
                         if (!queryRecibo.empty) {
                             alert("⚠️ Este comprobante ya fue registrado en otro proyecto.");
                             return;
                         }
 
-                        // Actualizamos Firebase con el recibo y marcamos como pagado
                         await db.collection("mascotas").doc(proyectoMascotaId).update({
                             pagado: true,
                             pagoIdUnico: codigoOperacion.trim()
