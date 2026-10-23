@@ -453,34 +453,44 @@
             }
         }
 
-        // Protección contra congelamiento: Compresión optimizada para redes móviles lentas o dispositivos limitados
+        // FUNCIÓN DE COMPRESIÓN CORREGIDA Y BLINDADA CONTRA CONGELAMIENTOS
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
                 const reader = new FileReader();
+                reader.onerror = () => resolve(null);
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
                     const img = new Image();
+                    img.onerror = () => resolve(e.target.result); // Si falla el canvas, pasa la original a prueba de fallos
                     img.src = e.target.result;
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let maxDimension = 500; // Límite seguro para evitar bloqueos de memoria en celulares
-                        let width = img.width;
-                        let height = img.height;
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let maxDimension = 500;
+                            let width = img.width;
+                            let height = img.height;
 
-                        if (width > height && width > maxDimension) {
-                            height = Math.round((height * maxDimension) / width);
-                            width = maxDimension;
-                        } else if (height > maxDimension) {
-                            width = Math.round((width * maxDimension) / height);
-                            height = maxDimension;
+                            if (width > height && width > maxDimension) {
+                                height = Math.round((height * maxDimension) / width);
+                                width = maxDimension;
+                            } else if (height > maxDimension) {
+                                width = Math.round((width * maxDimension) / height);
+                                height = maxDimension;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            resolve(canvas.toDataURL('image/jpeg', 0.6));
+                        } catch (err) {
+                            resolve(e.target.result); // Respaldo inmediato si ocurre cualquier error en memoria
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.6)); // Calidad reducida para carga fluida con datos móviles
                     };
                 };
             });
@@ -585,7 +595,9 @@
                     const maxFotos = Math.min(photosFiles.length, 2);
                     for (let i = 0; i < maxFotos; i++) {
                         const fotoOptimizada = await comprimirFotoEnMemoria(photosFiles[i]);
-                        pvPhotosArray.push(fotoOptimizada);
+                        if (fotoOptimizada) {
+                            pvPhotosArray.push(fotoOptimizada);
+                        }
                     }
                 }
 
@@ -698,7 +710,6 @@
             loadPvQuizQuestion();
 
             if (yaPagado) {
-                // Ocultar banner de anuncios si el proyecto ya está pagado/liberado (para que quien lea el código QR no vea anuncios)
                 const adBanner = document.getElementById('adsterraBannerContainer');
                 if (adBanner) adBanner.style.display = 'none';
 
