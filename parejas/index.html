@@ -43,7 +43,7 @@
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
 
-    <!-- BANNER FIJO SUPERIOR ADSTERRA (Solo para creadores, se oculta si es vista pública por QR) -->
+    <!-- BANNER FIJO SUPERIOR ADSTERRA (Solo se muestra a creadores en el panel de pago, se oculta en vista previa) -->
     <div id="adsterraBannerContainer" class="fixed top-0 left-0 w-full z-50 bg-burgundy-950/95 border-b border-rose-500/30 py-1.5 flex justify-center items-center shadow-lg">
         <script>
             atOptions = {
@@ -107,7 +107,7 @@
             <div class="w-12"></div>
         </div>
 
-        <form id="createForm" onsubmit="event.preventDefault(); guardarYVerVistaPrevia();" class="space-y-4">
+        <form id="createForm" onsubmit="event.preventDefault(); guardarProyectoYMostrarPanel();" class="space-y-4">
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">NOMBRE DEL PROYECTO (Para identificarlo):</label>
                 <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
@@ -124,9 +124,9 @@
             </div>
 
             <div class="space-y-1">
-                <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 2):</label>
+                <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 5):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple onchange="validarCantidadFotos(this)" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 2 imágenes para el carrusel.</p>
+                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes para el carrusel.</p>
             </div>
 
             <div class="space-y-1">
@@ -149,7 +149,7 @@
             </div>
 
             <button type="submit" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                ✨ Guardar y Ver Vista Previa
+                ✨ Guardar Proyecto
             </button>
         </form>
 
@@ -160,15 +160,79 @@
         </div>
     </div>
 
-    <!-- SECCIÓN 3: VISTA PREVIA EN PANTALLA COMPLETA -->
+    <!-- SECCIÓN 3: PANEL DE GESTIÓN Y PAGO (CON BOTÓN DE VISTA PREVIA SEPARADO) -->
+    <div id="panelContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-5 my-6">
+        <div class="flex items-center justify-between">
+            <button onclick="volverAlDashboardDesdePanel()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i> Mis Proyectos
+            </button>
+            <h2 class="text-xl font-bold font-cursive text-rose-100">Gestión del Detalle</h2>
+            <div class="w-12"></div>
+        </div>
+
+        <!-- BOTÓN EXPLÍCITO PARA ABRIR LA VISTA PREVIA EN PANTALLA COMPLETA -->
+        <button onclick="abrirVistaPreviaPantallaCompleta()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <i class="fas fa-eye text-sm"></i> 👁️ Ver Vista Previa en Pantalla Completa
+        </button>
+
+        <div id="paySection" class="bg-burgundy-950/60 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
+            <h3 class="text-sm font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
+            <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial.</p>
+
+            <!-- BOTÓN DE PAGO MERCADO PAGO -->
+            <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
+            </button>
+
+            <!-- CAMPO PARA EL CUPÓN O CÓDIGO -->
+            <div class="pt-3 border-t border-rose-500/20 space-y-2 text-left">
+                <label class="text-[11px] font-semibold text-rose-200 block">Agrega cupón de regalo:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
+                    <button onclick="validarCuponOMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
+                        Canjear
+                    </button>
+                </div>
+            </div>
+
+            <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA / COMPROBANTE -->
+            <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-circle"></i>
+                <span>✨ Ya realicé mi pago, desbloquear ahora</span>
+            </button>
+
+            <!-- BOTÓN DE EDITAR DATOS -->
+            <button onclick="editarDatosProyecto()" class="w-full py-2.5 bg-burgundy-900 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-800 transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-edit"></i> Editar datos del proyecto
+            </button>
+        </div>
+
+        <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
+        <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
+            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
+                <div id="qrcode"></div>
+            </div>
+            <div class="space-y-2">
+                <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
+                    Abrir Detalle Público
+                </a>
+                <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-900 text-xs text-rose-300 rounded-xl border border-rose-500/30">
+                    <i class="fas fa-copy"></i> Copiar Enlace
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: VISTA PREVIA EN PANTALLA COMPLETA (EXPERIENCIA LIMPIA SIN ANUNCIOS) -->
     <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-burgundy-950/95 backdrop-blur-2xl overflow-y-auto px-4 py-16 space-y-6">
         <div class="w-full max-w-lg mx-auto space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="cerrarVistaPrevia()" class="text-xs text-rose-300 bg-burgundy-900 px-3 py-2 rounded-xl border border-rose-500/30 shadow flex items-center gap-1.5">
-                    <i class="fas fa-arrow-left"></i> Volver a Mis Proyectos
+                    <i class="fas fa-arrow-left"></i> Volver al Panel
                 </button>
                 <div class="bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-rose-300/30 animate-pulse">
-                    👀 VISTA PREVIA
+                    👀 VISTA PREVIA EN VIVO
                 </div>
             </div>
 
@@ -242,55 +306,6 @@
                     <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
                 </section>
             </div>
-
-            <!-- SECCIÓN DE DESBLOQUEO / PAGO / VERIFICACIÓN -->
-            <div id="paySection" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
-                <h3 class="text-base font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
-                <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial.</p>
-
-                <!-- BOTÓN DE PAGO MERCADO PAGO -->
-                <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
-                </button>
-
-                <!-- CAMPO PARA EL CUPÓN O CÓDIGO -->
-                <div class="pt-3 border-t border-rose-500/20 space-y-2 text-left">
-                    <label class="text-[11px] font-semibold text-rose-200 block">Agrega cupón de regalo:</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
-                        <button onclick="validarCuponOMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
-                            Canjear
-                        </button>
-                    </div>
-                </div>
-
-                <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA / COMPROBANTE -->
-                <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check-circle"></i>
-                    <span>✨ Ya realicé mi pago, desbloquear ahora</span>
-                </button>
-
-                <!-- BOTÓN DE EDITAR DATOS -->
-                <button onclick="editarDatosProyecto()" class="w-full py-2.5 bg-burgundy-950 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-900 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-edit"></i> Editar datos del proyecto
-                </button>
-            </div>
-
-            <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
-            <div id="resultBox" class="hidden bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
-                <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
-                <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
-                    <div id="qrcode"></div>
-                </div>
-                <div class="space-y-2">
-                    <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
-                        Abrir Detalle Público
-                    </a>
-                    <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-950 text-xs text-rose-300 rounded-xl border border-rose-500/30">
-                        <i class="fas fa-copy"></i> Copiar Enlace
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -314,6 +329,7 @@
         let countdownInterval = null;
         let audioStream = null;
         let proyectoActualId = null;
+        let proyectoDatosCache = null; // Almacena temporalmente los datos del proyecto actual
 
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
@@ -343,7 +359,7 @@
                     if (docSnap.exists) {
                         proyectoActualId = docId;
                         alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu código QR ha sido desbloqueado.");
-                        abrirVistaPreviaConDatos(docSnap.data(), true);
+                        mostrarPanelGestion(docSnap.data(), true);
                     }
                 } catch(e) {
                     console.error("Error al actualizar el estado de pago:", e);
@@ -379,7 +395,7 @@
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
                         <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
-                            Ver / Pagar
+                            Ver / Gestionar
                         </button>
                         <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
                             <i class="fas fa-trash-alt"></i>
@@ -392,6 +408,7 @@
 
         function mostrarFormularioCreacion() {
             document.getElementById('homeDashboard').classList.add('hidden');
+            document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('createForm').reset();
             document.getElementById('formTitleText').innerText = "Nuevo Proyecto";
@@ -421,7 +438,7 @@
                         document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     }
 
-                    document.getElementById('previewContainer').classList.add('hidden');
+                    document.getElementById('panelContainer').classList.add('hidden');
                     document.getElementById('formContainer').classList.remove('hidden');
                     document.getElementById('formTitleText').innerText = "Editar Proyecto";
                 }
@@ -436,24 +453,29 @@
             renderizarProyectosGuardados();
         }
 
-        function cerrarVistaPrevia() {
-            document.getElementById('previewContainer').classList.add('hidden');
+        function volverAlDashboardDesdePanel() {
+            document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('homeDashboard').classList.remove('hidden');
             renderizarProyectosGuardados();
         }
 
+        function cerrarVistaPrevia() {
+            document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('panelContainer').classList.remove('hidden');
+        }
+
         function validarCantidadFotos(input) {
             const meter = document.getElementById('storageMeter');
-            if (input.files.length > 2) {
-                alert("⚠️ Solo puedes seleccionar un máximo de 2 fotografías.");
+            if (input.files.length > 5) {
+                alert("⚠️ Solo puedes seleccionar un máximo de 5 fotografías.");
                 input.value = "";
-                meter.innerText = "📸 Elige hasta 2 imágenes para el carrusel.";
+                meter.innerText = "📸 Elige hasta 5 imágenes para el carrusel.";
             } else if (input.files.length > 0) {
-                meter.innerText = `📸 ${input.files.length} de 2 fotos seleccionadas.`;
+                meter.innerText = `📸 ${input.files.length} de 5 fotos seleccionadas.`;
             }
         }
 
-        // FUNCIÓN DE COMPRESIÓN CORREGIDA Y BLINDADA CONTRA CONGELAMIENTOS
+        // COMPRESIÓN SEGURA Y ESTRICTA POR CANVAS (Soporta imágenes de alta resolución sin omitirlas ni congelar)
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
                 if (!file) {
@@ -465,12 +487,12 @@
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
                     const img = new Image();
-                    img.onerror = () => resolve(e.target.result); // Si falla el canvas, pasa la original a prueba de fallos
+                    img.onerror = () => resolve(null);
                     img.src = e.target.result;
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
-                            let maxDimension = 500;
+                            let maxDimension = 400; // Garantiza espacio seguro para 5 fotos dentro de Firestore
                             let width = img.width;
                             let height = img.height;
 
@@ -487,9 +509,9 @@
 
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.6));
+                            resolve(canvas.toDataURL('image/jpeg', 0.5)); // Compresión óptima multiformato
                         } catch (err) {
-                            resolve(e.target.result); // Respaldo inmediato si ocurre cualquier error en memoria
+                            resolve(null);
                         }
                     };
                 };
@@ -583,20 +605,20 @@
         let pvPhotosArray = [];
         let currentSlide = 0;
 
-        async function guardarYVerVistaPrevia() {
+        async function guardarProyectoYMostrarPanel() {
             const photosFiles = document.getElementById('photosInput').files;
             
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
 
             try {
+                let nuevasFotos = [];
                 if (photosFiles && photosFiles.length > 0) {
-                    pvPhotosArray = [];
-                    const maxFotos = Math.min(photosFiles.length, 2);
+                    const maxFotos = Math.min(photosFiles.length, 5);
                     for (let i = 0; i < maxFotos; i++) {
                         const fotoOptimizada = await comprimirFotoEnMemoria(photosFiles[i]);
                         if (fotoOptimizada) {
-                            pvPhotosArray.push(fotoOptimizada);
+                            nuevasFotos.push(fotoOptimizada);
                         }
                     }
                 }
@@ -617,12 +639,17 @@
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                if (pvPhotosArray.length > 0) {
-                    datosAEnviar.fotos = pvPhotosArray;
+                // Si seleccionaron nuevas fotos, se actualizan; si se está editando sin cambiar fotos, se mantienen las anteriores
+                if (nuevasFotos.length > 0) {
+                    datosAEnviar.fotos = nuevasFotos;
                 }
 
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
+                    // Si no subieron nuevas fotos al editar, conservamos las previas en la BD
+                    if (nuevasFotos.length === 0 && proyectoDatosCache && proyectoDatosCache.fotos) {
+                        delete datosAEnviar.fotos; 
+                    }
                     await docRef.update(datosAEnviar);
                 } else {
                     docRef = await db.collection("detalles").add(datosAEnviar);
@@ -646,18 +673,17 @@
                 guardarProyectosLocales(proyectos);
 
                 const snapCheck = await docRef.get();
-                const datosCompletos = snapCheck.data();
-                pvPhotosArray = datosCompletos.fotos || [];
-
-                abrirVistaPreviaConDatos(datosCompletos, datosCompletos.pagado === true);
+                proyectoDatosCache = snapCheck.data();
 
                 document.getElementById('statusBox').classList.add('hidden');
-                document.getElementById('createForm').classList.remove('hidden');
                 document.getElementById('formContainer').classList.add('hidden');
+                
+                // Mostrar panel de gestión (sin forzar vista previa de golpe)
+                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
 
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("⚠️ Ocurrió un error al guardar el proyecto debido a la conexión: " + error.message);
+                alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -670,7 +696,10 @@
             try {
                 const docSnap = await db.collection("detalles").doc(firebaseId).get();
                 if (docSnap.exists) {
-                    abrirVistaPreviaConDatos(docSnap.data(), docSnap.data().pagado === true);
+                    proyectoDatosCache = docSnap.data();
+                    document.getElementById('homeDashboard').classList.add('hidden');
+                    document.getElementById('formContainer').classList.add('hidden');
+                    mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
                 } else {
                     alert("No se encontró el proyecto en la base de datos.");
                 }
@@ -688,36 +717,17 @@
             }
         }
 
-        function abrirVistaPreviaConDatos(data, yaPagado) {
+        function mostrarPanelGestion(data, yaPagado) {
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('formContainer').classList.add('hidden');
-            document.getElementById('previewContainer').classList.remove('hidden');
-            document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
+            document.getElementById('previewContainer').classList.add('hidden');
+            document.getElementById('panelContainer').classList.remove('hidden');
 
-            document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${data.nombres}`;
-            document.getElementById('pv-mainDate').innerText = data.fecha;
-            document.getElementById('pv-cardMessage').innerText = data.mensaje;
-            pvPhotosArray = data.fotos || [];
-            buildPvCarousel();
-
-            if (data.voiceNoteBase64) {
-                document.getElementById('pv-voicePlayer').src = data.voiceNoteBase64;
-                document.getElementById('pv-voiceSection').classList.remove('hidden');
-            } else {
-                document.getElementById('pv-voiceSection').classList.add('hidden');
-            }
-
-            loadPvQuizQuestion();
+            const paySection = document.getElementById('paySection');
+            const resultBox = document.getElementById('resultBox');
 
             if (yaPagado) {
-                const adBanner = document.getElementById('adsterraBannerContainer');
-                if (adBanner) adBanner.style.display = 'none';
-
-                document.getElementById('pv-heart-section').classList.add('hidden');
-                document.getElementById('pv-mainContent').classList.remove('hidden');
-                document.getElementById('paySection').classList.add('hidden');
-                
-                const resultBox = document.getElementById('resultBox');
+                paySection.classList.add('hidden');
                 resultBox.classList.remove('hidden');
 
                 const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
@@ -730,10 +740,44 @@
                     height: 160
                 });
             } else {
+                paySection.classList.remove('hidden');
+                resultBox.classList.add('hidden');
+            }
+        }
+
+        // FUNCIÓN QUE ABRE LA PANTALLA COMPLETA AISLADA (OCULTANDO ANUNCIOS)
+        function abrirVistaPreviaPantallaCompleta() {
+            if (!proyectoDatosCache) return;
+
+            // Ocultar banner de Adsterra superior para que la vista previa luzca limpia
+            const adBanner = document.getElementById('adsterraBannerContainer');
+            if (adBanner) adBanner.style.display = 'none';
+
+            document.getElementById('panelContainer').classList.add('hidden');
+            document.getElementById('previewContainer').classList.remove('hidden');
+            document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
+
+            document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${proyectoDatosCache.nombres}`;
+            document.getElementById('pv-mainDate').innerText = proyectoDatosCache.fecha;
+            document.getElementById('pv-cardMessage').innerText = proyectoDatosCache.mensaje;
+            pvPhotosArray = proyectoDatosCache.fotos || [];
+            buildPvCarousel();
+
+            if (proyectoDatosCache.voiceNoteBase64) {
+                document.getElementById('pv-voicePlayer').src = proyectoDatosCache.voiceNoteBase64;
+                document.getElementById('pv-voiceSection').classList.remove('hidden');
+            } else {
+                document.getElementById('pv-voiceSection').classList.add('hidden');
+            }
+
+            loadPvQuizQuestion();
+
+            if (proyectoDatosCache.pagado === true) {
+                document.getElementById('pv-heart-section').classList.add('hidden');
+                document.getElementById('pv-mainContent').classList.remove('hidden');
+            } else {
                 document.getElementById('pv-heart-section').classList.remove('hidden');
                 document.getElementById('pv-mainContent').classList.add('hidden');
-                document.getElementById('paySection').classList.remove('hidden');
-                document.getElementById('resultBox').classList.add('hidden');
             }
         }
 
@@ -914,7 +958,7 @@
             try {
                 const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
                 if (docSnap.exists && docSnap.data().pagado === true) {
-                    abrirVistaPreviaConDatos(docSnap.data(), true);
+                    mostrarPanelGestion(docSnap.data(), true);
                     alert("✨ ¡Proyecto verificado y desbloqueado con éxito!");
                 } else {
                     const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
@@ -932,7 +976,7 @@
                         });
 
                         const updatedSnap = await db.collection("detalles").doc(proyectoActualId).get();
-                        abrirVistaPreviaConDatos(updatedSnap.data(), true);
+                        mostrarPanelGestion(updatedSnap.data(), true);
                         alert("🎉 ¡Comprobante validado correctamente! Desbloqueado con éxito.");
                     } else if (codigoOperacion !== null) {
                         alert("⚠️ Debes ingresar un número de comprobante válido.");
