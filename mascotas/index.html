@@ -17,8 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Google AdSense SDK -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
+    <!-- Anunsio ti Adsterra inikkat ti AdSense -->
 
     <style>
         body {
@@ -53,6 +52,20 @@
                 <i class="fa-solid fa-plus-circle text-lg"></i>
                 <span>CREAR NUEVA PLACA</span>
             </button>
+
+            <!-- ANUNCIO ADSTERRA 1: AL SELECCIONAR / ENTRAR EN MASCOTAS (MENU PRINCIPAL) -->
+            <div class="my-2 flex justify-center items-center bg-slate-950 p-2 rounded-xl border border-cyan-500/10 min-h-[60px] overflow-hidden">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '5df8950ef937373e7a705c085c8daeea',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"></script>
+            </div>
 
             <div class="pt-2 text-left">
                 <h3 class="text-xs font-bold text-cyan-300 mb-2 uppercase tracking-wider flex items-center gap-1.5">
@@ -198,15 +211,18 @@
                     <canvas id="placaCanvasPay" width="1024" height="1024" class="max-w-[220px] h-auto rounded-xl shadow-2xl border border-cyan-500/30"></canvas>
                 </div>
 
-                <!-- ANUNCIO ADSENSE INTERMEDIO -->
-                <div class="bg-slate-950 p-3 rounded-2xl border border-cyan-500/10 min-h-[90px] flex items-center justify-center">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-2082458944224549"
-                         data-ad-slot="2222222222"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                <!-- ANUNCIO ADSTERRA 2: EN LA PANTALLA DE GUARDAR Y DISEÑAR PLACA -->
+                <div class="my-2 flex justify-center items-center bg-slate-950 p-2 rounded-xl border border-cyan-500/10 min-h-[60px] overflow-hidden">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '5df8950ef937373e7a705c085c8daeea',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"></script>
                 </div>
 
                 <!-- BOTÓN DE PAGO MERCADO PAGO -->
@@ -295,7 +311,7 @@
         let enlaceGenerado = "";
         let fotoBase64 = "https://images.unsplash.com/photo-1543466835-00a7907e9de1";
         let proyectoMascotaId = localStorage.getItem("ultimoMascotaId") || "";
-        let esModoEdicion = false; // Bandera para saber si estamos editando un proyecto existente
+        let esModoEdicion = false;
 
         const PLACAS = {
             escudo:  { cara: "escudo.png", borde: "escudo%20borde.png" },
@@ -311,7 +327,6 @@
             paleta5: ['#455A64', '#1DE9B6', '#FFF9C4']
         };
 
-        // Detector de retorno de pago y validación única de comprobante
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const collectionId = urlParams.get('collection_id') || urlParams.get('payment_id');
@@ -390,7 +405,6 @@
 
                 const data = docSnap.data();
 
-                // Llenamos el formulario con los datos actuales
                 document.getElementById('nombreProyecto').value = data.nombreProyecto || '';
                 document.getElementById('nombreMascota').value = data.nombre || '';
                 document.getElementById('telefonoDuenio').value = data.telefono || '';
@@ -416,7 +430,6 @@
 
                 esModoEdicion = true;
 
-                // Ocultamos la sección de pago y mostramos el formulario
                 document.getElementById('paySection').classList.add('hidden');
                 document.getElementById('formContainer').classList.remove('hidden');
 
@@ -558,7 +571,6 @@
 
             try {
                 if (esModoEdicion && proyectoMascotaId) {
-                    // Actualizamos el proyecto existente
                     await db.collection("mascotas").doc(proyectoMascotaId).update({
                         nombreProyecto: nombreProyectoVal,
                         nombre,
@@ -573,7 +585,6 @@
                     guardarProyectoLocalmente(proyectoMascotaId, nombreProyectoVal, nombre, false);
                     alert("✨ ¡Datos actualizados con éxito!");
                 } else {
-                    // Creamos un proyecto nuevo
                     const docRef = await db.collection("mascotas").add({
                         nombreProyecto: nombreProyectoVal,
                         nombre,
@@ -629,7 +640,6 @@
             }
 
             try {
-                // 1. Verificamos si es tu código secreto personal permanente (nunca expira)
                 if (inputVal === CODIGO_SECRETO_PERSONAL) {
                     await db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true });
                     const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
@@ -646,19 +656,16 @@
                     return;
                 }
 
-                // 2. Si no es el personal, buscamos en la colección de cupones de un solo uso en Firebase
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponSnap = await cuponRef.get();
 
                 if (cuponSnap.exists && cuponSnap.data().usado === false) {
-                    // Quemamos el cupón para que no se vuelva a usar
                     await cuponRef.update({ 
                         usado: true, 
                         fechaUso: firebase.firestore.FieldValue.serverTimestamp(),
                         proyectoIdUsado: proyectoMascotaId 
                     });
 
-                    // Desbloqueamos la placa
                     await db.collection("mascotas").doc(proyectoMascotaId).update({ pagado: true });
 
                     const docSnap = await db.collection("mascotas").doc(proyectoMascotaId).get();
