@@ -475,7 +475,7 @@
             }
         }
 
-        // COMPRESIÓN SEGURA Y ESTRICTA POR CANVAS (Soporta imágenes de alta resolución sin omitirlas ni congelar)
+        // COMPRESIÓN ESTRICTAMENTE OPTIMIZADA PARA FOTOS DE ALTA RESOLUCIÓN (1.9 MP o más)
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
                 if (!file) {
@@ -492,7 +492,7 @@
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
-                            let maxDimension = 400; // Garantiza espacio seguro para 5 fotos dentro de Firestore
+                            let maxDimension = 350; // Redimensionado seguro para que múltiples fotos de alta resolución quepan en Firestore (<1MB)
                             let width = img.width;
                             let height = img.height;
 
@@ -509,7 +509,7 @@
 
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.5)); // Compresión óptima multiformato
+                            resolve(canvas.toDataURL('image/jpeg', 0.45)); // Calidad optimizada para evitar superar el límite de Firebase
                         } catch (err) {
                             resolve(null);
                         }
@@ -639,14 +639,13 @@
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // Si seleccionaron nuevas fotos, se actualizan; si se está editando sin cambiar fotos, se mantienen las anteriores
+                // Asignar fotos procesadas correctamente
                 if (nuevasFotos.length > 0) {
                     datosAEnviar.fotos = nuevasFotos;
                 }
 
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
-                    // Si no subieron nuevas fotos al editar, conservamos las previas en la BD
                     if (nuevasFotos.length === 0 && proyectoDatosCache && proyectoDatosCache.fotos) {
                         delete datosAEnviar.fotos; 
                     }
@@ -676,14 +675,13 @@
                 proyectoDatosCache = snapCheck.data();
 
                 document.getElementById('statusBox').classList.add('hidden');
-                document.getElementById('formContainer').classList.add('hidden');
+                document.getElementById('createForm').classList.remove('hidden');
                 
-                // Mostrar panel de gestión (sin forzar vista previa de golpe)
                 mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
 
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
+                alert("⚠️ Ocurrió un error al guardar el proyecto (es posible que el peso total aún exceda el límite permitido por la base de datos): " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -749,7 +747,6 @@
         function abrirVistaPreviaPantallaCompleta() {
             if (!proyectoDatosCache) return;
 
-            // Ocultar banner de Adsterra superior para que la vista previa luzca limpia
             const adBanner = document.getElementById('adsterraBannerContainer');
             if (adBanner) adBanner.style.display = 'none';
 
