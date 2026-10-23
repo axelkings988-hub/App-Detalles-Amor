@@ -17,8 +17,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Anunsio ti Adsterra inikkat ti AdSense -->
-
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -31,7 +29,25 @@
         }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white">
+<body class="p-4 pt-16 flex flex-col items-center justify-center min-h-screen text-white">
+
+    <!-- BANNER ADSTERRA FIJO EN LA PARTE SUPERIOR (CON PROTECCIÓN TRY-CATCH PARA DATOS MÓVILES) -->
+    <div id="stickyAdTop" class="fixed top-0 left-0 w-full bg-slate-950/95 border-b border-cyan-500/30 py-1.5 z-50 flex justify-center items-center shadow-xl backdrop-blur-md min-h-[55px] overflow-hidden">
+        <script type="text/javascript">
+            try {
+                atOptions = {
+                    'key' : '5df8950ef937373e7a705c085c8daeea',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+                document.write('<script type="text/javascript" src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"><\/script>');
+            } catch (e) {
+                console.log("Anuncio bloqueado por red móvil o sin conexión.");
+            }
+        </script>
+    </div>
 
     <div class="w-full max-w-md backdrop-blur-xl bg-slate-900/80 border border-cyan-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-5 relative overflow-hidden my-6">
         
@@ -52,20 +68,6 @@
                 <i class="fa-solid fa-plus-circle text-lg"></i>
                 <span>CREAR NUEVA PLACA</span>
             </button>
-
-            <!-- ANUNCIO ADSTERRA 1: AL SELECCIONAR / ENTRAR EN MASCOTAS (MENU PRINCIPAL) -->
-            <div class="my-2 flex justify-center items-center bg-slate-950 p-2 rounded-xl border border-cyan-500/10 min-h-[60px] overflow-hidden">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '5df8950ef937373e7a705c085c8daeea',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"></script>
-            </div>
 
             <div class="pt-2 text-left">
                 <h3 class="text-xs font-bold text-cyan-300 mb-2 uppercase tracking-wider flex items-center gap-1.5">
@@ -209,20 +211,6 @@
                 <!-- VISTA PREVIA DE LA PLACA CON QR DIFUMINADO -->
                 <div class="flex justify-center my-2">
                     <canvas id="placaCanvasPay" width="1024" height="1024" class="max-w-[220px] h-auto rounded-xl shadow-2xl border border-cyan-500/30"></canvas>
-                </div>
-
-                <!-- ANUNCIO ADSTERRA 2: EN LA PANTALLA DE GUARDAR Y DISEÑAR PLACA -->
-                <div class="my-2 flex justify-center items-center bg-slate-950 p-2 rounded-xl border border-cyan-500/10 min-h-[60px] overflow-hidden">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '5df8950ef937373e7a705c085c8daeea',
-                            'format' : 'iframe',
-                            'height' : 50,
-                            'width' : 320,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"></script>
                 </div>
 
                 <!-- BOTÓN DE PAGO MERCADO PAGO -->
