@@ -1,277 +1,147 @@
+Tengo problemas para conectarme al menú principal este es el .html será por los anuncios igual, ya que si cuento con datos móviles y solo me funciona con la red wifi, a pesar de que en el index de mascotas colocamos un script con un bloque de Try-Catch, será conveniente modificar el menú principal que es este?
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>App - Detalles y Utilidades</title>
 
-    <title>App Detalles & Amor</title>
+    <!-- Google AdSense SDK & Meta de Verificación -->
+    <meta name="google-adsense-account" content="ca-pub-2082458944224549">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
 
-    <!-- PRUEBA: SIN PUBLICIDAD NI RECURSOS EXTERNOS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            min-height: 100%;
-            background: #05050a;
-        }
-
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #05050a;
-            background-image:
-                radial-gradient(
-                    circle at 20% 20%,
-                    rgba(236, 72, 153, 0.15),
-                    transparent 40%
-                ),
-                radial-gradient(
-                    circle at 80% 40%,
-                    rgba(245, 158, 11, 0.15),
-                    transparent 40%
-                ),
-                radial-gradient(
-                    circle at 50% 80%,
-                    rgba(6, 182, 212, 0.15),
-                    transparent 40%
-                );
-
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px 16px;
-            color: #ffffff;
+            /* Fondo de fuegos artificiales y luces festivas */
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 40%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%23FFFFFF' stroke-width='1' opacity='0.08'%3E%3Cpath d='M400 100 L400 300 M300 200 L500 200 M330 130 L470 270 M330 270 L470 130'/%3E%3Cpath d='M150 500 L150 650 M80 575 L220 575'/%3E%3Cpath d='M650 500 L650 650 M580 575 L720 575'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: cover;
         }
 
-        .container {
-            width: 100%;
-            max-width: 380px;
-            margin: auto;
-            text-align: center;
-        }
-
-        .badge {
-            display: block;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-        }
-
-        .title {
-            margin-bottom: 6px;
-            color: #ffffff;
-            font-size: 28px;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        .subtitle {
-            margin-bottom: 24px;
-            color: #cbd5e1;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .menu-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            text-align: left;
-        }
-
-        .card {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            min-height: 80px;
-            padding: 14px;
-            border-radius: 16px;
-            text-decoration: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.15s ease;
-        }
-
-        .card:active {
-            transform: scale(0.98);
-        }
-
-        .icon-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 48px;
-            height: 48px;
-            margin-right: 14px;
-            border-radius: 12px;
-            font-size: 25px;
-        }
-
-        .card-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .card-title {
-            margin-bottom: 4px;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 800;
-            line-height: 1.3;
-        }
-
-        .card-desc {
-            color: #475569;
-            font-size: 11px;
-            font-weight: 500;
-            line-height: 1.4;
-        }
-
+        /* Efectos Glow Neón para las Tarjetas */
         .card-pink {
-            background: #fff1f2;
-            border: 2px solid #ec4899;
-            box-shadow: 0 0 18px rgba(236, 72, 153, 0.25);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 241, 242, 0.9) 100%);
+            border: 2px solid #EC4899;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.6), inset 0 0 15px rgba(236, 72, 153, 0.2);
         }
-
-        .card-pink .icon-box {
-            background: #fce7f3;
+        .card-pink:hover {
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.8), inset 0 0 20px rgba(236, 72, 153, 0.3);
+            transform: translateY(-3px);
         }
 
         .card-gold {
-            background: #fefce8;
-            border: 2px solid #f59e0b;
-            box-shadow: 0 0 18px rgba(245, 158, 11, 0.25);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 252, 232, 0.9) 100%);
+            border: 2px solid #F59E0B;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), inset 0 0 15px rgba(245, 158, 11, 0.2);
         }
-
-        .card-gold .icon-box {
-            background: #fef3c7;
+        .card-gold:hover {
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.8), inset 0 0 20px rgba(245, 158, 11, 0.3);
+            transform: translateY(-3px);
         }
 
         .card-cyan {
-            background: #ecfeff;
-            border: 2px solid #06b6d4;
-            box-shadow: 0 0 18px rgba(6, 182, 212, 0.25);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 254, 255, 0.9) 100%);
+            border: 2px solid #06B6D4;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.6), inset 0 0 15px rgba(6, 182, 212, 0.2);
         }
-
-        .card-cyan .icon-box {
-            background: #cffafe;
+        .card-cyan:hover {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.8), inset 0 0 20px rgba(6, 182, 212, 0.3);
+            transform: translateY(-3px);
         }
 
         .card-green {
-            background: #f0fdf4;
-            border: 2px solid #22c55e;
-            box-shadow: 0 0 18px rgba(34, 197, 94, 0.25);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.9) 100%);
+            border: 2px solid #22C55E;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), inset 0 0 15px rgba(34, 197, 94, 0.2);
+        }
+        .card-green:hover {
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.8), inset 0 0 20px rgba(34, 197, 94, 0.3);
+            transform: translateY(-3px);
         }
 
-        .card-green .icon-box {
-            background: #dcfce7;
-        }
-
-        .footer {
-            margin-top: 24px;
-            color: #94a3b8;
-            font-size: 10px;
-            line-height: 1.5;
-        }
-
-        @media (max-width: 350px) {
-            .title {
-                font-size: 24px;
-            }
-
-            .menu-list {
-                gap: 12px;
-            }
-
-            .card {
-                padding: 12px;
-            }
-
-            .icon-box {
-                margin-right: 10px;
-            }
+        .card-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white relative overflow-x-hidden">
 
-<body>
-    <main class="container">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="w-full max-w-sm text-center space-y-6 my-auto">
+        
+        <!-- ENCABEZADO -->
+        <div class="space-y-1.5">
+            <span class="text-[10px] text-slate-300 uppercase tracking-[0.25em] font-semibold">Centro de Utilidades</span>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">App Detalles & Amor</h1>
+            <p class="text-xs text-slate-300 font-medium">Selecciona una herramienta para comenzar.</p>
+        </div>
 
-        <header>
-            <span class="badge">Centro de Utilidades</span>
+        <!-- LISTA DE MÓDULOS -->
+        <div class="space-y-4 text-left pt-2">
 
-            <h1 class="title">App Detalles & Amor</h1>
-
-            <p class="subtitle">
-                Selecciona una herramienta para comenzar.
-            </p>
-        </header>
-
-        <nav class="menu-list" aria-label="Menú principal">
-
-            <a href="parejas/" class="card card-pink">
-                <div class="icon-box" aria-hidden="true">❤️</div>
-                <div class="card-content">
-                    <div class="card-title">Minisitio de Parejas</div>
-                    <div class="card-desc">
-                        Sorprende a tu pareja con detalles románticos.
-                    </div>
+            <!-- MÓDULO 1: PAREJAS -->
+            <a href="parejas/" class="card-pink card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-pink-600 transition-colors">Minisitio de Parejas</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Sorprende a tu pareja con detalles románticos.</p>
                 </div>
             </a>
 
-            <a href="temporizador/" class="card card-gold">
-                <div class="icon-box" aria-hidden="true">⏰</div>
-                <div class="card-content">
-                    <div class="card-title">Mensaje Temporizador</div>
-                    <div class="card-desc">
-                        Envía mensajes con cuenta regresiva especial.
-                    </div>
+            <!-- MÓDULO 2: MENSAJE TEMPORIZADOR -->
+            <a href="temporizador/" class="card-gold card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-amber-600 transition-colors">Mensaje Temporizador</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Envía mensajes con cuenta regresiva especial.</p>
                 </div>
             </a>
 
-            <a href="mascotas/" class="card card-cyan">
-                <div class="icon-box" aria-hidden="true">🐾</div>
-                <div class="card-content">
-                    <div class="card-title">Placa QR de Mascota</div>
-                    <div class="card-desc">
-                        Genera medallas con colores neón y perfil de emergencia.
-                    </div>
+            <!-- MÓDULO 3: MASCOTAS -->
+            <a href="mascotas/" class="card-cyan card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-paw"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-cyan-600 transition-colors">Placa QR de Mascota</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Genera medallas con colores neón y perfil de emergencia.</p>
                 </div>
             </a>
 
-            <a
-                href="https://wa.me/528128869036?text=Hola%2C%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR."
-                target="_blank"
-                rel="noopener noreferrer"
-                class="card card-green"
-            >
-                <div class="icon-box" aria-hidden="true">💬</div>
-                <div class="card-content">
-                    <div class="card-title">Atención al Cliente</div>
-                    <div class="card-desc">
-                        ¿Hiciste tu pago y no se vio el QR?
-                        Toca aquí para ayudarte por WhatsApp.
-                    </div>
+            <!-- MÓDULO 4: ATENCIÓN AL CLIENTE / SOPORTE WHATSAPP -->
+            <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
+                <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-green-600 transition-colors">Atención al Cliente</h2>
+                    <p class="text-[11px] text-slate-600 font-medium leading-tight">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte por WhatsApp.</p>
                 </div>
             </a>
 
-        </nav>
+        </div>
 
-        <footer class="footer">
-            Desarrollado con pasión • Protección y Detalles
-        </footer>
+        <!-- PIE DE PÁGINA -->
+        <div class="pt-4 text-[10px] text-slate-400 font-medium">
+            Desarrollado con pasión • Protección y Detalles • by kingsAngels
+        </div>
 
-    </main>
+    </div>
+
 </body>
 </html>
