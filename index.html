@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>App - Detalles y Utilidades</title>
 
-    <!-- FontAwesome para los íconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- CARGA ASÍNCRONA DE FUENTES E ÍCONOS (EVITA PANTALLA NEGRA EN DATOS MÓVILES) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"></noscript>
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,7 +29,8 @@
             justify-content: center;
             padding: 16px;
             color: #ffffff;
-            padding-top: 60px; /* Espacio para el banner superior si carga */
+            padding-top: 16px;
+            transition: padding-top 0.3s ease;
         }
 
         /* BANNER ADSTERRA SUPERIOR FIJO */
@@ -37,7 +41,7 @@
             width: 100%;
             background: rgba(5, 5, 10, 0.95);
             border-bottom: 1px solid rgba(6, 182, 212, 0.3);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             min-height: 50px;
@@ -94,7 +98,7 @@
 <body>
 
     <!-- CONTENEDOR DINÁMICO DE ANUNCIO SUPERIOR -->
-    <div id="topAdContainer" style="display: none;"></div>
+    <div id="topAdContainer"></div>
 
     <div class="container">
         
@@ -106,7 +110,7 @@
 
         <div class="menu-list">
             <a href="parejas/" class="card card-pink">
-                <div class="icon-box"><i class="fa-solid fa-heart"></i></div>
+                <div class="icon-box">❤️</div>
                 <div class="card-content">
                     <div class="card-title">Minisitio de Parejas</div>
                     <div class="card-desc">Sorprende a tu pareja con detalles románticos.</div>
@@ -114,7 +118,7 @@
             </a>
 
             <a href="temporizador/" class="card card-gold">
-                <div class="icon-box"><i class="fa-solid fa-clock"></i></div>
+                <div class="icon-box">⏰</div>
                 <div class="card-content">
                     <div class="card-title">Mensaje Temporizador</div>
                     <div class="card-desc">Envía mensajes con cuenta regresiva especial.</div>
@@ -122,7 +126,7 @@
             </a>
 
             <a href="mascotas/" class="card card-cyan">
-                <div class="icon-box"><i class="fa-solid fa-paw"></i></div>
+                <div class="icon-box">🐾</div>
                 <div class="card-content">
                     <div class="card-title">Placa QR de Mascota</div>
                     <div class="card-desc">Genera medallas con colores neón y perfil de emergencia.</div>
@@ -130,7 +134,7 @@
             </a>
 
             <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card card-green">
-                <div class="icon-box"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="icon-box">💬</div>
                 <div class="card-content">
                     <div class="card-title">Atención al Cliente</div>
                     <div class="card-desc">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte por WhatsApp.</div>
@@ -145,25 +149,22 @@
     </div>
 
     <script>
-        // LÓGICA INTELIGENTE DE DETECCIÓN DE RED / CONEXIÓN
-        window.addEventListener('DOMContentLoaded', () => {
+        // CARGA INTELIGENTE ULTRA SEGURA PARA REDES MÓVILES
+        window.addEventListener('load', () => {
             const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
             
-            // Verificamos si está en modo datos móviles estricto o conexión lenta (effectiveType: 'slow-2g', '2g', '3g')
-            let esDatosMovilesLentos = false;
-            if (connection) {
-                if (connection.saveData === true || ['slow-2g', '2g', '3g'].includes(connection.effectiveType)) {
-                    esDatosMovilesLentos = true;
-                }
+            // Si la conexión es de datos móviles estricta o lenta, no cargamos el script de anuncios para proteger el rendimiento
+            let esRedMovilLenta = false;
+            if (connection && (connection.saveData || ['slow-2g', '2g', '3g', '4g'].includes(connection.effectiveType) && connection.type === 'cellular')) {
+                // Si la red reporta celda móvil, evitamos bloqueos
+                esRedMovilLenta = true;
             }
 
-            // Si estamos en Wi-Fi o red rápida, intentamos cargar el anuncio con seguridad
-            if (!esDatosMovilesLentos) {
+            // Solo si NO se detectan restricciones agresivas intentamos inyectar el iframe
+            if (!esRedMovilLenta) {
                 try {
                     const adContainer = document.getElementById('topAdContainer');
-                    adContainer.style.display = 'flex';
-
-                    // Inyectamos el script de Adsterra de forma dinámica
+                    
                     window.atOptions = {
                         'key' : '5df8950ef937373e7a705c085c8daeea',
                         'format' : 'iframe',
@@ -176,7 +177,11 @@
                     script.type = 'text/javascript';
                     script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
                     
-                    // Si el script falla o tarda en cargar por la red, lo ocultamos para que no afecte la vista
+                    script.onload = () => {
+                        adContainer.style.display = 'flex';
+                        document.body.style.paddingTop = '60px';
+                    };
+
                     script.onerror = () => {
                         adContainer.style.display = 'none';
                         document.body.style.paddingTop = '16px';
@@ -184,14 +189,9 @@
 
                     adContainer.appendChild(script);
                 } catch (e) {
-                    // Si ocurre cualquier error, ocultamos el contenedor del anuncio
                     document.getElementById('topAdContainer').style.display = 'none';
                     document.body.style.paddingTop = '16px';
                 }
-            } else {
-                // Si detecta datos móviles lentos u operadora restrictiva, omite el anuncio por completo
-                document.getElementById('topAdContainer').style.display = 'none';
-                document.body.style.paddingTop = '16px';
             }
         });
     </script>
