@@ -58,9 +58,9 @@
             transition: background 0.8s ease-in-out;
         }
 
-        /* Fondo personalizado con tu GIF subido para el estilo Pareja */
+        /* Fondo para la Edición Romántica con filtro tenue para MÁXIMO BRILLO del GIF */
         .bg-pareja-revelado {
-            background-image: linear-gradient(rgba(35, 4, 8, 0.85), rgba(35, 4, 8, 0.85)), url('./gif-besos-de-amor.gif') !important;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.20)), url('./gif-besos-de-amor.gif') !important;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
@@ -86,12 +86,12 @@
         }
     </style>
 </head>
-<body id="bodyBg" class="p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
+<body id="bodyBg" class="p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
 
-    <!-- CONTENEDOR PRINCIPAL CON TRANSPARENCIA, BORDES BRILLANTES Y SOMBRA NEGRA PROFUNDA -->
-    <div id="mainContainer" class="w-full max-w-md backdrop-blur-md bg-black/35 border border-white/30 p-6 rounded-3xl shadow-[0_0_35px_rgba(0,0,0,0.85)] text-center space-y-5 relative overflow-hidden">
+    <!-- CONTENEDOR PRINCIPAL: Borde exterior removido y fondo transparente para máxima integración -->
+    <div id="mainContainer" class="w-full max-w-md p-2 text-center space-y-4 relative overflow-hidden">
         
-        <!-- CABECERA: PARA / DE -->
+        <!-- CABECERA: PARA / DE (CONSERVADO) -->
         <div class="space-y-1">
             <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md">Sorpresa Protegida</span>
             <h2 class="text-sm font-semibold opacity-100 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Para: <span id="txtPara" class="font-extrabold text-amber-200">...</span></h2>
@@ -128,9 +128,9 @@
             <p class="text-[10px] italic text-amber-200/90 drop-shadow">🔒 Protegido con candado hasta finalizar el tiempo.</p>
         </div>
 
-        <!-- MODO REVELADO -->
-        <div id="revealedBox" class="hidden space-y-4">
-            <div id="contenidoSorpresaContainer" class="p-4 rounded-3xl bg-black/40 backdrop-blur-md border border-white/30 text-center shadow-[0_0_25px_rgba(0,0,0,0.8)] relative overflow-hidden">
+        <!-- MODO REVELADO: Ocupa el tamaño de la foto limpia sin cuadros anidados -->
+        <div id="revealedBox" class="hidden w-full">
+            <div id="contenidoSorpresaContainer" class="w-full text-center relative overflow-hidden">
                 <!-- Se inyecta la sorpresa elegida -->
             </div>
         </div>
@@ -160,7 +160,7 @@
 
         let datosGlobales = {};
 
-        // GIFS DE FUEGOS ARTIFICIALES (Se usan si no es pareja)
+        // GIFS DE FUEGOS ARTIFICIALES
         const fondosFuegosArtificiales = {
             familiar: "https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif",
             cumpleaños: "https://media.giphy.com/media/3o7tT127O8vXzE2F6U/giphy.gif"
@@ -184,22 +184,18 @@
 
         function aplicarEstilo(estilo) {
             const body = document.getElementById('bodyBg');
-            const container = document.getElementById('mainContainer');
             const badge = document.getElementById('badgeEstilo');
 
             if(estilo === 'familiar') {
                 body.style.background = "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)";
-                container.className += " border-cyan-400/40";
                 badge.className += " bg-cyan-500 text-white";
                 badge.innerText = "✨ Edición Mágica";
             } else if(estilo === 'pareja') {
                 body.style.background = "linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%)";
-                container.className += " border-rose-400/40";
                 badge.className += " bg-rose-500 text-white";
                 badge.innerText = "💖 Edición Romántica";
             } else {
                 body.style.background = "linear-gradient(135deg, #31103F 0%, #4C1D95 50%, #6D28D9 100%)";
-                container.className += " border-amber-400/40";
                 badge.className += " bg-amber-400 text-amber-950";
                 badge.innerText = "🎉 Edición Cumpleaños";
             }
@@ -234,43 +230,47 @@
             document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
-            // Aplicar fondo correcto al finalizar el temporizador según el diseño
+            // Aplicar fondo resplandeciente para Estilo Pareja o Fuegos Artificiales para otros
             const body = document.getElementById('bodyBg');
             if(data.estilo === 'pareja') {
-                // Aplica tu imagen GIF personalizada de besos
-                body.className = "p-4 flex flex-col items-center justify-center min-h-screen text-white bg-pareja-revelado";
+                body.className = "p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-pareja-revelado";
             } else {
-                // Aplica fuegos artificiales normales para familiar o cumpleaños
                 const gifFuegos = fondosFuegosArtificiales[data.estilo] || fondosFuegosArtificiales['familiar'];
-                body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${gifFuegos}')`;
+                body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('${gifFuegos}')`;
             }
 
             const container = document.getElementById('contenidoSorpresaContainer');
             
             if(data.tipoSorpresa === 'audio') {
-                container.innerHTML = `<p class="text-xs mb-3 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🎵 Nota de Voz Recibida</p>
-                                       <audio controls class="w-full shadow-lg rounded-xl"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>`;
-            } else if(data.tipoSorpresa === 'foto') {
-                container.innerHTML = `<p class="text-xs mb-3 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🖼️ Foto Secreta Revelada</p>
-                                       <div class="p-2 bg-black rounded-2xl border border-white/20 shadow-2xl">
-                                           <img src="${data.contenidoSorpresa}" class="w-full max-h-80 object-contain rounded-xl mx-auto block opacity-100">
-                                       </div>`;
-            } else if(data.tipoSorpresa === 'cupon') {
-                /* EXPERIENCIA INTERACTIVA DE RASCA Y GANA PARA EL PREMIO */
                 container.innerHTML = `
-                    <p class="text-xs mb-2 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🎟️ ¡Premio Desbloqueado!</p>
-                    <p class="text-[11px] text-slate-200 mb-3 italic">✨ Rasca el recuadro con tu dedo para ver tu premio ✨</p>
-                    
-                    <div class="scratch-container relative w-full h-28 rounded-2xl overflow-hidden border-2 border-dashed border-amber-300 shadow-2xl bg-black/80 flex items-center justify-center p-3">
-                        <div class="text-base sm:text-lg font-extrabold text-amber-100 z-0 text-center px-2">
-                            ${data.contenidoSorpresa}
+                    <div class="bg-black/50 backdrop-blur-md p-4 rounded-3xl border border-white/20 shadow-2xl">
+                        <p class="text-xs mb-3 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🎵 Nota de Voz Recibida</p>
+                        <audio controls class="w-full shadow-lg rounded-xl"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>
+                    </div>`;
+            } else if(data.tipoSorpresa === 'foto') {
+                // Foto limpia sin marcos múltiples ni cuadros negros anidados
+                container.innerHTML = `
+                    <div class="w-full">
+                        <p class="text-xs mb-2 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🖼️ Foto Secreta Revelada</p>
+                        <img src="${data.contenidoSorpresa}" class="w-full max-h-[75vh] object-contain rounded-2xl mx-auto block shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-white/20">
+                    </div>`;
+            } else if(data.tipoSorpresa === 'cupon') {
+                container.innerHTML = `
+                    <div class="bg-black/50 backdrop-blur-md p-4 rounded-3xl border border-white/20 shadow-2xl space-y-3">
+                        <p class="text-xs font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🎟️ ¡Premio Desbloqueado!</p>
+                        <p class="text-[11px] text-slate-200 italic">✨ Rasca el recuadro con tu dedo para ver tu premio ✨</p>
+                        
+                        <div class="scratch-container relative w-full h-28 rounded-2xl overflow-hidden border-2 border-dashed border-amber-300 shadow-2xl bg-black/80 flex items-center justify-center p-3">
+                            <div class="text-base sm:text-lg font-extrabold text-amber-100 z-0 text-center px-2">
+                                ${data.contenidoSorpresa}
+                            </div>
+                            <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
                         </div>
-                        <canvas id="scratchCanvas" class="scratch-canvas"></canvas>
-                    </div>
 
-                    <button onclick="reclamarPremio('${data.de}', '${data.contenidoSorpresa}')" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-2xl transition-all active:scale-95">
-                        🎁 Reclamar Premio (Enviar a WhatsApp)
-                    </button>
+                        <button onclick="reclamarPremio('${data.de}', '${data.contenidoSorpresa}')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-2xl transition-all active:scale-95">
+                            🎁 Reclamar Premio (Enviar a WhatsApp)
+                        </button>
+                    </div>
                 `;
 
                 setTimeout(initScratchCard, 100);
