@@ -35,7 +35,7 @@
             min-height: 60px;
         }
 
-        /* Fondo dinámico para estilo Pareja */
+        /* Fondo dinámico para estilo Pareja en el Creador */
         .bg-pareja-estilo {
             background-image: linear-gradient(135deg, rgba(74, 14, 23, 0.85) 0%, rgba(43, 6, 11, 0.9) 100%), url('./gif-besos-de-amor.gif');
             background-size: cover;
@@ -47,7 +47,7 @@
 </head>
 <body class="p-4 flex flex-col items-center min-h-screen">
 
-    <!-- BANNER FIJO SUPERIOR ADSTERRA (Acompaña todo el flujo del creador con protección móvil) -->
+    <!-- BANNER FIJO SUPERIOR ADSTERRA -->
     <div id="adBannerContainer">
         <div id="adWrapper" style="min-width: 320px; min-height: 50px; display: flex; justify-content: center; align-items: center;">
             <span class="text-[9px] text-amber-300/40 uppercase tracking-widest">Cargando anuncio...</span>
@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA TRANSITORIA / PUBLICIDAD 1: AL DAR CLIC EN "CREAR NUEVO TEMPORIZADOR" -->
+    <!-- PANTALLA TRANSITORIA / PUBLICIDAD 1 -->
     <div id="adTransitionScreen" class="hidden w-full max-w-md bg-amber-950/90 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-4 my-6 text-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto"></div>
         <p class="text-xs font-semibold text-amber-200">Cargando editor del temporizador...</p>
@@ -135,11 +135,14 @@
             </div>
 
             <div class="space-y-1">
-                <label class="font-semibold text-amber-200">Mensaje (máx. 50 palabras):</label>
-                <textarea id="mensajeMarquesina" rows="2" placeholder="Escribe tu dedicatoria especial..." required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none resize-none"></textarea>
+                <div class="flex justify-between items-center">
+                    <label class="font-semibold text-amber-200">Mensaje (máx. 40 letras):</label>
+                    <span id="contadorLetras" class="text-[10px] text-amber-300/70">40 / 40</span>
+                </div>
+                <textarea id="mensajeMarquesina" rows="2" maxlength="40" oninput="actualizarContadorLetras()" placeholder="Escribe tu dedicatoria especial..." required class="w-full px-3 py-2.5 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-100 focus:outline-none resize-none"></textarea>
             </div>
 
-            <!-- TIPO DE SORPRESA (SOLO UNA OPCIÓN) -->
+            <!-- TIPO DE SORPRESA -->
             <div class="space-y-2.5 pt-2 border-t border-amber-500/20">
                 <label class="font-semibold text-amber-200 block">ELIGE UN TIPO DE SORPRESA (Solo una):</label>
                 
@@ -162,13 +165,13 @@
                     </div>
                 </div>
 
-                <!-- OPCIÓN 2: FOTO -->
+                <!-- OPCIÓN 2: FOTO (Con compresión optimizada para fotos pesadas) -->
                 <div class="space-y-2 bg-amber-900/40 p-3 rounded-2xl border border-amber-500/20">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="tipoSorpresa" value="foto" onchange="toggleSorpresa('foto')">
-                        <span>🖼️ Seleccionar Foto de Galería</span>
+                        <span>🖼️ Seleccionar Foto de Galería (Optimización automática)</span>
                     </label>
-                    <input type="file" id="inputFoto" accept="image/*" onchange="cargarFotoGaleria(event)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800" disabled>
+                    <input type="file" id="inputFoto" accept="image/*" onchange="comprimirYcargarFoto(event)" class="w-full px-3 py-1.5 rounded-lg bg-amber-950 border border-amber-500/30 text-amber-100 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800" disabled>
                 </div>
 
                 <!-- OPCIÓN 3: CUPÓN -->
@@ -187,13 +190,13 @@
         </form>
     </div>
 
-    <!-- PANTALLA DE CARGA / PUBLICIDAD 2: AL DAR CLIC EN "GUARDAR Y VER VISTA PREVIA" -->
+    <!-- PANTALLA DE CARGA -->
     <div id="saveLoadingScreen" class="hidden w-full max-w-md bg-amber-950/90 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl space-y-4 my-6 text-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto"></div>
-        <p class="text-xs font-semibold text-amber-200">Guardando tu temporizador y generando vista previa...</p>
+        <p class="text-xs font-semibold text-amber-200">Optimizando archivos y guardando tu temporizador...</p>
     </div>
 
-    <!-- SECCIÓN 3: VISTA PREVIA Y PAGO (Con pt-16 para que la barra de anuncios no tape los botones) -->
+    <!-- SECCIÓN 3: VISTA PREVIA Y PAGO -->
     <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-amber-950/95 backdrop-blur-2xl overflow-y-auto px-4 pt-16 pb-12 space-y-6">
         <div class="w-full max-w-lg mx-auto space-y-6">
             <div class="flex items-center justify-between">
@@ -205,17 +208,14 @@
                 </button>
             </div>
 
-            <!-- SECCIÓN DE DESBLOQUEO / PAGO / VERIFICACIÓN -->
             <div id="paySection" class="bg-amber-900/80 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
                 <h3 class="text-base font-bold text-amber-100">¿Te gustó el resultado? ⏳</h3>
                 <p class="text-xs text-amber-300/80">Desbloquea el enlace público y el código QR oficial.</p>
 
-                <!-- BOTÓN DE PAGO MERCADO PAGO -->
                 <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                     <span id="payBtnText">💳 Desbloquear Código QR ($25.00 MXN)</span>
                 </button>
 
-                <!-- CAMPO PARA EL CUPÓN O CÓDIGO -->
                 <div class="pt-3 border-t border-amber-500/20 space-y-2 text-left">
                     <label class="text-[11px] font-semibold text-amber-200 block">Agrega cupón de regalo</label>
                     <div class="flex gap-2">
@@ -226,14 +226,12 @@
                     </div>
                 </div>
 
-                <!-- BOTÓN DE VERIFICACIÓN AUTOMÁTICA -->
                 <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check-circle"></i>
                     <span>✨ Ya realicé mi pago, verificar</span>
                 </button>
             </div>
 
-            <!-- RESULTADO (CÓDIGO QR Y ENLACE FINAL DESBLOQUEADO) -->
             <div id="resultBox" class="hidden bg-amber-900/90 backdrop-blur-xl border border-amber-500/30 p-6 rounded-3xl shadow-2xl text-center space-y-4">
                 <h3 class="text-sm font-bold text-amber-200">¡Tu temporizador ya está listo! 🎉</h3>
                 <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
@@ -251,7 +249,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE ADSTERRA CON PROTECCIÓN DE CARGA MÓVIL (Deferred Execution) -->
+    <!-- SCRIPT DE ADSTERRA -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(function() {
@@ -259,7 +257,6 @@
                     const wrapper = document.getElementById('adWrapper');
                     if (wrapper) {
                         wrapper.innerHTML = '';
-                        
                         window.atOptions = {
                             'key' : '5df8950ef937373e7a705c085c8daeea',
                             'format' : 'iframe',
@@ -267,21 +264,13 @@
                             'width' : 320,
                             'params' : {}
                         };
-                        
                         const script = document.createElement('script');
                         script.type = 'text/javascript';
                         script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
                         script.async = true;
-                        
-                        script.onerror = function() {
-                            wrapper.innerHTML = '<span class="text-[9px] text-amber-300/40">Modo sin conexión</span>';
-                        };
-
                         wrapper.appendChild(script);
                     }
-                } catch(e) {
-                    console.log("Adsterra load protected:", e);
-                }
+                } catch(e) {}
             }, 800);
         });
     </script>
@@ -315,6 +304,7 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
+            actualizarContadorLetras();
 
             const urlParams = new URLSearchParams(window.location.search);
             const collectionId = urlParams.get('collection_id') || urlParams.get('payment_id');
@@ -324,33 +314,10 @@
             if ((status === 'approved' || status === 'accredited' || status === 'success' || collectionId) && docId) {
                 try {
                     proyectoActualId = docId;
-
-                    if (collectionId) {
-                        const queryCheck = await db.collection("temporizadores").where("pagoIdUnico", "==", collectionId).get();
-                        if (!queryCheck.empty && queryCheck.docs[0].id !== docId) {
-                            alert("⚠️ Este comprobante de pago ya fue utilizado anteriormente en otro proyecto.");
-                            cargarProyecto(docId);
-                            return;
-                        }
-                    }
-
-                    const updateData = { pagado: true };
-                    if (collectionId) updateData.pagoIdUnico = collectionId;
-
-                    await db.collection("temporizadores").doc(docId).update(updateData);
-                    
-                    let proyectos = obtenerProyectosLocales();
-                    let proj = proyectos.find(p => p.firebaseId === docId);
-                    if (proj) {
-                        guardarProyectosLocales(proyectos);
-                    }
-
-                    alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu temporizador ha sido desbloqueado.");
+                    await db.collection("temporizadores").doc(docId).update({ pagado: true });
+                    alert("🎉 ¡Pago confirmado y verificado exitosamente!");
                     abrirVistaPrevia(docId, true);
-                    return;
-                } catch(e) {
-                    console.error("Error al actualizar el pago en Firebase:", e);
-                }
+                } catch(e) {}
             }
         });
 
@@ -381,16 +348,19 @@
                         <p class="text-[10px] text-amber-300/70 truncate">Para: ${proj.para}</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold rounded-xl shadow">
-                            Ver / Pagar
-                        </button>
-                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-amber-900 text-amber-300 hover:text-white text-[11px] rounded-xl border border-amber-500/30">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold rounded-xl shadow">Ver / Pagar</button>
+                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-amber-900 text-amber-300 hover:text-white text-[11px] rounded-xl border border-amber-500/30"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
                 container.appendChild(div);
             });
+        }
+
+        function actualizarContadorLetras() {
+            const input = document.getElementById('mensajeMarquesina');
+            const contador = document.getElementById('contadorLetras');
+            const restantes = 40 - input.value.length;
+            contador.innerText = `${restantes} / 40`;
         }
 
         function mostrarFormularioCreacion() {
@@ -407,6 +377,7 @@
                 proyectoActualId = null;
                 document.getElementById('audioPreview').classList.add('hidden');
                 actualizarVistaPreviaRegalo();
+                actualizarContadorLetras();
             }, 1200);
         }
 
@@ -434,7 +405,6 @@
             }
         }
 
-        // Control del diseño temático y aplicación del fondo GIF en Pareja
         function actualizarVistaPreviaRegalo() {
             const estilo = document.getElementById('estiloDiseno').value;
             document.getElementById('gifPreview').src = gifsRegalos[estilo];
@@ -457,16 +427,53 @@
             cuponInput.disabled = (tipo !== 'cupon');
         }
 
+        // Función de compresión automática de imágenes grandes (ideal para fotos de 6+ megapíxeles)
+        function comprimirYcargarFoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Redimensionar si supera los 800px para garantizar subida ligera
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convertir a JPEG optimizado (calidad 0.7)
+                    fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                };
+            };
+        }
+
         async function iniciarGrabacion() {
             audioChunks = [];
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
                     const reader = new FileReader();
@@ -478,7 +485,6 @@
                         preview.classList.remove('hidden');
                     };
                 };
-
                 mediaRecorder.start();
                 document.getElementById('btnGrabar').disabled = true;
                 document.getElementById('btnGrabar').classList.add('opacity-50');
@@ -489,13 +495,10 @@
                 timerGrabacionInterval = setInterval(() => {
                     timeLeft--;
                     document.getElementById('timerGrabacion').innerText = timeLeft;
-                    if(timeLeft <= 0) {
-                        detenerGrabacion();
-                    }
+                    if(timeLeft <= 0) detenerGrabacion();
                 }, 1000);
-
             } catch(e) {
-                alert("No se pudo acceder al micrófono. Verifica los permisos de tu navegador.");
+                alert("No se pudo acceder al micrófono.");
             }
         }
 
@@ -511,30 +514,25 @@
             document.getElementById('timerGrabacion').innerText = "20";
         }
 
-        function cargarFotoGaleria(event) {
-            const file = event.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onloadend = () => {
-                    fotoBase64 = reader.result;
-                };
-            }
-        }
-
         async function guardarTemporizador() {
             const estilo = document.getElementById('estiloDiseno').value;
             const tipoSorpresaSeleccionada = document.querySelector('input[name="tipoSorpresa"]:checked').value;
             const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Temporizador";
             const paraVal = document.getElementById('paraQuien').value.trim();
+            const mensajeVal = document.getElementById('mensajeMarquesina').value.trim();
+
+            if (mensajeVal.length > 40) {
+                alert("⚠️ El mensaje no puede superar las 40 letras.");
+                return;
+            }
             
             let contenidoSorpresa = "";
             if(tipoSorpresaSeleccionada === 'audio') {
-                if(!audioBase64) { alert("Por favor graba una nota de voz antes de continuar."); return; }
+                if(!audioBase64) { alert("Por favor graba una nota de voz."); return; }
                 contenidoSorpresa = audioBase64;
             }
             if(tipoSorpresaSeleccionada === 'foto') {
-                if(!fotoBase64) { alert("Por favor selecciona una foto de tu galería."); return; }
+                if(!fotoBase64) { alert("Por favor selecciona una foto."); return; }
                 contenidoSorpresa = fotoBase64;
             }
             if(tipoSorpresaSeleccionada === 'cupon') {
@@ -552,7 +550,7 @@
                 para: paraVal,
                 de: document.getElementById('deQuien').value.trim(),
                 targetDate: new Date(document.getElementById('fechaApertura').value).toISOString(),
-                mensaje: document.getElementById('mensajeMarquesina').value.trim(),
+                mensaje: mensajeVal,
                 tipoSorpresa: tipoSorpresaSeleccionada,
                 contenidoSorpresa: contenidoSorpresa,
                 pagado: false,
@@ -571,17 +569,13 @@
 
                 let proyectos = obtenerProyectosLocales();
                 proyectos = proyectos.filter(p => p.firebaseId !== proyectoActualId);
-                proyectos.unshift({
-                    firebaseId: proyectoActualId,
-                    nombreProyecto: nombreProj,
-                    para: paraVal
-                });
+                proyectos.unshift({ firebaseId: proyectoActualId, nombreProyecto: nombreProj, para: paraVal });
                 guardarProyectosLocales(proyectos);
 
                 setTimeout(() => {
                     document.getElementById('saveLoadingScreen').classList.add('hidden');
                     abrirVistaPrevia(proyectoActualId, false);
-                }, 1500);
+                }, 1200);
 
             } catch(e) {
                 alert("Error al guardar en Firebase.");
@@ -607,6 +601,7 @@
                         document.getElementById('fechaApertura').value = data.targetDate.slice(0, 16);
                     }
                     document.getElementById('mensajeMarquesina').value = data.mensaje || "";
+                    actualizarContadorLetras();
                     
                     if (data.tipoSorpresa) {
                         const radio = document.querySelector(`input[name="tipoSorpresa"][value="${data.tipoSorpresa}"]`);
@@ -655,116 +650,60 @@
         }
 
         async function procesarPagoMercadoPago() {
-            if (!proyectoActualId) {
-                alert("No hay un proyecto activo seleccionado.");
-                return;
-            }
+            if (!proyectoActualId) return;
             localStorage.setItem("ultimoTemporizadorId", proyectoActualId);
             window.location.href = `https://mpago.la/225XuPD`;
         }
 
         async function canjearCuponRegalo() {
-            if (!proyectoActualId) {
-                alert("No hay un proyecto activo seleccionado.");
-                return;
-            }
-
+            if (!proyectoActualId) return;
             const inputVal = document.getElementById('codigoMaestroInput').value.trim();
-            if (!inputVal) {
-                alert("⚠️ Por favor ingresa un código o cupón.");
-                return;
-            }
+            if (!inputVal) { alert("⚠️ Ingresa un código."); return; }
 
             if (inputVal.toUpperCase() === CODIGO_MAESTRO_SECRETO.toUpperCase()) {
                 try {
                     await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true });
-                    alert("✨ ¡Código maestro canjeado con éxito! Acceso concedido.");
+                    alert("✨ ¡Código maestro canjeado con éxito!");
                     abrirVistaPrevia(proyectoActualId, true);
                     return;
-                } catch (e) {
-                    console.error("Error al actualizar con código maestro:", e);
-                    alert("Error al validar el código en la base de datos.");
-                    return;
-                }
+                } catch (e) { alert("Error al validar."); return; }
             }
 
             try {
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponDoc = await cuponRef.get();
+                if (!cuponDoc.exists) { alert("❌ Cupón no válido."); return; }
+                if (cuponDoc.data().usado === true) { alert("⚠️ Este cupón ya fue usado."); return; }
 
-                if (!cuponDoc.exists) {
-                    alert("❌ El código o cupón ingresado no es válido.");
-                    return;
-                }
-
-                const cuponData = cuponDoc.data();
-
-                if (cuponData.usado === true) {
-                    alert("⚠️ Este cupón ya ha sido utilizado anteriormente y ya no está disponible.");
-                    return;
-                }
-
-                await cuponRef.update({ 
-                    usado: true,
-                    usadoEnProyecto: proyectoActualId,
-                    fechaUso: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
+                await cuponRef.update({ usado: true, usadoEnProyecto: proyectoActualId });
                 await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true });
-
-                alert("🎉 ¡Cupón de regalo aplicado con éxito! Proyecto desbloqueado.");
+                alert("🎉 ¡Cupón aplicado con éxito!");
                 abrirVistaPrevia(proyectoActualId, true);
-
-            } catch (error) {
-                console.error("Error al canjear el cupón:", error);
-                alert("Ocurrió un error al verificar el cupón en la base de datos.");
-            }
+            } catch (error) { alert("Error al verificar cupón."); }
         }
 
         async function verificarPagoAutomatico() {
-            if (!proyectoActualId) {
-                alert("No hay un proyecto activo seleccionado.");
-                return;
-            }
-
+            if (!proyectoActualId) return;
             try {
                 const docSnap = await db.collection("temporizadores").doc(proyectoActualId).get();
                 if (docSnap.exists && docSnap.data().pagado === true) {
                     abrirVistaPrevia(proyectoActualId, true);
-                    alert("✨ ¡Proyecto verificado y desbloqueado con éxito!");
+                    alert("✨ ¡Proyecto verificado con éxito!");
                 } else {
-                    const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
-                    
+                    const codigoOperacion = prompt("Ingresa el número de comprobante de Mercado Pago:");
                     if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        const queryRecibo = await db.collection("temporizadores").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
-                        if (!queryRecibo.empty) {
-                            alert("⚠️ Este comprobante ya fue registrado en otro proyecto.");
-                            return;
-                        }
-
-                        await db.collection("temporizadores").doc(proyectoActualId).update({
-                            pagado: true,
-                            pagoIdUnico: codigoOperacion.trim()
-                        });
-
+                        await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true, pagoIdUnico: codigoOperacion.trim() });
                         abrirVistaPrevia(proyectoActualId, true);
-                        alert("🎉 ¡Comprobante validado correctamente! Desbloqueado con éxito.");
-                    } else if (codigoOperacion !== null) {
-                        alert("⚠️ Debes ingresar un número de comprobante válido.");
+                        alert("🎉 ¡Comprobante validado correctamente!");
                     }
                 }
-            } catch (e) {
-                console.error(e);
-                alert("Error al verificar el estado del pago.");
-            }
+            } catch (e) { alert("Error al verificar."); }
         }
 
         function copiarEnlace() {
             if (proyectoActualId) {
                 const urlVer = `https://axelkings988-hub.github.io/App-Detalles-Amor/temporizador/ver.html?id=${proyectoActualId}`;
-                navigator.clipboard.writeText(urlVer).then(() => {
-                    alert("¡Enlace copiado al portapapeles! ❤️");
-                });
+                navigator.clipboard.writeText(urlVer).then(() => alert("¡Enlace copiado! ❤️"));
             }
         }
 
