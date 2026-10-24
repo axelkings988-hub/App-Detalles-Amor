@@ -58,6 +58,15 @@
             transition: background 0.8s ease-in-out;
         }
 
+        /* Fondo personalizado con tu GIF subido para el estilo Pareja */
+        .bg-pareja-revelado {
+            background-image: linear-gradient(rgba(35, 4, 8, 0.85), rgba(35, 4, 8, 0.85)), url('./gif-besos-de-amor.gif') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+        }
+
         /* Estilo para la tarjeta de rasca y gana */
         .scratch-container {
             position: relative;
@@ -151,10 +160,9 @@
 
         let datosGlobales = {};
 
-        // GIFS DE FUEGOS ARTIFICIALES
+        // GIFS DE FUEGOS ARTIFICIALES (Se usan si no es pareja)
         const fondosFuegosArtificiales = {
             familiar: "https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif",
-            pareja: "https://media.giphy.com/media/l3d03k1B3b5zPqC2A/giphy.gif",
             cumpleaños: "https://media.giphy.com/media/3o7tT127O8vXzE2F6U/giphy.gif"
         };
 
@@ -226,10 +234,16 @@
             document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
-            // Aplica fondo de fuegos artificiales
+            // Aplicar fondo correcto al finalizar el temporizador según el diseño
             const body = document.getElementById('bodyBg');
-            const gifFuegos = fondosFuegosArtificiales[data.estilo] || fondosFuegosArtificiales['familiar'];
-            body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${gifFuegos}')`;
+            if(data.estilo === 'pareja') {
+                // Aplica tu imagen GIF personalizada de besos
+                body.className = "p-4 flex flex-col items-center justify-center min-h-screen text-white bg-pareja-revelado";
+            } else {
+                // Aplica fuegos artificiales normales para familiar o cumpleaños
+                const gifFuegos = fondosFuegosArtificiales[data.estilo] || fondosFuegosArtificiales['familiar'];
+                body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${gifFuegos}')`;
+            }
 
             const container = document.getElementById('contenidoSorpresaContainer');
             
@@ -259,7 +273,6 @@
                     </button>
                 `;
 
-                // Inicializar el área interactiva de rascar
                 setTimeout(initScratchCard, 100);
             }
 
@@ -276,7 +289,6 @@
             canvas.width = parent.offsetWidth;
             canvas.height = parent.offsetHeight;
 
-            // Rellenar con textura dorada brillante
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#F59E0B');
             grad.addColorStop(0.5, '#FCD34D');
@@ -284,7 +296,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Texto guía sobre la capa dorada
             ctx.fillStyle = '#78350F';
             ctx.font = 'bold 15px Plus Jakarta Sans, sans-serif';
             ctx.textAlign = 'center';
@@ -316,7 +327,6 @@
                 };
             }
 
-            // Eventos Mouse y Touch
             canvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); scratch(p.x, p.y); });
             canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const p = getPos(e); scratch(p.x, p.y); } });
             canvas.addEventListener('mouseup', () => isDrawing = false);
