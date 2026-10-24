@@ -249,7 +249,7 @@
                 try {
                     const wrapper = document.getElementById('adWrapper');
                     if (wrapper) {
-                        wrapper.innerHTML = ''; // Limpia el texto de carga
+                        wrapper.innerHTML = '';
                         
                         window.atOptions = {
                             'key' : '5df8950ef937373e7a705c085c8daeea',
@@ -264,7 +264,6 @@
                         script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
                         script.async = true;
                         
-                        // Protección en caso de fallo de red en datos móviles
                         script.onerror = function() {
                             wrapper.innerHTML = '<span class="text-[9px] text-amber-300/40">Modo sin conexión</span>';
                         };
@@ -274,7 +273,7 @@
                 } catch(e) {
                     console.log("Adsterra load protected:", e);
                 }
-            }, 800); // Retraso de 800ms para asegurar fluidez inicial en celulares
+            }, 800);
         });
     </script>
 
@@ -290,6 +289,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Código maestro corregido (se valida siempre primero y sin importar mayúsculas/espacios)
         const CODIGO_MAESTRO_SECRETO = "REAF940906SW8";
         let proyectoActualId = localStorage.getItem("ultimoTemporizadorId") || null;
 
@@ -647,6 +647,7 @@
             window.location.href = `https://mpago.la/225XuPD`;
         }
 
+        // FUNCIÓN CORREGIDA Y ROBUSTA PARA CANJEAR CÓDIGO MAESTRO Y CUPONES DE FIREBASE
         async function canjearCuponRegalo() {
             if (!proyectoActualId) {
                 alert("No hay un proyecto activo seleccionado.");
@@ -659,17 +660,21 @@
                 return;
             }
 
-            if (inputVal === CODIGO_MAESTRO_SECRETO) {
+            // 1. VALIDACIÓN PRIMARIA DEL CÓDIGO MAESTRO (Independiente de mayúsculas/minúsculas)
+            if (inputVal.toUpperCase() === CODIGO_MAESTRO_SECRETO.toUpperCase()) {
                 try {
                     await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true });
-                    alert("✨ ¡Código canjeado con éxito! Acceso concedido.");
+                    alert("✨ ¡Código maestro canjeado con éxito! Acceso concedido.");
                     abrirVistaPrevia(proyectoActualId, true);
+                    return;
                 } catch (e) {
-                    alert("Error al actualizar el estado del proyecto.");
+                    console.error("Error al actualizar con código maestro:", e);
+                    alert("Error al validar el código en la base de datos.");
+                    return;
                 }
-                return;
             }
 
+            // 2. VALIDACIÓN SECUNDARIA DE CUPONES EN FIREBASE
             try {
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponDoc = await cuponRef.get();
@@ -686,12 +691,14 @@
                     return;
                 }
 
+                // Marcar el cupón como usado
                 await cuponRef.update({ 
                     usado: true,
                     usadoEnProyecto: proyectoActualId,
                     fechaUso: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
+                // Desbloquear temporizador
                 await db.collection("temporizadores").doc(proyectoActualId).update({ pagado: true });
 
                 alert("🎉 ¡Cupón de regalo aplicado con éxito! Proyecto desbloqueado.");
