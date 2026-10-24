@@ -883,6 +883,7 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
+        // VALIDACIÓN CORREGIDA Y ROBUSTA PARA CÓDIGO MAESTRO Y CUPONES
         async function validarCuponOMaestro() {
             const inputVal = document.getElementById('codigoMaestroInput').value.trim();
             const codigoMayus = inputVal.toUpperCase();
@@ -897,18 +898,20 @@
                 return;
             }
 
+            // 1. Evaluar primero si es el código maestro (sin ir a Firestore)
             if (codigoMayus === CÓDIGO_ESPECIAL_MAESTRO) {
                 try {
                     await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
-                    alert("✨ ¡Código canjeado con éxito! Acceso concedido.");
+                    alert("✨ ¡Código maestro canjeado con éxito! Acceso concedido.");
                     cargarProyecto(proyectoActualId);
                     return;
                 } catch(e) {
-                    alert("Error al aplicar el código.");
+                    alert("Error al aplicar el código maestro.");
                     return;
                 }
             }
 
+            // 2. Si no es el maestro, buscar como cupón en la base de datos
             try {
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponSnap = await cuponRef.get();
