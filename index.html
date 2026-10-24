@@ -10,13 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* RESET & BASE */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #05050a;
@@ -32,6 +26,23 @@
             justify-content: center;
             padding: 16px;
             color: #ffffff;
+            padding-top: 60px; /* Espacio para el banner superior si carga */
+        }
+
+        /* BANNER ADSTERRA SUPERIOR FIJO */
+        #topAdContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(5, 5, 10, 0.95);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
         }
 
         .container {
@@ -41,201 +52,148 @@
             margin: auto;
         }
 
-        /* ENCABEZADO */
         .badge {
-            font-size: 10px;
-            color: #cbd5e1;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 6px;
+            font-size: 10px; color: #cbd5e1; text-transform: uppercase;
+            letter-spacing: 0.25em; font-weight: 600; display: block; margin-bottom: 6px;
         }
+        .title { font-size: 1.75rem; font-weight: 800; color: #ffffff; letter-spacing: -0.025em; margin-bottom: 4px; }
+        .subtitle { font-size: 0.75rem; color: #cbd5e1; font-weight: 500; margin-bottom: 24px; }
 
-        .title {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.025em;
-            margin-bottom: 4px;
-        }
+        .menu-list { display: flex; flex-direction: column; gap: 16px; text-align: left; }
 
-        .subtitle {
-            font-size: 0.75rem;
-            color: #cbd5e1;
-            font-weight: 500;
-            margin-bottom: 24px;
-        }
-
-        .menu-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            text-align: left;
-        }
-
-        /* TARJETAS INTERACTIVAS */
         .card {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            border-radius: 16px;
-            text-decoration: none;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex; align-items: center; padding: 16px; border-radius: 16px;
+            text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .card:active {
-            transform: scale(0.98);
-        }
+        .card:active { transform: scale(0.98); }
 
         .icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-right: 16px;
-            flex-shrink: 0;
+            width: 48px; height: 48px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 16px; flex-shrink: 0;
         }
+        .card-content { flex: 1; padding-right: 8px; }
 
-        .card-content {
-            flex: 1;
-            padding-right: 8px;
-        }
+        .card-title { font-size: 0.875rem; font-weight: 800; color: #0f172a !important; line-height: 1.25; margin-bottom: 2px; }
+        .card-desc { font-size: 0.6875rem; color: #475569 !important; font-weight: 500; line-height: 1.3; }
 
-        /* TEXTOS CON COLOR OSCURO LEGIBLE */
-        .card-title {
-            font-size: 0.875rem;
-            font-weight: 800;
-            color: #0f172a !important; /* Slate 900 asegurado */
-            line-height: 1.25;
-            margin-bottom: 2px;
-        }
+        .card-pink { background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,241,242,0.95) 100%); border: 2px solid #EC4899; box-shadow: 0 0 18px rgba(236,72,153,0.5); }
+        .card-pink .icon-box { background-color: #fce7f3; color: #ec4899; }
 
-        .card-desc {
-            font-size: 0.6875rem;
-            color: #475569 !important; /* Slate 600 asegurado */
-            font-weight: 500;
-            line-height: 1.3;
-        }
+        .card-gold { background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(254,252,232,0.95) 100%); border: 2px solid #F59E0B; box-shadow: 0 0 18px rgba(245,158,11,0.5); }
+        .card-gold .icon-box { background-color: #fef3c7; color: #d97706; }
 
-        /* ESTILOS DE CADA TARJETA */
-        .card-pink {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 241, 242, 0.95) 100%);
-            border: 2px solid #EC4899;
-            box-shadow: 0 0 18px rgba(236, 72, 153, 0.5);
-        }
-        .card-pink .icon-box {
-            background-color: #fce7f3;
-            color: #ec4899;
-        }
+        .card-cyan { background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(236,254,255,0.95) 100%); border: 2px solid #06B6D4; box-shadow: 0 0 18px rgba(6,182,212,0.5); }
+        .card-cyan .icon-box { background-color: #cffafe; color: #0891b2; }
 
-        .card-gold {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 252, 232, 0.95) 100%);
-            border: 2px solid #F59E0B;
-            box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
-        }
-        .card-gold .icon-box {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
+        .card-green { background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,253,244,0.95) 100%); border: 2px solid #22C55E; box-shadow: 0 0 18px rgba(34,197,94,0.5); }
+        .card-green .icon-box { background-color: #dcfce7; color: #16a34a; }
 
-        .card-cyan {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 254, 255, 0.95) 100%);
-            border: 2px solid #06B6D4;
-            box-shadow: 0 0 18px rgba(6, 182, 212, 0.5);
-        }
-        .card-cyan .icon-box {
-            background-color: #cffafe;
-            color: #0891b2;
-        }
-
-        .card-green {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 244, 0.95) 100%);
-            border: 2px solid #22C55E;
-            box-shadow: 0 0 18px rgba(34, 197, 94, 0.5);
-        }
-        .card-green .icon-box {
-            background-color: #dcfce7;
-            color: #16a34a;
-        }
-
-        .footer {
-            margin-top: 24px;
-            font-size: 10px;
-            color: #94a3b8;
-            font-weight: 500;
-        }
+        .footer { margin-top: 24px; font-size: 10px; color: #94a3b8; font-weight: 500; }
     </style>
 </head>
 <body>
 
+    <!-- CONTENEDOR DINÁMICO DE ANUNCIO SUPERIOR -->
+    <div id="topAdContainer" style="display: none;"></div>
+
     <div class="container">
         
-        <!-- ENCABEZADO -->
         <div>
             <span class="badge">Centro de Utilidades</span>
             <h1 class="title">App Detalles & Amor</h1>
             <p class="subtitle">Selecciona una herramienta para comenzar.</p>
         </div>
 
-        <!-- LISTA DE MÓDULOS -->
         <div class="menu-list">
-
-            <!-- MÓDULO 1: PAREJAS -->
             <a href="parejas/" class="card card-pink">
-                <div class="icon-box">
-                    <i class="fa-solid fa-heart"></i>
-                </div>
+                <div class="icon-box"><i class="fa-solid fa-heart"></i></div>
                 <div class="card-content">
                     <div class="card-title">Minisitio de Parejas</div>
                     <div class="card-desc">Sorprende a tu pareja con detalles románticos.</div>
                 </div>
             </a>
 
-            <!-- MÓDULO 2: MENSAJE TEMPORIZADOR -->
             <a href="temporizador/" class="card card-gold">
-                <div class="icon-box">
-                    <i class="fa-solid fa-clock"></i>
-                </div>
+                <div class="icon-box"><i class="fa-solid fa-clock"></i></div>
                 <div class="card-content">
                     <div class="card-title">Mensaje Temporizador</div>
                     <div class="card-desc">Envía mensajes con cuenta regresiva especial.</div>
                 </div>
             </a>
 
-            <!-- MÓDULO 3: MASCOTAS -->
             <a href="mascotas/" class="card card-cyan">
-                <div class="icon-box">
-                    <i class="fa-solid fa-paw"></i>
-                </div>
+                <div class="icon-box"><i class="fa-solid fa-paw"></i></div>
                 <div class="card-content">
                     <div class="card-title">Placa QR de Mascota</div>
                     <div class="card-desc">Genera medallas con colores neón y perfil de emergencia.</div>
                 </div>
             </a>
 
-            <!-- MÓDULO 4: ATENCIÓN AL CLIENTE / WHATSAPP -->
             <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card card-green">
-                <div class="icon-box">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </div>
+                <div class="icon-box"><i class="fa-brands fa-whatsapp"></i></div>
                 <div class="card-content">
                     <div class="card-title">Atención al Cliente</div>
                     <div class="card-desc">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte por WhatsApp.</div>
                 </div>
             </a>
-
         </div>
 
-        <!-- PIE DE PÁGINA -->
         <div class="footer">
             Desarrollado con pasión • Protección y Detalles
         </div>
 
     </div>
 
+    <script>
+        // LÓGICA INTELIGENTE DE DETECCIÓN DE RED / CONEXIÓN
+        window.addEventListener('DOMContentLoaded', () => {
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            
+            // Verificamos si está en modo datos móviles estricto o conexión lenta (effectiveType: 'slow-2g', '2g', '3g')
+            let esDatosMovilesLentos = false;
+            if (connection) {
+                if (connection.saveData === true || ['slow-2g', '2g', '3g'].includes(connection.effectiveType)) {
+                    esDatosMovilesLentos = true;
+                }
+            }
+
+            // Si estamos en Wi-Fi o red rápida, intentamos cargar el anuncio con seguridad
+            if (!esDatosMovilesLentos) {
+                try {
+                    const adContainer = document.getElementById('topAdContainer');
+                    adContainer.style.display = 'flex';
+
+                    // Inyectamos el script de Adsterra de forma dinámica
+                    window.atOptions = {
+                        'key' : '5df8950ef937373e7a705c085c8daeea',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
+                    
+                    // Si el script falla o tarda en cargar por la red, lo ocultamos para que no afecte la vista
+                    script.onerror = () => {
+                        adContainer.style.display = 'none';
+                        document.body.style.paddingTop = '16px';
+                    };
+
+                    adContainer.appendChild(script);
+                } catch (e) {
+                    // Si ocurre cualquier error, ocultamos el contenedor del anuncio
+                    document.getElementById('topAdContainer').style.display = 'none';
+                    document.body.style.paddingTop = '16px';
+                }
+            } else {
+                // Si detecta datos móviles lentos u operadora restrictiva, omite el anuncio por completo
+                document.getElementById('topAdContainer').style.display = 'none';
+                document.body.style.paddingTop = '16px';
+            }
+        });
+    </script>
 </body>
 </html>
