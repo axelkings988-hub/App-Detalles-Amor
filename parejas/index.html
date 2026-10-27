@@ -475,7 +475,7 @@
             }
         }
 
-        // COMPRESIÓN ESTRICTAMENTE OPTIMIZADA PARA FOTOS DE ALTA RESOLUCIÓN (1.9 MP o más)
+        // COMPRESIÓN BLINDADA Y ROBUSTA (Soporta tanto alta como baja resolución sin fallos)
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
                 if (!file) {
@@ -486,15 +486,21 @@
                 reader.onerror = () => resolve(null);
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
+                    const originalBase64 = e.target.result;
                     const img = new Image();
-                    img.onerror = () => resolve(null);
-                    img.src = e.target.result;
+                    img.onerror = () => resolve(originalBase64); // Respaldo infalible si la imagen es muy ligera o da error de canvas
+                    img.src = originalBase64;
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
-                            let maxDimension = 350; // Redimensionado seguro para que múltiples fotos de alta resolución quepan en Firestore (<1MB)
+                            let maxDimension = 400; 
                             let width = img.width;
                             let height = img.height;
+
+                            if (!width || !height) {
+                                resolve(originalBase64);
+                                return;
+                            }
 
                             if (width > height && width > maxDimension) {
                                 height = Math.round((height * maxDimension) / width);
@@ -509,9 +515,9 @@
 
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.45)); // Calidad optimizada para evitar superar el límite de Firebase
+                            resolve(canvas.toDataURL('image/jpeg', 0.6));
                         } catch (err) {
-                            resolve(null);
+                            resolve(originalBase64); // Si ocurre cualquier detalle, pasa la imagen original directamente
                         }
                     };
                 };
@@ -681,7 +687,7 @@
 
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("⚠️ Ocurrió un error al guardar el proyecto (es posible que el peso total aún exceda el límite permitido por la base de datos): " + error.message);
+                alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -883,7 +889,6 @@
             setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
         }
 
-        // VALIDACIÓN CORREGIDA Y ROBUSTA PARA CÓDIGO MAESTRO Y CUPONES
         async function validarCuponOMaestro() {
             const inputVal = document.getElementById('codigoMaestroInput').value.trim();
             const codigoMayus = inputVal.toUpperCase();
@@ -898,7 +903,6 @@
                 return;
             }
 
-            // 1. Evaluar primero si es el código maestro (sin ir a Firestore)
             if (codigoMayus === CÓDIGO_ESPECIAL_MAESTRO) {
                 try {
                     await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
@@ -911,7 +915,6 @@
                 }
             }
 
-            // 2. Si no es el maestro, buscar como cupón en la base de datos
             try {
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponSnap = await cuponRef.get();
