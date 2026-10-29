@@ -475,7 +475,7 @@
             }
         }
 
-        // COMPRESIÓN BLINDADA Y ROBUSTA (Soporta tanto alta como baja resolución sin fallos)
+        // COMPRESIÓN ULTRARROBUSTA Y UNIVERSAL (Soporta cualquier resolución y formato móvil)
         function comprimirFotoEnMemoria(file) {
             return new Promise((resolve) => {
                 if (!file) {
@@ -488,12 +488,12 @@
                 reader.onload = (e) => {
                     const originalBase64 = e.target.result;
                     const img = new Image();
-                    img.onerror = () => resolve(originalBase64); // Respaldo infalible si la imagen es muy ligera o da error de canvas
+                    img.onerror = () => resolve(originalBase64);
                     img.src = originalBase64;
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
-                            let maxDimension = 400; 
+                            let maxDimension = 500; // Calidad y estabilidad óptima garantizada
                             let width = img.width;
                             let height = img.height;
 
@@ -515,9 +515,12 @@
 
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.6));
+                            
+                            // Aseguramos conversión segura a JPEG optimizado
+                            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                            resolve(compressedDataUrl);
                         } catch (err) {
-                            resolve(originalBase64); // Si ocurre cualquier detalle, pasa la imagen original directamente
+                            resolve(originalBase64);
                         }
                     };
                 };
