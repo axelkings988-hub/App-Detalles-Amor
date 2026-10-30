@@ -129,7 +129,7 @@
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 5):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple onchange="validarCantidadFotos(this)" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes para el carrusel.</p>
+                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes (se optimizarán automáticamente).</p>
             </div>
 
             <div class="space-y-1">
@@ -159,7 +159,7 @@
         <!-- CARGA -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Subiendo fotos a Supabase y guardando proyecto...</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando y subiendo fotos a Supabase...</p>
         </div>
     </div>
 
@@ -320,7 +320,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // CONFIGURACIÓN SUPABASE (Llave JWT clásica corregida)
+        // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -478,6 +478,52 @@
             }
         }
 
+        // FUNCIÓN PARA COMPRIMIR Y REDIMENSIONAR FOTOS EN EL NAVEGADOR
+        async function comprimirImagen(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        const MAX_WIDTH = 1600;
+                        const MAX_HEIGHT = 1600;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height = Math.round((height * MAX_WIDTH) / width);
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width = Math.round((width * MAX_HEIGHT) / height);
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve(compressedFile);
+                        }, 'image/jpeg', 0.8);
+                    };
+                };
+            });
+        }
+
         // SUBIR FOTO A SUPABASE STORAGE
         async function subirFotoSupabase(file) {
             try {
@@ -607,14 +653,16 @@
             
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
-            document.getElementById('statusText').innerText = "Subiendo imágenes a Supabase...";
+            document.getElementById('statusText').innerText = "Optimizando y subiendo fotos...";
 
             try {
                 let urlsFotos = [];
                 if (photosFiles && photosFiles.length > 0) {
                     const maxFotos = Math.min(photosFiles.length, 5);
                     for (let i = 0; i < maxFotos; i++) {
-                        const publicUrl = await subirFotoSupabase(photosFiles[i]);
+                        // Comprimimos antes de mandar a Supabase
+                        const fotoOptimizada = await comprimirImagen(photosFiles[i]);
+                        const publicUrl = await subirFotoSupabase(fotoOptimizada);
                         if (publicUrl) {
                             urlsFotos.push(publicUrl);
                         }
