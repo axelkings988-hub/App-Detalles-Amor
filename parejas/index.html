@@ -320,7 +320,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // CONFIGURACIÓN SUPABASE (Tus credenciales reales ya integradas)
+        // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
         const SUPABASE_ANON_KEY = "Sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -478,25 +478,35 @@
             }
         }
 
-        // SUBIR FOTO A SUPABASE STORAGE
+        // SUBIR FOTO A SUPABASE STORAGE (VERSIÓN ROBUSTA Y LIMPIA)
         async function subirFotoSupabase(file) {
             try {
                 const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+                const cleanName = file.name.replace(/[^a-zA-Z0-9]/g, "_");
+                const fileName = `${Date.now()}_${cleanName}.${fileExt}`;
                 const filePath = `fotos/${fileName}`;
 
                 const { data, error } = await supabaseClient.storage
                     .from('detalles-fotos')
-                    .upload(filePath, file);
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
 
                 if (error) {
                     console.error("Error al subir a Supabase:", error);
+                    alert("Error de Supabase: " + error.message);
                     return null;
                 }
 
                 const { data: publicData } = supabaseClient.storage
                     .from('detalles-fotos')
                     .getPublicUrl(filePath);
+
+                if (!publicData || !publicData.publicUrl) {
+                    console.error("No se pudo obtener la URL pública.");
+                    return null;
+                }
 
                 return publicData.publicUrl;
             } catch (err) {
