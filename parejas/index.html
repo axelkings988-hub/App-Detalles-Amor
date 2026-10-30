@@ -478,57 +478,78 @@
             }
         }
 
-        // FUNCIÓN PARA COMPRIMIR Y REDIMENSIONAR FOTOS EN EL NAVEGADOR
+        // FUNCIÓN SEGURA PARA COMPRIMIR Y REDIMENSIONAR FOTOS EN EL NAVEGADOR
         async function comprimirImagen(file) {
             return new Promise((resolve) => {
+                if (!file || !file.type.startsWith('image/')) {
+                    resolve(file);
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
+                
                 reader.onload = (event) => {
                     const img = new Image();
                     img.src = event.target.result;
+                    
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
 
-                        const MAX_WIDTH = 1600;
-                        const MAX_HEIGHT = 1600;
+                            const MAX_WIDTH = 1600;
+                            const MAX_HEIGHT = 1600;
 
-                        if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height = Math.round((height * MAX_WIDTH) / width);
-                                width = MAX_WIDTH;
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height = Math.round((height * MAX_WIDTH) / width);
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width = Math.round((width * MAX_HEIGHT) / height);
+                                    height = MAX_HEIGHT;
+                                }
                             }
-                        } else {
-                            if (height > MAX_HEIGHT) {
-                                width = Math.round((width * MAX_HEIGHT) / height);
-                                height = MAX_HEIGHT;
-                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            canvas.toBlob((blob) => {
+                                if (!blob) {
+                                    resolve(file);
+                                    return;
+                                }
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compressedFile);
+                            }, 'image/jpeg', 0.8);
+
+                        } catch (e) {
+                            console.warn("Fallo menor en compresión, usando archivo original:", e);
+                            resolve(file);
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        canvas.toBlob((blob) => {
-                            const compressedFile = new File([blob], file.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            });
-                            resolve(compressedFile);
-                        }, 'image/jpeg', 0.8);
                     };
+
+                    img.onerror = () => { resolve(file); };
                 };
+
+                reader.onerror = () => { resolve(file); };
             });
         }
 
         // SUBIR FOTO A SUPABASE STORAGE
         async function subirFotoSupabase(file) {
             try {
-                const fileExt = file.name.split('.').pop();
-                const cleanName = file.name.replace(/[^a-zA-Z0-9]/g, "_");
+                const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
+                const cleanName = file.name ? file.name.replace(/[^a-zA-Z0-9]/g, "_") : 'foto';
                 const fileName = `${Date.now()}_${cleanName}.${fileExt}`;
                 const filePath = `fotos/${fileName}`;
 
@@ -653,23 +674,26 @@
             
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
-            document.getElementById('statusText').innerText = "Optimizando y subiendo fotos...";
+            document.getElementById('statusText').innerText = "Iniciando proceso...";
 
             try {
                 let urlsFotos = [];
                 if (photosFiles && photosFiles.length > 0) {
                     const maxFotos = Math.min(photosFiles.length, 5);
                     for (let i = 0; i < maxFotos; i++) {
-                        // Comprimimos antes de mandar a Supabase
+                        document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
                         const fotoOptimizada = await comprimirImagen(photosFiles[i]);
+                        
+                        document.getElementById('statusText').innerText = `Subiendo foto ${i + 1} de ${maxFotos} a Supabase...`;
                         const publicUrl = await subirFotoSupabase(fotoOptimizada);
+                        
                         if (publicUrl) {
                             urlsFotos.push(publicUrl);
                         }
                     }
                 }
 
-                document.getElementById('statusText').innerText = "Guardando proyecto...";
+                document.getElementById('statusText').innerText = "Guardando proyecto en base de datos...";
 
                 const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
                 const nombres = document.getElementById('nombresInput').value.trim();
