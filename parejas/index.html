@@ -76,7 +76,7 @@
             height: 100% !important;
         }
 
-        /* Reglas optimizadas para impresión en tamaño compacto (media carta / foto) */
+        /* Reglas optimizadas para impresión limpia en una sola hoja */
         @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -92,21 +92,21 @@
                 background: white !important;
                 box-shadow: none !important;
                 border: none !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                min-height: 100vh !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             .no-print, button, a, #adsterraBannerContainer, h3 { display: none !important; }
             .postal-container-preview { 
                 box-shadow: none !important; 
                 width: 100% !important; 
-                max-width: 12cm !important; /* Tamaño controlado estilo foto / media carta */
-                margin: auto !important;
+                max-width: 11cm !important; 
+                margin: 2cm auto !important; 
                 border-radius: 0 !important;
                 background-image: url('diseño-postal.jpg') !important;
                 background-size: cover !important;
                 background-position: center !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
         }
     </style>
@@ -142,7 +142,7 @@
             </div>
             <div class="flex items-center space-x-2">
                 <i class="fas fa-volume-up text-xs text-rose-300"></i>
-                <input id="pv-volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustPvVolume(this.value)" class="w-14 h-1 accent-rose-500 bg-rose-950 rounded-lg cursor-pointer">
+                <input id="pv-volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustPvVolume(this.value)" class="w-14 h-1 accent-rose-500 bg-burgundy-950 rounded-lg cursor-pointer">
             </div>
         </div>
     </div>
