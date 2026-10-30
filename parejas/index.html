@@ -76,11 +76,23 @@
             height: 100% !important;
         }
 
-        /* Reglas optimizadas para impresión limpia en una sola hoja */
+        /* Reglas optimizadas y blindadas para impresión móvil en una sola hoja limpia */
         @media print {
+            @page {
+                size: portrait;
+                margin: 0mm;
+            }
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            body, html {
+                background: white !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
             }
             body * { visibility: hidden !important; }
             #resultBox, #resultBox * { visibility: visible !important; }
@@ -89,22 +101,29 @@
                 left: 0 !important;
                 top: 0 !important;
                 width: 100% !important;
+                height: 100% !important;
                 background: white !important;
                 box-shadow: none !important;
                 border: none !important;
-                padding: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
                 margin: 0 !important;
+                padding: 0 !important;
             }
             .no-print, button, a, #adsterraBannerContainer, h3 { display: none !important; }
             .postal-container-preview { 
                 box-shadow: none !important; 
-                width: 100% !important; 
-                max-width: 11cm !important; 
-                margin: 2cm auto !important; 
+                width: 9cm !important; 
+                max-width: 9cm !important; 
+                aspect-ratio: 700 / 1000 !important;
+                margin: auto !important;
                 border-radius: 0 !important;
                 background-image: url('diseño-postal.jpg') !important;
                 background-size: cover !important;
                 background-position: center !important;
+                page-break-before: avoid !important;
+                page-break-after: avoid !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
