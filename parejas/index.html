@@ -42,7 +42,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
 
-        /* Estilos de la postal integrada en el panel con ruta corregida */
+        /* Estilos de la postal integrada en el panel */
         .postal-container-preview {
             position: relative;
             width: 100%;
@@ -76,10 +76,38 @@
             height: 100% !important;
         }
 
+        /* Reglas optimizadas para impresión en tamaño compacto (media carta / foto) */
         @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
-            .postal-container-preview { box-shadow: none !important; width: 100% !important; max-width: 100% !important; border-radius: 0 !important; }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body * { visibility: hidden !important; }
+            #resultBox, #resultBox * { visibility: visible !important; }
+            #resultBox {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                background: white !important;
+                box-shadow: none !important;
+                border: none !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                min-height: 100vh !important;
+            }
+            .no-print, button, a, #adsterraBannerContainer, h3 { display: none !important; }
+            .postal-container-preview { 
+                box-shadow: none !important; 
+                width: 100% !important; 
+                max-width: 12cm !important; /* Tamaño controlado estilo foto / media carta */
+                margin: auto !important;
+                border-radius: 0 !important;
+                background-image: url('diseño-postal.jpg') !important;
+                background-size: cover !important;
+                background-position: center !important;
+            }
         }
     </style>
     <link rel="manifest" href="../manifest.json">
