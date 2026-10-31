@@ -41,93 +41,6 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
-
-        /* Estilos de la postal integrada en el panel */
-        .postal-container-preview {
-            position: relative;
-            width: 100%;
-            max-width: 320px;
-            aspect-ratio: 700 / 1000;
-            background-image: url('diseño-postal.jpg');
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.6);
-            border-radius: 1rem;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        #qr-slot-preview {
-            position: absolute;
-            top: 36.5%;
-            left: 55.2%;
-            width: 31.5%;
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #ffffff;
-            padding: 3px;
-            border-radius: 4px;
-        }
-
-        #qrcode img {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* Reglas optimizadas y blindadas para impresión móvil en una sola hoja limpia */
-        @media print {
-            @page {
-                size: portrait;
-                margin: 0mm;
-            }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            body, html {
-                background: white !important;
-                width: 100% !important;
-                height: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden !important;
-            }
-            body * { visibility: hidden !important; }
-            #resultBox, #resultBox * { visibility: visible !important; }
-            #resultBox {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background: white !important;
-                box-shadow: none !important;
-                border: none !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .no-print, button, a, #adsterraBannerContainer, h3 { display: none !important; }
-            .postal-container-preview { 
-                box-shadow: none !important; 
-                width: 9cm !important; 
-                max-width: 9cm !important; 
-                aspect-ratio: 700 / 1000 !important;
-                margin: auto !important;
-                border-radius: 0 !important;
-                background-image: url('diseño-postal.jpg') !important;
-                background-size: cover !important;
-                background-position: center !important;
-                page-break-before: avoid !important;
-                page-break-after: avoid !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-        }
     </style>
     <link rel="manifest" href="../manifest.json">
 </head>
@@ -161,7 +74,7 @@
             </div>
             <div class="flex items-center space-x-2">
                 <i class="fas fa-volume-up text-xs text-rose-300"></i>
-                <input id="pv-volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustPvVolume(this.value)" class="w-14 h-1 accent-rose-500 bg-burgundy-950 rounded-lg cursor-pointer">
+                <input id="pv-volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustPvVolume(this.value)" class="w-14 h-1 accent-rose-500 bg-rose-950 rounded-lg cursor-pointer">
             </div>
         </div>
     </div>
@@ -294,23 +207,12 @@
 
         <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
             <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
-            
-            <!-- TARJETA POSTAL INTEGRADA CON QR -->
-            <div class="postal-container-preview my-2">
-                <div id="qr-slot-preview">
-                    <div id="qrcode"></div>
-                </div>
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
+                <div id="qrcode"></div>
             </div>
-
-            <div class="space-y-2 pt-2">
-                <button onclick="window.print()" class="w-full py-2.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow flex items-center justify-center gap-2">
-                    <i class="fas fa-print"></i> Imprimir / Guardar Postal
-                </button>
-                <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-burgundy-900 border border-rose-500/40 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
+            <div class="space-y-2">
+                <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
                     Abrir Detalle Público
-                </a>
-                <a id="whatsappShareBtn" href="#" target="_blank" class="block w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl text-center">
-                    <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
                 </a>
                 <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-900 text-xs text-rose-300 rounded-xl border border-rose-500/30">
                     <i class="fas fa-copy"></i> Copiar Enlace
@@ -405,6 +307,7 @@
     </div>
 
     <script>
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
@@ -417,8 +320,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
-        const SUPABASE_ANON_KEY = "Sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
@@ -574,6 +478,7 @@
             }
         }
 
+        // FUNCIÓN SEGURA PARA COMPRIMIR Y REDIMENSIONAR FOTOS EN EL NAVEGADOR
         async function comprimirImagen(file) {
             return new Promise((resolve) => {
                 if (!file || !file.type.startsWith('image/')) {
@@ -640,6 +545,7 @@
             });
         }
 
+        // SUBIR FOTO A SUPABASE STORAGE
         async function subirFotoSupabase(file) {
             try {
                 const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
@@ -896,16 +802,11 @@
                 const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
                 document.getElementById('finalLink').href = finalLink;
                 
-                // Configurar botón de WhatsApp
-                const mensajeWa = encodeURIComponent(`¡Hola! Te comparto nuestra postal y código QR especial de Dilo D' QRazón ❤️: ${finalLink}`);
-                document.getElementById('whatsappShareBtn').href = `https://wa.me/?text=${mensajeWa}`;
-
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
                     text: finalLink,
                     width: 160,
-                    height: 160,
-                    correctLevel: QRCode.CorrectLevel.M
+                    height: 160
                 });
             } else {
                 paySection.classList.remove('hidden');
