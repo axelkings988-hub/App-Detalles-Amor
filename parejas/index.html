@@ -51,8 +51,8 @@
                 left: 0 !important;
                 top: 0 !important;
                 transform: none !important;
-                width: 85% !important;
-                max-width: 450px !important;
+                width: 90% !important;
+                max-width: 500px !important;
                 box-shadow: none !important;
                 border: none !important;
                 background: white !important;
@@ -227,11 +227,11 @@
         <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
             <h3 class="text-sm font-bold text-rose-200 no-print">¡Tu detalle ya está listo! 🎉</h3>
             
-            <!-- POSTAL CON QR POSICIONADO CON PORCENTAJES (RESPONSIVO AL ESCALAR) -->
+            <!-- POSTAL CON QR FIJO AL CENTRO DEL CUADRO BLANCO -->
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
-                <!-- QR ANCLADO EXACTAMENTE PORCENTUALMENTE AL CUADRO BLANCO -->
-                <div class="absolute" style="top: 56.5%; right: 20%; transform: translate(50%, -50%);">
+                <!-- QR ANCLADO EXACTAMENTE AL CENTRO DEL RECUADRO BLANCO -->
+                <div class="absolute" style="top: 56.5%; left: 63.5%; transform: translate(-50%, -50%);">
                     <div class="bg-white p-1 rounded shadow">
                         <div id="qrcode"></div>
                     </div>
