@@ -42,20 +42,21 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
 
-        /* ESTILOS DE IMPRESIÓN: Oculta lo innecesario y ajusta la postal a la mitad de la hoja */
+        /* ESTILOS DE IMPRESIÓN: Alinear a la esquina superior izquierda */
         @media print {
             body * { visibility: hidden; }
             #printablePostal, #printablePostal * { visibility: visible; }
             #printablePostal {
                 position: absolute;
-                left: 50%;
-                top: 40%;
-                transform: translate(-50%, -50%);
-                width: 50% !important;
-                max-width: 350px !important;
+                left: 0 !important;
+                top: 0 !important;
+                transform: none !important;
+                width: 45% !important;
+                max-width: 320px !important;
                 box-shadow: none !important;
                 border: none !important;
                 background: white !important;
+                margin: 0 !important;
             }
             .no-print { display: none !important; }
         }
@@ -229,8 +230,8 @@
             <!-- POSTAL CON QR AJUSTADO AL RECUADRO BLANCO -->
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
-                <!-- POSICIONAMIENTO EXACTO SOBRE EL CUADRO BLANCO (Ajusta right y bottom si necesitas afinarlo) -->
-                <div class="absolute inset-0 flex items-end justify-end pointer-events-none" style="padding-bottom: 24%; padding-right: 12%;">
+                <!-- QR SUBIDO UN POCO MÁS PARA CENTRARLO EXACTAMENTE EN EL CUADRO BLANCO -->
+                <div class="absolute inset-0 flex items-end justify-end pointer-events-none" style="padding-bottom: 27%; padding-right: 12%;">
                     <div class="bg-white p-1 rounded shadow pointer-events-auto">
                         <div id="qrcode"></div>
                     </div>
@@ -1008,7 +1009,7 @@
             if (codigoMayus === CÓDIGO_ESPECIAL_MAESTRO) {
                 try {
                     await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
-                    alert("✨ ¡Código maestro canjeado con éxito! Access concedido.");
+                    alert("✨ ¡Código maestro canjeado con éxito! Acceso concedido.");
                     cargarProyecto(proyectoActualId);
                     return;
                 } catch(e) {
