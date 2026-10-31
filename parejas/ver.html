@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nuestra Historia Especial - Dilo D' QRazón</title>
+    <title>Nuestra Historia Especial</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
@@ -36,7 +31,7 @@
         }
     </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; overflow-x: hidden; touch-action: manipulation; min-height: 100vh; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; overflow-x: hidden; touch-action: manipulation; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
@@ -46,55 +41,14 @@
             50% { opacity: 0.25; }
             100% { transform: translateY(-10vh) scale(1.2) rotate(360deg); opacity: 0; }
         }
-
-        /* Estilos específicos para la vista de la postal con el fondo .jpg */
-        .postal-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            aspect-ratio: 700 / 1000;
-            background-image: url('diseño-postal.jpg');
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
-            border-radius: 1rem;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        /* Cuadro blanco exacto para el QR */
-        #qr-slot {
-            position: absolute;
-            top: 41.5%;
-            left: 55.2%;
-            width: 31.5%;
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #ffffff;
-            padding: 4px;
-            border-radius: 4px;
-        }
-
-        #qrcode img {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
-            .postal-wrapper { box-shadow: none !important; width: 100% !important; max-width: 100% !important; border-radius: 0 !important; }
-        }
     </style>
 </head>
-<body class="min-h-screen relative pb-20 antialiased flex flex-col items-center justify-center p-4">
+<body class="min-h-screen relative pb-20 antialiased">
 
     <div id="bg-hearts-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
 
     <!-- PANTALLA DE CARGA / ERROR -->
-    <div id="loadingScreen" class="fixed inset-0 bg-burgundy-950 z-50 flex flex-col items-center justify-center p-6 text-center">
+    <div id="loadingScreen" class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
             <div id="spinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
             <p id="loadingText" class="text-xs text-rose-300">Cargando tu sorpresa de amor...</p>
@@ -122,50 +76,32 @@
 
     <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
-    <!-- PANTALLA DE DESBLOQUEO CON CORAZÓN Y POSTAL -->
-    <section id="heart-game-section" class="hidden w-full max-w-md flex flex-col items-center justify-center text-center relative z-10 py-10 space-y-6">
-        
-        <!-- Aquí va la postal integrada en el desbloqueo -->
-        <div class="postal-wrapper">
-            <div id="qr-slot">
-                <div id="qrcode"></div>
-            </div>
-        </div>
-
-        <div class="w-full bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl relative overflow-hidden">
-            <span class="inline-block px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-xs font-semibold uppercase tracking-widest mb-3">
+    <!-- PANTALLA DE DESBLOQUEO CON CORAZÓN -->
+    <section id="heart-game-section" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10">
+        <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+            <span class="inline-block px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-xs font-semibold uppercase tracking-widest mb-4">
                 Regalo Especial
             </span>
-            <h1 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h1>
-            <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para ver el contenido...</p>
+            <h1 class="text-3xl font-bold font-cursive text-rose-100 mb-2">Desbloquea Mi Sorpresa</h1>
+            <p class="text-xs text-rose-300/80 mb-6">Toca el corazón para llenarlo de amor...</p>
 
-            <div id="heartContainer" onclick="handleHeartClick()" class="relative w-28 h-28 mx-auto mb-4 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
+            <div id="heartContainer" onclick="handleHeartClick()" class="relative w-36 h-36 mx-auto mb-6 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
                 <svg class="absolute inset-0 w-full h-full text-burgundy-950 fill-current drop-shadow-lg" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
                 <div id="heartFill" class="absolute bottom-0 left-0 w-full overflow-hidden" style="height: 0%;">
-                    <svg class="w-28 h-28 text-rose-500 fill-current absolute bottom-0 left-0 drop-shadow-[0_0_15px_rgba(236,72,153,0.8)]" viewBox="0 0 24 24">
+                    <svg class="w-36 h-36 text-rose-500 fill-current absolute bottom-0 left-0 drop-shadow-[0_0_15px_rgba(236,72,153,0.8)]" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                 </div>
-                <span id="clickCounter" class="relative z-10 text-base font-bold text-white drop-shadow-md">0 / 10</span>
+                <span id="clickCounter" class="relative z-10 text-xl font-bold text-white drop-shadow-md">0 / 10</span>
             </div>
             <p id="tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Haz clic o toca aquí!</p>
-        </div>
-
-        <!-- Botones de Impresión / Compartir Postal -->
-        <div class="no-print w-full space-y-3 pt-2">
-            <button onclick="window.print()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                <i class="fas fa-print"></i> Imprimir / Guardar Postal
-            </button>
-            <a id="whatsappShareBtn" href="#" target="_blank" class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg text-center active:scale-95 transition-transform">
-                <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
-            </a>
         </div>
     </section>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 z-10 relative pt-20 px-4 max-w-md mx-auto space-y-10 w-full">
+    <main id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 z-10 relative pt-20 px-4 max-w-md mx-auto space-y-10">
         <div class="text-center space-y-2 py-2">
             <h2 id="mainTitle" class="text-4xl font-cursive font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-300 via-rose-100 to-gold-400">
                 Nuestra Historia
@@ -221,7 +157,7 @@
             </div>
         </section>
 
-        <!-- MENSAJE DE VOZ -->
+        <!-- MENSAJE DE VOZ (DESPUÉS DE LA TRIVIA) -->
         <section id="voiceNoteSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-microphone-alt text-rose-400"></i> Mensaje de Voz Especial
@@ -247,10 +183,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
-        const SUPABASE_ANON_KEY = "Sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let photosArray = [];
         let currentSlide = 0;
@@ -282,19 +214,6 @@
                     document.getElementById('mainDate').innerText = data.fecha || '';
                     document.getElementById('cardMessage').innerText = data.mensaje || '';
 
-                    // Generar QR de la postal
-                    const currentUrl = window.location.href;
-                    new QRCode(document.getElementById("qrcode"), {
-                        text: currentUrl,
-                        width: 200,
-                        height: 200,
-                        correctLevel: QRCode.CorrectLevel.M
-                    });
-
-                    // Configurar WhatsApp
-                    const mensajeWa = encodeURIComponent(`¡Hola! Te comparto nuestra postal y código QR especial de Dilo D' QRazón ❤️: ${currentUrl}`);
-                    document.getElementById('whatsappShareBtn').href = `https://wa.me/?text=${mensajeWa}`;
-
                     photosArray = data.fotos || [];
                     totalSlides = photosArray.length > 0 ? photosArray.length : 1;
                     buildCarousel();
@@ -320,7 +239,7 @@
                 <div class="w-full max-w-sm bg-burgundy-900/60 p-8 rounded-3xl border border-rose-500/20 space-y-3">
                     <h2 class="text-lg font-bold text-rose-400">Aviso importante</h2>
                     <p class="text-xs text-rose-200">${msg}</p>
-                    <a href="../index.html" class="inline-block mt-2 px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-xl">Crear Nuevo Enlace</a>
+                    <a href="index.html" class="inline-block mt-2 px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-xl">Crear Nuevo Enlace</a>
                 </div>
             `;
         }
