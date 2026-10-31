@@ -41,13 +41,31 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
+
+        /* ESTILOS ESPECIALES DE IMPRESIÓN (Solo sale la postal con el QR) */
+        @media print {
+            body * { visibility: hidden; }
+            #printablePostal, #printablePostal * { visibility: visible; }
+            #printablePostal {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 100% !important;
+                max-width: 400px !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+            }
+            .no-print { display: none !important; }
+        }
     </style>
     <link rel="manifest" href="../manifest.json">
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
 
     <!-- BANNER FIJO SUPERIOR ADSTERRA -->
-    <div id="adsterraBannerContainer" class="fixed top-0 left-0 w-full z-50 bg-burgundy-950/95 border-b border-rose-500/30 py-1.5 flex justify-center items-center shadow-lg">
+    <div id="adsterraBannerContainer" class="fixed top-0 left-0 w-full z-50 bg-burgundy-950/95 border-b border-rose-500/30 py-1.5 flex justify-center items-center shadow-lg no-print">
         <script>
             atOptions = {
                 'key' : '5df8950ef937373e7a705c085c8daeea',
@@ -61,7 +79,7 @@
     </div>
 
     <!-- REPRODUCTOR MÚSICA FLOTANTE VISTA PREVIA -->
-    <div id="pv-musicPlayerContainer" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
+    <div id="pv-musicPlayerContainer" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm no-print">
         <div class="bg-burgundy-950/90 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-2xl">
             <div class="flex items-center space-x-3 overflow-hidden">
                 <button id="pv-musicBtn" onclick="togglePvAudio()" class="w-8 h-8 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg active:scale-95 transition-transform">
@@ -165,7 +183,7 @@
 
     <!-- SECCIÓN 3: PANEL DE GESTIÓN Y PAGO -->
     <div id="panelContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-5 my-6">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between no-print">
             <button onclick="volverAlDashboardDesdePanel()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
                 <i class="fas fa-arrow-left"></i> Mis Proyectos
             </button>
@@ -173,11 +191,11 @@
             <div class="w-12"></div>
         </div>
 
-        <button onclick="abrirVistaPreviaPantallaCompleta()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+        <button onclick="abrirVistaPreviaPantallaCompleta()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 no-print">
             <i class="fas fa-eye text-sm"></i> 👁️ Ver Vista Previa en Pantalla Completa
         </button>
 
-        <div id="paySection" class="bg-burgundy-950/60 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
+        <div id="paySection" class="bg-burgundy-950/60 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4 no-print">
             <h3 class="text-sm font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
             <p class="text-xs text-rose-300/80">Desbloquea el enlace público y el código QR oficial.</p>
 
@@ -206,14 +224,33 @@
         </div>
 
         <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
-            <h3 class="text-sm font-bold text-rose-200">¡Tu detalle ya está listo! 🎉</h3>
-            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
-                <div id="qrcode"></div>
+            <h3 class="text-sm font-bold text-rose-200 no-print">¡Tu detalle ya está listo! 🎉</h3>
+            
+            <!-- POSTAL CON QR INTEGRADO -->
+            <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
+                <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[260px] h-auto object-cover rounded-xl block mx-auto">
+                <div class="absolute inset-0 flex items-center justify-center p-6">
+                    <div class="bg-white p-3 rounded-xl shadow-lg border-2 border-rose-500/30">
+                        <div id="qrcode"></div>
+                    </div>
+                </div>
             </div>
-            <div class="space-y-2">
+
+            <div class="space-y-2 no-print">
                 <a id="finalLink" href="#" target="_blank" class="block w-full py-2.5 bg-rose-600/30 border border-rose-500 text-rose-100 text-xs font-semibold rounded-xl truncate px-4">
                     Abrir Detalle Público
                 </a>
+                
+                <!-- BOTONES DE COMPARTIR WHATSAPP E IMPRIMIR -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="compartirWhatsApp()" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                    </button>
+                    <button onclick="window.print()" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-print text-sm"></i> Imprimir
+                    </button>
+                </div>
+
                 <button onclick="copiarEnlace()" class="w-full py-2 bg-burgundy-900 text-xs text-rose-300 rounded-xl border border-rose-500/30">
                     <i class="fas fa-copy"></i> Copiar Enlace
                 </button>
@@ -322,7 +359,7 @@
 
         // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Ijsxcm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
@@ -805,8 +842,8 @@
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), {
                     text: finalLink,
-                    width: 160,
-                    height: 160
+                    width: 130,
+                    height: 130
                 });
             } else {
                 paySection.classList.remove('hidden');
@@ -906,7 +943,7 @@
             { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
             { question: "¿Cuál es nuestro pasatiempo favorito en pareja?", options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"], correct: 3, feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨" },
             { question: "¿Qué palabra define mejor lo que siento por ti?", options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"], correct: 3, feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖" },
-            { question: "¿Qué promesa nos hacemos para el futuro?", options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"], correct: 3, feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀" }
+            { question: "¿Qué promesa nos hacemos para el futuro?", options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermoso", "Todas las anteriores"], correct: 3, feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀" }
         ];
 
         let pvCurrentQuizIndex = 0;
@@ -1061,6 +1098,14 @@
                 navigator.clipboard.writeText(finalLink).then(() => {
                     alert("¡Enlace copiado al portapapeles! ❤️");
                 });
+            }
+        }
+
+        function compartirWhatsApp() {
+            if (proyectoActualId) {
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                const mensaje = encodeURIComponent(`¡Hola! Te comparto nuestro detalle de amor interactivo creado con Dilo D' QRazón: ${finalLink}`);
+                window.open(`https://api.whatsapp.com/send?text=${mensaje}`, '_blank');
             }
         }
     </script>
