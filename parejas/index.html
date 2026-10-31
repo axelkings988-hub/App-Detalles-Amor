@@ -42,7 +42,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
 
-        /* ESTILOS DE IMPRESIÓN OPTIMIZADOS: Postal grande alineada a la esquina superior izquierda */
+        /* ESTILOS DE IMPRESIÓN OPTIMIZADOS */
         @media print {
             body * { visibility: hidden; }
             #printablePostal, #printablePostal * { visibility: visible; }
@@ -51,7 +51,7 @@
                 left: 0 !important;
                 top: 0 !important;
                 transform: none !important;
-                width: 85% !important; /* <--- Postal ampliada para que no se vea chica en la hoja */
+                width: 85% !important;
                 max-width: 450px !important;
                 box-shadow: none !important;
                 border: none !important;
@@ -227,12 +227,12 @@
         <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
             <h3 class="text-sm font-bold text-rose-200 no-print">¡Tu detalle ya está listo! 🎉</h3>
             
-            <!-- POSTAL CON QR AJUSTADO -->
+            <!-- POSTAL CON QR POSICIONADO CON PORCENTAJES (RESPONSIVO AL ESCALAR) -->
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
-                <!-- QR POSICIONADO EXACTAMENTE EN EL CENTRO DEL CUADRO BLANCO -->
-                <div class="absolute inset-0 flex items-center justify-end pointer-events-none" style="top: 5%; right: 10.5%;">
-                    <div class="bg-white p-1 rounded shadow pointer-events-auto">
+                <!-- QR ANCLADO EXACTAMENTE PORCENTUALMENTE AL CUADRO BLANCO -->
+                <div class="absolute" style="top: 56.5%; right: 20%; transform: translate(50%, -50%);">
+                    <div class="bg-white p-1 rounded shadow">
                         <div id="qrcode"></div>
                     </div>
                 </div>
