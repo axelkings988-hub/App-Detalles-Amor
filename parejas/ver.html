@@ -282,6 +282,17 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
+                // REGLA ESTÉTICA: Ocultar bloques si son 0 (excepto minutos y segundos)
+                const contenedorAnos = document.getElementById('counterYears').parentElement;
+                const contenedorMeses = document.getElementById('counterMonths').parentElement;
+                const contenedorDias = document.getElementById('counterDays').parentElement;
+                const contenedorHoras = document.getElementById('counterHours').parentElement;
+
+                contenedorAnos.style.display = anos > 0 ? 'block' : 'none';
+                contenedorMeses.style.display = meses > 0 ? 'block' : 'none';
+                contenedorDias.style.display = dias > 0 ? 'block' : 'none';
+                contenedorHoras.style.display = horas > 0 ? 'block' : 'none';
+
                 document.getElementById('counterYears').innerText = anos;
                 document.getElementById('counterMonths').innerText = meses;
                 document.getElementById('counterDays').innerText = dias;
@@ -338,8 +349,8 @@
             document.getElementById('quizQuestion').innerText = quizData[0].question;
             const container = document.getElementById('quizOptions');
             container.innerHTML = '';
-            quizData[0].options.forEach((opt, idx) => {
-                container.innerHTML += `<button onclick="this.style.background='#065f46'" class="w-full text-left p-3 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
+            quizData[0].options.forEach((opt) => {
+                container.innerHTML += `<button class="w-full text-left p-3 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
             });
         }
     </script>
