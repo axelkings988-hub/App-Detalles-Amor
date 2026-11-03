@@ -166,19 +166,42 @@
             <audio id="finalVoicePlayer" controls class="w-full mt-2 accent-rose-500"></audio>
         </section>
 
-        <!-- CONTADOR DE TIEMPO -->
-        <section id="loveCounterSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
-            <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
-                <i class="fas fa-clock text-rose-400"></i> Tiempo Juntos
+        <!-- CONTADOR DE TIEMPO (NUEVO DISEÑO ESTÉTICO) -->
+        <section id="loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
+            <h3 class="text-base font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
+                <i class="far fa-clock text-rose-400"></i> Tiempo Juntos <span class="text-rose-400">♥</span>
             </h3>
-            <div class="grid grid-cols-3 gap-2.5 pt-1">
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterYears" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Años</span></div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterMonths" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Meses</span></div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterDays" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Días</span></div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterHours" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Horas</span></div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterMinutes" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Minutos</span></div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterSeconds" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Segundos</span></div>
+
+            <div class="grid grid-cols-6 gap-1.5 pt-1">
+                <div id="boxAnos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                    <span id="counterYears" class="text-base font-bold text-rose-100 block leading-tight">0</span>
+                    <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">AÑOS</span>
+                </div>
+                <div id="boxMeses" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                    <span id="counterMonths" class="text-base font-bold text-rose-100 block leading-tight">0</span>
+                    <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">MESES</span>
+                </div>
+                <div id="boxDias" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                    <span id="counterDays" class="text-base font-bold text-rose-100 block leading-tight">0</span>
+                    <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">DÍAS</span>
+                </div>
+                <div id="boxHoras" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                    <span id="counterHours" class="text-base font-bold text-rose-100 block leading-tight">0</span>
+                    <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">HORAS</span>
+                </div>
+                <div id="boxMinutos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                    <span id="counterMinutes" class="text-base font-bold text-rose-100 block leading-tight">0</span>
+                    <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">MINUTOS</span>
+                </div>
+                <div id="boxSegundos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                    <span id="counterSeconds" class="text-base font-bold text-rose-100 block leading-tight">0</span>
+                    <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">SEGUNDOS</span>
+                </div>
             </div>
+
+            <p class="text-xs font-cursive text-rose-200/90 italic pt-1">
+                Y cada segundo contigo se siente como el primero. 😍
+            </p>
         </section>
     </main>
 
@@ -282,16 +305,11 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
-                // REGLA ESTÉTICA: Ocultar bloques si son 0 (excepto minutos y segundos)
-                const contenedorAnos = document.getElementById('counterYears').parentElement;
-                const contenedorMeses = document.getElementById('counterMonths').parentElement;
-                const contenedorDias = document.getElementById('counterDays').parentElement;
-                const contenedorHoras = document.getElementById('counterHours').parentElement;
-
-                contenedorAnos.style.display = anos > 0 ? 'block' : 'none';
-                contenedorMeses.style.display = meses > 0 ? 'block' : 'none';
-                contenedorDias.style.display = dias > 0 ? 'block' : 'none';
-                contenedorHoras.style.display = horas > 0 ? 'block' : 'none';
+                // REGLA ESTÉTICA: Ocultar tarjetas si son 0 (excepto minutos y segundos)
+                document.getElementById('boxAnos').style.display = anos > 0 ? 'flex' : 'none';
+                document.getElementById('boxMeses').style.display = meses > 0 ? 'flex' : 'none';
+                document.getElementById('boxDias').style.display = dias > 0 ? 'flex' : 'none';
+                document.getElementById('boxHoras').style.display = horas > 0 ? 'flex' : 'none';
 
                 document.getElementById('counterYears').innerText = anos;
                 document.getElementById('counterMonths').innerText = meses;
