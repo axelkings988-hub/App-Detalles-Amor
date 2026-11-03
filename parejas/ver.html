@@ -47,7 +47,6 @@
 
     <div id="bg-hearts-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
 
-    <!-- PANTALLA DE CARGA / ERROR -->
     <div id="loadingScreen" class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
             <div id="spinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
@@ -63,29 +62,25 @@
             </div>
             <div class="space-y-1">
                 <h2 class="text-2xl font-bold font-cursive text-rose-100">Acceso Protegido</h2>
-                <p class="text-xs text-rose-300/80">Este detalle de amor requiere una contraseña para poder abrirse.</p>
+                <p class="text-xs text-rose-300/80">Este detalle de amor requiere una contraseña.</p>
             </div>
-            
             <div class="space-y-3 pt-2">
-                <input type="password" id="accessPasswordInput" placeholder="Ingresa la contraseña secreta" class="w-full px-4 py-3 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 text-center focus:outline-none focus:border-rose-500">
-                <button onclick="verificarPasswordSecreta()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform">
+                <input type="password" id="accessPasswordInput" placeholder="Ingresa la contraseña" class="w-full px-4 py-3 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 text-center focus:outline-none focus:border-rose-500">
+                <button onclick="verificarPasswordSecreta()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg">
                     Desbloquear Contenido
                 </button>
             </div>
-
             <div id="hintContainer" class="hidden pt-2 border-t border-rose-500/20 text-center">
                 <p class="text-[11px] text-rose-300/70 italic" id="hintTextDisplay"></p>
             </div>
-
             <div>
-                <button onclick="mostrarPistaAyuda()" class="text-[11px] text-rose-300 hover:text-rose-200 underline transition-colors">
-                    <i class="fas fa-lightbulb text-gold-400 mr-1"></i> ¿No recuerdas la contraseña? Ver pista
+                <button onclick="mostrarPistaAyuda()" class="text-[11px] text-rose-300 hover:text-rose-200 underline">
+                    <i class="fas fa-lightbulb text-gold-400 mr-1"></i> Ver pista
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- REPRODUCTOR DE MÚSICA FLOTANTE -->
     <div id="musicPlayerContainer" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
         <div class="bg-burgundy-950/85 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -106,7 +101,6 @@
 
     <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
-    <!-- PANTALLA DE DESBLOQUEO CON CORAZÓN -->
     <section id="heart-game-section" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10">
         <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
             <span class="inline-block px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-xs font-semibold uppercase tracking-widest mb-4">
@@ -130,7 +124,6 @@
         </div>
     </section>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 z-10 relative pt-20 px-4 max-w-md mx-auto space-y-10">
         <div class="text-center space-y-2 py-2">
             <h2 id="mainTitle" class="text-4xl font-cursive font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-300 via-rose-100 to-gold-400">
@@ -254,6 +247,7 @@
         let totalSlides = 1;
         let touchStartX = 0, touchEndX = 0;
         let proyectoGlobalData = null;
+        let countdownInterval = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
@@ -261,14 +255,7 @@
         if (!docId) {
             showError("No se encontró el identificador (ID) en el enlace.");
         } else {
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error("Tiempo de espera agotado")), 6000)
-            );
-
-            Promise.race([
-                db.collection("detalles").doc(docId).get(),
-                timeoutPromise
-            ])
+            db.collection("detalles").doc(docId).get()
             .then((doc) => {
                 if (doc.exists) {
                     proyectoGlobalData = doc.data();
@@ -279,15 +266,11 @@
                     } else {
                         inicializarProyectoCompleto();
                     }
-
                 } else {
-                    showError("La tarjeta no existe o fue eliminada de la base de datos.");
+                    showError("La tarjeta no existe o fue eliminada.");
                 }
             })
-            .catch((error) => {
-                console.error("Error al conectar con Firebase:", error);
-                showError("No se pudo conectar con la base de datos.");
-            });
+            .catch(() => showError("Error al conectar con la base de datos."));
         }
 
         function verificarPasswordSecreta() {
@@ -296,7 +279,7 @@
                 document.getElementById('passwordScreen').classList.add('hidden');
                 inicializarProyectoCompleto();
             } else {
-                alert("❌ Contraseña incorrecta. Inténtalo de nuevo.");
+                alert("❌ Contraseña incorrecta.");
             }
         }
 
@@ -318,7 +301,6 @@
 
             document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
             
-            // Lógica inteligente de fecha y contador (evita duplicidad)
             const dateElement = document.getElementById('mainDate');
             if (data.activarContador && data.fechaEspecialTimestamp) {
                 dateElement.classList.add('hidden');
@@ -348,6 +330,7 @@
 
         function iniciarContadorTiempoReal(timestampFecha) {
             const fechaObjetivo = new Date(timestampFecha);
+            if (countdownInterval) clearInterval(countdownInterval);
 
             function actualizarReloj() {
                 const ahora = new Date();
@@ -381,7 +364,7 @@
             }
 
             actualizarReloj();
-            setInterval(actualizarReloj, 1000);
+            countdownInterval = setInterval(actualizarReloj, 1000);
         }
 
         function showError(msg) {
@@ -522,7 +505,6 @@
                         <i class="fas fa-trophy text-3xl text-gold-400 animate-bounce"></i>
                         <h4 class="text-sm font-bold text-white">¡Trivia Superada!</h4>
                         <p class="text-xs text-rose-200">¡Obtuviste ${quizScore} de ${quizData.length} respuestas correctas!</p>
-                        <p class="text-[11px] text-rose-300 italic">Demostraste que nos conocemos a la perfección.</p>
                     </div>
                 `;
                 return;
