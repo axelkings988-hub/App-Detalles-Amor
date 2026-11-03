@@ -42,7 +42,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
 
-        /* ESTILOS DE IMPRESIÓN OPTIMIZADOS */
+        /* ESTILOS DE IMPRESIÓN OPTIMIZADOS: Postal grande alineada a la esquina superior izquierda */
         @media print {
             body * { visibility: hidden; }
             #printablePostal, #printablePostal * { visibility: visible; }
@@ -133,34 +133,6 @@
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">NOMBRE DEL PROYECTO (Para identificarlo):</label>
                 <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
-            </div>
-
-            <!-- LÍNEA HORIZONTAL Y OPCIÓN DE CONTRASEÑA -->
-            <hr class="border-rose-500/20 my-3">
-            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
-                <label class="text-xs font-semibold text-rose-200 block">🔒 ¿Proteger detalle con contraseña?</label>
-                <div class="flex items-center gap-6 pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
-                        <input type="radio" name="protegerOpcion" value="si" onclick="togglePasswordOptions(true)" class="accent-rose-500"> Sí
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
-                        <input type="radio" name="protegerOpcion" value="no" checked onclick="togglePasswordOptions(false)" class="accent-rose-500"> No
-                    </label>
-                </div>
-                <p id="descripcionOpcion" class="text-[11px] text-rose-300/80 italic pt-1">
-                    🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.
-                </p>
-
-                <div id="passwordFieldsContainer" class="hidden space-y-3 pt-3 border-t border-rose-500/20">
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-rose-200">Contraseña:</label>
-                        <input type="password" id="detallePassword" placeholder="Ingresa contraseña secreta" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-rose-200">Pista (en caso de olvido):</label>
-                        <input type="text" id="detallePista" placeholder="Ej. Fecha de nuestro aniversario" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
-                    </div>
-                </div>
             </div>
 
             <div class="space-y-1">
@@ -258,6 +230,7 @@
             <!-- POSTAL CON QR AJUSTADO -->
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
+                <!-- QR POSICIONADO EXACTAMENTE EN EL CENTRO DEL CUADRO BLANCO -->
                 <div class="absolute inset-0 flex items-center justify-end pointer-events-none" style="top: 5%; right: 10.5%;">
                     <div class="bg-white p-1 rounded shadow pointer-events-auto">
                         <div id="qrcode"></div>
@@ -270,6 +243,7 @@
                     Abrir Detalle Público
                 </a>
                 
+                <!-- BOTONES DE COMPARTIR WHATSAPP E IMPRIMIR -->
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="compartirWhatsApp()" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-1.5">
                         <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
@@ -283,13 +257,6 @@
                     <i class="fas fa-copy"></i> Copiar Enlace
                 </button>
             </div>
-        </div>
-
-        <!-- BOTÓN DE ELIMINACIÓN PERMANENTE EN EL PANEL -->
-        <div class="pt-2 no-print">
-            <button onclick="eliminarProyectoPermanentemente(proyectoActualId)" class="w-full py-2.5 bg-burgundy-950 text-rose-400 hover:text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/30 hover:border-rose-500/60 transition-colors flex items-center justify-center gap-2">
-                <i class="fas fa-trash-alt"></i> Eliminar proyecto y datos permanentemente
-            </button>
         </div>
     </div>
 
@@ -394,7 +361,7 @@
 
         // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
@@ -442,20 +409,6 @@
             } 
         });
 
-        function togglePasswordOptions(esSi) {
-            const container = document.getElementById('passwordFieldsContainer');
-            const desc = document.getElementById('descripcionOpcion');
-            if (esSi) {
-                container.classList.remove('hidden');
-                desc.innerText = "🔒 Ahora tu QR está protegido. Al escanear, pedirá una contraseña para poder ver el contenido.";
-            } else {
-                container.classList.add('hidden');
-                desc.innerText = "🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.";
-                document.getElementById('detallePassword').value = '';
-                document.getElementById('detallePista').value = '';
-            }
-        }
-
         function obtenerProyectosLocales() {
             try { return JSON.parse(localStorage.getItem("misProyectosAmor") || "[]"); } catch(e) { return []; }
         }
@@ -486,7 +439,7 @@
                         <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
                             Ver / Gestionar
                         </button>
-                        <button onclick="eliminarProyectoPermanentemente('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
+                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
@@ -495,68 +448,15 @@
             });
         }
 
-        // FUNCIÓN DE LIMPIEZA TOTAL Y ELIMINACIÓN PERMANENTE
-        async function eliminarProyectoPermanentemente(firebaseId) {
-            if (!firebaseId) return;
-
-            const confirmar = confirm("¿Estás seguro de eliminar este proyecto?\n\nEsta acción borrará todas tus fotos, mensajes y el enlace público para siempre y no se puede deshacer.");
-            
-            if (!confirmar) return;
-
-            try {
-                const docRef = db.collection("detalles").doc(firebaseId);
-                const docSnap = await docRef.get();
-
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    
-                    if (data.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
-                        for (const fotoUrl of data.fotos) {
-                            try {
-                                const urlObj = new URL(fotoUrl);
-                                const pathSegments = urlObj.pathname.split('/');
-                                const bucketIndex = pathSegments.indexOf('detalles-fotos');
-                                if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
-                                    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
-                                    await supabaseClient.storage.from('detalles-fotos').remove([filePath]);
-                                }
-                            } catch (err) {
-                                console.warn("No se pudo eliminar una foto de Supabase:", err);
-                            }
-                        }
-                    }
-
-                    await docRef.delete();
-                }
-
-                let proyectos = obtenerProyectosLocales();
-                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
-                guardarProyectosLocales(proyectos);
-
-                proyectoActualId = null;
-                proyectoDatosCache = null;
-                if (localStorage.getItem("ultimoDetalleId") === firebaseId) {
-                    localStorage.removeItem("ultimoDetalleId");
-                }
-
-                alert("🗑️ El proyecto y todos sus archivos asociados fueron eliminados permanentemente.");
-                volverAlDashboardDesdePanel();
-
-            } catch (error) {
-                console.error("Error al eliminar el proyecto:", error);
-                alert("⚠️ Ocurrió un error al intentar eliminar los datos: " + error.message);
-            }
-        }
-
         function mostrarFormularioCreacion() {
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('createForm').reset();
-            togglePasswordOptions(false);
             document.getElementById('formTitleText').innerText = "Nuevo Proyecto";
             recordedAudioBase64 = null;
             proyectoActualId = null;
+            proyectoDatosCache = null;
             document.getElementById('audioPreviewContainer').classList.add('hidden');
         }
 
@@ -569,24 +469,14 @@
             try {
                 const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
                 if (docSnap.exists) {
-                    const data = docSnap.data();
-                    document.getElementById('nombreProyectoInput').value = data.nombreProyecto || '';
-                    document.getElementById('nombresInput').value = data.nombres || '';
-                    document.getElementById('fechaInput').value = data.fecha || '';
-                    document.getElementById('mensajeInput').value = data.mensaje || '';
+                    proyectoDatosCache = docSnap.data();
+                    document.getElementById('nombreProyectoInput').value = proyectoDatosCache.nombreProyecto || '';
+                    document.getElementById('nombresInput').value = proyectoDatosCache.nombres || '';
+                    document.getElementById('fechaInput').value = proyectoDatosCache.fecha || '';
+                    document.getElementById('mensajeInput').value = proyectoDatosCache.mensaje || '';
                     
-                    if (data.password) {
-                        document.querySelector('input[name="protegerOpcion"][value="si"]').checked = true;
-                        togglePasswordOptions(true);
-                        document.getElementById('detallePassword').value = data.password;
-                        document.getElementById('detallePista').value = data.pista || '';
-                    } else {
-                        document.querySelector('input[name="protegerOpcion"][value="no"]').checked = true;
-                        togglePasswordOptions(false);
-                    }
-
-                    if (data.voiceNoteBase64) {
-                        recordedAudioBase64 = data.voiceNoteBase64;
+                    if (proyectoDatosCache.voiceNoteBase64) {
+                        recordedAudioBase64 = proyectoDatosCache.voiceNoteBase64;
                         document.getElementById('audioPreview').src = recordedAudioBase64;
                         document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     }
@@ -700,7 +590,10 @@
 
                 const { data, error } = await supabaseClient.storage
                     .from('detalles-fotos')
-                    .upload(filePath, file, { cacheControl: '3600', upsert: false });
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
 
                 if (error) return null;
 
@@ -761,7 +654,8 @@
                     reader.readAsDataURL(audioBlob);
                     reader.onloadend = () => {
                         recordedAudioBase64 = reader.result;
-                        document.getElementById('audioPreview').src = recordedAudioBase64;
+                        const preview = document.getElementById('audioPreview');
+                        preview.src = recordedAudioBase64;
                         document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     };
                     recordBtn.className = "px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
@@ -798,6 +692,7 @@
         let pvPhotosArray = [];
         let currentSlide = 0;
 
+        // FUNCIÓN GUARDAR PROYECTO CORREGIDA PARA PROTEGER LAS FOTOS EXISTENTES
         async function guardarProyectoYMostrarPanel() {
             const photosFiles = document.getElementById('photosInput').files;
             
@@ -806,13 +701,15 @@
             document.getElementById('statusText').innerText = "Iniciando proceso...";
 
             try {
-                // Recuperar fotos existentes si estamos editando
+                // 1. Recuperar fotos existentes de la caché para no perderlas al editar textos
                 let urlsFotos = [];
-                if (proyectoActualId && proyectoDatosCache && proyectoDatosCache.fotos) {
+                if (proyectoDatosCache && proyectoDatosCache.fotos && Array.isArray(proyectoDatosCache.fotos)) {
                     urlsFotos = [...proyectoDatosCache.fotos];
                 }
 
+                // 2. Si el usuario selecciona fotos nuevas, se agregan/actualizan
                 if (photosFiles && photosFiles.length > 0) {
+                    urlsFotos = []; // Si sube un lote nuevo, limpiamos o reemplazamos según prefieras; aquí cargará las nuevas
                     const maxFotos = Math.min(photosFiles.length, 5);
                     for (let i = 0; i < maxFotos; i++) {
                         document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
@@ -822,13 +719,8 @@
                         const publicUrl = await subirFotoSupabase(fotoOptimizada);
                         
                         if (publicUrl) {
-                            // Si el usuario subió fotos nuevas, las añadimos o reemplazamos
                             urlsFotos.push(publicUrl);
                         }
-                    }
-                    // Mantener máximo 5 fotos
-                    if (urlsFotos.length > 5) {
-                        urlsFotos = urlsFotos.slice(-5);
                     }
                 }
 
@@ -838,17 +730,6 @@
                 const nombres = document.getElementById('nombresInput').value.trim();
                 const fecha = document.getElementById('fechaInput').value.trim();
                 const mensaje = document.getElementById('mensajeInput').value.trim();
-                
-                const protegerSeleccionado = document.querySelector('input[name="protegerOpcion"]:checked').value === 'si';
-                const passwordVal = protegerSeleccionado ? document.getElementById('detallePassword').value.trim() : null;
-                const pistaVal = protegerSeleccionado ? document.getElementById('detallePista').value.trim() : null;
-
-                if (protegerSeleccionado && !passwordVal) {
-                    alert("⚠️ Por favor ingresa una contraseña para proteger el detalle.");
-                    document.getElementById('statusBox').classList.add('hidden');
-                    document.getElementById('createForm').classList.remove('hidden');
-                    return;
-                }
 
                 let docRef;
                 const datosAEnviar = {
@@ -856,14 +737,12 @@
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
-                    voiceNoteBase64: recordedAudioBase64 || null,
-                    password: passwordVal,
-                    pista: pistaVal,
-                    pagado: false,
-                    creado: firebase.firestore.FieldValue.serverTimestamp()
+                    voiceNoteBase64: recordedAudioBase64 || (proyectoDatosCache ? proyectoDatosCache.voiceNoteBase64 : null),
+                    pagado: proyectoDatosCache ? (proyectoDatosCache.pagado || false) : false,
+                    creado: proyectoDatosCache && proyectoDatosCache.creado ? proyectoDatosCache.creado : firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // Asegurar que siempre se guarde el arreglo de fotos correctamente
+                // Asegurar que las fotos se envíen siempre de forma correcta
                 if (urlsFotos.length > 0) {
                     datosAEnviar.fotos = urlsFotos;
                 }
@@ -901,6 +780,7 @@
                 mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
 
             } catch (error) {
+                console.error("Error al guardar:", error);
                 alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
@@ -923,6 +803,15 @@
                 }
             } catch(e) {
                 alert("Error al cargar el proyecto.");
+            }
+        }
+
+        function eliminarProyecto(firebaseId) {
+            if (confirm("¿Estás seguro de eliminar este proyecto guardado?")) {
+                let proyectos = obtenerProyectosLocales();
+                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                guardarProyectosLocales(proyectos);
+                renderizarProyectosGuardados();
             }
         }
 
