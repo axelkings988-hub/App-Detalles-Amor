@@ -499,27 +499,22 @@
         async function eliminarProyectoPermanentemente(firebaseId) {
             if (!firebaseId) return;
 
-            // Doble seguridad: Ventana de confirmación
             const confirmar = confirm("¿Estás seguro de eliminar este proyecto?\n\nEsta acción borrará todas tus fotos, mensajes y el enlace público para siempre y no se puede deshacer.");
             
             if (!confirmar) return;
 
             try {
-                // 1. Obtener los datos del documento en Firebase para extraer las URLs de las fotos en Supabase
                 const docRef = db.collection("detalles").doc(firebaseId);
                 const docSnap = await docRef.get();
 
                 if (docSnap.exists) {
                     const data = docSnap.data();
                     
-                    // 2. Eliminar las fotografías almacenadas en el bucket de Supabase
                     if (data.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
                         for (const fotoUrl of data.fotos) {
                             try {
-                                // Extraer la ruta del archivo a partir de la URL pública de Supabase
                                 const urlObj = new URL(fotoUrl);
                                 const pathSegments = urlObj.pathname.split('/');
-                                // Buscar el índice donde dice 'detalles-fotos' o tomar los últimos segmentos
                                 const bucketIndex = pathSegments.indexOf('detalles-fotos');
                                 if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
                                     const filePath = pathSegments.slice(bucketIndex + 1).join('/');
@@ -531,16 +526,13 @@
                         }
                     }
 
-                    // 3. Borrar el documento correspondiente en Firestore
                     await docRef.delete();
                 }
 
-                // 4. Eliminar el proyecto del localStorage del navegador
                 let proyectos = obtenerProyectosLocales();
                 proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
                 guardarProyectosLocales(proyectos);
 
-                // Limpiar caché y volver al dashboard
                 proyectoActualId = null;
                 proyectoDatosCache = null;
                 if (localStorage.getItem("ultimoDetalleId") === firebaseId) {
@@ -814,7 +806,12 @@
             document.getElementById('statusText').innerText = "Iniciando proceso...";
 
             try {
+                // Recuperar fotos existentes si estamos editando
                 let urlsFotos = [];
+                if (proyectoActualId && proyectoDatosCache && proyectoDatosCache.fotos) {
+                    urlsFotos = [...proyectoDatosCache.fotos];
+                }
+
                 if (photosFiles && photosFiles.length > 0) {
                     const maxFotos = Math.min(photosFiles.length, 5);
                     for (let i = 0; i < maxFotos; i++) {
@@ -824,7 +821,14 @@
                         document.getElementById('statusText').innerText = `Subiendo foto ${i + 1} de ${maxFotos} a Supabase...`;
                         const publicUrl = await subirFotoSupabase(fotoOptimizada);
                         
-                        if (publicUrl) urlsFotos.push(publicUrl);
+                        if (publicUrl) {
+                            // Si el usuario subió fotos nuevas, las añadimos o reemplazamos
+                            urlsFotos.push(publicUrl);
+                        }
+                    }
+                    // Mantener máximo 5 fotos
+                    if (urlsFotos.length > 5) {
+                        urlsFotos = urlsFotos.slice(-5);
                     }
                 }
 
@@ -859,13 +863,13 @@
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                if (urlsFotos.length > 0) datosAEnviar.fotos = urlsFotos;
+                // Asegurar que siempre se guarde el arreglo de fotos correctamente
+                if (urlsFotos.length > 0) {
+                    datosAEnviar.fotos = urlsFotos;
+                }
 
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
-                    if (urlsFotos.length === 0 && proyectoDatosCache && proyectoDatosCache.fotos) {
-                        delete datosAEnviar.fotos; 
-                    }
                     await docRef.update(datosAEnviar);
                 } else {
                     docRef = await db.collection("detalles").add(datosAEnviar);
@@ -1166,7 +1170,7 @@
                     const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
                     
                     if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        const queryRecibo = await db.collection("detaldas") || await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
+                        const queryRecibo = await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
                         if (!queryRecibo.empty) {
                             alert("⚠️ Este comprobante ya fue registrado en otro proyecto.");
                             return;
