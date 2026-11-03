@@ -55,6 +55,33 @@
         </div>
     </div>
 
+    <!-- PANTALLA DE BLOQUEO POR CONTRASEÑA (OCULTA POR DEFECTO) -->
+    <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
+        <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-4">
+            <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center mx-auto border border-rose-500/30">
+                <i class="fas fa-lock text-lg"></i>
+            </div>
+            <h2 class="text-2xl font-bold font-cursive text-rose-100">Detalle Protegido</h2>
+            <p class="text-xs text-rose-300/80">Este detalle requiere una contraseña para poder ser visto.</p>
+
+            <div class="space-y-3 pt-2">
+                <input type="password" id="accessPasswordInput" placeholder="Ingresa la contraseña" class="w-full px-4 py-3 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 text-center tracking-widest">
+                <button onclick="verificarPasswordAcceso()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform">
+                    Desbloquear Contenido
+                </button>
+            </div>
+
+            <div id="pistaContainer" class="hidden pt-2 text-left bg-burgundy-950/60 p-3 rounded-xl border border-rose-500/20">
+                <p class="text-[11px] text-rose-300 font-semibold">💡 Pista:</p>
+                <p id="pistaText" class="text-[11px] text-rose-200/90 italic"></p>
+            </div>
+
+            <button onclick="mostrarPista()" id="btnVerPista" class="text-[11px] text-rose-300 underline hover:text-rose-100 pt-1">
+                ¿Olvidaste tu contraseña? Ver pista
+            </button>
+        </div>
+    </div>
+
     <!-- REPRODUCTOR DE MÚSICA FLOTANTE -->
     <div id="musicPlayerContainer" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
         <div class="bg-burgundy-950/85 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl">
@@ -69,7 +96,7 @@
             </div>
             <div class="flex items-center space-x-2">
                 <i class="fas fa-volume-up text-xs text-rose-300"></i>
-                <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustVolume(this.value)" class="w-16 h-1 accent-rose-500 bg-rose-950 rounded-lg cursor-pointer">
+                <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustVolume(this.value)" class="w-16 h-1 accent-rose-500 bg-burgundy-950 rounded-lg cursor-pointer">
             </div>
         </div>
     </div>
@@ -188,6 +215,7 @@
         let currentSlide = 0;
         let totalSlides = 1;
         let touchStartX = 0, touchEndX = 0;
+        let detalleDataGlobal = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
@@ -205,23 +233,15 @@
             ])
             .then((doc) => {
                 if (doc.exists) {
-                    const data = doc.data();
+                    detalleDataGlobal = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
-                    document.getElementById('heart-game-section').classList.remove('hidden');
-                    document.getElementById('musicPlayerContainer').classList.remove('hidden');
 
-                    document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
-                    document.getElementById('mainDate').innerText = data.fecha || '';
-                    document.getElementById('cardMessage').innerText = data.mensaje || '';
-
-                    photosArray = data.fotos || [];
-                    totalSlides = photosArray.length > 0 ? photosArray.length : 1;
-                    buildCarousel();
-                    loadQuizQuestion();
-
-                    if (data.voiceNoteBase64) {
-                        document.getElementById('finalVoicePlayer').src = data.voiceNoteBase64;
-                        document.getElementById('voiceNoteSection').classList.remove('hidden');
+                    // Verificar si el detalle tiene contraseña configurada
+                    if (detalleDataGlobal.password && detalleDataGlobal.password.trim() !== "") {
+                        document.getElementById('passwordScreen').classList.remove('hidden');
+                    } else {
+                        // Si no tiene contraseña, pasa directo a la experiencia
+                        iniciarExperienciaDetalle();
                     }
 
                 } else {
@@ -232,6 +252,47 @@
                 console.error("Error al conectar con Firebase:", error);
                 showError("No se pudo conectar con la base de datos.");
             });
+        }
+
+        function verificarPasswordAcceso() {
+            const inputPass = document.getElementById('accessPasswordInput').value.trim();
+            if (inputPass === detalleDataGlobal.password) {
+                document.getElementById('passwordScreen').classList.add('hidden');
+                iniciarExperienciaDetalle();
+            } else {
+                alert("❌ Contraseña incorrecta. Inténtalo de nuevo.");
+                document.getElementById('accessPasswordInput').value = "";
+            }
+        }
+
+        function mostrarPista() {
+            const pistaContainer = document.getElementById('pistaContainer');
+            const pistaText = document.getElementById('pistaText');
+            if (detalleDataGlobal.pista && detalleDataGlobal.pista.trim() !== "") {
+                pistaText.innerText = detalleDataGlobal.pista;
+            } else {
+                pistaText.innerText = "El creador no dejó ninguna pista registrada.";
+            }
+            pistaContainer.classList.remove('hidden');
+        }
+
+        function iniciarExperienciaDetalle() {
+            document.getElementById('heart-game-section').classList.remove('hidden');
+            document.getElementById('musicPlayerContainer').classList.remove('hidden');
+
+            document.getElementById('mainTitle').innerText = `Nuestra Historia: ${detalleDataGlobal.nombres || ''}`;
+            document.getElementById('mainDate').innerText = detalleDataGlobal.fecha || '';
+            document.getElementById('cardMessage').innerText = detalleDataGlobal.mensaje || '';
+
+            photosArray = detalleDataGlobal.fotos || [];
+            totalSlides = photosArray.length > 0 ? photosArray.length : 1;
+            buildCarousel();
+            loadQuizQuestion();
+
+            if (detalleDataGlobal.voiceNoteBase64) {
+                document.getElementById('finalVoicePlayer').src = detalleDataGlobal.voiceNoteBase64;
+                document.getElementById('voiceNoteSection').classList.remove('hidden');
+            }
         }
 
         function showError(msg) {
