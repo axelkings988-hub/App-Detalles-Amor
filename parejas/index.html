@@ -831,6 +831,7 @@
         function iniciarContadorTiempoRealPv(timestampFecha) {
             const fechaObjetivo = new Date(timestampFecha);
             if (pvCountdownInterval) clearInterval(pvCountdownInterval);
+
             function actualizar() {
                 const ahora = new Date();
                 let diferencia = ahora - fechaObjetivo;
@@ -852,6 +853,17 @@
                     dias += new Date(ahora.getFullYear(), ahora.getMonth(), 0).getDate();
                 }
                 if (meses < 0) { anos--; meses += 12; }
+
+                // REGLA ESTÉTICA: Ocultar bloques si son 0 (excepto minutos y segundos)
+                const contenedorAnos = document.getElementById('pv-counterYears').parentElement;
+                const contenedorMeses = document.getElementById('pv-counterMonths').parentElement;
+                const contenedorDias = document.getElementById('pv-counterDays').parentElement;
+                const contenedorHoras = document.getElementById('pv-counterHours').parentElement;
+
+                contenedorAnos.style.display = anos > 0 ? 'block' : 'none';
+                contenedorMeses.style.display = meses > 0 ? 'block' : 'none';
+                contenedorDias.style.display = dias > 0 ? 'block' : 'none';
+                contenedorHoras.style.display = horas > 0 ? 'block' : 'none';
 
                 document.getElementById('pv-counterYears').innerText = anos;
                 document.getElementById('pv-counterMonths').innerText = meses;
@@ -880,15 +892,13 @@
             document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
-        const pvQuizData = [
-            { question: "¿Cuál es nuestro lugar favorito?", options: ["Parque", "Café", "Cualquier lugar juntos", "Playa"], correct: 2, feedback: "¡Exacto! ❤️" }
-        ];
+        const pvQuizData = [{ question: "¿Cuál es nuestro lugar favorito?", options: ["Parque", "Café", "Cualquier lugar juntos", "Playa"], correct: 2 }];
         function loadPvQuizQuestion() {
             document.getElementById('pv-quizQuestion').innerText = pvQuizData[0].question;
             const container = document.getElementById('pv-quizOptions');
             container.innerHTML = '';
-            pvQuizData[0].options.forEach((opt, idx) => {
-                container.innerHTML += `<button onclick="this.style.background='#065f46'" class="w-full text-left p-2.5 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
+            pvQuizData[0].options.forEach((opt) => {
+                container.innerHTML += `<button class="w-full text-left p-2.5 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
             });
         }
 
