@@ -22,10 +22,7 @@
                         rose: { 300: '#F472B6', 500: '#EC4899', 600: '#DB2777', 900: '#831843' },
                         gold: { 400: '#FBBF24', 500: '#F59E0B' }
                     },
-                    fontFamily: {
-                        cursive: ['"Dancing Script"', 'cursive'],
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    }
+                    fontFamily: { cursive: ['"Dancing Script"', 'cursive'], sans: ['"Plus Jakarta Sans"', 'sans-serif'] }
                 }
             }
         }
@@ -35,28 +32,19 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
-        .bg-heart { position: absolute; opacity: 0.15; animation: floatUp linear infinite; pointer-events: none; }
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
-            50% { opacity: 0.25; }
-            100% { transform: translateY(-10vh) scale(1.2) rotate(360deg); opacity: 0; }
-        }
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
 
-    <div id="bg-hearts-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
-
     <div id="loadingScreen" class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
-            <div id="spinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
-            <p id="loadingText" class="text-xs text-rose-300">Cargando tu sorpresa de amor...</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
+            <p class="text-xs text-rose-300">Cargando tu sorpresa de amor...</p>
         </div>
     </div>
 
-    <!-- PANTALLA DE ACCESO PROTEGIDO CON CONTRASEÑA -->
     <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-30">
-        <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
+        <div class="w-full max-w-sm bg-burgundy-900/85 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
             <div class="w-14 h-14 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/40">
                 <i class="fas fa-lock text-rose-400 text-xl"></i>
             </div>
@@ -132,7 +120,6 @@
             <p id="mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
         </div>
 
-        <!-- CARRUSEL DE FOTOS -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
@@ -140,93 +127,59 @@
                 </h3>
                 <span id="carouselIndicator" class="text-xs text-rose-300/70 font-semibold">1 / 1</span>
             </div>
-
-            <div id="carouselViewport" class="overflow-hidden rounded-2xl relative touch-pan-y" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)" ontouchend="handleTouchEnd()">
+            <div id="carouselViewport" class="overflow-hidden rounded-2xl relative">
                 <div id="carouselTrack" class="carousel-track"></div>
             </div>
-
             <div class="flex items-center justify-between pt-2">
-                <button onclick="prevSlide()" class="w-9 h-9 rounded-full bg-burgundy-950/80 border border-rose-500/30 text-rose-200 flex items-center justify-center active:scale-95"><i class="fas fa-chevron-left text-xs"></i></button>
-                <div class="flex space-x-1 overflow-x-auto max-w-[200px] py-1 px-2" id="carouselDots"></div>
-                <button onclick="nextSlide()" class="w-9 h-9 rounded-full bg-burgundy-950/80 border border-rose-500/30 text-rose-200 flex items-center justify-center active:scale-95"><i class="fas fa-chevron-right text-xs"></i></button>
+                <button onclick="prevSlide()" class="w-9 h-9 rounded-full bg-burgundy-950 text-rose-200 flex items-center justify-center"><i class="fas fa-chevron-left text-xs"></i></button>
+                <button onclick="nextSlide()" class="w-9 h-9 rounded-full bg-burgundy-950 text-rose-200 flex items-center justify-center"><i class="fas fa-chevron-right text-xs"></i></button>
             </div>
         </section>
 
-        <!-- CARTA DIGITAL -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
                 <i class="fas fa-envelope-open-text text-rose-400"></i> Mensaje Especial
             </h3>
-            <div class="bg-burgundy-950/70 p-5 rounded-2xl border border-rose-500/10 text-xs leading-relaxed text-rose-200/90 font-sans">
+            <div class="bg-burgundy-950/70 p-5 rounded-2xl border border-rose-500/10 text-xs leading-relaxed text-rose-200/90">
                 <p id="cardMessage" class="whitespace-pre-line"></p>
             </div>
         </section>
 
-        <!-- TRIVIA DE PAREJA -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-rose-100 flex items-center gap-2">
                     <i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja
                 </h3>
-                <span id="quizScore" class="text-xs bg-gold-400/20 text-gold-400 border border-gold-400/30 px-2.5 py-1 rounded-full font-bold">
-                    Puntos: 0
-                </span>
+                <span id="quizScore" class="text-xs bg-gold-400/20 text-gold-400 px-2.5 py-1 rounded-full font-bold">Puntos: 0</span>
             </div>
-
             <div id="quizContainer" class="bg-burgundy-950/60 p-4 rounded-2xl border border-rose-500/10 space-y-4">
-                <p id="quizQuestion" class="text-xs font-semibold text-rose-100">Cargando pregunta...</p>
+                <p id="quizQuestion" class="text-xs font-semibold text-rose-100">Cargando...</p>
                 <div id="quizOptions" class="space-y-2"></div>
                 <div id="quizFeedback" class="hidden text-xs font-semibold p-3 rounded-xl text-center"></div>
             </div>
         </section>
 
-        <!-- MENSAJE DE VOZ -->
         <section id="voiceNoteSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-microphone-alt text-rose-400"></i> Mensaje de Voz Especial
             </h3>
-            <p class="text-xs text-rose-300/80">Escucha esta dedicatoria en voz alta:</p>
             <audio id="finalVoicePlayer" controls class="w-full mt-2 accent-rose-500"></audio>
         </section>
 
-        <!-- CONTADOR DE AMOR EN TIEMPO REAL -->
+        <!-- CONTADOR DE TIEMPO -->
         <section id="loveCounterSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-clock text-rose-400"></i> Tiempo Juntos
             </h3>
-            <p class="text-xs text-rose-300/80 italic">Cada segundo a tu lado es un regalo maravilloso.</p>
-            
             <div class="grid grid-cols-3 gap-2.5 pt-1">
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20">
-                    <span id="counterYears" class="text-lg font-bold text-rose-200 block">0</span>
-                    <span class="text-[10px] text-rose-400/80 uppercase">Años</span>
-                </div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20">
-                    <span id="counterMonths" class="text-lg font-bold text-rose-200 block">0</span>
-                    <span class="text-[10px] text-rose-400/80 uppercase">Meses</span>
-                </div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20">
-                    <span id="counterDays" class="text-lg font-bold text-rose-200 block">0</span>
-                    <span class="text-[10px] text-rose-400/80 uppercase">Días</span>
-                </div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20">
-                    <span id="counterHours" class="text-lg font-bold text-rose-200 block">0</span>
-                    <span class="text-[10px] text-rose-400/80 uppercase">Horas</span>
-                </div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20">
-                    <span id="counterMinutes" class="text-lg font-bold text-rose-200 block">0</span>
-                    <span class="text-[10px] text-rose-400/80 uppercase">Minutos</span>
-                </div>
-                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20">
-                    <span id="counterSeconds" class="text-lg font-bold text-rose-200 block">0</span>
-                    <span class="text-[10px] text-rose-400/80 uppercase">Segundos</span>
-                </div>
+                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterYears" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Años</span></div>
+                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterMonths" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Meses</span></div>
+                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterDays" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Días</span></div>
+                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterHours" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Horas</span></div>
+                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterMinutes" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Minutos</span></div>
+                <div class="bg-burgundy-950/80 p-2.5 rounded-xl border border-rose-500/20"><span id="counterSeconds" class="text-lg font-bold text-rose-200 block">0</span><span class="text-[10px] text-rose-400 uppercase">Segundos</span></div>
             </div>
         </section>
-
-        <footer class="text-center py-6 text-xs text-rose-400/60 space-y-1">
-            <p class="font-cursive text-lg text-rose-300">Con todo mi amor ❤️</p>
-        </footer>
     </main>
 
     <script>
@@ -242,63 +195,39 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let photosArray = [];
-        let currentSlide = 0;
-        let totalSlides = 1;
-        let touchStartX = 0, touchEndX = 0;
-        let proyectoGlobalData = null;
-        let countdownInterval = null;
-
+        let photosArray = [], currentSlide = 0, totalSlides = 1, proyectoGlobalData = null, countdownInterval = null;
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
-        if (!docId) {
-            showError("No se encontró el identificador (ID) en el enlace.");
-        } else {
-            db.collection("detalles").doc(docId).get()
-            .then((doc) => {
+        if (!docId) { alert("ID no encontrado"); }
+        else {
+            db.collection("detalles").doc(docId).get().then((doc) => {
                 if (doc.exists) {
                     proyectoGlobalData = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
-
                     if (proyectoGlobalData.privado === true && proyectoGlobalData.password) {
                         document.getElementById('passwordScreen').classList.remove('hidden');
-                    } else {
-                        inicializarProyectoCompleto();
-                    }
-                } else {
-                    showError("La tarjeta no existe o fue eliminada.");
+                    } else { inicializarProyectoCompleto(); }
                 }
-            })
-            .catch(() => showError("Error al conectar con la base de datos."));
+            });
         }
 
         function verificarPasswordSecreta() {
-            const passInput = document.getElementById('accessPasswordInput').value.trim();
-            if (passInput === proyectoGlobalData.password) {
+            if (document.getElementById('accessPasswordInput').value.trim() === proyectoGlobalData.password) {
                 document.getElementById('passwordScreen').classList.add('hidden');
                 inicializarProyectoCompleto();
-            } else {
-                alert("❌ Contraseña incorrecta.");
-            }
+            } else { alert("❌ Contraseña incorrecta."); }
         }
 
         function mostrarPistaAyuda() {
-            const hintContainer = document.getElementById('hintContainer');
-            const hintDisplay = document.getElementById('hintTextDisplay');
-            if (proyectoGlobalData.pista) {
-                hintDisplay.innerText = `💡 Pista: "${proyectoGlobalData.pista}"`;
-            } else {
-                hintDisplay.innerText = "💡 El creador no dejó ninguna pista registrada.";
-            }
-            hintContainer.classList.remove('hidden');
+            document.getElementById('hintContainer').classList.remove('hidden');
+            document.getElementById('hintTextDisplay').innerText = `💡 Pista: "${proyectoGlobalData.pista || 'Ninguna'}"`;
         }
 
         function inicializarProyectoCompleto() {
             const data = proyectoGlobalData;
             document.getElementById('heart-game-section').classList.remove('hidden');
             document.getElementById('musicPlayerContainer').classList.remove('hidden');
-
             document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
             
             const dateElement = document.getElementById('mainDate');
@@ -306,7 +235,7 @@
                 dateElement.classList.add('hidden');
                 iniciarContadorTiempoReal(data.fechaEspecialTimestamp);
                 document.getElementById('loveCounterSection').classList.remove('hidden');
-            } else if (data.fecha && data.fecha.trim() !== "") {
+            } else if (data.fecha) {
                 dateElement.innerText = data.fecha;
                 dateElement.classList.remove('hidden');
                 document.getElementById('loveCounterSection').classList.add('hidden');
@@ -316,7 +245,6 @@
             }
 
             document.getElementById('cardMessage').innerText = data.mensaje || '';
-
             photosArray = data.fotos || [];
             totalSlides = photosArray.length > 0 ? photosArray.length : 1;
             buildCarousel();
@@ -350,8 +278,7 @@
 
                 if (dias < 0) {
                     meses--;
-                    const mesAnterior = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
-                    dias += mesAnterior.getDate();
+                    dias += new Date(ahora.getFullYear(), ahora.getMonth(), 0).getDate();
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
@@ -362,80 +289,30 @@
                 document.getElementById('counterMinutes').innerText = minutos;
                 document.getElementById('counterSeconds').innerText = segundos;
             }
-
             actualizarReloj();
             countdownInterval = setInterval(actualizarReloj, 1000);
         }
 
-        function showError(msg) {
-            document.getElementById('loadingScreen').innerHTML = `
-                <div class="w-full max-w-sm bg-burgundy-900/60 p-8 rounded-3xl border border-rose-500/20 space-y-3">
-                    <h2 class="text-lg font-bold text-rose-400">Aviso importante</h2>
-                    <p class="text-xs text-rose-200">${msg}</p>
-                    <a href="index.html" class="inline-block mt-2 px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-xl">Crear Nuevo Enlace</a>
-                </div>
-            `;
-        }
-
         const bgMusic = document.getElementById('bgMusic');
-        const playIcon = document.getElementById('playIcon');
-        const musicStatus = document.getElementById('musicStatus');
         let isMusicPlaying = false;
-
         function toggleAudio() {
-            if (isMusicPlaying) {
-                bgMusic.pause();
-                playIcon.className = 'fas fa-play text-xs ml-0.5';
-                musicStatus.innerText = 'Pausado';
-            } else {
-                bgMusic.play().then(() => {
-                    playIcon.className = 'fas fa-pause text-xs';
-                    musicStatus.innerText = 'Reproduciendo ❤️';
-                }).catch(() => {});
-            }
+            if (isMusicPlaying) bgMusic.pause(); else bgMusic.play();
             isMusicPlaying = !isMusicPlaying;
         }
         function adjustVolume(val) { bgMusic.volume = val; }
 
         let heartClicks = 0;
-        const targetClicks = 10;
-        let musicAutoTriggered = false;
-
         function handleHeartClick() {
-            if (!musicAutoTriggered && !isMusicPlaying) {
-                bgMusic.play().then(() => {
-                    isMusicPlaying = true;
-                    playIcon.className = 'fas fa-pause text-xs';
-                    musicStatus.innerText = 'Reproduciendo ❤️';
-                    musicAutoTriggered = true;
-                }).catch(() => {});
-            }
-
-            if (heartClicks < targetClicks) {
+            if (heartClicks < 10) {
                 heartClicks++;
-                const fillPercentage = Math.round((heartClicks / targetClicks) * 100);
-                document.getElementById('heartFill').style.height = `${fillPercentage}%`;
-                document.getElementById('clickCounter').innerText = `${heartClicks} / ${targetClicks}`;
-
-                const container = document.getElementById('heartContainer');
-                container.classList.add('scale-110');
-                setTimeout(() => container.classList.remove('scale-110'), 150);
-
-                if (heartClicks === targetClicks) {
-                    document.getElementById('tapHint').innerText = "¡Desbloqueado! ❤️";
-                    if (typeof confetti === 'function') {
-                        confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-                    }
+                document.getElementById('heartFill').style.height = `${heartClicks * 10}%`;
+                document.getElementById('clickCounter').innerText = `${heartClicks} / 10`;
+                if (heartClicks === 10) {
+                    if (typeof confetti === 'function') confetti();
                     setTimeout(() => {
-                        const gameSec = document.getElementById('heart-game-section');
-                        const mainContent = document.getElementById('mainContent');
-                        gameSec.style.transition = 'all 0.6s ease-out';
-                        gameSec.style.opacity = '0';
-                        setTimeout(() => {
-                            gameSec.classList.add('hidden');
-                            mainContent.classList.remove('hidden');
-                            setTimeout(() => mainContent.classList.remove('opacity-0'), 50);
-                        }, 600);
+                        document.getElementById('heart-game-section').classList.add('hidden');
+                        document.getElementById('mainContent').classList.remove('hidden');
+                        document.getElementById('mainContent').classList.remove('opacity-0');
                     }, 400);
                 }
             }
@@ -443,124 +320,28 @@
 
         function buildCarousel() {
             const track = document.getElementById('carouselTrack');
-            const dotsContainer = document.getElementById('carouselDots');
             track.innerHTML = '';
-            dotsContainer.innerHTML = '';
-
-            photosArray.forEach((photo, idx) => {
-                const slideDiv = document.createElement('div');
-                slideDiv.className = 'w-full flex-shrink-0 relative';
-                slideDiv.innerHTML = `
-                    <div class="aspect-[4/5] w-full rounded-2xl overflow-hidden bg-burgundy-950 relative">
-                        <img src="${photo}" alt="Foto ${idx+1}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-burgundy-950 via-transparent to-transparent opacity-80"></div>
-                        <div class="absolute bottom-0 inset-x-0 p-4">
-                            <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">Recuerdo ${idx + 1} de ${photosArray.length}</span>
-                        </div>
-                    </div>
-                `;
-                track.appendChild(slideDiv);
-
-                const dot = document.createElement('span');
-                dot.className = idx === 0 ? 'w-2 h-2 rounded-full bg-rose-500 flex-shrink-0' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40 flex-shrink-0';
-                dotsContainer.appendChild(dot);
+            photosArray.forEach((photo) => {
+                track.innerHTML += `<div class="w-full flex-shrink-0"><img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl"></div>`;
             });
             updateCarousel();
         }
-
         function updateCarousel() {
-            const track = document.getElementById('carouselTrack');
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.getElementById('carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
             document.getElementById('carouselIndicator').innerText = `${currentSlide + 1} / ${totalSlides}`;
-            const dots = document.getElementById('carouselDots').children;
-            for (let i = 0; i < dots.length; i++) {
-                dots[i].className = i === currentSlide ? 'w-2 h-2 rounded-full bg-rose-500 flex-shrink-0' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40 flex-shrink-0';
-            }
         }
-
         function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateCarousel(); }
         function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateCarousel(); }
 
-        function handleTouchStart(e) { touchStartX = e.changedTouches[0].screenX; }
-        function handleTouchMove(e) { touchEndX = e.changedTouches[0].screenX; }
-        function handleTouchEnd() {
-            if (touchStartX - touchEndX > 40) nextSlide();
-            else if (touchEndX - touchStartX > 40) prevSlide();
-        }
-
-        const quizData = [
-            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2, feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️" },
-            { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
-            { question: "¿Cuál es nuestro pasatiempo favorito en pareja?", options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"], correct: 3, feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨" },
-            { question: "¿Qué palabra define mejor lo que siento por ti?", options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"], correct: 3, feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖" },
-            { question: "¿Qué promesa nos hacemos para el futuro?", options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"], correct: 3, feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀" }
-        ];
-
-        let currentQuizIndex = 0, quizScore = 0;
-
+        const quizData = [{ question: "¿Cuál es nuestro lugar favorito?", options: ["Parque", "Café", "Cualquier lugar juntos", "Playa"], correct: 2 }];
         function loadQuizQuestion() {
-            if (currentQuizIndex >= quizData.length) {
-                document.getElementById('quizContainer').innerHTML = `
-                    <div class="text-center py-4 space-y-2">
-                        <i class="fas fa-trophy text-3xl text-gold-400 animate-bounce"></i>
-                        <h4 class="text-sm font-bold text-white">¡Trivia Superada!</h4>
-                        <p class="text-xs text-rose-200">¡Obtuviste ${quizScore} de ${quizData.length} respuestas correctas!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const q = quizData[currentQuizIndex];
-            document.getElementById('quizQuestion').innerText = `${currentQuizIndex + 1}. ${q.question}`;
-            const optionsContainer = document.getElementById('quizOptions');
-            optionsContainer.innerHTML = '';
-            document.getElementById('quizFeedback').className = 'hidden';
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-3 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between active:scale-[0.98]';
-                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-rose-400/50"></i>`;
-                btn.onclick = () => checkAnswer(idx, q.correct, q.feedback, btn);
-                optionsContainer.appendChild(btn);
+            document.getElementById('quizQuestion').innerText = quizData[0].question;
+            const container = document.getElementById('quizOptions');
+            container.innerHTML = '';
+            quizData[0].options.forEach((opt, idx) => {
+                container.innerHTML += `<button onclick="this.style.background='#065f46'" class="w-full text-left p-3 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
             });
         }
-
-        function checkAnswer(selected, correct, feedbackText, btnElement) {
-            const options = document.getElementById('quizOptions').children;
-            for (let btn of options) { btn.disabled = true; }
-            const feedback = document.getElementById('quizFeedback');
-            feedback.classList.remove('hidden');
-
-            if (selected === correct) {
-                quizScore++;
-                document.getElementById('quizScore').innerText = `Puntos: ${quizScore}`;
-                btnElement.className = 'w-full text-left p-3 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
-                btnElement.querySelector('i').className = 'fas fa-check-circle text-emerald-400';
-                feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
-                feedback.innerText = feedbackText;
-                if (typeof confetti === 'function') confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
-            } else {
-                btnElement.className = 'w-full text-left p-3 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
-                btnElement.querySelector('i').className = 'fas fa-times-circle text-rose-500';
-                feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
-                feedback.innerText = "¡Casi, pero lo importante es cuánto nos amamos! ❤️";
-            }
-            setTimeout(() => { currentQuizIndex++; loadQuizQuestion(); }, 2000);
-        }
-
-        function initFloatingHearts() {
-            const container = document.getElementById('bg-hearts-container');
-            for (let i = 0; i < 15; i++) {
-                const heart = document.createElement('i');
-                heart.className = 'fas fa-heart bg-heart text-rose-500';
-                heart.style.left = `${Math.random() * 100}%`;
-                heart.style.animationDuration = `${6 + Math.random() * 8}s`;
-                heart.style.animationDelay = `${Math.random() * 5}s`;
-                heart.style.fontSize = `${12 + Math.random() * 18}px`;
-                container.appendChild(heart);
-            }
-        }
-        window.onload = initFloatingHearts;
     </script>
 </body>
 </html>
