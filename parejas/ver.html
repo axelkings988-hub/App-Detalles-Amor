@@ -33,12 +33,7 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%); color: #FCE7F3; overflow-x: hidden; touch-action: manipulation; }
         .font-cursive { font-family: 'Dancing Script', cursive; }
-        
-        /* ESTILOS CLAVE RESTAURADOS PARA EL CARRUSEL DE FOTOS */
-        #carouselViewport { width: 100%; overflow: hidden; position: relative; border-radius: 1rem; }
-        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
-        .carousel-track > div { width: 100%; flex-shrink: 0; }
-
+        .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
         .bg-heart { position: absolute; opacity: 0.15; animation: floatUp linear infinite; pointer-events: none; }
         @keyframes floatUp {
@@ -60,7 +55,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE BLOQUEO POR CONTRASEÑA -->
+    <!-- PANTALLA DE BLOQUEO POR CONTRASEÑA (OCULTA POR DEFECTO) -->
     <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-4">
             <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center mx-auto border border-rose-500/30">
@@ -141,16 +136,6 @@
             <p id="mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
         </div>
 
-        <!-- CONTADOR DE DÍAS (DORADO CON BRILLO) -->
-        <section id="contadorSection" class="hidden bg-burgundy-900/60 backdrop-blur-lg border border-gold-400/30 rounded-3xl p-4 shadow-2xl text-center space-y-1">
-            <p class="text-[11px] font-cursive text-rose-200/90 italic">"Cada segundo a tu lado es mi regalo favorito..."</p>
-            <div class="py-1">
-                <span class="text-xs font-bold text-gold-400 tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" id="contadorTextoDias">
-                    ✨ Llevamos 0 días escribiendo nuestra historia ✨
-                </span>
-            </div>
-        </section>
-
         <!-- CARRUSEL DE FOTOS -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
@@ -199,7 +184,7 @@
             </div>
         </section>
 
-        <!-- MENSAJE DE VOZ -->
+        <!-- MENSAJE DE VOZ (DESPUÉS DE LA TRIVIA) -->
         <section id="voiceNoteSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-microphone-alt text-rose-400"></i> Mensaje de Voz Especial
@@ -251,9 +236,11 @@
                     detalleDataGlobal = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
 
+                    // Verificar si el detalle tiene contraseña configurada
                     if (detalleDataGlobal.password && detalleDataGlobal.password.trim() !== "") {
                         document.getElementById('passwordScreen').classList.remove('hidden');
                     } else {
+                        // Si no tiene contraseña, pasa directo a la experiencia
                         iniciarExperienciaDetalle();
                     }
 
@@ -293,33 +280,17 @@
             document.getElementById('heart-game-section').classList.remove('hidden');
             document.getElementById('musicPlayerContainer').classList.remove('hidden');
 
-            const data = detalleDataGlobal;
-            document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
-            document.getElementById('mainDate').innerText = data.fecha || '';
-            document.getElementById('cardMessage').innerText = data.mensaje || '';
+            document.getElementById('mainTitle').innerText = `Nuestra Historia: ${detalleDataGlobal.nombres || ''}`;
+            document.getElementById('mainDate').innerText = detalleDataGlobal.fecha || '';
+            document.getElementById('cardMessage').innerText = detalleDataGlobal.mensaje || '';
 
-            // LÓGICA DEL CONTADOR DE DÍAS
-            const contadorSec = document.getElementById('contadorSection');
-            if (data.activarContador && data.fecha) {
-                const fechaInicio = new Date(data.fecha + 'T00:00:00');
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                const diferenciaTiempo = hoy - fechaInicio;
-                const diasTotales = Math.max(0, Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)));
-                
-                document.getElementById('contadorTextoDias').innerText = `✨ Llevamos ${diasTotales} días escribiendo nuestra historia ✨`;
-                contadorSec.classList.remove('hidden');
-            } else {
-                contadorSec.classList.add('hidden');
-            }
-
-            photosArray = data.fotos || [];
+            photosArray = detalleDataGlobal.fotos || [];
             totalSlides = photosArray.length > 0 ? photosArray.length : 1;
             buildCarousel();
             loadQuizQuestion();
 
-            if (data.voiceNoteBase64) {
-                document.getElementById('finalVoicePlayer').src = data.voiceNoteBase64;
+            if (detalleDataGlobal.voiceNoteBase64) {
+                document.getElementById('finalVoicePlayer').src = detalleDataGlobal.voiceNoteBase64;
                 document.getElementById('voiceNoteSection').classList.remove('hidden');
             }
         }
