@@ -128,13 +128,23 @@
     </section>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 z-10 relative pt-20 px-4 max-w-md mx-auto space-y-10">
+    <main id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 z-10 relative pt-20 px-4 max-w-md mx-auto space-y-8">
         <div class="text-center space-y-2 py-2">
             <h2 id="mainTitle" class="text-4xl font-cursive font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-300 via-rose-100 to-gold-400">
                 Nuestra Historia
             </h2>
             <p id="mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
         </div>
+
+        <!-- CONTADOR DE DÍAS (DORADO CON BRILLO) -->
+        <section id="contadorSection" class="hidden bg-burgundy-900/60 backdrop-blur-lg border border-gold-400/30 rounded-3xl p-4 shadow-2xl text-center space-y-1">
+            <p class="text-[11px] font-cursive text-rose-200/90 italic">"Cada segundo a tu lado es mi regalo favorito..."</p>
+            <div class="py-1">
+                <span class="text-xs font-bold text-gold-400 tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" id="contadorTextoDias">
+                    ✨ Llevamos 0 días escribiendo nuestra historia ✨
+                </span>
+            </div>
+        </section>
 
         <!-- CARRUSEL DE FOTOS -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
@@ -236,11 +246,9 @@
                     detalleDataGlobal = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
 
-                    // Verificar si el detalle tiene contraseña configurada
                     if (detalleDataGlobal.password && detalleDataGlobal.password.trim() !== "") {
                         document.getElementById('passwordScreen').classList.remove('hidden');
                     } else {
-                        // Si no tiene contraseña, pasa directo a la experiencia
                         iniciarExperienciaDetalle();
                     }
 
@@ -283,6 +291,21 @@
             document.getElementById('mainTitle').innerText = `Nuestra Historia: ${detalleDataGlobal.nombres || ''}`;
             document.getElementById('mainDate').innerText = detalleDataGlobal.fecha || '';
             document.getElementById('cardMessage').innerText = detalleDataGlobal.mensaje || '';
+
+            // LÓGICA DEL CONTADOR DE DÍAS
+            const contadorSec = document.getElementById('contadorSection');
+            if (detalleDataGlobal.activarContador && detalleDataGlobal.fecha) {
+                const fechaInicio = new Date(detalleDataGlobal.fecha + 'T00:00:00');
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                const diferenciaTiempo = hoy - fechaInicio;
+                const diasTotales = Math.max(0, Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)));
+                
+                document.getElementById('contadorTextoDias').innerText = `✨ Llevamos ${diasTotales} días escribiendo nuestra historia ✨`;
+                contadorSec.classList.remove('hidden');
+            } else {
+                contadorSec.classList.add('hidden');
+            }
 
             photosArray = detalleDataGlobal.fotos || [];
             totalSlides = photosArray.length > 0 ? photosArray.length : 1;
