@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -68,7 +69,7 @@
 
     <div id="bg-hearts-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
 
-    <!-- PANTALLA DE CARGA / ERROR -->
+    <!-- PANTALLA DE CARGA -->
     <div id="loadingScreen" class="min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
             <div id="spinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mx-auto mb-4"></div>
@@ -76,9 +77,10 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE BLOQUEO POR CONTRASEÑA -->
+    <!-- PANTALLA DE CONTRASEÑA -->
     <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-4">
+
             <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center mx-auto border border-rose-500/30">
                 <i class="fas fa-lock text-lg"></i>
             </div>
@@ -106,9 +108,10 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR DE MÚSICA FLOTANTE -->
+    <!-- REPRODUCTOR DE MÚSICA -->
     <div id="musicPlayerContainer" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
         <div class="bg-burgundy-950/85 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl">
+
             <div class="flex items-center space-x-3 overflow-hidden">
                 <button id="musicBtn" onclick="toggleAudio()" class="w-10 h-10 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg active:scale-95 transition-transform">
                     <i id="playIcon" class="fas fa-play text-xs ml-0.5"></i>
@@ -129,8 +132,9 @@
 
     <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
-    <!-- PANTALLA DE DESBLOQUEO CON CORAZÓN -->
+    <!-- DESBLOQUEO CON CORAZÓN -->
     <section id="heart-game-section" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-10">
+
         <div class="w-full max-w-sm bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
 
             <span class="inline-block px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-xs font-semibold uppercase tracking-widest mb-4">
@@ -170,7 +174,7 @@
             <p id="mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
         </div>
 
-        <!-- CARRUSEL DE FOTOS -->
+        <!-- GALERÍA -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
 
             <div class="flex items-center justify-between">
@@ -184,7 +188,28 @@
                 <div id="carouselTrack" class="carousel-track"></div>
             </div>
 
+            <!-- PANEL DE DIAGNÓSTICO -->
+            <div id="photoDiagnostic" class="mt-4 p-4 rounded-xl bg-black/40 border border-amber-400/30 text-left space-y-2">
+
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-xs font-bold text-amber-300">
+                        <i class="fas fa-stethoscope mr-1"></i>
+                        DIAGNÓSTICO DE FOTOGRAFÍAS
+                    </p>
+                    <span id="diagGeneral" class="text-[10px] text-amber-200">Revisando...</span>
+                </div>
+
+                <p id="diagCount" class="text-[11px] text-rose-200">Fotografías recibidas: esperando datos...</p>
+
+                <p id="diagType" class="text-[11px] text-rose-200 break-all">Tipo de información: pendiente</p>
+
+                <p id="diagFirst" class="text-[10px] text-rose-300 break-all">Primera dirección: pendiente</p>
+
+                <div id="diagPhotoList" class="space-y-2"></div>
+            </div>
+
             <div class="flex items-center justify-between pt-2">
+
                 <button onclick="prevSlide()" class="w-9 h-9 rounded-full bg-burgundy-950/80 border border-rose-500/30 text-rose-200 flex items-center justify-center active:scale-95">
                     <i class="fas fa-chevron-left text-xs"></i>
                 </button>
@@ -209,7 +234,7 @@
             </div>
         </section>
 
-        <!-- TRIVIA DE PAREJA -->
+        <!-- TRIVIA -->
         <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4">
 
             <div class="flex items-center justify-between">
@@ -247,6 +272,10 @@
     </main>
 
     <script>
+        // =========================================
+        // FIREBASE
+        // =========================================
+
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
@@ -258,23 +287,31 @@
         };
 
         firebase.initializeApp(firebaseConfig);
+
         const db = firebase.firestore();
 
         let photosArray = [];
         let currentSlide = 0;
-        let totalSlides = 1;
-        let touchStartX = 0, touchEndX = 0;
+        let totalSlides = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
         let detalleDataGlobal = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
+        // =========================================
+        // LECTURA DE FIRESTORE
+        // =========================================
+
         if (!docId) {
+
             showError("No se encontró el identificador (ID) en el enlace.");
+
         } else {
 
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Tiempo de espera agotado")), 6000)
+                setTimeout(() => reject(new Error("Tiempo de espera agotado")), 10000)
             );
 
             Promise.race([
@@ -291,85 +328,161 @@
 
                     document.getElementById('loadingScreen').classList.add('hidden');
 
-                    if (detalleDataGlobal.password && detalleDataGlobal.password.trim() !== "") {
+                    if (
+                        detalleDataGlobal.password &&
+                        String(detalleDataGlobal.password).trim() !== ""
+                    ) {
+
                         document.getElementById('passwordScreen').classList.remove('hidden');
+
                     } else {
+
                         iniciarExperienciaDetalle();
                     }
 
                 } else {
+
                     showError("La tarjeta no existe o fue eliminada de la base de datos.");
                 }
 
             })
             .catch((error) => {
+
                 console.error("Error al conectar con Firebase:", error);
-                showError("No se pudo conectar con la base de datos.");
+
+                showError(
+                    "No se pudo conectar con la base de datos. Comprueba tu conexión e inténtalo nuevamente."
+                );
             });
         }
 
+        // =========================================
+        // CONTRASEÑA
+        // =========================================
+
         function verificarPasswordAcceso() {
 
-            const inputPass = document.getElementById('accessPasswordInput').value.trim();
+            const inputPass =
+                document.getElementById('accessPasswordInput').value.trim();
 
-            if (inputPass === detalleDataGlobal.password) {
+            if (!detalleDataGlobal) return;
+
+            if (inputPass === String(detalleDataGlobal.password || '')) {
 
                 document.getElementById('passwordScreen').classList.add('hidden');
+
                 iniciarExperienciaDetalle();
 
             } else {
 
                 alert("❌ Contraseña incorrecta. Inténtalo de nuevo.");
+
                 document.getElementById('accessPasswordInput').value = "";
             }
         }
+
+        document.getElementById('accessPasswordInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                verificarPasswordAcceso();
+            }
+        });
 
         function mostrarPista() {
 
             const pistaContainer = document.getElementById('pistaContainer');
             const pistaText = document.getElementById('pistaText');
 
-            if (detalleDataGlobal.pista && detalleDataGlobal.pista.trim() !== "") {
+            if (
+                detalleDataGlobal.pista &&
+                String(detalleDataGlobal.pista).trim() !== ""
+            ) {
+
                 pistaText.innerText = detalleDataGlobal.pista;
+
             } else {
-                pistaText.innerText = "El creador no dejó ninguna pista registrada.";
+
+                pistaText.innerText =
+                    "El creador no dejó ninguna pista registrada.";
             }
 
             pistaContainer.classList.remove('hidden');
         }
 
+        // =========================================
+        // INICIAR EXPERIENCIA
+        // =========================================
+
         function iniciarExperienciaDetalle() {
 
             document.getElementById('heart-game-section').classList.remove('hidden');
+
             document.getElementById('musicPlayerContainer').classList.remove('hidden');
 
-            document.getElementById('mainTitle').innerText = `Nuestra Historia: ${detalleDataGlobal.nombres || ''}`;
-            document.getElementById('mainDate').innerText = detalleDataGlobal.fecha || '';
-            document.getElementById('cardMessage').innerText = detalleDataGlobal.mensaje || '';
+            document.getElementById('mainTitle').innerText =
+                `Nuestra Historia: ${detalleDataGlobal.nombres || ''}`;
 
-            photosArray = detalleDataGlobal.fotos || [];
+            document.getElementById('mainDate').innerText =
+                detalleDataGlobal.fecha || '';
 
-            totalSlides = photosArray.length > 0 ? photosArray.length : 1;
+            document.getElementById('cardMessage').innerText =
+                detalleDataGlobal.mensaje || '';
 
             buildCarousel();
+
             loadQuizQuestion();
 
             if (detalleDataGlobal.voiceNoteBase64) {
-                document.getElementById('finalVoicePlayer').src = detalleDataGlobal.voiceNoteBase64;
+
+                document.getElementById('finalVoicePlayer').src =
+                    detalleDataGlobal.voiceNoteBase64;
+
                 document.getElementById('voiceNoteSection').classList.remove('hidden');
             }
         }
 
+        // =========================================
+        // ERRORES
+        // =========================================
+
         function showError(msg) {
 
-            document.getElementById('loadingScreen').innerHTML = `
-                <div class="w-full max-w-sm bg-burgundy-900/60 p-8 rounded-3xl border border-rose-500/20 space-y-3">
-                    <h2 class="text-lg font-bold text-rose-400">Aviso importante</h2>
-                    <p class="text-xs text-rose-200">${msg}</p>
-                    <a href="index.html" class="inline-block mt-2 px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-xl">Crear Nuevo Enlace</a>
-                </div>
-            `;
+            const screen = document.getElementById('loadingScreen');
+
+            screen.innerHTML = '';
+
+            const box = document.createElement('div');
+
+            box.className =
+                'w-full max-w-sm bg-burgundy-900/60 p-8 rounded-3xl border border-rose-500/20 space-y-3';
+
+            const title = document.createElement('h2');
+
+            title.className = 'text-lg font-bold text-rose-400';
+            title.innerText = 'Aviso importante';
+
+            const message = document.createElement('p');
+
+            message.className = 'text-xs text-rose-200';
+            message.innerText = msg;
+
+            const link = document.createElement('a');
+
+            link.href = 'index.html';
+            link.className =
+                'inline-block mt-2 px-4 py-2 bg-rose-600 text-white text-xs font-semibold rounded-xl';
+
+            link.innerText = 'Crear Nuevo Enlace';
+
+            box.appendChild(title);
+            box.appendChild(message);
+            box.appendChild(link);
+
+            screen.appendChild(box);
         }
+
+        // =========================================
+        // MÚSICA
+        // =========================================
 
         const bgMusic = document.getElementById('bgMusic');
         const playIcon = document.getElementById('playIcon');
@@ -382,23 +495,39 @@
             if (isMusicPlaying) {
 
                 bgMusic.pause();
+
                 playIcon.className = 'fas fa-play text-xs ml-0.5';
+
                 musicStatus.innerText = 'Pausado';
+
+                isMusicPlaying = false;
 
             } else {
 
                 bgMusic.play().then(() => {
-                    playIcon.className = 'fas fa-pause text-xs';
-                    musicStatus.innerText = 'Reproduciendo ❤️';
-                }).catch(() => {});
-            }
 
-            isMusicPlaying = !isMusicPlaying;
+                    isMusicPlaying = true;
+
+                    playIcon.className = 'fas fa-pause text-xs';
+
+                    musicStatus.innerText = 'Reproduciendo ❤️';
+
+                }).catch(() => {
+
+                    musicStatus.innerText = 'No se pudo reproducir';
+                });
+            }
         }
 
         function adjustVolume(val) {
-            bgMusic.volume = val;
+            bgMusic.volume = Number(val);
         }
+
+        bgMusic.volume = 0.8;
+
+        // =========================================
+        // DESBLOQUEO DEL CORAZÓN
+        // =========================================
 
         let heartClicks = 0;
         const targetClicks = 10;
@@ -411,8 +540,11 @@
                 bgMusic.play().then(() => {
 
                     isMusicPlaying = true;
+
                     playIcon.className = 'fas fa-pause text-xs';
+
                     musicStatus.innerText = 'Reproduciendo ❤️';
+
                     musicAutoTriggered = true;
 
                 }).catch(() => {});
@@ -422,39 +554,59 @@
 
                 heartClicks++;
 
-                const fillPercentage = Math.round((heartClicks / targetClicks) * 100);
+                const fillPercentage =
+                    Math.round((heartClicks / targetClicks) * 100);
 
-                document.getElementById('heartFill').style.height = `${fillPercentage}%`;
-                document.getElementById('clickCounter').innerText = `${heartClicks} / ${targetClicks}`;
+                document.getElementById('heartFill').style.height =
+                    `${fillPercentage}%`;
 
-                const container = document.getElementById('heartContainer');
+                document.getElementById('clickCounter').innerText =
+                    `${heartClicks} / ${targetClicks}`;
+
+                const container =
+                    document.getElementById('heartContainer');
 
                 container.classList.add('scale-110');
 
-                setTimeout(() => container.classList.remove('scale-110'), 150);
+                setTimeout(() => {
+                    container.classList.remove('scale-110');
+                }, 150);
 
                 if (heartClicks === targetClicks) {
 
-                    document.getElementById('tapHint').innerText = "¡Desbloqueado! ❤️";
+                    document.getElementById('tapHint').innerText =
+                        "¡Desbloqueado! ❤️";
 
                     if (typeof confetti === 'function') {
-                        confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+
+                        confetti({
+                            particleCount: 90,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
                     }
 
                     setTimeout(() => {
 
-                        const gameSec = document.getElementById('heart-game-section');
-                        const mainContent = document.getElementById('mainContent');
+                        const gameSec =
+                            document.getElementById('heart-game-section');
+
+                        const mainContent =
+                            document.getElementById('mainContent');
 
                         gameSec.style.transition = 'all 0.6s ease-out';
+
                         gameSec.style.opacity = '0';
 
                         setTimeout(() => {
 
                             gameSec.classList.add('hidden');
+
                             mainContent.classList.remove('hidden');
 
-                            setTimeout(() => mainContent.classList.remove('opacity-0'), 50);
+                            setTimeout(() => {
+                                mainContent.classList.remove('opacity-0');
+                            }, 50);
 
                         }, 600);
 
@@ -463,101 +615,356 @@
             }
         }
 
-        // =====================================================
-        // CONSTRUCCIÓN DEL CARRUSEL Y DIAGNÓSTICO DE FOTOGRAFÍAS
-        // =====================================================
+        // =========================================
+        // DIAGNÓSTICO DE FOTOGRAFÍAS
+        // =========================================
+
+        function extraerUrlFoto(photo) {
+
+            if (typeof photo === 'string') {
+                return photo.trim();
+            }
+
+            if (photo && typeof photo === 'object' && !Array.isArray(photo)) {
+
+                return (
+                    photo.url ||
+                    photo.publicUrl ||
+                    photo.publicURL ||
+                    photo.src ||
+                    photo.downloadURL ||
+                    photo.downloadUrl ||
+                    photo.imageUrl ||
+                    photo.imagen ||
+                    photo.foto ||
+                    ''
+                );
+            }
+
+            return '';
+        }
 
         function buildCarousel() {
 
             const track = document.getElementById('carouselTrack');
-            const dotsContainer = document.getElementById('carouselDots');
+
+            const dotsContainer =
+                document.getElementById('carouselDots');
+
+            const diagList =
+                document.getElementById('diagPhotoList');
 
             track.innerHTML = '';
+
             dotsContainer.innerHTML = '';
 
-            let rawFotos = detalleDataGlobal.fotos;
+            diagList.innerHTML = '';
 
-            // DIAGNÓSTICO: información recibida desde Firestore
-            console.log("====================================");
-            console.log("DIAGNÓSTICO DE FOTOGRAFÍAS");
+            const rawFotos = detalleDataGlobal.fotos;
+
+            // Información original de Firebase
+            let tipoOriginal;
+
+            if (Array.isArray(rawFotos)) {
+                tipoOriginal = 'Array (arreglo)';
+            } else if (rawFotos === null) {
+                tipoOriginal = 'null';
+            } else {
+                tipoOriginal = typeof rawFotos;
+            }
+
+            document.getElementById('diagType').innerText =
+                `Tipo de información: ${tipoOriginal}`;
+
+            console.log("========== DIAGNÓSTICO ==========");
+
             console.log("FOTOS RECIBIDAS:", rawFotos);
-            console.log("TIPO DE FOTOS:", typeof rawFotos);
-            console.log("¿ES UN ARREGLO?:", Array.isArray(rawFotos));
-            console.log("PRIMER ELEMENTO:", rawFotos?.[0]);
-            console.log("TIPO DEL PRIMER ELEMENTO:", typeof rawFotos?.[0]);
-            console.log("====================================");
 
-            // Normalización de fotografías
-            if (rawFotos && !Array.isArray(rawFotos) && typeof rawFotos === 'object') {
+            console.log("TIPO:", tipoOriginal);
+
+            console.log("ES ARREGLO:", Array.isArray(rawFotos));
+
+            console.log("PRIMER ELEMENTO:", rawFotos?.[0]);
+
+            // Normalización
+            if (Array.isArray(rawFotos)) {
+
+                photosArray = rawFotos;
+
+            } else if (rawFotos && typeof rawFotos === 'object') {
 
                 photosArray = Object.values(rawFotos);
 
             } else {
 
-                photosArray = Array.isArray(rawFotos) ? rawFotos : [];
+                photosArray = [];
             }
 
-            console.log("ARREGLO FINAL DE FOTOS:", photosArray);
-            console.log("CANTIDAD DE FOTOS:", photosArray.length);
+            console.log("FOTOS NORMALIZADAS:", photosArray);
+
+            console.log("CANTIDAD:", photosArray.length);
+
+            document.getElementById('diagCount').innerText =
+                `Fotografías recibidas: ${photosArray.length}`;
+
+            const primeraUrl = photosArray.length
+                ? extraerUrlFoto(photosArray[0])
+                : '';
+
+            document.getElementById('diagFirst').innerText =
+                primeraUrl
+                    ? `Primera dirección: ${primeraUrl}`
+                    : 'Primera dirección: no se encontró una URL válida.';
 
             totalSlides = photosArray.length;
 
+            currentSlide = 0;
+
             if (totalSlides === 0) {
 
-                console.warn("ADVERTENCIA: No se encontraron fotografías.");
+                document.getElementById('diagGeneral').innerText =
+                    'SIN FOTOS';
 
                 track.innerHTML = `
                     <div class="w-full flex-shrink-0 p-6 text-center bg-burgundy-950 rounded-2xl border border-rose-500/30 space-y-2">
                         <i class="fas fa-image text-rose-400 text-2xl"></i>
-                        <p class="text-xs font-bold text-rose-200">Sin fotografías registradas</p>
-                        <p class="text-[11px] text-rose-300/80">Este detalle de amor no contiene imágenes en su galería.</p>
+                        <p class="text-xs font-bold text-rose-200">
+                            Sin fotografías registradas
+                        </p>
+                        <p class="text-[11px] text-rose-300/80">
+                            Este detalle no contiene imágenes en su galería.
+                        </p>
                     </div>
                 `;
 
-                document.getElementById('carouselIndicator').innerText = "0 / 0";
+                document.getElementById('carouselIndicator').innerText =
+                    '0 / 0';
 
                 return;
             }
 
+            let fotosCargadas = 0;
+            let fotosFallidas = 0;
+            let fotosPendientes = totalSlides;
+
+            document.getElementById('diagGeneral').innerText =
+                'CARGANDO';
+
+            function actualizarEstadoGeneral() {
+
+                if (fotosPendientes > 0) {
+
+                    document.getElementById('diagGeneral').innerText =
+                        `PENDIENTES: ${fotosPendientes}`;
+
+                } else if (fotosFallidas === 0) {
+
+                    document.getElementById('diagGeneral').innerText =
+                        'TODAS CARGADAS';
+
+                } else {
+
+                    document.getElementById('diagGeneral').innerText =
+                        `${fotosFallidas} CON ERROR`;
+                }
+
+                console.log(
+                    'RESULTADO:',
+                    fotosCargadas,
+                    'CARGADAS;',
+                    fotosFallidas,
+                    'FALLIDAS;',
+                    fotosPendientes,
+                    'PENDIENTES'
+                );
+            }
+
             photosArray.forEach((photo, idx) => {
 
-                console.log(`FOTOGRAFÍA ${idx + 1}:`, photo);
-                console.log(`TIPO DE FOTOGRAFÍA ${idx + 1}:`, typeof photo);
+                const photoUrl = extraerUrlFoto(photo);
 
+                console.log(`FOTOGRAFÍA ${idx + 1}:`, photo);
+
+                console.log(`URL ${idx + 1}:`, photoUrl);
+
+                // Panel individual
+                const diagItem = document.createElement('div');
+
+                diagItem.className =
+                    'p-2 rounded-lg bg-burgundy-950/80 border border-rose-500/20';
+
+                const diagTitle = document.createElement('p');
+
+                diagTitle.className =
+                    'text-[11px] font-bold text-rose-200';
+
+                diagTitle.innerText =
+                    `Fotografía ${idx + 1}`;
+
+                const diagStatus = document.createElement('p');
+
+                diagStatus.className =
+                    'text-[10px] text-amber-300';
+
+                diagStatus.innerText = photoUrl
+                    ? '⏳ Cargando imagen...'
+                    : '❌ Dirección no válida';
+
+                const diagUrl = document.createElement('p');
+
+                diagUrl.className =
+                    'text-[9px] text-rose-300/70 break-all mt-1';
+
+                diagUrl.innerText = photoUrl || 'Sin URL';
+
+                diagItem.appendChild(diagTitle);
+
+                diagItem.appendChild(diagStatus);
+
+                diagItem.appendChild(diagUrl);
+
+                diagList.appendChild(diagItem);
+
+                // Diapositiva
                 const slideDiv = document.createElement('div');
 
-                slideDiv.className = 'w-full flex-shrink-0 relative';
+                slideDiv.className =
+                    'w-full flex-shrink-0 relative';
 
-                slideDiv.innerHTML = `
-                    <div class="aspect-[4/5] w-full rounded-2xl overflow-hidden bg-burgundy-950 relative flex items-center justify-center">
+                const imageContainer = document.createElement('div');
 
-                        <img
-                            src="${photo}"
-                            alt="Foto ${idx + 1}"
-                            class="w-full h-full object-cover"
-                            onload="console.log('FOTO CARGADA CORRECTAMENTE:', this.src)"
-                            onerror="console.error('ERROR AL CARGAR FOTO:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                        >
+                imageContainer.className =
+                    'aspect-[4/5] w-full rounded-2xl overflow-hidden bg-burgundy-950 relative flex items-center justify-center';
 
-                        <div class="absolute inset-0 bg-burgundy-950/95 flex-col items-center justify-center p-4 text-center space-y-2" style="display: none;">
-                            <i class="fas fa-triangle-exclamation text-amber-400 text-2xl"></i>
-                            <p class="text-xs font-bold text-rose-200">⚠️ No se pudo cargar la fotografía</p>
-                            <p class="text-[11px] text-rose-300/80">Comprueba la dirección de la imagen o la conexión con el servidor de almacenamiento.</p>
-                        </div>
+                const img = document.createElement('img');
 
-                        <div class="absolute inset-0 bg-gradient-to-t from-burgundy-950 via-transparent to-transparent opacity-80 pointer-events-none"></div>
+                img.alt = `Foto ${idx + 1}`;
 
-                        <div class="absolute bottom-0 inset-x-0 p-4 pointer-events-none">
-                            <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">
-                                Recuerdo ${idx + 1} de ${totalSlides}
-                            </span>
-                        </div>
+                img.className = 'w-full h-full object-cover';
 
-                    </div>
+                img.style.display = 'none';
+
+                const fallback = document.createElement('div');
+
+                fallback.className =
+                    'absolute inset-0 bg-burgundy-950 flex-col items-center justify-center p-4 text-center space-y-2';
+
+                fallback.style.display = 'flex';
+
+                fallback.innerHTML = `
+                    <i class="fas fa-image text-rose-400 text-2xl"></i>
+                    <p class="text-xs font-bold text-rose-200">
+                        Preparando fotografía...
+                    </p>
                 `;
+
+                imageContainer.appendChild(img);
+
+                imageContainer.appendChild(fallback);
+
+                const gradient = document.createElement('div');
+
+                gradient.className =
+                    'absolute inset-0 bg-gradient-to-t from-burgundy-950 via-transparent to-transparent opacity-80 pointer-events-none';
+
+                imageContainer.appendChild(gradient);
+
+                const caption = document.createElement('div');
+
+                caption.className =
+                    'absolute bottom-0 inset-x-0 p-4 pointer-events-none';
+
+                caption.innerHTML = `
+                    <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">
+                        Recuerdo ${idx + 1} de ${totalSlides}
+                    </span>
+                `;
+
+                imageContainer.appendChild(caption);
+
+                slideDiv.appendChild(imageContainer);
 
                 track.appendChild(slideDiv);
 
+                // Si no hay URL
+                if (!photoUrl) {
+
+                    fotosFallidas++;
+
+                    fotosPendientes--;
+
+                    diagStatus.innerText =
+                        '❌ No se encontró una dirección de imagen válida';
+
+                    diagStatus.className =
+                        'text-[10px] text-red-400';
+
+                    fallback.innerHTML = `
+                        <i class="fas fa-triangle-exclamation text-amber-400 text-2xl"></i>
+                        <p class="text-xs font-bold text-rose-200">
+                            Dirección de imagen inválida
+                        </p>
+                    `;
+
+                    actualizarEstadoGeneral();
+
+                } else {
+
+                    // Carga correcta
+                    img.onload = function() {
+
+                        fotosCargadas++;
+
+                        fotosPendientes--;
+
+                        img.style.display = 'block';
+
+                        fallback.style.display = 'none';
+
+                        diagStatus.innerText =
+                            '✅ Imagen cargada correctamente';
+
+                        diagStatus.className =
+                            'text-[10px] text-green-400';
+
+                        actualizarEstadoGeneral();
+                    };
+
+                    // Error de carga
+                    img.onerror = function() {
+
+                        fotosFallidas++;
+
+                        fotosPendientes--;
+
+                        img.style.display = 'none';
+
+                        fallback.style.display = 'flex';
+
+                        fallback.innerHTML = `
+                            <i class="fas fa-triangle-exclamation text-amber-400 text-2xl"></i>
+                            <p class="text-xs font-bold text-rose-200">
+                                No se pudo cargar la fotografía
+                            </p>
+                            <p class="text-[11px] text-rose-300/80">
+                                Comprueba la conexión o el almacenamiento.
+                            </p>
+                        `;
+
+                        diagStatus.innerText =
+                            '❌ Error al descargar la imagen';
+
+                        diagStatus.className =
+                            'text-[10px] text-red-400';
+
+                        actualizarEstadoGeneral();
+                    };
+
+                    // Comenzar descarga
+                    img.src = photoUrl;
+                }
+
+                // Puntos del carrusel
                 const dot = document.createElement('span');
 
                 dot.className = idx === 0
@@ -567,23 +974,30 @@
                 dotsContainer.appendChild(dot);
             });
 
-            currentSlide = 0;
+            actualizarEstadoGeneral();
 
             updateCarousel();
         }
 
+        // =========================================
+        // MOVIMIENTO DEL CARRUSEL
+        // =========================================
+
         function updateCarousel() {
 
-            const track = document.getElementById('carouselTrack');
+            const track =
+                document.getElementById('carouselTrack');
 
             if (totalSlides === 0) return;
 
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            track.style.transform =
+                `translateX(-${currentSlide * 100}%)`;
 
             document.getElementById('carouselIndicator').innerText =
                 `${currentSlide + 1} / ${totalSlides}`;
 
-            const dots = document.getElementById('carouselDots').children;
+            const dots =
+                document.getElementById('carouselDots').children;
 
             for (let i = 0; i < dots.length; i++) {
 
@@ -597,7 +1011,8 @@
 
             if (totalSlides === 0) return;
 
-            currentSlide = (currentSlide + 1) % totalSlides;
+            currentSlide =
+                (currentSlide + 1) % totalSlides;
 
             updateCarousel();
         }
@@ -606,31 +1021,37 @@
 
             if (totalSlides === 0) return;
 
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            currentSlide =
+                (currentSlide - 1 + totalSlides) % totalSlides;
 
             updateCarousel();
         }
 
         function handleTouchStart(e) {
+
             touchStartX = e.changedTouches[0].screenX;
         }
 
         function handleTouchMove(e) {
+
             touchEndX = e.changedTouches[0].screenX;
         }
 
         function handleTouchEnd() {
 
             if (touchStartX - touchEndX > 40) {
+
                 nextSlide();
+
             } else if (touchEndX - touchStartX > 40) {
+
                 prevSlide();
             }
         }
 
-        // =====================================================
-        // TRIVIA DE PAREJA
-        // =====================================================
+        // =========================================
+        // TRIVIA
+        // =========================================
 
         const quizData = [
 
@@ -696,6 +1117,7 @@
         ];
 
         let currentQuizIndex = 0;
+
         let quizScore = 0;
 
         function loadQuizQuestion() {
@@ -706,8 +1128,12 @@
                     <div class="text-center py-4 space-y-2">
                         <i class="fas fa-trophy text-3xl text-gold-400 animate-bounce"></i>
                         <h4 class="text-sm font-bold text-white">¡Trivia Superada!</h4>
-                        <p class="text-xs text-rose-200">¡Obtuviste ${quizScore} de ${quizData.length} respuestas correctas!</p>
-                        <p class="text-[11px] text-rose-300 italic">Demostraste que nos conocemos a la perfección.</p>
+                        <p class="text-xs text-rose-200">
+                            ¡Obtuviste ${quizScore} de ${quizData.length} respuestas correctas!
+                        </p>
+                        <p class="text-[11px] text-rose-300 italic">
+                            Demostraste que nos conocemos a la perfección.
+                        </p>
                     </div>
                 `;
 
@@ -719,21 +1145,35 @@
             document.getElementById('quizQuestion').innerText =
                 `${currentQuizIndex + 1}. ${q.question}`;
 
-            const optionsContainer = document.getElementById('quizOptions');
+            const optionsContainer =
+                document.getElementById('quizOptions');
 
             optionsContainer.innerHTML = '';
 
-            document.getElementById('quizFeedback').className = 'hidden';
+            document.getElementById('quizFeedback').className =
+                'hidden';
 
             q.options.forEach((opt, idx) => {
 
                 const btn = document.createElement('button');
 
-                btn.className = 'w-full text-left p-3 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between active:scale-[0.98]';
+                btn.className =
+                    'w-full text-left p-3 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between active:scale-[0.98]';
 
-                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-rose-400/50"></i>`;
+                const span = document.createElement('span');
 
-                btn.onclick = () => checkAnswer(idx, q.correct, q.feedback, btn);
+                span.innerText = opt;
+
+                const icon = document.createElement('i');
+
+                icon.className = 'far fa-circle text-rose-400/50';
+
+                btn.appendChild(span);
+
+                btn.appendChild(icon);
+
+                btn.onclick = () =>
+                    checkAnswer(idx, q.correct, q.feedback, btn);
 
                 optionsContainer.appendChild(btn);
             });
@@ -741,13 +1181,15 @@
 
         function checkAnswer(selected, correct, feedbackText, btnElement) {
 
-            const options = document.getElementById('quizOptions').children;
+            const options =
+                document.getElementById('quizOptions').children;
 
             for (let btn of options) {
                 btn.disabled = true;
             }
 
-            const feedback = document.getElementById('quizFeedback');
+            const feedback =
+                document.getElementById('quizFeedback');
 
             feedback.classList.remove('hidden');
 
@@ -755,29 +1197,42 @@
 
                 quizScore++;
 
-                document.getElementById('quizScore').innerText = `Puntos: ${quizScore}`;
+                document.getElementById('quizScore').innerText =
+                    `Puntos: ${quizScore}`;
 
-                btnElement.className = 'w-full text-left p-3 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
+                btnElement.className =
+                    'w-full text-left p-3 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
 
-                btnElement.querySelector('i').className = 'fas fa-check-circle text-emerald-400';
+                btnElement.querySelector('i').className =
+                    'fas fa-check-circle text-emerald-400';
 
-                feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
+                feedback.className =
+                    'text-xs font-semibold p-3 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
 
                 feedback.innerText = feedbackText;
 
                 if (typeof confetti === 'function') {
-                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+
+                    confetti({
+                        particleCount: 30,
+                        spread: 50,
+                        origin: { y: 0.7 }
+                    });
                 }
 
             } else {
 
-                btnElement.className = 'w-full text-left p-3 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
+                btnElement.className =
+                    'w-full text-left p-3 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
 
-                btnElement.querySelector('i').className = 'fas fa-times-circle text-rose-500';
+                btnElement.querySelector('i').className =
+                    'fas fa-times-circle text-rose-500';
 
-                feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
+                feedback.className =
+                    'text-xs font-semibold p-3 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
 
-                feedback.innerText = "¡Casi, pero lo importante es cuánto nos amamos! ❤️";
+                feedback.innerText =
+                    "¡Casi, pero lo importante es cuánto nos amamos! ❤️";
             }
 
             setTimeout(() => {
@@ -789,33 +1244,39 @@
             }, 2000);
         }
 
-        // =====================================================
+        // =========================================
         // CORAZONES ANIMADOS
-        // =====================================================
+        // =========================================
 
         function initFloatingHearts() {
 
-            const container = document.getElementById('bg-hearts-container');
+            const container =
+                document.getElementById('bg-hearts-container');
 
             for (let i = 0; i < 15; i++) {
 
                 const heart = document.createElement('i');
 
-                heart.className = 'fas fa-heart bg-heart text-rose-500';
+                heart.className =
+                    'fas fa-heart bg-heart text-rose-500';
 
-                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.left =
+                    `${Math.random() * 100}%`;
 
-                heart.style.animationDuration = `${6 + Math.random() * 8}s`;
+                heart.style.animationDuration =
+                    `${6 + Math.random() * 8}s`;
 
-                heart.style.animationDelay = `${Math.random() * 5}s`;
+                heart.style.animationDelay =
+                    `${Math.random() * 5}s`;
 
-                heart.style.fontSize = `${12 + Math.random() * 18}px`;
+                heart.style.fontSize =
+                    `${12 + Math.random() * 18}px`;
 
                 container.appendChild(heart);
             }
         }
 
-        window.onload = initFloatingHearts;
+        initFloatingHearts();
 
     </script>
 </body>
