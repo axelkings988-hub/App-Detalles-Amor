@@ -170,16 +170,7 @@
 
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">2. FECHA ESPECIAL:</label>
-                <input type="date" id="fechaInput" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 focus:outline-none focus:border-rose-500 cursor-pointer">
-            </div>
-
-            <!-- NUEVA OPCIÓN: CONTADOR DE DÍAS -->
-            <div class="space-y-1 bg-burgundy-950/50 p-3 rounded-xl border border-rose-500/20">
-                <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
-                    <input type="checkbox" id="activarContadorInput" class="w-4 h-4 accent-rose-500 rounded cursor-pointer"> 
-                    <span class="font-semibold">⏳ Agregar contador de días juntos</span>
-                </label>
-                <p class="text-[10px] text-rose-300/70 italic pl-6">Muestra un mensaje especial con los días transcurridos desde tu fecha especial.</p>
+                <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
             <div class="space-y-1">
@@ -339,16 +330,6 @@
                     <h2 id="pv-mainTitle" class="text-3xl font-cursive font-bold text-rose-200"></h2>
                     <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
                 </div>
-
-                <!-- CONTADOR DE DÍAS (DORADO CON BRILLO) -->
-                <section id="pv-contadorSection" class="hidden bg-burgundy-900/60 backdrop-blur-lg border border-gold-400/30 rounded-3xl p-4 shadow-2xl text-center space-y-1">
-                    <p class="text-[11px] font-cursive text-rose-200/90 italic">"Cada segundo a tu lado es mi regalo favorito..."</p>
-                    <div class="py-1">
-                        <span class="text-xs font-bold text-gold-400 tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" id="pv-contadorTextoDias">
-                            ✨ Llevamos 0 días escribiendo nuestra historia ✨
-                        </span>
-                    </div>
-                </section>
 
                 <!-- CARRUSEL DE FOTOS -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
@@ -518,20 +499,27 @@
         async function eliminarProyectoPermanentemente(firebaseId) {
             if (!firebaseId) return;
 
+            // Doble seguridad: Ventana de confirmación
             const confirmar = confirm("¿Estás seguro de eliminar este proyecto?\n\nEsta acción borrará todas tus fotos, mensajes y el enlace público para siempre y no se puede deshacer.");
+            
             if (!confirmar) return;
 
             try {
+                // 1. Obtener los datos del documento en Firebase para extraer las URLs de las fotos en Supabase
                 const docRef = db.collection("detalles").doc(firebaseId);
                 const docSnap = await docRef.get();
 
                 if (docSnap.exists) {
                     const data = docSnap.data();
+                    
+                    // 2. Eliminar las fotografías almacenadas en el bucket de Supabase
                     if (data.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
                         for (const fotoUrl of data.fotos) {
                             try {
+                                // Extraer la ruta del archivo a partir de la URL pública de Supabase
                                 const urlObj = new URL(fotoUrl);
                                 const pathSegments = urlObj.pathname.split('/');
+                                // Buscar el índice donde dice 'detalles-fotos' o tomar los últimos segmentos
                                 const bucketIndex = pathSegments.indexOf('detalles-fotos');
                                 if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
                                     const filePath = pathSegments.slice(bucketIndex + 1).join('/');
@@ -542,13 +530,17 @@
                             }
                         }
                     }
+
+                    // 3. Borrar el documento correspondiente en Firestore
                     await docRef.delete();
                 }
 
+                // 4. Eliminar el proyecto del localStorage del navegador
                 let proyectos = obtenerProyectosLocales();
                 proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
                 guardarProyectosLocales(proyectos);
 
+                // Limpiar caché y volver al dashboard
                 proyectoActualId = null;
                 proyectoDatosCache = null;
                 if (localStorage.getItem("ultimoDetalleId") === firebaseId) {
@@ -559,6 +551,7 @@
                 volverAlDashboardDesdePanel();
 
             } catch (error) {
+                console.error("Error al eliminar el proyecto:", error);
                 alert("⚠️ Ocurrió un error al intentar eliminar los datos: " + error.message);
             }
         }
@@ -588,7 +581,6 @@
                     document.getElementById('nombreProyectoInput').value = data.nombreProyecto || '';
                     document.getElementById('nombresInput').value = data.nombres || '';
                     document.getElementById('fechaInput').value = data.fecha || '';
-                    document.getElementById('activarContadorInput').checked = data.activarContador === true;
                     document.getElementById('mensajeInput').value = data.mensaje || '';
                     
                     if (data.password) {
@@ -841,7 +833,6 @@
                 const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
                 const nombres = document.getElementById('nombresInput').value.trim();
                 const fecha = document.getElementById('fechaInput').value.trim();
-                const activarContador = document.getElementById('activarContadorInput').checked;
                 const mensaje = document.getElementById('mensajeInput').value.trim();
                 
                 const protegerSeleccionado = document.querySelector('input[name="protegerOpcion"]:checked').value === 'si';
@@ -860,7 +851,6 @@
                     nombreProyecto: nombreProj,
                     nombres: nombres,
                     fecha: fecha,
-                    activarContador: activarContador,
                     mensaje: mensaje,
                     voiceNoteBase64: recordedAudioBase64 || null,
                     password: passwordVal,
@@ -972,22 +962,6 @@
 
             document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${proyectoDatosCache.nombres}`;
             document.getElementById('pv-mainDate').innerText = proyectoDatosCache.fecha;
-            
-            // Lógica del contador de días en la vista previa
-            const contadorSec = document.getElementById('pv-contadorSection');
-            if (proyectoDatosCache.activarContador && proyectoDatosCache.fecha) {
-                const fechaInicio = new Date(proyectoDatosCache.fecha + 'T00:00:00');
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                const diferenciaTiempo = hoy - fechaInicio;
-                const diasTotales = Math.max(0, Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24)));
-                
-                document.getElementById('pv-contadorTextoDias').innerText = `✨ Llevamos ${diasTotales} días escribiendo nuestra historia ✨`;
-                contadorSec.classList.remove('hidden');
-            } else {
-                contadorSec.classList.add('hidden');
-            }
-
             document.getElementById('pv-cardMessage').innerText = proyectoDatosCache.mensaje;
             pvPhotosArray = proyectoDatosCache.fotos || [];
             buildPvCarousel();
@@ -1192,7 +1166,7 @@
                     const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
                     
                     if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        const queryRecibo = await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
+                        const queryRecibo = await db.collection("detaldas") || await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
                         if (!queryRecibo.empty) {
                             alert("⚠️ Este comprobante ya fue registrado en otro proyecto.");
                             return;
