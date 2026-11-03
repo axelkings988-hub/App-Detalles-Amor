@@ -187,7 +187,7 @@
             </div>
         </section>
 
-        <!-- MENSAJE DE VOZ (DESPUÉS DE LA TRIVIA) -->
+        <!-- MENSAJE DE VOZ -->
         <section id="voiceNoteSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-microphone-alt text-rose-400"></i> Mensaje de Voz Especial
@@ -274,7 +274,6 @@
                     proyectoGlobalData = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
 
-                    // Verificar sistema de privacidad con contraseña
                     if (proyectoGlobalData.privado === true && proyectoGlobalData.password) {
                         document.getElementById('passwordScreen').classList.remove('hidden');
                     } else {
@@ -318,7 +317,22 @@
             document.getElementById('musicPlayerContainer').classList.remove('hidden');
 
             document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
-            document.getElementById('mainDate').innerText = data.fecha || '';
+            
+            // Lógica inteligente de fecha y contador (evita duplicidad)
+            const dateElement = document.getElementById('mainDate');
+            if (data.activarContador && data.fechaEspecialTimestamp) {
+                dateElement.classList.add('hidden');
+                iniciarContadorTiempoReal(data.fechaEspecialTimestamp);
+                document.getElementById('loveCounterSection').classList.remove('hidden');
+            } else if (data.fecha && data.fecha.trim() !== "") {
+                dateElement.innerText = data.fecha;
+                dateElement.classList.remove('hidden');
+                document.getElementById('loveCounterSection').classList.add('hidden');
+            } else {
+                dateElement.classList.add('hidden');
+                document.getElementById('loveCounterSection').classList.add('hidden');
+            }
+
             document.getElementById('cardMessage').innerText = data.mensaje || '';
 
             photosArray = data.fotos || [];
@@ -330,12 +344,6 @@
                 document.getElementById('finalVoicePlayer').src = data.voiceNoteBase64;
                 document.getElementById('voiceNoteSection').classList.remove('hidden');
             }
-
-            // Inicializar contador de tiempo real si está activo
-            if (data.activarContador && data.fechaEspecialTimestamp) {
-                iniciarContadorTiempoReal(data.fechaEspecialTimestamp);
-                document.getElementById('loveCounterSection').classList.remove('hidden');
-            }
         }
 
         function iniciarContadorTiempoReal(timestampFecha) {
@@ -344,7 +352,6 @@
             function actualizarReloj() {
                 const ahora = new Date();
                 let diferencia = ahora - fechaObjetivo;
-
                 if (diferencia < 0) diferencia = 0;
 
                 const segundosTotales = Math.floor(diferencia / 1000);
@@ -354,7 +361,6 @@
                 const horasTotales = Math.floor(minutosTotales / 60);
                 const horas = horasTotales % 24;
                 
-                // Cálculo aproximado de años, meses y días
                 let anos = ahora.getFullYear() - fechaObjetivo.getFullYear();
                 let meses = ahora.getMonth() - fechaObjetivo.getMonth();
                 let dias = ahora.getDate() - fechaObjetivo.getDate();
@@ -364,10 +370,7 @@
                     const mesAnterior = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
                     dias += mesAnterior.getDate();
                 }
-                if (meses < 0) {
-                    anos--;
-                    meses += 12;
-                }
+                if (meses < 0) { anos--; meses += 12; }
 
                 document.getElementById('counterYears').innerText = anos;
                 document.getElementById('counterMonths').innerText = meses;
@@ -503,40 +506,14 @@
         }
 
         const quizData = [
-            {
-                question: "¿Cuál es el lugar que más disfrutamos visitar juntos?",
-                options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"],
-                correct: 2,
-                feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️"
-            },
-            {
-                question: "¿Qué fue lo primero que pensé al conocerte?",
-                options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"],
-                correct: 3,
-                feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊"
-            },
-            {
-                question: "¿Cuál es nuestro pasatiempo favorito en pareja?",
-                options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"],
-                correct: 3,
-                feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨"
-            },
-            {
-                question: "¿Qué palabra define mejor lo que siento por ti?",
-                options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"],
-                correct: 3,
-                feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖"
-            },
-            {
-                question: "¿Qué promesa nos hacemos para el futuro?",
-                options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"],
-                correct: 3,
-                feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀"
-            }
+            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2, feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️" },
+            { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
+            { question: "¿Cuál es nuestro pasatiempo favorito en pareja?", options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"], correct: 3, feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨" },
+            { question: "¿Qué palabra define mejor lo que siento por ti?", options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"], correct: 3, feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖" },
+            { question: "¿Qué promesa nos hacemos para el futuro?", options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"], correct: 3, feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀" }
         ];
 
-        let currentQuizIndex = 0;
-        let quizScore = 0;
+        let currentQuizIndex = 0, quizScore = 0;
 
         function loadQuizQuestion() {
             if (currentQuizIndex >= quizData.length) {
@@ -553,7 +530,6 @@
 
             const q = quizData[currentQuizIndex];
             document.getElementById('quizQuestion').innerText = `${currentQuizIndex + 1}. ${q.question}`;
-            
             const optionsContainer = document.getElementById('quizOptions');
             optionsContainer.innerHTML = '';
             document.getElementById('quizFeedback').className = 'hidden';
@@ -570,7 +546,6 @@
         function checkAnswer(selected, correct, feedbackText, btnElement) {
             const options = document.getElementById('quizOptions').children;
             for (let btn of options) { btn.disabled = true; }
-
             const feedback = document.getElementById('quizFeedback');
             feedback.classList.remove('hidden');
 
@@ -579,25 +554,16 @@
                 document.getElementById('quizScore').innerText = `Puntos: ${quizScore}`;
                 btnElement.className = 'w-full text-left p-3 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
                 btnElement.querySelector('i').className = 'fas fa-check-circle text-emerald-400';
-                
                 feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
                 feedback.innerText = feedbackText;
-
-                if (typeof confetti === 'function') {
-                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
-                }
+                if (typeof confetti === 'function') confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
             } else {
                 btnElement.className = 'w-full text-left p-3 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
                 btnElement.querySelector('i').className = 'fas fa-times-circle text-rose-500';
-
                 feedback.className = 'text-xs font-semibold p-3 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
                 feedback.innerText = "¡Casi, pero lo importante es cuánto nos amamos! ❤️";
             }
-
-            setTimeout(() => {
-                currentQuizIndex++;
-                loadQuizQuestion();
-            }, 2000);
+            setTimeout(() => { currentQuizIndex++; loadQuizQuestion(); }, 2000);
         }
 
         function initFloatingHearts() {
