@@ -5,15 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Detalle de Amor - Mis Proyectos</title>
 
+    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+    <!-- Mercado Pago SDK -->
     <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -58,6 +64,7 @@
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
 
+    <!-- BANNER FIJO SUPERIOR ADSTERRA -->
     <div id="adsterraBannerContainer" class="fixed top-0 left-0 w-full z-50 bg-burgundy-950/95 border-b border-rose-500/30 py-1.5 flex justify-center items-center shadow-lg no-print">
         <script>
             atOptions = {
@@ -71,6 +78,7 @@
         <script src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"></script>
     </div>
 
+    <!-- REPRODUCTOR MÚSICA FLOTANTE VISTA PREVIA -->
     <div id="pv-musicPlayerContainer" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm no-print">
         <div class="bg-burgundy-950/90 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-2xl">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -91,6 +99,7 @@
 
     <audio id="pv-bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
+    <!-- SECCIÓN 1: INICIO / PROYECTOS GUARDADOS -->
     <div id="homeDashboard" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         <div class="text-center space-y-1">
             <h1 class="text-3xl font-bold font-cursive text-rose-100">Mis Detalles de Amor</h1>
@@ -109,6 +118,7 @@
         </div>
     </div>
 
+    <!-- SECCIÓN 2: FORMULARIO DE CREACIÓN / EDICIÓN -->
     <div id="formContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         <div class="flex items-center justify-between">
             <button onclick="volverAlDashboard()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
@@ -122,29 +132,6 @@
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">NOMBRE DEL PROYECTO (Para identificarlo):</label>
                 <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
-            </div>
-
-            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
-                <label class="text-xs font-semibold text-rose-200 block">🔒 ¿Deseas proteger tu detalle con contraseña?</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <button type="button" id="btnPrivadoNo" onclick="togglePrivacidad(false)" class="py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow transition-all">
-                        No (Público)
-                    </button>
-                    <button type="button" id="btnPrivadoSi" onclick="togglePrivacidad(true)" class="py-2 bg-burgundy-900 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition-all">
-                        Sí (Privado)
-                    </button>
-                </div>
-                
-                <div id="camposPrivacidadContainer" class="hidden space-y-3 pt-3 border-t border-rose-500/20">
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-rose-200">Contraseña Secreta:</label>
-                        <input type="password" id="passwordInput" placeholder="Ej. 1234" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-rose-200">Pista de Ayuda (Opcional):</label>
-                        <input type="text" id="pistaInput" placeholder="Ej. Nuestra fecha" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
-                    </div>
-                </div>
             </div>
 
             <div class="space-y-1">
@@ -162,16 +149,15 @@
                 </div>
 
                 <div id="fechaEspecificaContainer" class="hidden space-y-1 pt-1">
-                    <label class="text-[11px] font-semibold text-rose-300">Selecciona la fecha y hora exactas para el cálculo:</label>
+                    <label class="text-[11px] font-semibold text-rose-300">Selecciona la fecha y hora exactas:</label>
                     <input type="datetime-local" id="fechaEspecialTimestampInput" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 focus:outline-none focus:border-rose-500">
-                    <p class="text-[10px] text-rose-300/70 italic">El contador dinámico sustituirá al texto plano al leer el QR.</p>
                 </div>
             </div>
 
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 5):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple onchange="validarCantidadFotos(this)" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes (se optimización automáticamente).</p>
+                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes (se optimizarán automáticamente).</p>
             </div>
 
             <div class="space-y-1">
@@ -179,16 +165,17 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
+            <!-- GRABACIÓN DE VOZ (Con cuenta regresiva de 10s y botón detener) -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
                 <div class="flex items-center justify-center gap-3 pt-1">
-                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2 transition-all">
+                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2">
                         <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Iniciar Grabación</span>
                     </button>
                     <span id="timerLabel" class="text-xs font-mono text-rose-300 hidden">00:10</span>
                 </div>
                 <div id="audioPreviewContainer" class="hidden pt-2">
-                    <audio id="audioPreview" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
+                    <audio id="audioPreview" controls class="w-full h-8 mt-1"></audio>
                 </div>
             </div>
 
@@ -197,12 +184,14 @@
             </button>
         </form>
 
+        <!-- CARGA -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando y subiendo datos...</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando y subiendo fotos a Supabase...</p>
         </div>
     </div>
 
+    <!-- SECCIÓN 3: PANEL DE GESTIÓN Y PAGO -->
     <div id="panelContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-5 my-6">
         <div class="flex items-center justify-between no-print">
             <button onclick="volverAlDashboardDesdePanel()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
@@ -277,7 +266,7 @@
         </div>
     </div>
 
-    <!-- SECCIÓN VISTA PREVIA -->
+    <!-- SECCIÓN 4: VISTA PREVIA EN PANTALLA COMPLETA -->
     <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-burgundy-950/95 backdrop-blur-2xl overflow-y-auto px-4 py-16 space-y-6">
         <div class="w-full max-w-lg mx-auto space-y-6">
             <div class="flex items-center justify-between">
@@ -289,32 +278,7 @@
                 </div>
             </div>
 
-            <div id="pv-passwordScreen" class="hidden min-h-[50vh] flex flex-col items-center justify-center p-6 text-center">
-                <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
-                    <div class="w-14 h-14 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/40">
-                        <i class="fas fa-lock text-rose-400 text-xl"></i>
-                    </div>
-                    <div class="space-y-1">
-                        <h2 class="text-2xl font-bold font-cursive text-rose-100">Acceso Protegido</h2>
-                        <p class="text-xs text-rose-300/80">Este detalle requiere contraseña.</p>
-                    </div>
-                    <div class="space-y-3 pt-2">
-                        <input type="password" id="pv-accessPasswordInput" placeholder="Ingresa la contraseña" class="w-full px-4 py-3 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 text-center focus:outline-none focus:border-rose-500">
-                        <button onclick="verificarPasswordPv()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg">
-                            Desbloquear
-                        </button>
-                    </div>
-                    <div id="pv-hintContainer" class="hidden pt-2 border-t border-rose-500/20 text-center">
-                        <p class="text-[11px] text-rose-300/70 italic" id="pv-hintTextDisplay"></p>
-                    </div>
-                    <div>
-                        <button onclick="mostrarPistaAyudaPv()" class="text-[11px] text-rose-300 hover:text-rose-200 underline">
-                            <i class="fas fa-lightbulb text-gold-400 mr-1"></i> Ver pista
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+            <!-- JUEGO DEL CORAZÓN -->
             <section id="pv-heart-section" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl text-center shadow-2xl">
                 <h2 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h2>
                 <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo...</p>
@@ -333,12 +297,14 @@
                 <p id="pv-tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Toca aquí!</p>
             </section>
 
+            <!-- CONTENIDO PRINCIPAL VISTA PREVIA -->
             <div id="pv-mainContent" class="hidden space-y-6">
                 <div class="text-center space-y-1">
                     <h2 id="pv-mainTitle" class="text-3xl font-cursive font-bold text-rose-200"></h2>
                     <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
                 </div>
 
+                <!-- CARRUSEL DE FOTOS -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                     <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
                         <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
@@ -355,6 +321,7 @@
                     </div>
                 </section>
 
+                <!-- CARTA DE AMOR -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-2">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-envelope-open-text text-rose-400"></i> Mensaje Especial</h3>
                     <div class="bg-burgundy-950/70 p-4 rounded-2xl border border-rose-500/10">
@@ -362,6 +329,7 @@
                     </div>
                 </section>
 
+                <!-- TRIVIA DE PAREJA (5 Preguntas completas) -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja</h3>
@@ -373,11 +341,13 @@
                     </div>
                 </section>
 
+                <!-- NOTA DE VOZ -->
                 <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz</h3>
                     <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
                 </section>
 
+                <!-- CONTADOR DE TIEMPO ESTÉTICO -->
                 <section id="pv-loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 text-center shadow-2xl space-y-4">
                     <h3 class="text-sm font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
                         <i class="far fa-clock text-rose-400"></i> Tiempo Juntos <span class="text-rose-400">♥</span>
@@ -425,7 +395,8 @@
             projectId: "appdetallesamor",
             storageBucket: "appdetallesamor.firebasestorage.app",
             messagingSenderId: "917968456649",
-            appId: "1:917968456649:web:32261e841942825685b618"
+            appId: "1:917968456649:web:32261e841942825685b618",
+            measurementId: "G-ZTGDLNQXSF"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -435,11 +406,18 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
-        let mediaRecorder = null, audioChunks = [], recordedAudioBase64 = null, recordingTimer = null;
-        let audioStream = null, proyectoActualId = null, proyectoDatosCache = null, esPrivadoActivo = false, pvCountdownInterval = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioBase64 = null;
+        let countdownInterval = null;
+        let pvCountdownInterval = null;
+        let audioStream = null;
+        let proyectoActualId = null;
+        let proyectoDatosCache = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
+
             const urlParams = new URLSearchParams(window.location.search);
             const collectionId = urlParams.get('collection_id') || urlParams.get('payment_id');
             const status = urlParams.get('status') || urlParams.get('collection_status');
@@ -447,141 +425,29 @@
 
             if ((status === 'approved' || status === 'accredited' || status === 'success' || collectionId) && docId) {
                 try {
+                    if (collectionId) {
+                        const queryCheck = await db.collection("detalles").where("pagoIdUnico", "==", collectionId).get();
+                        if (!queryCheck.empty && queryCheck.docs[0].id !== docId) {
+                            alert("⚠️ Este comprobante de pago ya fue utilizado anteriormente en otro proyecto.");
+                            cargarProyecto(docId);
+                            return;
+                        }
+                    }
+
                     const updateData = { pagado: true };
                     if (collectionId) updateData.pagoIdUnico = collectionId;
+
                     await db.collection("detalles").doc(docId).update(updateData);
                     const docSnap = await db.collection("detalles").doc(docId).get();
+                    
                     if (docSnap.exists) {
                         proyectoActualId = docId;
+                        alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu código QR ha sido desbloqueado.");
                         mostrarPanelGestion(docSnap.data(), true);
                     }
                 } catch(e) {}
             } 
         });
-
-        // GRABACIÓN DE VOZ (Temporizador de 10s y botón detener funcional)
-        async function toggleRecording() {
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                detenerGrabacion();
-                return;
-            }
-            try {
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(audioStream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.readAsDataURL(blob);
-                    reader.onloadend = () => {
-                        recordedAudioBase64 = reader.result;
-                        document.getElementById('audioPreview').src = recordedAudioBase64;
-                        document.getElementById('audioPreviewContainer').classList.remove('hidden');
-                    };
-                };
-                mediaRecorder.start();
-
-                const recordBtn = document.getElementById('recordBtn');
-                const recordText = document.getElementById('recordText');
-                const recordIcon = document.getElementById('recordIcon');
-                const timerLabel = document.getElementById('timerLabel');
-
-                recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
-                recordText.innerText = "Detener Grabación";
-                recordIcon.className = "fas fa-stop-circle";
-                timerLabel.classList.remove('hidden');
-                
-                let timeLeft = 10;
-                timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-                
-                if (recordingTimer) clearInterval(recordingTimer);
-                recordingTimer = setInterval(() => {
-                    timeLeft--;
-                    timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-                    if (timeLeft <= 0) detenerGrabacion();
-                }, 1000);
-            } catch (e) { alert("⚠️ No se pudo acceder al micrófono."); }
-        }
-
-        function detenerGrabacion() {
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-                if (audioStream) audioStream.getTracks().forEach(track => track.stop());
-            }
-            if (recordingTimer) clearInterval(recordingTimer);
-
-            const recordBtn = document.getElementById('recordBtn');
-            const recordText = document.getElementById('recordText');
-            const recordIcon = document.getElementById('recordIcon');
-            const timerLabel = document.getElementById('timerLabel');
-
-            if (recordBtn) {
-                recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
-                recordText.innerText = "Iniciar Grabación";
-                recordIcon.className = "fas fa-microphone";
-            }
-            if (timerLabel) timerLabel.classList.add('hidden');
-        }
-
-        // TRIVIA DE PAREJA (5 Preguntas completas)
-        const quizData = [
-            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2 },
-            { question: "¿Cuál fue nuestra primera impresión mutua?", options: ["Nervios pero mucha química", "Risas desde el primer momento", "Timidez al principio", "Conexión instantánea"], correct: 0 },
-            { question: "¿Cuál es tu recuerdo favorito de nosotros?", options: ["Nuestro primer viaje", "Una tarde lluviosa juntos", "Cualquier momento ordinario a tu lado", "Nuestras pláticas hasta tarde"], correct: 2 },
-            { question: "¿Qué es lo que más te hace sonreír de mí?", options: ["Mis ocurrencias y chistes", "Cómo te cuido y te apoyo", "Mis gestos y miradas", "Todo en general"], correct: 1 },
-            { question: "¿Cuál es nuestra meta más grande a futuro?", options: ["Viajar por todo el mundo", "Construir nuestro propio hogar", "Crecer juntos profesionalmente", "Estar siempre el uno para el otro"], correct: 3 }
-        ];
-        let currentQuizIndex = 0, quizScore = 0;
-
-        function loadPvQuizQuestion() {
-            if (currentQuizIndex >= quizData.length) currentQuizIndex = 0;
-            const q = quizData[currentQuizIndex];
-            const qEl = document.getElementById('pv-quizQuestion');
-            const optsEl = document.getElementById('pv-quizOptions');
-            if (!qEl || !optsEl) return;
-
-            qEl.innerText = `${currentQuizIndex + 1}. ${q.question}`;
-            optsEl.innerHTML = '';
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-2.5 rounded-xl bg-burgundy-900 hover:bg-burgundy-800 text-xs text-rose-100 border border-rose-500/20 transition-colors";
-                btn.innerText = opt;
-                btn.onclick = () => verificarRespuestaPv(idx, q.correct);
-                optsEl.appendChild(btn);
-            });
-        }
-
-        function verificarRespuestaPv(sel, cor) {
-            const optsEl = document.getElementById('pv-quizOptions');
-            const buttons = optsEl.getElementsByTagName('button');
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].disabled = true;
-                if (i === cor) buttons[i].style.background = '#065f46';
-                else if (i === sel) buttons[i].style.background = '#991b1b';
-            }
-            if (sel === cor) {
-                quizScore += 20;
-                document.getElementById('pv-quizScore').innerText = `Puntos: ${quizScore}`;
-            }
-            setTimeout(() => {
-                currentQuizIndex++;
-                if (currentQuizIndex < quizData.length) {
-                    loadPvQuizQuestion();
-                } else {
-                    optsEl.innerHTML = `<p class="text-xs text-rose-200 text-center font-bold py-2">🎉 ¡Terminaste con ${quizScore} puntos!</p>`;
-                }
-            }, 1500);
-        }
-
-        function togglePrivacidad(estado) {
-            esPrivadoActivo = estado;
-            document.getElementById('camposPrivacidadContainer').classList.toggle('hidden', !estado);
-        }
-
-        function toggleContadorFecha(cb) {
-            document.getElementById('fechaEspecificaContainer').classList.toggle('hidden', !cb.checked);
-        }
 
         function obtenerProyectosLocales() {
             try { return JSON.parse(localStorage.getItem("misProyectosAmor") || "[]"); } catch(e) { return []; }
@@ -594,10 +460,12 @@
         function renderizarProyectosGuardados() {
             const container = document.getElementById('listaProyectosContainer');
             const proyectos = obtenerProyectosLocales();
+
             if (proyectos.length === 0) {
                 container.innerHTML = `<p class="text-xs text-rose-300/60 text-center py-4 italic">No tienes proyectos guardados aún.</p>`;
                 return;
             }
+
             container.innerHTML = '';
             proyectos.forEach((proj) => {
                 const div = document.createElement('div');
@@ -608,23 +476,16 @@
                         <p class="text-[10px] text-rose-300/70 truncate">Para: ${proj.nombres}</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">Ver</button>
-                        <button onclick="eliminarProyectoPermanente('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
+                            Ver
+                        </button>
+                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 `;
                 container.appendChild(div);
             });
-        }
-
-        async function eliminarProyectoPermanente(firebaseId) {
-            if (!confirm("⚠️ ¿Estás seguro de eliminar este proyecto permanentemente?")) return;
-            try {
-                await db.collection("detalles").doc(firebaseId).delete();
-                let proyectos = obtenerProyectosLocales().filter(p => p.firebaseId !== firebaseId);
-                guardarProyectosLocales(proyectos);
-                renderizarProyectosGuardados();
-                if (proyectoActualId === firebaseId) volverAlDashboard();
-            } catch (e) {}
         }
 
         function mostrarFormularioCreacion() {
@@ -632,18 +493,21 @@
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('createForm').reset();
-            togglePrivacidad(false);
-            document.getElementById('activarContadorCheck').checked = false;
-            document.getElementById('fechaEspecificaContainer').classList.add('hidden');
             document.getElementById('formTitleText').innerText = "Nuevo Proyecto";
             recordedAudioBase64 = null;
             proyectoActualId = null;
             proyectoDatosCache = null;
             document.getElementById('audioPreviewContainer').classList.add('hidden');
+            document.getElementById('activarContadorCheck').checked = false;
+            document.getElementById('fechaEspecificaContainer').classList.add('hidden');
         }
 
         async function editarDatosProyecto() {
-            if (!proyectoActualId) return;
+            if (!proyectoActualId) {
+                alert("No hay un proyecto activo para editar.");
+                return;
+            }
+
             try {
                 const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
                 if (docSnap.exists) {
@@ -653,12 +517,6 @@
                     document.getElementById('fechaInput').value = proyectoDatosCache.fecha || '';
                     document.getElementById('mensajeInput').value = proyectoDatosCache.mensaje || '';
                     
-                    if (proyectoDatosCache.privado) {
-                        togglePrivacidad(true);
-                        document.getElementById('passwordInput').value = proyectoDatosCache.password || '';
-                        document.getElementById('pistaInput').value = proyectoDatosCache.pista || '';
-                    } else { togglePrivacidad(false); }
-
                     if (proyectoDatosCache.activarContador) {
                         document.getElementById('activarContadorCheck').checked = true;
                         document.getElementById('fechaEspecificaContainer').classList.remove('hidden');
@@ -680,7 +538,9 @@
                     document.getElementById('formContainer').classList.remove('hidden');
                     document.getElementById('formTitleText').innerText = "Editar Proyecto";
                 }
-            } catch(e) {}
+            } catch(e) {
+                alert("No se pudieron cargar los datos para editar.");
+            }
         }
 
         function volverAlDashboard() {
@@ -702,89 +562,253 @@
         }
 
         function validarCantidadFotos(input) {
+            const meter = document.getElementById('storageMeter');
             if (input.files.length > 5) {
-                alert("⚠️ Máximo 5 fotografías.");
+                alert("⚠️ Solo puedes seleccionar un máximo de 5 fotografías.");
                 input.value = "";
+                meter.innerText = "📸 Elige hasta 5 imágenes para el carrusel.";
+            } else if (input.files.length > 0) {
+                meter.innerText = `📸 ${input.files.length} de 5 fotos seleccionadas.`;
             }
+        }
+
+        function toggleContadorFecha(cb) {
+            document.getElementById('fechaEspecificaContainer').classList.toggle('hidden', !cb.checked);
         }
 
         async function comprimirImagen(file) {
             return new Promise((resolve) => {
-                if (!file || !file.type.startsWith('image/')) { resolve(file); return; }
+                if (!file || !file.type.startsWith('image/')) {
+                    resolve(file);
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
+                
                 reader.onload = (event) => {
                     const img = new Image();
                     img.src = event.target.result;
+                    
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width, height = img.height;
-                        const MAX = 1600;
-                        if (width > height && width > MAX) { height *= MAX / width; width = MAX; }
-                        else if (height > MAX) { width *= MAX / height; height = MAX; }
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.8);
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+
+                            const MAX_WIDTH = 1600;
+                            const MAX_HEIGHT = 1600;
+
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height = Math.round((height * MAX_WIDTH) / width);
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width = Math.round((width * MAX_HEIGHT) / height);
+                                    height = MAX_HEIGHT;
+                                }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            canvas.toBlob((blob) => {
+                                if (!blob) {
+                                    resolve(file);
+                                    return;
+                                }
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compressedFile);
+                            }, 'image/jpeg', 0.8);
+
+                        } catch (e) {
+                            resolve(file);
+                        }
                     };
+                    img.onerror = () => { resolve(file); };
                 };
+                reader.onerror = () => { resolve(file); };
             });
         }
 
         async function subirFotoSupabase(file) {
             try {
-                const filePath = `fotos/${Date.now()}_${file.name}`;
-                await supabaseClient.storage.from('detalles-fotos').upload(filePath, file);
-                const { data } = supabaseClient.storage.from('detalles-fotos').getPublicUrl(filePath);
-                return data ? data.publicUrl : null;
-            } catch (e) { return null; }
+                const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
+                const cleanName = file.name ? file.name.replace(/[^a-zA-Z0-9]/g, "_") : 'foto';
+                const fileName = `${Date.now()}_${cleanName}.${fileExt}`;
+                const filePath = `fotos/${fileName}`;
+
+                const { data, error } = await supabaseClient.storage
+                    .from('detalles-fotos')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) return null;
+
+                const { data: publicData } = supabaseClient.storage
+                    .from('detalles-fotos')
+                    .getPublicUrl(filePath);
+
+                return publicData ? publicData.publicUrl : null;
+            } catch (err) {
+                return null;
+            }
         }
 
         const pvBgMusic = document.getElementById('pv-bgMusic');
         const pvPlayIcon = document.getElementById('pv-playIcon');
+        const pvMusicStatus = document.getElementById('pv-musicStatus');
         let isPvMusicPlaying = false;
+        let musicAutoStarted = false;
 
         function togglePvAudio() {
-            if (isPvMusicPlaying) { pvBgMusic.pause(); pvPlayIcon.className = 'fas fa-play text-xs ml-0.5'; }
-            else { pvBgMusic.play(); pvPlayIcon.className = 'fas fa-pause text-xs'; }
+            if (isPvMusicPlaying) {
+                pvBgMusic.pause();
+                pvPlayIcon.className = 'fas fa-play text-xs ml-0.5';
+                pvMusicStatus.innerText = 'Pausado';
+            } else {
+                pvBgMusic.play().then(() => {
+                    pvPlayIcon.className = 'fas fa-pause text-xs';
+                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
+                }).catch(() => {});
+            }
             isPvMusicPlaying = !isPvMusicPlaying;
         }
         function adjustPvVolume(val) { pvBgMusic.volume = val; }
 
-        let pvPhotosArray = [], currentSlide = 0;
+        // GRABACIÓN DE VOZ (10 segundos estables y botón detener)
+        async function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordText = document.getElementById('recordText');
+            const recordIcon = document.getElementById('recordIcon');
+            const timerLabel = document.getElementById('timerLabel');
 
-        async function guardarProyectoYMostrarPanel() {
-            const photosFiles = document.getElementById('photosInput').files;
-            document.getElementById('createForm').classList.add('hidden');
-            document.getElementById('statusBox').classList.remove('hidden');
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                detenerGrabacion();
+                return;
+            }
 
             try {
-                let urlsFotos = proyectoDatosCache?.fotos ? [...proyectoDatosCache.fotos] : [];
-                if (photosFiles.length > 0) {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(audioStream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        const preview = document.getElementById('audioPreview');
+                        preview.src = recordedAudioBase64;
+                        document.getElementById('audioPreviewContainer').classList.remove('hidden');
+                    };
+                    recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
+                    recordText.innerText = "Iniciar Grabación";
+                    recordIcon.className = "fas fa-microphone";
+                    timerLabel.classList.add('hidden');
+                };
+
+                mediaRecorder.start();
+                recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
+                recordText.innerText = "Detener Grabación";
+                recordIcon.className = "fas fa-stop-circle";
+                timerLabel.classList.remove('hidden');
+
+                let timeLeft = 10;
+                timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                clearInterval(countdownInterval);
+
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                    if (timeLeft <= 0) detenerGrabacion();
+                }, 1000);
+
+            } catch (e) {
+                alert("⚠️ No se pudo acceder al micrófono.");
+            }
+        }
+
+        function detenerGrabacion() {
+            clearInterval(countdownInterval);
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            if (audioStream) audioStream.getTracks().forEach(track => track.stop());
+        }
+
+        let pvPhotosArray = [];
+        let currentSlide = 0;
+
+        // FUNCIÓN GUARDAR PROYECTO ESTABLE (Basada en el código antiguo que sí sube fotos)
+        async function guardarProyectoYMostrarPanel() {
+            const photosFiles = document.getElementById('photosInput').files;
+            
+            document.getElementById('createForm').classList.add('hidden');
+            document.getElementById('statusBox').classList.remove('hidden');
+            document.getElementById('statusText').innerText = "Iniciando proceso...";
+
+            try {
+                let urlsFotos = [];
+                if (proyectoDatosCache && proyectoDatosCache.fotos && Array.isArray(proyectoDatosCache.fotos)) {
+                    urlsFotos = [...proyectoDatosCache.fotos];
+                }
+
+                if (photosFiles && photosFiles.length > 0) {
                     urlsFotos = [];
-                    for (let file of photosFiles) {
-                        const opt = await comprimirImagen(file);
-                        const url = await subirFotoSupabase(opt);
-                        if (url) urlsFotos.push(url);
+                    const maxFotos = Math.min(photosFiles.length, 5);
+                    for (let i = 0; i < maxFotos; i++) {
+                        document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
+                        const fotoOptimizada = await comprimirImagen(photosFiles[i]);
+                        
+                        document.getElementById('statusText').innerText = `Subiendo foto ${i + 1} de ${maxFotos} a Supabase...`;
+                        const publicUrl = await subirFotoSupabase(fotoOptimizada);
+                        
+                        if (publicUrl) {
+                            urlsFotos.push(publicUrl);
+                        }
                     }
                 }
 
-                const datosAEnviar = {
-                    nombreProyecto: document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle",
-                    nombres: document.getElementById('nombresInput').value.trim(),
-                    fecha: document.getElementById('fechaInput').value.trim(),
-                    mensaje: document.getElementById('mensajeInput').value.trim(),
-                    privado: esPrivadoActivo,
-                    password: esPrivadoActivo ? document.getElementById('passwordInput').value.trim() : "",
-                    pista: esPrivadoActivo ? document.getElementById('pistaInput').value.trim() : "",
-                    activarContador: document.getElementById('activarContadorCheck').checked,
-                    fechaEspecialTimestamp: document.getElementById('activarContadorCheck').checked ? document.getElementById('fechaEspecialTimestampInput').value : "",
-                    voiceNoteBase64: recordedAudioBase64 || proyectoDatosCache?.voiceNoteBase64 || null,
-                    pagado: proyectoDatosCache?.pagado || false,
-                    creado: proyectoDatosCache?.creado || firebase.firestore.FieldValue.serverTimestamp()
-                };
-                if (urlsFotos.length > 0) datosAEnviar.fotos = urlsFotos;
+                document.getElementById('statusText').innerText = "Guardando proyecto en base de datos...";
+
+                const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
+                const nombres = document.getElementById('nombresInput').value.trim();
+                const fecha = document.getElementById('fechaInput').value.trim();
+                const mensaje = document.getElementById('mensajeInput').value.trim();
+                const activarContador = document.getElementById('activarContadorCheck').checked;
+                const fechaEspecialTimestamp = activarContador ? document.getElementById('fechaEspecialTimestampInput').value : "";
 
                 let docRef;
+                const datosAEnviar = {
+                    nombreProyecto: nombreProj,
+                    nombres: nombres,
+                    fecha: fecha,
+                    mensaje: mensaje,
+                    activarContador: activarContador,
+                    fechaEspecialTimestamp: fechaEspecialTimestamp,
+                    voiceNoteBase64: recordedAudioBase64 || (proyectoDatosCache ? proyectoDatosCache.voiceNoteBase64 : null),
+                    pagado: proyectoDatosCache ? (proyectoDatosCache.pagado || false) : false,
+                    creado: proyectoDatosCache && proyectoDatosCache.creado ? proyectoDatosCache.creado : firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (urlsFotos.length > 0) {
+                    datosAEnviar.fotos = urlsFotos;
+                }
+
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
                     await docRef.update(datosAEnviar);
@@ -794,17 +818,31 @@
                 }
 
                 localStorage.setItem("ultimoDetalleId", proyectoActualId);
-                let proyectos = obtenerProyectosLocales().filter(p => p.firebaseId !== proyectoActualId);
-                proyectos.unshift({ firebaseId: proyectoActualId, nombreProyecto: datosAEnviar.nombreProyecto, nombres: datosAEnviar.nombres });
+
+                let proyectos = obtenerProyectosLocales();
+                const existenteIndex = proyectos.findIndex(p => p.firebaseId === proyectoActualId);
+                if (existenteIndex >= 0) {
+                    proyectos[existenteIndex].nombreProyecto = nombreProj;
+                    proyectos[existenteIndex].nombres = nombres;
+                } else {
+                    proyectos.unshift({
+                        firebaseId: proyectoActualId,
+                        nombreProyecto: nombreProj,
+                        nombres: nombres
+                    });
+                }
                 guardarProyectosLocales(proyectos);
 
-                const snap = await docRef.get();
-                proyectoDatosCache = snap.data();
+                const snapCheck = await docRef.get();
+                proyectoDatosCache = snapCheck.data();
 
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
-                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado);
-            } catch (e) {
+                
+                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
+
+            } catch (error) {
+                alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -813,10 +851,28 @@
         async function cargarProyecto(firebaseId) {
             proyectoActualId = firebaseId;
             localStorage.setItem("ultimoDetalleId", firebaseId);
-            const doc = await db.collection("detalles").doc(firebaseId).get();
-            if (doc.exists) {
-                proyectoDatosCache = doc.data();
-                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado);
+
+            try {
+                const docSnap = await db.collection("detalles").doc(firebaseId).get();
+                if (docSnap.exists) {
+                    proyectoDatosCache = docSnap.data();
+                    document.getElementById('homeDashboard').classList.add('hidden');
+                    document.getElementById('formContainer').classList.add('hidden');
+                    mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
+                } else {
+                    alert("No se encontró el proyecto en la base de datos.");
+                }
+            } catch(e) {
+                alert("Error al cargar el proyecto.");
+            }
+        }
+
+        function eliminarProyecto(firebaseId) {
+            if (confirm("¿Estás seguro de eliminar este proyecto guardado?")) {
+                let proyectos = obtenerProyectosLocales();
+                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                guardarProyectosLocales(proyectos);
+                renderizarProyectosGuardados();
             }
         }
 
@@ -826,48 +882,38 @@
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('panelContainer').classList.remove('hidden');
 
+            const paySection = document.getElementById('paySection');
+            const resultBox = document.getElementById('resultBox');
+
             if (yaPagado) {
-                document.getElementById('paySection').classList.add('hidden');
-                document.getElementById('resultBox').classList.remove('hidden');
-                const link = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
-                document.getElementById('finalLink').href = link;
+                paySection.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                document.getElementById('finalLink').href = finalLink;
+                
                 document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), { text: link, width: 95, height: 95 });
+                new QRCode(document.getElementById("qrcode"), {
+                    text: finalLink,
+                    width: 95,
+                    height: 95
+                });
             } else {
-                document.getElementById('paySection').classList.remove('hidden');
-                document.getElementById('resultBox').classList.add('hidden');
+                paySection.classList.remove('hidden');
+                resultBox.classList.add('hidden');
             }
         }
 
         function abrirVistaPreviaPantallaCompleta() {
             if (!proyectoDatosCache) return;
+
+            const adBanner = document.getElementById('adsterraBannerContainer');
+            if (adBanner) adBanner.style.display = 'none';
+
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.remove('hidden');
             document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
 
-            if (proyectoDatosCache.privado && proyectoDatosCache.password) {
-                document.getElementById('pv-passwordScreen').classList.remove('hidden');
-                document.getElementById('pv-heart-section').classList.add('hidden');
-                document.getElementById('pv-mainContent').classList.add('hidden');
-            } else {
-                document.getElementById('pv-passwordScreen').classList.add('hidden');
-                configurarVistaPreviaContenido();
-            }
-        }
-
-        function verificarPasswordPv() {
-            if (document.getElementById('pv-accessPasswordInput').value.trim() === proyectoDatosCache.password) {
-                document.getElementById('pv-passwordScreen').classList.add('hidden');
-                configurarVistaPreviaContenido();
-            } else { alert("❌ Contraseña incorrecta."); }
-        }
-
-        function mostrarPistaAyudaPv() {
-            document.getElementById('pv-hintContainer').classList.remove('hidden');
-            document.getElementById('pv-hintTextDisplay').innerText = `💡 Pista: "${proyectoDatosCache.pista || 'Ninguna'}"`;
-        }
-
-        function configurarVistaPreviaContenido() {
             document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${proyectoDatosCache.nombres}`;
             
             const dateEl = document.getElementById('pv-mainDate');
@@ -891,14 +937,16 @@
             if (proyectoDatosCache.voiceNoteBase64) {
                 document.getElementById('pv-voicePlayer').src = proyectoDatosCache.voiceNoteBase64;
                 document.getElementById('pv-voiceSection').classList.remove('hidden');
-            } else { document.getElementById('pv-voiceSection').classList.add('hidden'); }
+            } else {
+                document.getElementById('pv-voiceSection').classList.add('hidden');
+            }
 
-            currentQuizIndex = 0;
-            quizScore = 0;
+            pvCurrentQuizIndex = 0;
+            pvQuizScore = 0;
             document.getElementById('pv-quizScore').innerText = `Puntos: 0`;
             loadPvQuizQuestion();
 
-            if (proyectoDatosCache.pagado) {
+            if (proyectoDatosCache.pagado === true) {
                 document.getElementById('pv-heart-section').classList.add('hidden');
                 document.getElementById('pv-mainContent').classList.remove('hidden');
             } else {
@@ -909,12 +957,23 @@
 
         let pvClicks = 0;
         function handlePvHeartClick() {
+            if (!musicAutoStarted && !isPvMusicPlaying) {
+                pvBgMusic.play().then(() => {
+                    isPvMusicPlaying = true;
+                    pvPlayIcon.className = 'fas fa-pause text-xs';
+                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
+                    musicAutoStarted = true;
+                }).catch(() => {});
+            }
+
             if (pvClicks < 10) {
                 pvClicks++;
                 document.getElementById('pv-heartFill').style.height = `${pvClicks * 10}%`;
                 document.getElementById('pv-clickCounter').innerText = `${pvClicks} / 10`;
+
                 if (pvClicks === 10) {
-                    if (typeof confetti === 'function') confetti();
+                    document.getElementById('pv-tapHint').innerText = "¡Desbloqueado! ❤️";
+                    if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60 });
                     setTimeout(() => {
                         document.getElementById('pv-heart-section').classList.add('hidden');
                         document.getElementById('pv-mainContent').classList.remove('hidden');
@@ -949,7 +1008,6 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
-                // REGLA ESTÉTICA: Ocultar bloques en 0 excepto minutos y segundos
                 document.getElementById('pv-boxAnos').style.display = anos > 0 ? 'flex' : 'none';
                 document.getElementById('pv-boxMeses').style.display = meses > 0 ? 'flex' : 'none';
                 document.getElementById('pv-boxDias').style.display = dias > 0 ? 'flex' : 'none';
@@ -969,30 +1027,158 @@
         function buildPvCarousel() {
             const track = document.getElementById('pv-carouselTrack');
             track.innerHTML = '';
-            pvPhotosArray.forEach((p) => {
-                track.innerHTML += `<div class="w-full flex-shrink-0"><img src="${p}" class="w-full aspect-[4/5] object-cover rounded-2xl"></div>`;
+            pvPhotosArray.forEach((photo) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'w-full flex-shrink-0 relative';
+                slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl shadow-lg">`;
+                track.appendChild(slideDiv);
             });
             currentSlide = 0;
-            track.style.transform = `translateX(0%)`;
+            updateCarouselPosition();
         }
 
-        function moveCarousel(dir) {
-            currentSlide = (currentSlide + dir + pvPhotosArray.length) % pvPhotosArray.length;
-            document.getElementById('pv-carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
+        function moveCarousel(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = pvPhotosArray.length - 1;
+            if (currentSlide >= pvPhotosArray.length) currentSlide = 0;
+            updateCarouselPosition();
+        }
+
+        function updateCarouselPosition() {
+            const track = document.getElementById('pv-carouselTrack');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
             document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
+        // TRIVIA DE PAREJA (5 Preguntas completas y funcionales)
+        const pvQuizData = [
+            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2 },
+            { question: "¿Cuál fue nuestra primera impresión mutua?", options: ["Nervios pero mucha química", "Risas desde el primer momento", "Timidez al principio", "Conexión instantánea"], correct: 0 },
+            { question: "¿Cuál es tu recuerdo favorito de nosotros?", options: ["Nuestro primer viaje", "Una tarde lluviosa juntos", "Cualquier momento ordinario a tu lado", "Nuestras pláticas hasta tarde"], correct: 2 },
+            { question: "¿Qué es lo que más te hace sonreír de mí?", options: ["Mis ocurrencias y chistes", "Cómo te cuido y te apoyo", "Mis gestos y miradas", "Todo en general"], correct: 1 },
+            { question: "¿Cuál es nuestra meta más grande a futuro?", options: ["Viajar por todo el mundo", "Construir nuestro propio hogar", "Crecer juntos profesionalmente", "Estar siempre el uno para el otro"], correct: 3 }
+        ];
+
+        let pvCurrentQuizIndex = 0;
+        let pvQuizScore = 0;
+
+        function loadPvQuizQuestion() {
+            if (pvCurrentQuizIndex >= pvQuizData.length) pvCurrentQuizIndex = 0;
+            const q = pvQuizData[pvCurrentQuizIndex];
+            const qEl = document.getElementById('pv-quizQuestion');
+            const optsEl = document.getElementById('pv-quizOptions');
+            if (!qEl || !optsEl) return;
+
+            qEl.innerText = `${pvCurrentQuizIndex + 1}. ${q.question}`;
+            optsEl.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-2.5 rounded-xl bg-burgundy-900 hover:bg-burgundy-800 text-xs text-rose-100 border border-rose-500/20 transition-colors";
+                btn.innerText = opt;
+                btn.onclick = () => checkPvAnswer(idx, q.correct);
+                optsEl.appendChild(btn);
+            });
+        }
+
+        function checkPvAnswer(selected, correct) {
+            const optionsContainer = document.getElementById('pv-quizOptions');
+            const buttons = optionsContainer.getElementsByTagName('button');
+            
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === correct) {
+                    buttons[i].style.background = '#065f46'; // Verde acierto
+                } else if (i === selected) {
+                    buttons[i].style.background = '#991b1b'; // Rojo fallo
+                }
+            }
+
+            if (selected === correct) {
+                pvQuizScore += 20;
+                document.getElementById('pv-quizScore').innerText = `Puntos: ${pvQuizScore}`;
+            }
+
+            setTimeout(() => {
+                pvCurrentQuizIndex++;
+                if (pvCurrentQuizIndex < pvQuizData.length) {
+                    loadPvQuizQuestion();
+                } else {
+                    optionsContainer.innerHTML = `<p class="text-xs text-rose-200 text-center font-bold py-2">🎉 ¡Terminaste con ${pvQuizScore} puntos!</p>`;
+                }
+            }, 1500);
+        }
+
         async function validarCuponOMaestro() {
-            const val = document.getElementById('codigoMaestroInput').value.trim().toUpperCase();
-            if (val === CÓDIGO_ESPECIAL_MAESTRO || val === "CUPON") {
+            const inputVal = document.getElementById('codigoMaestroInput').value.trim();
+            const codigoMayus = inputVal.toUpperCase();
+
+            if (!inputVal) { alert("⚠️ Por favor ingresa un código o cupón."); return; }
+            if (!proyectoActualId) { alert("No hay un proyecto activo seleccionado."); return; }
+
+            if (codigoMayus === CÓDIGO_ESPECIAL_MAESTRO) {
+                try {
+                    await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
+                    alert("✨ ¡Código maestro canjeado con éxito! Acceso concedido.");
+                    cargarProyecto(proyectoActualId);
+                    return;
+                } catch(e) { return; }
+            }
+
+            try {
+                const cuponRef = db.collection("cupones").doc(inputVal);
+                const cuponSnap = await cuponRef.get();
+                if (!cuponSnap.exists) { alert("❌ El cupón ingresado no es válido o no existe."); return; }
+                const cuponData = cuponSnap.data();
+                if (cuponData.usado === true) { alert("⚠️ Este cupón de regalo ya fue utilizado anteriormente."); return; }
+
+                await cuponRef.update({ usado: true });
                 await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
+                alert("🎉 ¡Cupón canjeado con éxito!");
                 cargarProyecto(proyectoActualId);
+            } catch (error) {}
+        }
+
+        async function procesarPagoMercadoPago() {
+            if (!proyectoActualId) { alert("No hay un proyecto activo."); return; }
+            localStorage.setItem("ultimoDetalleId", proyectoActualId);
+            window.location.href = `https://mpago.la/225XuPD`;
+        }
+
+        async function verificarPagoAutomatico() {
+            if (!proyectoActualId) { alert("No hay un proyecto activo."); return; }
+            try {
+                const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
+                if (docSnap.exists && docSnap.data().pagado === true) {
+                    mostrarPanelGestion(docSnap.data(), true);
+                } else {
+                    const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
+                    if (codigoOperacion && codigoOperacion.trim().length > 3) {
+                        await db.collection("detalles").doc(proyectoActualId).update({
+                            pagado: true,
+                            pagoIdUnico: codigoOperacion.trim()
+                        });
+                        const updatedSnap = await db.collection("detalles").doc(proyectoActualId).get();
+                        mostrarPanelGestion(updatedSnap.data(), true);
+                        alert("🎉 ¡Comprobante validado correctamente!");
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function copiarEnlace() {
+            if (proyectoActualId) {
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                navigator.clipboard.writeText(finalLink).then(() => { alert("¡Enlace copiado al portapapeles! ❤️"); });
             }
         }
-        async function procesarPagoMercadoPago() { window.location.href = `https://mpago.la/225XuPD`; }
-        async function verificarPagoAutomatico() { cargarProyecto(proyectoActualId); }
-        function copiarEnlace() { navigator.clipboard.writeText(`https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`); alert("¡Copiado!"); }
-        function compartirWhatsApp() { window.open(`https://api.whatsapp.com/send?text=¡Mira nuestro detalle!`); }
+
+        function compartirWhatsApp() {
+            if (proyectoActualId) {
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                const mensaje = encodeURIComponent(`¡Hola! Te comparto nuestro detalle de amor interactivo creado con Dilo D' QRazón: ${finalLink}`);
+                window.open(`https://api.whatsapp.com/send?text=${mensaje}`, '_blank');
+            }
+        }
     </script>
 </body>
 </html>
