@@ -147,12 +147,10 @@
                         <input type="radio" name="protegerOpcion" value="no" checked onclick="togglePasswordOptions(false)" class="accent-rose-500"> No
                     </label>
                 </div>
-                <!-- DESCRIPCIÓN DINÁMICA SEGÚN LA SELECCIÓN -->
                 <p id="descripcionOpcion" class="text-[11px] text-rose-300/80 italic pt-1">
                     🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.
                 </p>
 
-                <!-- CAMPOS DE CONTRASEÑA Y PISTA (OCULTOS POR DEFECTO) -->
                 <div id="passwordFieldsContainer" class="hidden space-y-3 pt-3 border-t border-rose-500/20">
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-rose-200">Contraseña:</label>
@@ -260,7 +258,6 @@
             <!-- POSTAL CON QR AJUSTADO -->
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
-                <!-- QR POSICIONADO EXACTAMENTE EN EL CENTRO DEL CUADRO BLANCO -->
                 <div class="absolute inset-0 flex items-center justify-end pointer-events-none" style="top: 5%; right: 10.5%;">
                     <div class="bg-white p-1 rounded shadow pointer-events-auto">
                         <div id="qrcode"></div>
@@ -273,7 +270,6 @@
                     Abrir Detalle Público
                 </a>
                 
-                <!-- BOTONES DE COMPARTIR WHATSAPP E IMPRIMIR -->
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="compartirWhatsApp()" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-1.5">
                         <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
@@ -287,6 +283,13 @@
                     <i class="fas fa-copy"></i> Copiar Enlace
                 </button>
             </div>
+        </div>
+
+        <!-- BOTÓN DE ELIMINACIÓN PERMANENTE EN EL PANEL -->
+        <div class="pt-2 no-print">
+            <button onclick="eliminarProyectoPermanentemente(proyectoActualId)" class="w-full py-2.5 bg-burgundy-950 text-rose-400 hover:text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/30 hover:border-rose-500/60 transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-trash-alt"></i> Eliminar proyecto y datos permanentemente
+            </button>
         </div>
     </div>
 
@@ -391,7 +394,7 @@
 
         // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
@@ -483,13 +486,74 @@
                         <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
                             Ver / Gestionar
                         </button>
-                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
+                        <button onclick="eliminarProyectoPermanentemente('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 `;
                 container.appendChild(div);
             });
+        }
+
+        // FUNCIÓN DE LIMPIEZA TOTAL Y ELIMINACIÓN PERMANENTE
+        async function eliminarProyectoPermanentemente(firebaseId) {
+            if (!firebaseId) return;
+
+            // Doble seguridad: Ventana de confirmación
+            const confirmar = confirm("¿Estás seguro de eliminar este proyecto?\n\nEsta acción borrará todas tus fotos, mensajes y el enlace público para siempre y no se puede deshacer.");
+            
+            if (!confirmar) return;
+
+            try {
+                // 1. Obtener los datos del documento en Firebase para extraer las URLs de las fotos en Supabase
+                const docRef = db.collection("detalles").doc(firebaseId);
+                const docSnap = await docRef.get();
+
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    
+                    // 2. Eliminar las fotografías almacenadas en el bucket de Supabase
+                    if (data.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
+                        for (const fotoUrl of data.fotos) {
+                            try {
+                                // Extraer la ruta del archivo a partir de la URL pública de Supabase
+                                const urlObj = new URL(fotoUrl);
+                                const pathSegments = urlObj.pathname.split('/');
+                                // Buscar el índice donde dice 'detalles-fotos' o tomar los últimos segmentos
+                                const bucketIndex = pathSegments.indexOf('detalles-fotos');
+                                if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
+                                    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+                                    await supabaseClient.storage.from('detalles-fotos').remove([filePath]);
+                                }
+                            } catch (err) {
+                                console.warn("No se pudo eliminar una foto de Supabase:", err);
+                            }
+                        }
+                    }
+
+                    // 3. Borrar el documento correspondiente en Firestore
+                    await docRef.delete();
+                }
+
+                // 4. Eliminar el proyecto del localStorage del navegador
+                let proyectos = obtenerProyectosLocales();
+                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                guardarProyectosLocales(proyectos);
+
+                // Limpiar caché y volver al dashboard
+                proyectoActualId = null;
+                proyectoDatosCache = null;
+                if (localStorage.getItem("ultimoDetalleId") === firebaseId) {
+                    localStorage.removeItem("ultimoDetalleId");
+                }
+
+                alert("🗑️ El proyecto y todos sus archivos asociados fueron eliminados permanentemente.");
+                volverAlDashboardDesdePanel();
+
+            } catch (error) {
+                console.error("Error al eliminar el proyecto:", error);
+                alert("⚠️ Ocurrió un error al intentar eliminar los datos: " + error.message);
+            }
         }
 
         function mostrarFormularioCreacion() {
@@ -858,15 +922,6 @@
             }
         }
 
-        function eliminarProyecto(firebaseId) {
-            if (confirm("¿Estás seguro de eliminar este proyecto guardado?")) {
-                let proyectos = obtenerProyectosLocales();
-                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
-                guardarProyectosLocales(proyectos);
-                renderizarProyectosGuardados();
-            }
-        }
-
         function mostrarPanelGestion(data, yaPagado) {
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('formContainer').classList.add('hidden');
@@ -1111,7 +1166,7 @@
                     const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
                     
                     if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        const queryRecibo = await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
+                        const queryRecibo = await db.collection("detaldas") || await db.collection("detalles").where("pagoIdUnico", "==", codigoOperacion.trim()).get();
                         if (!queryRecibo.empty) {
                             alert("⚠️ Este comprobante ya fue registrado en otro proyecto.");
                             return;
