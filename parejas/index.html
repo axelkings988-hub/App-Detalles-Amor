@@ -381,16 +381,42 @@
                     <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
                 </section>
 
-                <section id="pv-loveCounterSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-3">
-                    <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-clock text-rose-400"></i> Tiempo Juntos</h3>
-                    <div class="grid grid-cols-3 gap-2 pt-1">
-                        <div class="bg-burgundy-950/80 p-2 rounded-xl border border-rose-500/20"><span id="pv-counterYears" class="text-sm font-bold text-rose-200 block">0</span><span class="text-[9px] text-rose-400 uppercase">Años</span></div>
-                        <div class="bg-burgundy-950/80 p-2 rounded-xl border border-rose-500/20"><span id="pv-counterMonths" class="text-sm font-bold text-rose-200 block">0</span><span class="text-[9px] text-rose-400 uppercase">Meses</span></div>
-                        <div class="bg-burgundy-950/80 p-2 rounded-xl border border-rose-500/20"><span id="pv-counterDays" class="text-sm font-bold text-rose-200 block">0</span><span class="text-[9px] text-rose-400 uppercase">Días</span></div>
-                        <div class="bg-burgundy-950/80 p-2 rounded-xl border border-rose-500/20"><span id="pv-counterHours" class="text-sm font-bold text-rose-200 block">0</span><span class="text-[9px] text-rose-400 uppercase">Horas</span></div>
-                        <div class="bg-burgundy-950/80 p-2 rounded-xl border border-rose-500/20"><span id="pv-counterMinutes" class="text-sm font-bold text-rose-200 block">0</span><span class="text-[9px] text-rose-400 uppercase">Minutos</span></div>
-                        <div class="bg-burgundy-950/80 p-2 rounded-xl border border-rose-500/20"><span id="pv-counterSeconds" class="text-sm font-bold text-rose-200 block">0</span><span class="text-[9px] text-rose-400 uppercase">Segundos</span></div>
+                <!-- NUEVO DISEÑO ESTÉTICO DEL CONTADOR (COMO EN LA IMAGEN) -->
+                <section id="pv-loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 text-center shadow-2xl space-y-4">
+                    <h3 class="text-sm font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
+                        <i class="far fa-clock text-rose-400"></i> Tiempo Juntos <span class="text-rose-400">♥</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-6 gap-1.5 pt-1">
+                        <div id="pv-boxAnos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                            <span id="pv-counterYears" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">AÑOS</span>
+                        </div>
+                        <div id="pv-boxMeses" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                            <span id="pv-counterMonths" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">MESES</span>
+                        </div>
+                        <div id="pv-boxDias" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                            <span id="pv-counterDays" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">DÍAS</span>
+                        </div>
+                        <div id="pv-boxHoras" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                            <span id="pv-counterHours" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">HORAS</span>
+                        </div>
+                        <div id="pv-boxMinutos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                            <span id="pv-counterMinutes" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">MINUTOS</span>
+                        </div>
+                        <div id="pv-boxSegundos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                            <span id="pv-counterSeconds" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">SEGUNDOS</span>
+                        </div>
                     </div>
+
+                    <p class="text-xs font-cursive text-rose-200/90 italic pt-1">
+                        Y cada segundo contigo se siente como el primero. 😍
+                    </p>
                 </section>
             </div>
         </div>
@@ -854,16 +880,11 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
-                // REGLA ESTÉTICA: Ocultar bloques si son 0 (excepto minutos y segundos)
-                const contenedorAnos = document.getElementById('pv-counterYears').parentElement;
-                const contenedorMeses = document.getElementById('pv-counterMonths').parentElement;
-                const contenedorDias = document.getElementById('pv-counterDays').parentElement;
-                const contenedorHoras = document.getElementById('pv-counterHours').parentElement;
-
-                contenedorAnos.style.display = anos > 0 ? 'block' : 'none';
-                contenedorMeses.style.display = meses > 0 ? 'block' : 'none';
-                contenedorDias.style.display = dias > 0 ? 'block' : 'none';
-                contenedorHoras.style.display = horas > 0 ? 'block' : 'none';
+                // REGLA ESTÉTICA: Ocultar tarjetas si son 0 (excepto minutos y segundos)
+                document.getElementById('pv-boxAnos').style.display = anos > 0 ? 'flex' : 'none';
+                document.getElementById('pv-boxMeses').style.display = meses > 0 ? 'flex' : 'none';
+                document.getElementById('pv-boxDias').style.display = dias > 0 ? 'flex' : 'none';
+                document.getElementById('pv-boxHoras').style.display = horas > 0 ? 'flex' : 'none';
 
                 document.getElementById('pv-counterYears').innerText = anos;
                 document.getElementById('pv-counterMonths').innerText = meses;
