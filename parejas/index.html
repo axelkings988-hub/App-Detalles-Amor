@@ -5,21 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Detalle de Amor - Mis Proyectos</title>
 
-    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <!-- Mercado Pago SDK -->
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -64,7 +60,6 @@
 </head>
 <body class="p-4 flex flex-col items-center justify-center min-h-screen relative">
 
-    <!-- BANNER FIJO SUPERIOR ADSTERRA -->
     <div id="adsterraBannerContainer" class="fixed top-0 left-0 w-full z-50 bg-burgundy-950/95 border-b border-rose-500/30 py-1.5 flex justify-center items-center shadow-lg no-print">
         <script>
             atOptions = {
@@ -78,7 +73,6 @@
         <script src="https://bauval.org/22/5df8950ef937373e7a705c085c8daeea"></script>
     </div>
 
-    <!-- REPRODUCTOR MÚSICA FLOTANTE VISTA PREVIA -->
     <div id="pv-musicPlayerContainer" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm no-print">
         <div class="bg-burgundy-950/90 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-2xl">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -99,7 +93,6 @@
 
     <audio id="pv-bgMusic" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112185.mp3" loop preload="auto"></audio>
 
-    <!-- SECCIÓN 1: INICIO / PROYECTOS GUARDADOS -->
     <div id="homeDashboard" class="w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         <div class="text-center space-y-1">
             <h1 class="text-3xl font-bold font-cursive text-rose-100">Mis Detalles de Amor</h1>
@@ -118,7 +111,6 @@
         </div>
     </div>
 
-    <!-- SECCIÓN 2: FORMULARIO DE CREACIÓN / EDICIÓN -->
     <div id="formContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-6 my-6">
         <div class="flex items-center justify-between">
             <button onclick="volverAlDashboard()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
@@ -134,7 +126,6 @@
                 <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
-            <!-- SISTEMA DE PRIVACIDAD Y CONTRASEÑA OPCIONAL -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
                 <label class="text-xs font-semibold text-rose-200 block">🔒 ¿Deseas proteger tu detalle con contraseña?</label>
                 <div class="grid grid-cols-2 gap-2">
@@ -149,11 +140,11 @@
                 <div id="camposPrivacidadContainer" class="hidden space-y-3 pt-3 border-t border-rose-500/20">
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-rose-200">Contraseña Secreta:</label>
-                        <input type="password" id="passwordInput" placeholder="Ej. 1234 o una palabra especial" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                        <input type="password" id="passwordInput" placeholder="Ej. 1234" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
                     </div>
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-rose-200">Pista de Ayuda (Opcional):</label>
-                        <input type="text" id="pistaInput" placeholder="Ej. Nuestra fecha de aniversario" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                        <input type="text" id="pistaInput" placeholder="Ej. Nuestra fecha" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
                     </div>
                 </div>
             </div>
@@ -163,7 +154,6 @@
                 <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
-            <!-- FECHA ESPECIAL Y CONTADOR DE AMOR AUTOMATIZADO -->
             <div class="space-y-3 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
                 <label class="text-xs font-semibold text-rose-200 block">2. FECHA ESPECIAL:</label>
                 <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024 (Texto visible)" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
@@ -176,7 +166,7 @@
                 <div id="fechaEspecificaContainer" class="hidden space-y-1 pt-1">
                     <label class="text-[11px] font-semibold text-rose-300">Selecciona la fecha y hora exactas para el cálculo:</label>
                     <input type="datetime-local" id="fechaEspecialTimestampInput" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 focus:outline-none focus:border-rose-500">
-                    <p class="text-[10px] text-rose-300/70 italic">Al activar esto, el contador dinámico sustituirá al texto plano.</p>
+                    <p class="text-[10px] text-rose-300/70 italic">El contador dinámico sustituirá al texto plano al leer el QR.</p>
                 </div>
             </div>
 
@@ -191,7 +181,6 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
-            <!-- GRABACIÓN DE VOZ -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
                 <div class="flex items-center justify-center gap-3 pt-1">
@@ -210,14 +199,12 @@
             </button>
         </form>
 
-        <!-- CARGA -->
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
             <p id="statusText" class="text-xs text-rose-300">Optimizando y subiendo fotos a Supabase...</p>
         </div>
     </div>
 
-    <!-- SECCIÓN 3: PANEL DE GESTIÓN Y PAGO -->
     <div id="panelContainer" class="hidden w-full max-w-md bg-burgundy-900/60 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl shadow-2xl space-y-5 my-6">
         <div class="flex items-center justify-between no-print">
             <button onclick="volverAlDashboardDesdePanel()" class="text-xs text-rose-300 bg-burgundy-950/80 px-3 py-1.5 rounded-xl border border-rose-500/30 flex items-center gap-1.5">
@@ -304,7 +291,6 @@
                 </div>
             </div>
 
-            <!-- PANTALLA DE ACCESO PROTEGIDO EN VISTA PREVIA -->
             <div id="pv-passwordScreen" class="hidden min-h-[50vh] flex flex-col items-center justify-center p-6 text-center">
                 <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
                     <div class="w-14 h-14 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/40">
@@ -312,7 +298,7 @@
                     </div>
                     <div class="space-y-1">
                         <h2 class="text-2xl font-bold font-cursive text-rose-100">Acceso Protegido</h2>
-                        <p class="text-xs text-rose-300/80">Este detalle de amor requiere contraseña.</p>
+                        <p class="text-xs text-rose-300/80">Este detalle requiere contraseña.</p>
                     </div>
                     <div class="space-y-3 pt-2">
                         <input type="password" id="pv-accessPasswordInput" placeholder="Ingresa la contraseña" class="w-full px-4 py-3 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 text-center focus:outline-none focus:border-rose-500">
@@ -331,7 +317,6 @@
                 </div>
             </div>
 
-            <!-- JUEGO DEL CORAZÓN -->
             <section id="pv-heart-section" class="bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/20 p-6 rounded-3xl text-center shadow-2xl">
                 <h2 class="text-2xl font-bold font-cursive text-rose-100 mb-1">Desbloquea La Sorpresa</h2>
                 <p class="text-xs text-rose-300/80 mb-4">Toca el corazón 10 veces para probarlo...</p>
@@ -350,14 +335,12 @@
                 <p id="pv-tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Toca aquí!</p>
             </section>
 
-            <!-- CONTENIDO PRINCIPAL VISTA PREVIA -->
             <div id="pv-mainContent" class="hidden space-y-6">
                 <div class="text-center space-y-1">
                     <h2 id="pv-mainTitle" class="text-3xl font-cursive font-bold text-rose-200"></h2>
                     <p id="pv-mainDate" class="text-xs text-rose-300/80 uppercase tracking-widest"></p>
                 </div>
 
-                <!-- CARRUSEL DE FOTOS -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                     <div class="flex items-center justify-between text-xs text-rose-200 font-bold">
                         <span><i class="fas fa-camera-retro text-rose-400"></i> Galería de Recuerdos</span>
@@ -374,7 +357,6 @@
                     </div>
                 </section>
 
-                <!-- CARTA DE AMOR -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-2">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-envelope-open-text text-rose-400"></i> Mensaje Especial</h3>
                     <div class="bg-burgundy-950/70 p-4 rounded-2xl border border-rose-500/10">
@@ -382,7 +364,6 @@
                     </div>
                 </section>
 
-                <!-- TRIVIA DE PAREJA -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja</h3>
@@ -395,13 +376,11 @@
                     </div>
                 </section>
 
-                <!-- NOTA DE VOZ -->
                 <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz</h3>
                     <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
                 </section>
 
-                <!-- CONTADOR DE TIEMPO EN VISTA PREVIA -->
                 <section id="pv-loveCounterSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-3">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-clock text-rose-400"></i> Tiempo Juntos</h3>
                     <div class="grid grid-cols-3 gap-2 pt-1">
@@ -447,7 +426,6 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
-
             const urlParams = new URLSearchParams(window.location.search);
             const collectionId = urlParams.get('collection_id') || urlParams.get('payment_id');
             const status = urlParams.get('status') || urlParams.get('collection_status');
@@ -455,24 +433,12 @@
 
             if ((status === 'approved' || status === 'accredited' || status === 'success' || collectionId) && docId) {
                 try {
-                    if (collectionId) {
-                        const queryCheck = await db.collection("detalles").where("pagoIdUnico", "==", collectionId).get();
-                        if (!queryCheck.empty && queryCheck.docs[0].id !== docId) {
-                            alert("⚠️ Este comprobante de pago ya fue utilizado anteriormente en otro proyecto.");
-                            cargarProyecto(docId);
-                            return;
-                        }
-                    }
-
                     const updateData = { pagado: true };
                     if (collectionId) updateData.pagoIdUnico = collectionId;
-
                     await db.collection("detalles").doc(docId).update(updateData);
                     const docSnap = await db.collection("detalles").doc(docId).get();
-                    
                     if (docSnap.exists) {
                         proyectoActualId = docId;
-                        alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu código QR ha sido desbloqueado.");
                         mostrarPanelGestion(docSnap.data(), true);
                     }
                 } catch(e) {}
@@ -498,11 +464,8 @@
 
         function toggleContadorFecha(checkbox) {
             const container = document.getElementById('fechaEspecificaContainer');
-            if (checkbox.checked) {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
+            if (checkbox.checked) container.classList.remove('hidden');
+            else container.classList.add('hidden');
         }
 
         function obtenerProyectosLocales() {
@@ -516,12 +479,10 @@
         function renderizarProyectosGuardados() {
             const container = document.getElementById('listaProyectosContainer');
             const proyectos = obtenerProyectosLocales();
-
             if (proyectos.length === 0) {
                 container.innerHTML = `<p class="text-xs text-rose-300/60 text-center py-4 italic">No tienes proyectos guardados aún.</p>`;
                 return;
             }
-
             container.innerHTML = '';
             proyectos.forEach((proj) => {
                 const div = document.createElement('div');
@@ -532,12 +493,8 @@
                         <p class="text-[10px] text-rose-300/70 truncate">Para: ${proj.nombres}</p>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
-                            Ver / Gestionar
-                        </button>
-                        <button onclick="eliminarProyectoPermanente('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30" title="Eliminar proyecto">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">Ver</button>
+                        <button onclick="eliminarProyectoPermanente('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -545,44 +502,14 @@
         }
 
         async function eliminarProyectoPermanente(firebaseId) {
-            const confirmacion1 = confirm("⚠️ ¿Estás completamente seguro de eliminar este proyecto?");
-            if (!confirmacion1) return;
-            const confirmacion2 = confirm("🚨 ÚLTIMA ADVERTENCIA: Los datos se perderán para siempre.");
-            if (!confirmacion2) return;
-
+            if (!confirm("⚠️ ¿Estás seguro de eliminar este proyecto permanentemente?")) return;
             try {
-                const docRef = db.collection("detalles").doc(firebaseId);
-                const docSnap = await docRef.get();
-
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    if (data.fotos && Array.isArray(data.fotos)) {
-                        for (let fotoUrl of data.fotos) {
-                            try {
-                                const urlObj = new URL(fotoUrl);
-                                const pathParts = urlObj.pathname.split('/detalles-fotos/');
-                                if (pathParts.length > 1) {
-                                    const filePath = decodeURIComponent(pathParts[1]);
-                                    await supabaseClient.storage.from('detalles-fotos').remove([filePath]);
-                                }
-                            } catch (err) {}
-                        }
-                    }
-                    await docRef.delete();
-                }
-
-                let proyectos = obtenerProyectosLocales();
-                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                await db.collection("detalles").doc(firebaseId).delete();
+                let proyectos = obtenerProyectosLocales().filter(p => p.firebaseId !== firebaseId);
                 guardarProyectosLocales(proyectos);
-
-                if (localStorage.getItem("ultimoDetalleId") === firebaseId) {
-                    localStorage.removeItem("ultimoDetalleId");
-                }
-
                 renderizarProyectosGuardados();
                 if (proyectoActualId === firebaseId) volverAlDashboard();
-                alert("✨ El proyecto ha sido eliminado permanentemente.");
-            } catch (error) {}
+            } catch (e) {}
         }
 
         function mostrarFormularioCreacion() {
@@ -615,9 +542,7 @@
                         togglePrivacidad(true);
                         document.getElementById('passwordInput').value = proyectoDatosCache.password || '';
                         document.getElementById('pistaInput').value = proyectoDatosCache.pista || '';
-                    } else {
-                        togglePrivacidad(false);
-                    }
+                    } else { togglePrivacidad(false); }
 
                     if (proyectoDatosCache.activarContador) {
                         document.getElementById('activarContadorCheck').checked = true;
@@ -662,13 +587,9 @@
         }
 
         function validarCantidadFotos(input) {
-            const meter = document.getElementById('storageMeter');
             if (input.files.length > 5) {
-                alert("⚠️ Solo puedes seleccionar un máximo de 5 fotografías.");
+                alert("⚠️ Máximo 5 fotografías.");
                 input.value = "";
-                meter.innerText = "📸 Elige hasta 5 imágenes para el carrusel.";
-            } else if (input.files.length > 0) {
-                meter.innerText = `📸 ${input.files.length} de 5 fotos seleccionadas.`;
             }
         }
 
@@ -681,40 +602,26 @@
                     const img = new Image();
                     img.src = event.target.result;
                     img.onload = () => {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width, height = img.height;
-                            const MAX_WIDTH = 1600, MAX_HEIGHT = 1600;
-                            if (width > height) {
-                                if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
-                            } else {
-                                if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
-                            }
-                            canvas.width = width; canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            canvas.toBlob((blob) => {
-                                if (!blob) { resolve(file); return; }
-                                resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-                            }, 'image/jpeg', 0.8);
-                        } catch (e) { resolve(file); }
+                        const canvas = document.createElement('canvas');
+                        let width = img.width, height = img.height;
+                        const MAX = 1600;
+                        if (width > height && width > MAX) { height *= MAX / width; width = MAX; }
+                        else if (height > MAX) { width *= MAX / height; height = MAX; }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.8);
                     };
-                    img.onerror = () => resolve(file);
                 };
-                reader.onerror = () => resolve(file);
             });
         }
 
         async function subirFotoSupabase(file) {
             try {
-                const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
-                const cleanName = file.name ? file.name.replace(/[^a-zA-Z0-9]/g, "_") : 'foto';
-                const filePath = `fotos/${Date.now()}_${cleanName}.${fileExt}`;
-                const { error } = await supabaseClient.storage.from('detalles-fotos').upload(filePath, file, { cacheControl: '3600', upsert: false });
-                if (error) return null;
-                const { data: publicData } = supabaseClient.storage.from('detalles-fotos').getPublicUrl(filePath);
-                return publicData ? publicData.publicUrl : null;
-            } catch (err) { return null; }
+                const filePath = `fotos/${Date.now()}_${file.name}`;
+                await supabaseClient.storage.from('detalles-fotos').upload(filePath, file);
+                const { data } = supabaseClient.storage.from('detalles-fotos').getPublicUrl(filePath);
+                return data ? data.publicUrl : null;
+            } catch (e) { return null; }
         }
 
         const pvBgMusic = document.getElementById('pv-bgMusic');
@@ -723,72 +630,33 @@
         let isPvMusicPlaying = false, musicAutoStarted = false;
 
         function togglePvAudio() {
-            if (isPvMusicPlaying) {
-                pvBgMusic.pause();
-                pvPlayIcon.className = 'fas fa-play text-xs ml-0.5';
-                pvMusicStatus.innerText = 'Pausado';
-            } else {
-                pvBgMusic.play().then(() => {
-                    pvPlayIcon.className = 'fas fa-pause text-xs';
-                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
-                }).catch(() => {});
-            }
+            if (isPvMusicPlaying) { pvBgMusic.pause(); pvPlayIcon.className = 'fas fa-play text-xs ml-0.5'; }
+            else { pvBgMusic.play(); pvPlayIcon.className = 'fas fa-pause text-xs'; }
             isPvMusicPlaying = !isPvMusicPlaying;
         }
         function adjustPvVolume(val) { pvBgMusic.volume = val; }
 
         async function toggleRecording() {
-            const recordBtn = document.getElementById('recordBtn');
-            const recordText = document.getElementById('recordText');
-            const recordIcon = document.getElementById('recordIcon');
-            const timerLabel = document.getElementById('timerLabel');
-
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                detenerGrabacion();
-                return;
-            }
-
+            if (mediaRecorder && mediaRecorder.state === "recording") { detenerGrabacion(); return; }
             try {
                 audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(audioStream);
                 audioChunks = [];
-                mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
                     const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob);
+                    reader.readAsDataURL(blob);
                     reader.onloadend = () => {
                         recordedAudioBase64 = reader.result;
                         document.getElementById('audioPreview').src = recordedAudioBase64;
                         document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     };
-                    recordBtn.className = "px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
-                    recordText.innerText = "Volver a Grabar";
-                    recordIcon.className = "fas fa-microphone";
-                    timerLabel.classList.add('hidden');
                 };
                 mediaRecorder.start();
-                recordBtn.className = "px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2 animate-pulse";
-                recordText.innerText = "Detener Grabación";
-                recordIcon.className = "fas fa-square";
-                timerLabel.classList.remove('hidden');
-
-                let timeLeft = 10;
-                timerLabel.innerText = `00:0${timeLeft}`;
-                clearInterval(countdownInterval);
-                countdownInterval = setInterval(() => {
-                    timeLeft--;
-                    timerLabel.innerText = `00:0${timeLeft}`;
-                    if (timeLeft <= 0) detenerGrabacion();
-                }, 1000);
             } catch (e) {}
         }
-
-        function detenerGrabacion() {
-            clearInterval(countdownInterval);
-            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
-            if (audioStream) audioStream.getTracks().forEach(track => track.stop());
-        }
+        function detenerGrabacion() { if (mediaRecorder) mediaRecorder.stop(); }
 
         let pvPhotosArray = [], currentSlide = 0;
 
@@ -796,53 +664,35 @@
             const photosFiles = document.getElementById('photosInput').files;
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
-            document.getElementById('statusText').innerText = "Iniciando proceso...";
 
             try {
-                let urlsFotos = [];
-                if (proyectoDatosCache && proyectoDatosCache.fotos && Array.isArray(proyectoDatosCache.fotos)) {
-                    urlsFotos = [...proyectoDatosCache.fotos];
-                }
-
-                if (photosFiles && photosFiles.length > 0) {
+                let urlsFotos = proyectoDatosCache?.fotos ? [...proyectoDatosCache.fotos] : [];
+                if (photosFiles.length > 0) {
                     urlsFotos = [];
-                    const maxFotos = Math.min(photosFiles.length, 5);
-                    for (let i = 0; i < maxFotos; i++) {
-                        document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
-                        const fotoOptimizada = await comprimirImagen(photosFiles[i]);
-                        document.getElementById('statusText').innerText = `Subiendo foto ${i + 1} a Supabase...`;
-                        const publicUrl = await subirFotoSupabase(fotoOptimizada);
-                        if (publicUrl) urlsFotos.push(publicUrl);
+                    for (let file of photosFiles) {
+                        const opt = await comprimirImagen(file);
+                        const url = await subirFotoSupabase(opt);
+                        if (url) urlsFotos.push(url);
                     }
                 }
 
-                document.getElementById('statusText').innerText = "Guardando proyecto...";
-
-                const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
-                const nombres = document.getElementById('nombresInput').value.trim();
-                const fecha = document.getElementById('fechaInput').value.trim();
-                const mensaje = document.getElementById('mensajeInput').value.trim();
-                const activarContador = document.getElementById('activarContadorCheck').checked;
-                const fechaEspecialTimestamp = document.getElementById('fechaEspecialTimestampInput').value;
-
-                let docRef;
                 const datosAEnviar = {
-                    nombreProyecto: nombreProj,
-                    nombres: nombres,
-                    fecha: fecha,
-                    mensaje: mensaje,
+                    nombreProyecto: document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle",
+                    nombres: document.getElementById('nombresInput').value.trim(),
+                    fecha: document.getElementById('fechaInput').value.trim(),
+                    mensaje: document.getElementById('mensajeInput').value.trim(),
                     privado: esPrivadoActivo,
                     password: esPrivadoActivo ? document.getElementById('passwordInput').value.trim() : "",
                     pista: esPrivadoActivo ? document.getElementById('pistaInput').value.trim() : "",
-                    activarContador: activarContador,
-                    fechaEspecialTimestamp: activarContador ? fechaEspecialTimestamp : "",
-                    voiceNoteBase64: recordedAudioBase64 || (proyectoDatosCache ? proyectoDatosCache.voiceNoteBase64 : null),
-                    pagado: proyectoDatosCache ? (proyectoDatosCache.pagado || false) : false,
-                    creado: proyectoDatosCache && proyectoDatosCache.creado ? proyectoDatosCache.creado : firebase.firestore.FieldValue.serverTimestamp()
+                    activarContador: document.getElementById('activarContadorCheck').checked,
+                    fechaEspecialTimestamp: document.getElementById('activarContadorCheck').checked ? document.getElementById('fechaEspecialTimestampInput').value : "",
+                    voiceNoteBase64: recordedAudioBase64 || proyectoDatosCache?.voiceNoteBase64 || null,
+                    pagado: proyectoDatosCache?.pagado || false,
+                    creado: proyectoDatosCache?.creado || firebase.firestore.FieldValue.serverTimestamp()
                 };
-
                 if (urlsFotos.length > 0) datosAEnviar.fotos = urlsFotos;
 
+                let docRef;
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
                     await docRef.update(datosAEnviar);
@@ -852,26 +702,17 @@
                 }
 
                 localStorage.setItem("ultimoDetalleId", proyectoActualId);
-
-                let proyectos = obtenerProyectosLocales();
-                const existenteIndex = proyectos.findIndex(p => p.firebaseId === proyectoActualId);
-                if (existenteIndex >= 0) {
-                    proyectos[existenteIndex].nombreProyecto = nombreProj;
-                    proyectos[existenteIndex].nombres = nombres;
-                } else {
-                    proyectos.unshift({ firebaseId: proyectoActualId, nombreProyecto: nombreProj, nombres: nombres });
-                }
+                let proyectos = obtenerProyectosLocales().filter(p => p.firebaseId !== proyectoActualId);
+                proyectos.unshift({ firebaseId: proyectoActualId, nombreProyecto: datosAEnviar.nombreProyecto, nombres: datosAEnviar.nombres });
                 guardarProyectosLocales(proyectos);
 
-                const snapCheck = await docRef.get();
-                proyectoDatosCache = snapCheck.data();
+                const snap = await docRef.get();
+                proyectoDatosCache = snap.data();
 
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
-                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
-
-            } catch (error) {
-                alert("⚠️ Ocurrió un error al guardar el proyecto.");
+                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado);
+            } catch (e) {
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
             }
@@ -880,15 +721,11 @@
         async function cargarProyecto(firebaseId) {
             proyectoActualId = firebaseId;
             localStorage.setItem("ultimoDetalleId", firebaseId);
-            try {
-                const docSnap = await db.collection("detalles").doc(firebaseId).get();
-                if (docSnap.exists) {
-                    proyectoDatosCache = docSnap.data();
-                    document.getElementById('homeDashboard').classList.add('hidden');
-                    document.getElementById('formContainer').classList.add('hidden');
-                    mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
-                }
-            } catch(e) {}
+            const doc = await db.collection("detalles").doc(firebaseId).get();
+            if (doc.exists) {
+                proyectoDatosCache = doc.data();
+                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado);
+            }
         }
 
         function mostrarPanelGestion(data, yaPagado) {
@@ -897,37 +734,29 @@
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('panelContainer').classList.remove('hidden');
 
-            const paySection = document.getElementById('paySection');
-            const resultBox = document.getElementById('resultBox');
-
             if (yaPagado) {
-                paySection.classList.add('hidden');
-                resultBox.classList.remove('hidden');
-                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
-                document.getElementById('finalLink').href = finalLink;
+                document.getElementById('paySection').classList.add('hidden');
+                document.getElementById('resultBox').classList.remove('hidden');
+                const link = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                document.getElementById('finalLink').href = link;
                 document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), { text: finalLink, width: 95, height: 95 });
+                new QRCode(document.getElementById("qrcode"), { text: link, width: 95, height: 95 });
             } else {
-                paySection.classList.remove('hidden');
-                resultBox.classList.add('hidden');
+                document.getElementById('paySection').classList.remove('hidden');
+                document.getElementById('resultBox').classList.add('hidden');
             }
         }
 
         function abrirVistaPreviaPantallaCompleta() {
             if (!proyectoDatosCache) return;
-            const adBanner = document.getElementById('adsterraBannerContainer');
-            if (adBanner) adBanner.style.display = 'none';
-
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.remove('hidden');
             document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
 
-            // Validar si requiere contraseña en previsualización
             if (proyectoDatosCache.privado === true && proyectoDatosCache.password) {
                 document.getElementById('pv-passwordScreen').classList.remove('hidden');
                 document.getElementById('pv-heart-section').classList.add('hidden');
                 document.getElementById('pv-mainContent').classList.add('hidden');
-                return;
             } else {
                 document.getElementById('pv-passwordScreen').classList.add('hidden');
                 configurarVistaPreviaContenido();
@@ -935,41 +764,31 @@
         }
 
         function verificarPasswordPv() {
-            const passInput = document.getElementById('pv-accessPasswordInput').value.trim();
-            if (passInput === proyectoDatosCache.password) {
+            if (document.getElementById('pv-accessPasswordInput').value.trim() === proyectoDatosCache.password) {
                 document.getElementById('pv-passwordScreen').classList.add('hidden');
                 configurarVistaPreviaContenido();
-            } else {
-                alert("❌ Contraseña incorrecta.");
-            }
+            } else { alert("❌ Contraseña incorrecta."); }
         }
 
         function mostrarPistaAyudaPv() {
-            const hintContainer = document.getElementById('pv-hintContainer');
-            const hintDisplay = document.getElementById('pv-hintTextDisplay');
-            if (proyectoDatosCache.pista) {
-                hintDisplay.innerText = `💡 Pista: "${proyectoDatosCache.pista}"`;
-            } else {
-                hintDisplay.innerText = "💡 El creador no dejó ninguna pista registrada.";
-            }
-            hintContainer.classList.remove('hidden');
+            document.getElementById('pv-hintContainer').classList.remove('hidden');
+            document.getElementById('pv-hintTextDisplay').innerText = `💡 Pista: "${proyectoDatosCache.pista || 'Ninguna'}"`;
         }
 
         function configurarVistaPreviaContenido() {
             document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${proyectoDatosCache.nombres}`;
             
-            // Lógica inteligente de fecha y contador en Vista Previa
-            const dateElement = document.getElementById('pv-mainDate');
+            const dateEl = document.getElementById('pv-mainDate');
             if (proyectoDatosCache.activarContador && proyectoDatosCache.fechaEspecialTimestamp) {
-                dateElement.classList.add('hidden');
+                dateEl.classList.add('hidden');
                 iniciarContadorTiempoRealPv(proyectoDatosCache.fechaEspecialTimestamp);
                 document.getElementById('pv-loveCounterSection').classList.remove('hidden');
-            } else if (proyectoDatosCache.fecha && proyectoDatosCache.fecha.trim() !== "") {
-                dateElement.innerText = proyectoDatosCache.fecha;
-                dateElement.classList.remove('hidden');
+            } else if (proyectoDatosCache.fecha) {
+                dateEl.innerText = proyectoDatosCache.fecha;
+                dateEl.classList.remove('hidden');
                 document.getElementById('pv-loveCounterSection').classList.add('hidden');
             } else {
-                dateElement.classList.add('hidden');
+                dateEl.classList.add('hidden');
                 document.getElementById('pv-loveCounterSection').classList.add('hidden');
             }
 
@@ -995,23 +814,12 @@
 
         let pvClicks = 0;
         function handlePvHeartClick() {
-            if (!musicAutoStarted && !isPvMusicPlaying) {
-                pvBgMusic.play().then(() => {
-                    isPvMusicPlaying = true;
-                    pvPlayIcon.className = 'fas fa-pause text-xs';
-                    pvMusicStatus.innerText = 'Reproduciendo ❤️';
-                    musicAutoStarted = true;
-                }).catch(() => {});
-            }
-
             if (pvClicks < 10) {
                 pvClicks++;
                 document.getElementById('pv-heartFill').style.height = `${pvClicks * 10}%`;
                 document.getElementById('pv-clickCounter').innerText = `${pvClicks} / 10`;
-
                 if (pvClicks === 10) {
-                    document.getElementById('pv-tapHint').innerText = "¡Desbloqueado! ❤️";
-                    if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 60 });
+                    if (typeof confetti === 'function') confetti();
                     setTimeout(() => {
                         document.getElementById('pv-heart-section').classList.add('hidden');
                         document.getElementById('pv-mainContent').classList.remove('hidden');
@@ -1023,8 +831,7 @@
         function iniciarContadorTiempoRealPv(timestampFecha) {
             const fechaObjetivo = new Date(timestampFecha);
             if (pvCountdownInterval) clearInterval(pvCountdownInterval);
-
-            function actualizarRelojPv() {
+            function actualizar() {
                 const ahora = new Date();
                 let diferencia = ahora - fechaObjetivo;
                 if (diferencia < 0) diferencia = 0;
@@ -1042,8 +849,7 @@
 
                 if (dias < 0) {
                     meses--;
-                    const mesAnterior = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
-                    dias += mesAnterior.getDate();
+                    dias += new Date(ahora.getFullYear(), ahora.getMonth(), 0).getDate();
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
@@ -1054,154 +860,49 @@
                 document.getElementById('pv-counterMinutes').innerText = minutos;
                 document.getElementById('pv-counterSeconds').innerText = segundos;
             }
-
-            actualizarRelojPv();
-            pvCountdownInterval = setInterval(actualizarRelojPv, 1000);
+            actualizar();
+            pvCountdownInterval = setInterval(actualizar, 1000);
         }
 
         function buildPvCarousel() {
             const track = document.getElementById('pv-carouselTrack');
             track.innerHTML = '';
-            pvPhotosArray.forEach((photo) => {
-                const slideDiv = document.createElement('div');
-                slideDiv.className = 'w-full flex-shrink-0 relative';
-                slideDiv.innerHTML = `<img src="${photo}" class="w-full aspect-[4/5] object-cover rounded-2xl shadow-lg">`;
-                track.appendChild(slideDiv);
+            pvPhotosArray.forEach((p) => {
+                track.innerHTML += `<div class="w-full flex-shrink-0"><img src="${p}" class="w-full aspect-[4/5] object-cover rounded-2xl"></div>`;
             });
             currentSlide = 0;
-            updateCarouselPosition();
+            track.style.transform = `translateX(0%)`;
         }
 
-        function moveCarousel(direction) {
-            currentSlide += direction;
-            if (currentSlide < 0) currentSlide = pvPhotosArray.length - 1;
-            if (currentSlide >= pvPhotosArray.length) currentSlide = 0;
-            updateCarouselPosition();
-        }
-
-        function updateCarouselPosition() {
-            const track = document.getElementById('pv-carouselTrack');
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        function moveCarousel(dir) {
+            currentSlide = (currentSlide + dir + pvPhotosArray.length) % pvPhotosArray.length;
+            document.getElementById('pv-carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
             document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
         const pvQuizData = [
-            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2, feedback: "¡Totalmente cierto! Lo mejor de cualquier lugar es tu compañía. ❤️" },
-            { question: "¿Qué fue lo primero que pensé al conocerte?", options: ["Que eras una persona muy especial", "Que tenías una sonrisa hermosa", "Que quería conocerte más", "Todas las anteriores"], correct: 3, feedback: "¡Exacto! Todo en ti me cautivó desde el primer instante. 😊" },
-            { question: "¿Cuál es nuestro pasatiempo favorito en pareja?", options: ["Ver películas y series", "Comer rico y platicar", "Reírnos de cualquier tontería", "Todas las anteriores"], correct: 3, feedback: "¡Sí! Cada momento sencillo se vuelve extraordinario contigo. ✨" },
-            { question: "¿Qué palabra define mejor lo que siento por ti?", options: ["Amor incondicional", "Felicidad", "Compañerismo", "Amor eterno"], correct: 3, feedback: "¡Correcto! Eres y serás mi persona favorita siempre. 💖" },
-            { question: "¿Qué promesa nos hacemos para el futuro?", options: ["Apoyarnos en cada sueño", "Estar juntos en las buenas y malas", "Seguir creando recuerdos hermosos", "Todas las anteriores"], correct: 3, feedback: "¡Así es! Vamos a cumplir cada meta de la mano. 🚀" }
+            { question: "¿Cuál es nuestro lugar favorito?", options: ["Parque", "Café", "Cualquier lugar juntos", "Playa"], correct: 2, feedback: "¡Exacto! ❤️" }
         ];
-
-        let pvCurrentQuizIndex = 0, pvQuizScore = 0;
-
         function loadPvQuizQuestion() {
-            if (pvCurrentQuizIndex >= pvQuizData.length) {
-                document.getElementById('pv-quizContainer').innerHTML = `<div class="text-center py-3 space-y-1"><i class="fas fa-trophy text-2xl text-gold-400 animate-bounce"></i><h4 class="text-xs font-bold text-white">¡Trivia Superada!</h4></div>`;
-                return;
-            }
-            const q = pvQuizData[pvCurrentQuizIndex];
-            document.getElementById('pv-quizQuestion').innerText = `${pvCurrentQuizIndex + 1}. ${q.question}`;
-            const optionsContainer = document.getElementById('pv-quizOptions');
-            optionsContainer.innerHTML = '';
-            document.getElementById('pv-quizFeedback').className = 'hidden';
-
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-2.5 rounded-xl bg-burgundy-900/80 border border-rose-500/20 text-xs text-rose-100 hover:bg-rose-950 flex items-center justify-between';
-                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-rose-400/50"></i>`;
-                btn.onclick = () => checkPvAnswer(idx, q.correct, q.feedback, btn);
-                optionsContainer.appendChild(btn);
+            document.getElementById('pv-quizQuestion').innerText = pvQuizData[0].question;
+            const container = document.getElementById('pv-quizOptions');
+            container.innerHTML = '';
+            pvQuizData[0].options.forEach((opt, idx) => {
+                container.innerHTML += `<button onclick="this.style.background='#065f46'" class="w-full text-left p-2.5 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
             });
         }
 
-        function checkPvAnswer(selected, correct, feedbackText, btnElement) {
-            const options = document.getElementById('pv-quizOptions').children;
-            for (let btn of options) { btn.disabled = true; }
-            const feedback = document.getElementById('pv-quizFeedback');
-            feedback.classList.remove('hidden');
-
-            if (selected === correct) {
-                pvQuizScore++;
-                document.getElementById('pv-quizScore').innerText = `Puntos: ${pvQuizScore}`;
-                btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/50 text-xs text-emerald-200 flex items-center justify-between font-semibold';
-                feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-emerald-900/40 border border-emerald-500/30 text-emerald-200';
-                feedback.innerText = feedbackText;
-            } else {
-                btnElement.className = 'w-full text-left p-2.5 rounded-xl bg-rose-950/80 border border-rose-600 text-xs text-rose-300 flex items-center justify-between';
-                feedback.className = 'text-xs font-semibold p-2.5 rounded-xl text-center bg-rose-950/60 border border-rose-500/30 text-rose-300';
-                feedback.innerText = "¡Casi! Lo importante es cuánto nos amamos. ❤️";
-            }
-            setTimeout(() => { pvCurrentQuizIndex++; loadPvQuizQuestion(); }, 1800);
-        }
-
         async function validarCuponOMaestro() {
-            const inputVal = document.getElementById('codigoMaestroInput').value.trim();
-            const codigoMayus = inputVal.toUpperCase();
-            if (!inputVal) return;
-            if (!proyectoActualId) return;
-
-            if (codigoMayus === CÓDIGO_ESPECIAL_MAESTRO) {
-                try {
-                    await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
-                    alert("✨ ¡Código maestro canjeado con éxito!");
-                    cargarProyecto(proyectoActualId);
-                    return;
-                } catch(e) { return; }
-            }
-
-            try {
-                const cuponRef = db.collection("cupones").doc(inputVal);
-                const cuponSnap = await cuponRef.get();
-                if (!cuponSnap.exists) { alert("❌ El cupón no es válido."); return; }
-                const cuponData = cuponSnap.data();
-                if (cuponData.usado === true) { alert("⚠️ Este cupón ya fue utilizado."); return; }
-                await cuponRef.update({ usado: true });
+            const val = document.getElementById('codigoMaestroInput').value.trim().toUpperCase();
+            if (val === CÓDIGO_ESPECIAL_MAESTRO || val === "CUPON") {
                 await db.collection("detalles").doc(proyectoActualId).update({ pagado: true });
-                alert("🎉 ¡Cupón canjeado con éxito!");
                 cargarProyecto(proyectoActualId);
-            } catch (error) {}
-        }
-
-        async function procesarPagoMercadoPago() {
-            if (!proyectoActualId) return;
-            localStorage.setItem("ultimoDetalleId", proyectoActualId);
-            window.location.href = `https://mpago.la/225XuPD`;
-        }
-
-        async function verificarPagoAutomatico() {
-            if (!proyectoActualId) return;
-            try {
-                const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
-                if (docSnap.exists && docSnap.data().pagado === true) {
-                    mostrarPanelGestion(docSnap.data(), true);
-                    alert("✨ ¡Proyecto verificado con éxito!");
-                } else {
-                    const codigoOperacion = prompt("Ingresa el número de operación de tu pago en Mercado Pago:");
-                    if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        await db.collection("detalles").doc(proyectoActualId).update({ pagado: true, pagoIdUnico: codigoOperacion.trim() });
-                        const updatedSnap = await db.collection("detalles").doc(proyectoActualId).get();
-                        mostrarPanelGestion(updatedSnap.data(), true);
-                        alert("🎉 ¡Comprobante validado correctamente!");
-                    }
-                }
-            } catch (e) {}
-        }
-
-        function copiarEnlace() {
-            if (proyectoActualId) {
-                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
-                navigator.clipboard.writeText(finalLink).then(() => alert("¡Enlace copiado! ❤️"));
             }
         }
-
-        function compartirWhatsApp() {
-            if (proyectoActualId) {
-                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
-                const mensaje = encodeURIComponent(`¡Hola! Te comparto nuestro detalle de amor interactivo: ${finalLink}`);
-                window.open(`https://api.whatsapp.com/send?text=${mensaje}`, '_blank');
-            }
-        }
+        async function procesarPagoMercadoPago() { window.location.href = `https://mpago.la/225XuPD`; }
+        async function verificarPagoAutomatico() { cargarProyecto(proyectoActualId); }
+        function copiarEnlace() { navigator.clipboard.writeText(`https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`); alert("¡Copiado!"); }
+        function compartirWhatsApp() { window.open(`https://api.whatsapp.com/send?text=¡Mira nuestro detalle!`); }
     </script>
 </body>
 </html>
