@@ -42,17 +42,17 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
 
-        /* ESTILOS DE IMPRESIÓN: Postal alineada a la esquina superior izquierda */
+        /* ESTILOS DE IMPRESIÓN OPTIMIZADOS */
         @media print {
             body * { visibility: hidden; }
             #printablePostal, #printablePostal * { visibility: visible; }
             #printablePostal {
-                position: absolute;
+                position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
                 transform: none !important;
-                width: 45% !important;
-                max-width: 320px !important;
+                width: 85% !important;
+                max-width: 450px !important;
                 box-shadow: none !important;
                 border: none !important;
                 background: white !important;
@@ -133,6 +133,36 @@
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">NOMBRE DEL PROYECTO (Para identificarlo):</label>
                 <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+            </div>
+
+            <!-- LÍNEA HORIZONTAL Y OPCIÓN DE CONTRASEÑA -->
+            <hr class="border-rose-500/20 my-3">
+            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
+                <label class="text-xs font-semibold text-rose-200 block">🔒 ¿Proteger detalle con contraseña?</label>
+                <div class="flex items-center gap-6 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
+                        <input type="radio" name="protegerOpcion" value="si" onclick="togglePasswordOptions(true)" class="accent-rose-500"> Sí
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
+                        <input type="radio" name="protegerOpcion" value="no" checked onclick="togglePasswordOptions(false)" class="accent-rose-500"> No
+                    </label>
+                </div>
+                <!-- DESCRIPCIÓN DINÁMICA SEGÚN LA SELECCIÓN -->
+                <p id="descripcionOpcion" class="text-[11px] text-rose-300/80 italic pt-1">
+                    🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.
+                </p>
+
+                <!-- CAMPOS DE CONTRASEÑA Y PISTA (OCULTOS POR DEFECTO) -->
+                <div id="passwordFieldsContainer" class="hidden space-y-3 pt-3 border-t border-rose-500/20">
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-semibold text-rose-200">Contraseña:</label>
+                        <input type="password" id="detallePassword" placeholder="Ingresa contraseña secreta" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-semibold text-rose-200">Pista (en caso de olvido):</label>
+                        <input type="text" id="detallePista" placeholder="Ej. Fecha de nuestro aniversario" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                    </div>
+                </div>
             </div>
 
             <div class="space-y-1">
@@ -227,10 +257,10 @@
         <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
             <h3 class="text-sm font-bold text-rose-200 no-print">¡Tu detalle ya está listo! 🎉</h3>
             
-            <!-- POSTAL CON QR AJUSTADO: MÁS ARRIBA (TOP 5%) Y MÁS A LA IZQUIERDA (RIGHT 10.5%) -->
+            <!-- POSTAL CON QR AJUSTADO -->
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
-                <!-- QR AJUSTADO: TOP 5% Y RIGHT 10.5% -->
+                <!-- QR POSICIONADO EXACTAMENTE EN EL CENTRO DEL CUADRO BLANCO -->
                 <div class="absolute inset-0 flex items-center justify-end pointer-events-none" style="top: 5%; right: 10.5%;">
                     <div class="bg-white p-1 rounded shadow pointer-events-auto">
                         <div id="qrcode"></div>
@@ -409,6 +439,20 @@
             } 
         });
 
+        function togglePasswordOptions(esSi) {
+            const container = document.getElementById('passwordFieldsContainer');
+            const desc = document.getElementById('descripcionOpcion');
+            if (esSi) {
+                container.classList.remove('hidden');
+                desc.innerText = "🔒 Ahora tu QR está protegido. Al escanear, pedirá una contraseña para poder ver el contenido.";
+            } else {
+                container.classList.add('hidden');
+                desc.innerText = "🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.";
+                document.getElementById('detallePassword').value = '';
+                document.getElementById('detallePista').value = '';
+            }
+        }
+
         function obtenerProyectosLocales() {
             try { return JSON.parse(localStorage.getItem("misProyectosAmor") || "[]"); } catch(e) { return []; }
         }
@@ -453,6 +497,7 @@
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('createForm').reset();
+            togglePasswordOptions(false);
             document.getElementById('formTitleText').innerText = "Nuevo Proyecto";
             recordedAudioBase64 = null;
             proyectoActualId = null;
@@ -474,6 +519,16 @@
                     document.getElementById('fechaInput').value = data.fecha || '';
                     document.getElementById('mensajeInput').value = data.mensaje || '';
                     
+                    if (data.password) {
+                        document.querySelector('input[name="protegerOpcion"][value="si"]').checked = true;
+                        togglePasswordOptions(true);
+                        document.getElementById('detallePassword').value = data.password;
+                        document.getElementById('detallePista').value = data.pista || '';
+                    } else {
+                        document.querySelector('input[name="protegerOpcion"][value="no"]').checked = true;
+                        togglePasswordOptions(false);
+                    }
+
                     if (data.voiceNoteBase64) {
                         recordedAudioBase64 = data.voiceNoteBase64;
                         document.getElementById('audioPreview').src = recordedAudioBase64;
@@ -517,7 +572,6 @@
             }
         }
 
-        // FUNCIÓN SEGURA PARA COMPRIMIR Y REDIMENSIONAR FOTOS EN EL NAVEGADOR
         async function comprimirImagen(file) {
             return new Promise((resolve) => {
                 if (!file || !file.type.startsWith('image/')) {
@@ -572,19 +626,15 @@
                             }, 'image/jpeg', 0.8);
 
                         } catch (e) {
-                            console.warn("Fallo menor en compresión, usando archivo original:", e);
                             resolve(file);
                         }
                     };
-
                     img.onerror = () => { resolve(file); };
                 };
-
                 reader.onerror = () => { resolve(file); };
             });
         }
 
-        // SUBIR FOTO A SUPABASE STORAGE
         async function subirFotoSupabase(file) {
             try {
                 const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
@@ -594,29 +644,16 @@
 
                 const { data, error } = await supabaseClient.storage
                     .from('detalles-fotos')
-                    .upload(filePath, file, {
-                        cacheControl: '3600',
-                        upsert: false
-                    });
+                    .upload(filePath, file, { cacheControl: '3600', upsert: false });
 
-                if (error) {
-                    console.error("Error al subir a Supabase:", error);
-                    alert("Error de Supabase: " + error.message);
-                    return null;
-                }
+                if (error) return null;
 
                 const { data: publicData } = supabaseClient.storage
                     .from('detalles-fotos')
                     .getPublicUrl(filePath);
 
-                if (!publicData || !publicData.publicUrl) {
-                    console.error("No se pudo obtener la URL pública.");
-                    return null;
-                }
-
-                return publicData.publicUrl;
+                return publicData ? publicData.publicUrl : null;
             } catch (err) {
-                console.error("Excepción al subir foto:", err);
                 return null;
             }
         }
@@ -668,8 +705,7 @@
                     reader.readAsDataURL(audioBlob);
                     reader.onloadend = () => {
                         recordedAudioBase64 = reader.result;
-                        const preview = document.getElementById('audioPreview');
-                        preview.src = recordedAudioBase64;
+                        document.getElementById('audioPreview').src = recordedAudioBase64;
                         document.getElementById('audioPreviewContainer').classList.remove('hidden');
                     };
                     recordBtn.className = "px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
@@ -694,9 +730,7 @@
                     if (timeLeft <= 0) detenerGrabacion();
                 }, 1000);
 
-            } catch (e) {
-                console.warn("Acceso a micrófono no otorgado.");
-            }
+            } catch (e) {}
         }
 
         function detenerGrabacion() {
@@ -726,9 +760,7 @@
                         document.getElementById('statusText').innerText = `Subiendo foto ${i + 1} de ${maxFotos} a Supabase...`;
                         const publicUrl = await subirFotoSupabase(fotoOptimizada);
                         
-                        if (publicUrl) {
-                            urlsFotos.push(publicUrl);
-                        }
+                        if (publicUrl) urlsFotos.push(publicUrl);
                     }
                 }
 
@@ -738,6 +770,17 @@
                 const nombres = document.getElementById('nombresInput').value.trim();
                 const fecha = document.getElementById('fechaInput').value.trim();
                 const mensaje = document.getElementById('mensajeInput').value.trim();
+                
+                const protegerSeleccionado = document.querySelector('input[name="protegerOpcion"]:checked').value === 'si';
+                const passwordVal = protegerSeleccionado ? document.getElementById('detallePassword').value.trim() : null;
+                const pistaVal = protegerSeleccionado ? document.getElementById('detallePista').value.trim() : null;
+
+                if (protegerSeleccionado && !passwordVal) {
+                    alert("⚠️ Por favor ingresa una contraseña para proteger el detalle.");
+                    document.getElementById('statusBox').classList.add('hidden');
+                    document.getElementById('createForm').classList.remove('hidden');
+                    return;
+                }
 
                 let docRef;
                 const datosAEnviar = {
@@ -746,13 +789,13 @@
                     fecha: fecha,
                     mensaje: mensaje,
                     voiceNoteBase64: recordedAudioBase64 || null,
+                    password: passwordVal,
+                    pista: pistaVal,
                     pagado: false,
                     creado: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                if (urlsFotos.length > 0) {
-                    datosAEnviar.fotos = urlsFotos;
-                }
+                if (urlsFotos.length > 0) datosAEnviar.fotos = urlsFotos;
 
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
@@ -790,7 +833,6 @@
                 mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
 
             } catch (error) {
-                console.error("Error al guardar:", error);
                 alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
@@ -1041,7 +1083,6 @@
                 cargarProyecto(proyectoActualId);
 
             } catch (error) {
-                console.error("Error al validar cupón:", error);
                 alert("Hubo un error al verificar el cupón. Inténtalo de nuevo.");
             }
         }
@@ -1089,7 +1130,6 @@
                     }
                 }
             } catch (e) {
-                console.error(e);
                 alert("Error al verificar el estado del pago.");
             }
         }
