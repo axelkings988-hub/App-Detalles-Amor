@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE BLOQUEO POR CONTRASEÑA (OCULTA POR DEFECTO) -->
+    <!-- PANTALLA DE BLOQUEO POR CONTRASEÑA -->
     <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-4">
             <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center mx-auto border border-rose-500/30">
@@ -184,7 +184,7 @@
             </div>
         </section>
 
-        <!-- MENSAJE DE VOZ (DESPUÉS DE LA TRIVIA) -->
+        <!-- MENSAJE DE VOZ -->
         <section id="voiceNoteSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-microphone-alt text-rose-400"></i> Mensaje de Voz Especial
@@ -236,14 +236,11 @@
                     detalleDataGlobal = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
 
-                    // Verificar si el detalle tiene contraseña configurada
                     if (detalleDataGlobal.password && detalleDataGlobal.password.trim() !== "") {
                         document.getElementById('passwordScreen').classList.remove('hidden');
                     } else {
-                        // Si no tiene contraseña, pasa directo a la experiencia
                         iniciarExperienciaDetalle();
                     }
-
                 } else {
                     showError("La tarjeta no existe o fue eliminada de la base de datos.");
                 }
@@ -375,8 +372,16 @@
             track.innerHTML = '';
             dotsContainer.innerHTML = '';
 
-            // SI EL PROYECTO NO TIENE FOTOS REGISTRADAS O ESTÁ VACÍO
-            if (!photosArray || photosArray.length === 0) {
+            let rawFotos = detalleDataGlobal.fotos;
+            if (rawFotos && !Array.isArray(rawFotos) && typeof rawFotos === 'object') {
+                photosArray = Object.values(rawFotos);
+            } else {
+                photosArray = Array.isArray(rawFotos) ? rawFotos : [];
+            }
+
+            totalSlides = photosArray.length;
+
+            if (totalSlides === 0) {
                 track.innerHTML = `
                     <div class="w-full flex-shrink-0 p-6 text-center bg-burgundy-950 rounded-2xl border border-rose-500/30 space-y-2">
                         <i class="fas fa-image text-rose-400 text-2xl"></i>
@@ -393,19 +398,17 @@
                 slideDiv.className = 'w-full flex-shrink-0 relative';
                 slideDiv.innerHTML = `
                     <div class="aspect-[4/5] w-full rounded-2xl overflow-hidden bg-burgundy-950 relative flex items-center justify-center">
-                        <!-- Manejo de error automático (onerror) si Supabase falla o el enlace rota -->
                         <img src="${photo}" alt="Foto ${idx+1}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         
-                        <!-- Aviso estético oculto por defecto que se muestra si la imagen falla -->
                         <div class="absolute inset-0 bg-burgundy-950/95 flex-col items-center justify-center p-4 text-center space-y-2" style="display: none;">
                             <i class="fas fa-triangle-exclamation text-amber-400 text-2xl"></i>
                             <p class="text-xs font-bold text-rose-200">⚠️ Servidor en mantenimiento</p>
-                            <p class="text-[11px] text-rose-300/80">El servidor de almacenamiento (Supabase) está presentando intermitencias. Las fotos volverán a verse pronto.</p>
+                            <p class="text-[11px] text-rose-300/80">El servidor de almacenamiento (Supabase) está presentando intermitencias.</p>
                         </div>
 
                         <div class="absolute inset-0 bg-gradient-to-t from-burgundy-950 via-transparent to-transparent opacity-80 pointer-events-none"></div>
                         <div class="absolute bottom-0 inset-x-0 p-4 pointer-events-none">
-                            <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">Recuerdo ${idx + 1} de ${photosArray.length}</span>
+                            <span class="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/30 px-2 py-0.5 rounded-full font-mono">Recuerdo ${idx + 1} de ${totalSlides}</span>
                         </div>
                     </div>
                 `;
@@ -415,7 +418,8 @@
                 dot.className = idx === 0 ? 'w-2 h-2 rounded-full bg-rose-500 flex-shrink-0' : 'w-2 h-2 rounded-full bg-rose-950 border border-rose-500/40 flex-shrink-0';
                 dotsContainer.appendChild(dot);
             });
-            totalSlides = photosArray.length;
+
+            currentSlide = 0;
             updateCarousel();
         }
 
