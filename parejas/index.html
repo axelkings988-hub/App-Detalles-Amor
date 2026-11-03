@@ -12,10 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script src="https://sdk.mercadopago.com/js/v2"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -173,7 +171,7 @@
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">3. FOTOS PARA EL CARRUSEL (MÁXIMO 5):</label>
                 <input type="file" id="photosInput" accept="image/*" multiple onchange="validarCantidadFotos(this)" class="w-full text-xs text-rose-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700 cursor-pointer bg-burgundy-950/80 rounded-xl border border-rose-500/30">
-                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes (se optimizarán automáticamente).</p>
+                <p id="storageMeter" class="text-[10px] text-rose-300/80 font-semibold italic pt-1">📸 Elige hasta 5 imágenes (se optimización automáticamente).</p>
             </div>
 
             <div class="space-y-1">
@@ -184,13 +182,13 @@
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
                 <div class="flex items-center justify-center gap-3 pt-1">
-                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2">
+                    <button type="button" id="recordBtn" onclick="toggleRecording()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2 transition-all">
                         <i id="recordIcon" class="fas fa-microphone"></i> <span id="recordText">Iniciar Grabación</span>
                     </button>
                     <span id="timerLabel" class="text-xs font-mono text-rose-300 hidden">00:10</span>
                 </div>
                 <div id="audioPreviewContainer" class="hidden pt-2">
-                    <audio id="audioPreview" controls class="w-full h-8 mt-1"></audio>
+                    <audio id="audioPreview" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
                 </div>
             </div>
 
@@ -201,7 +199,7 @@
 
         <div id="statusBox" class="hidden text-center py-4 space-y-4">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
-            <p id="statusText" class="text-xs text-rose-300">Optimizando y subiendo fotos a Supabase...</p>
+            <p id="statusText" class="text-xs text-rose-300">Optimizando y subiendo datos...</p>
         </div>
     </div>
 
@@ -279,7 +277,7 @@
         </div>
     </div>
 
-    <!-- SECCIÓN 4: VISTA PREVIA EN PANTALLA COMPLETA -->
+    <!-- SECCIÓN VISTA PREVIA -->
     <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-burgundy-950/95 backdrop-blur-2xl overflow-y-auto px-4 py-16 space-y-6">
         <div class="w-full max-w-lg mx-auto space-y-6">
             <div class="flex items-center justify-between">
@@ -372,7 +370,6 @@
                     <div id="pv-quizContainer" class="bg-burgundy-950/60 p-4 rounded-2xl border border-rose-500/10 space-y-3">
                         <p id="pv-quizQuestion" class="text-xs font-semibold text-rose-100">Cargando pregunta...</p>
                         <div id="pv-quizOptions" class="space-y-2"></div>
-                        <div id="pv-quizFeedback" class="hidden text-xs font-semibold p-2.5 rounded-xl text-center"></div>
                     </div>
                 </section>
 
@@ -381,36 +378,35 @@
                     <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
                 </section>
 
-                <!-- NUEVO DISEÑO ESTÉTICO DEL CONTADOR (COMO EN LA IMAGEN) -->
                 <section id="pv-loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 text-center shadow-2xl space-y-4">
                     <h3 class="text-sm font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
                         <i class="far fa-clock text-rose-400"></i> Tiempo Juntos <span class="text-rose-400">♥</span>
                     </h3>
                     
                     <div class="grid grid-cols-6 gap-1.5 pt-1">
-                        <div id="pv-boxAnos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                        <div id="pv-boxAnos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 flex flex-col items-center justify-center">
                             <span id="pv-counterYears" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
-                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">AÑOS</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase mt-1">AÑOS</span>
                         </div>
-                        <div id="pv-boxMeses" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                        <div id="pv-boxMeses" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 flex flex-col items-center justify-center">
                             <span id="pv-counterMonths" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
-                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">MESES</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase mt-1">MESES</span>
                         </div>
-                        <div id="pv-boxDias" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                        <div id="pv-boxDias" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 flex flex-col items-center justify-center">
                             <span id="pv-counterDays" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
-                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">DÍAS</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase mt-1">DÍAS</span>
                         </div>
-                        <div id="pv-boxHoras" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                        <div id="pv-boxHoras" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 flex flex-col items-center justify-center">
                             <span id="pv-counterHours" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
-                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">HORAS</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase mt-1">HORAS</span>
                         </div>
-                        <div id="pv-boxMinutos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                        <div id="pv-boxMinutos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 flex flex-col items-center justify-center">
                             <span id="pv-counterMinutes" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
-                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">MINUTOS</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase mt-1">MINUTOS</span>
                         </div>
-                        <div id="pv-boxSegundos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 shadow-inner flex flex-col items-center justify-center">
+                        <div id="pv-boxSegundos" class="bg-burgundy-950/90 py-2.5 px-1 rounded-xl border border-rose-500/30 flex flex-col items-center justify-center">
                             <span id="pv-counterSeconds" class="text-sm font-bold text-rose-100 block leading-tight">0</span>
-                            <span class="text-[8px] font-bold text-rose-300/80 uppercase tracking-tighter mt-1">SEGUNDOS</span>
+                            <span class="text-[8px] font-bold text-rose-300/80 uppercase mt-1">SEGUNDOS</span>
                         </div>
                     </div>
 
@@ -429,8 +425,7 @@
             projectId: "appdetallesamor",
             storageBucket: "appdetallesamor.firebasestorage.app",
             messagingSenderId: "917968456649",
-            appId: "1:917968456649:web:32261e841942825685b618",
-            measurementId: "G-ZTGDLNQXSF"
+            appId: "1:917968456649:web:32261e841942825685b618"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -440,15 +435,8 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let recordedAudioBase64 = null;
-        let countdownInterval = null;
-        let audioStream = null;
-        let proyectoActualId = null;
-        let proyectoDatosCache = null;
-        let esPrivadoActivo = false;
-        let pvCountdownInterval = null;
+        let mediaRecorder = null, audioChunks = [], recordedAudioBase64 = null, recordingTimer = null;
+        let audioStream = null, proyectoActualId = null, proyectoDatosCache = null, esPrivadoActivo = false, pvCountdownInterval = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
@@ -471,27 +459,128 @@
             } 
         });
 
-        function togglePrivacidad(estado) {
-            esPrivadoActivo = estado;
-            const btnNo = document.getElementById('btnPrivadoNo');
-            const btnSi = document.getElementById('btnPrivadoSi');
-            const camposPrivacidad = document.getElementById('camposPrivacidadContainer');
-
-            if (estado) {
-                btnSi.className = "py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow transition-all";
-                btnNo.className = "py-2 bg-burgundy-900 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition-all";
-                camposPrivacidad.classList.remove('hidden');
-            } else {
-                btnNo.className = "py-2 bg-rose-600 text-white text-xs font-bold rounded-xl shadow transition-all";
-                btnSi.className = "py-2 bg-burgundy-900 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl shadow transition-all";
-                camposPrivacidad.classList.add('hidden');
+        // GRABACIÓN DE VOZ (Temporizador de 10s y botón detener funcional)
+        async function toggleRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                detenerGrabacion();
+                return;
             }
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(audioStream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        document.getElementById('audioPreview').src = recordedAudioBase64;
+                        document.getElementById('audioPreviewContainer').classList.remove('hidden');
+                    };
+                };
+                mediaRecorder.start();
+
+                const recordBtn = document.getElementById('recordBtn');
+                const recordText = document.getElementById('recordText');
+                const recordIcon = document.getElementById('recordIcon');
+                const timerLabel = document.getElementById('timerLabel');
+
+                recordBtn.className = "px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
+                recordText.innerText = "Detener Grabación";
+                recordIcon.className = "fas fa-stop-circle";
+                timerLabel.classList.remove('hidden');
+                
+                let timeLeft = 10;
+                timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                
+                if (recordingTimer) clearInterval(recordingTimer);
+                recordingTimer = setInterval(() => {
+                    timeLeft--;
+                    timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                    if (timeLeft <= 0) detenerGrabacion();
+                }, 1000);
+            } catch (e) { alert("⚠️ No se pudo acceder al micrófono."); }
         }
 
-        function toggleContadorFecha(checkbox) {
-            const container = document.getElementById('fechaEspecificaContainer');
-            if (checkbox.checked) container.classList.remove('hidden');
-            else container.classList.add('hidden');
+        function detenerGrabacion() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+                if (audioStream) audioStream.getTracks().forEach(track => track.stop());
+            }
+            if (recordingTimer) clearInterval(recordingTimer);
+
+            const recordBtn = document.getElementById('recordBtn');
+            const recordText = document.getElementById('recordText');
+            const recordIcon = document.getElementById('recordIcon');
+            const timerLabel = document.getElementById('timerLabel');
+
+            if (recordBtn) {
+                recordBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow flex items-center gap-2";
+                recordText.innerText = "Iniciar Grabación";
+                recordIcon.className = "fas fa-microphone";
+            }
+            if (timerLabel) timerLabel.classList.add('hidden');
+        }
+
+        // TRIVIA DE PAREJA (5 Preguntas completas)
+        const quizData = [
+            { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2 },
+            { question: "¿Cuál fue nuestra primera impresión mutua?", options: ["Nervios pero mucha química", "Risas desde el primer momento", "Timidez al principio", "Conexión instantánea"], correct: 0 },
+            { question: "¿Cuál es tu recuerdo favorito de nosotros?", options: ["Nuestro primer viaje", "Una tarde lluviosa juntos", "Cualquier momento ordinario a tu lado", "Nuestras pláticas hasta tarde"], correct: 2 },
+            { question: "¿Qué es lo que más te hace sonreír de mí?", options: ["Mis ocurrencias y chistes", "Cómo te cuido y te apoyo", "Mis gestos y miradas", "Todo en general"], correct: 1 },
+            { question: "¿Cuál es nuestra meta más grande a futuro?", options: ["Viajar por todo el mundo", "Construir nuestro propio hogar", "Crecer juntos profesionalmente", "Estar siempre el uno para el otro"], correct: 3 }
+        ];
+        let currentQuizIndex = 0, quizScore = 0;
+
+        function loadPvQuizQuestion() {
+            if (currentQuizIndex >= quizData.length) currentQuizIndex = 0;
+            const q = quizData[currentQuizIndex];
+            const qEl = document.getElementById('pv-quizQuestion');
+            const optsEl = document.getElementById('pv-quizOptions');
+            if (!qEl || !optsEl) return;
+
+            qEl.innerText = `${currentQuizIndex + 1}. ${q.question}`;
+            optsEl.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-2.5 rounded-xl bg-burgundy-900 hover:bg-burgundy-800 text-xs text-rose-100 border border-rose-500/20 transition-colors";
+                btn.innerText = opt;
+                btn.onclick = () => verificarRespuestaPv(idx, q.correct);
+                optsEl.appendChild(btn);
+            });
+        }
+
+        function verificarRespuestaPv(sel, cor) {
+            const optsEl = document.getElementById('pv-quizOptions');
+            const buttons = optsEl.getElementsByTagName('button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === cor) buttons[i].style.background = '#065f46';
+                else if (i === sel) buttons[i].style.background = '#991b1b';
+            }
+            if (sel === cor) {
+                quizScore += 20;
+                document.getElementById('pv-quizScore').innerText = `Puntos: ${quizScore}`;
+            }
+            setTimeout(() => {
+                currentQuizIndex++;
+                if (currentQuizIndex < quizData.length) {
+                    loadPvQuizQuestion();
+                } else {
+                    optsEl.innerHTML = `<p class="text-xs text-rose-200 text-center font-bold py-2">🎉 ¡Terminaste con ${quizScore} puntos!</p>`;
+                }
+            }, 1500);
+        }
+
+        function togglePrivacidad(estado) {
+            esPrivadoActivo = estado;
+            document.getElementById('camposPrivacidadContainer').classList.toggle('hidden', !estado);
+        }
+
+        function toggleContadorFecha(cb) {
+            document.getElementById('fechaEspecificaContainer').classList.toggle('hidden', !cb.checked);
         }
 
         function obtenerProyectosLocales() {
@@ -564,7 +653,7 @@
                     document.getElementById('fechaInput').value = proyectoDatosCache.fecha || '';
                     document.getElementById('mensajeInput').value = proyectoDatosCache.mensaje || '';
                     
-                    if (proyectoDatosCache.privado === true) {
+                    if (proyectoDatosCache.privado) {
                         togglePrivacidad(true);
                         document.getElementById('passwordInput').value = proyectoDatosCache.password || '';
                         document.getElementById('pistaInput').value = proyectoDatosCache.pista || '';
@@ -652,8 +741,7 @@
 
         const pvBgMusic = document.getElementById('pv-bgMusic');
         const pvPlayIcon = document.getElementById('pv-playIcon');
-        const pvMusicStatus = document.getElementById('pv-musicStatus');
-        let isPvMusicPlaying = false, musicAutoStarted = false;
+        let isPvMusicPlaying = false;
 
         function togglePvAudio() {
             if (isPvMusicPlaying) { pvBgMusic.pause(); pvPlayIcon.className = 'fas fa-play text-xs ml-0.5'; }
@@ -661,28 +749,6 @@
             isPvMusicPlaying = !isPvMusicPlaying;
         }
         function adjustPvVolume(val) { pvBgMusic.volume = val; }
-
-        async function toggleRecording() {
-            if (mediaRecorder && mediaRecorder.state === "recording") { detenerGrabacion(); return; }
-            try {
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(audioStream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.readAsDataURL(blob);
-                    reader.onloadend = () => {
-                        recordedAudioBase64 = reader.result;
-                        document.getElementById('audioPreview').src = recordedAudioBase64;
-                        document.getElementById('audioPreviewContainer').classList.remove('hidden');
-                    };
-                };
-                mediaRecorder.start();
-            } catch (e) {}
-        }
-        function detenerGrabacion() { if (mediaRecorder) mediaRecorder.stop(); }
 
         let pvPhotosArray = [], currentSlide = 0;
 
@@ -779,7 +845,7 @@
             document.getElementById('previewContainer').classList.remove('hidden');
             document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
 
-            if (proyectoDatosCache.privado === true && proyectoDatosCache.password) {
+            if (proyectoDatosCache.privado && proyectoDatosCache.password) {
                 document.getElementById('pv-passwordScreen').classList.remove('hidden');
                 document.getElementById('pv-heart-section').classList.add('hidden');
                 document.getElementById('pv-mainContent').classList.add('hidden');
@@ -827,9 +893,12 @@
                 document.getElementById('pv-voiceSection').classList.remove('hidden');
             } else { document.getElementById('pv-voiceSection').classList.add('hidden'); }
 
+            currentQuizIndex = 0;
+            quizScore = 0;
+            document.getElementById('pv-quizScore').innerText = `Puntos: 0`;
             loadPvQuizQuestion();
 
-            if (proyectoDatosCache.pagado === true) {
+            if (proyectoDatosCache.pagado) {
                 document.getElementById('pv-heart-section').classList.add('hidden');
                 document.getElementById('pv-mainContent').classList.remove('hidden');
             } else {
@@ -880,7 +949,7 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
-                // REGLA ESTÉTICA: Ocultar tarjetas si son 0 (excepto minutos y segundos)
+                // REGLA ESTÉTICA: Ocultar bloques en 0 excepto minutos y segundos
                 document.getElementById('pv-boxAnos').style.display = anos > 0 ? 'flex' : 'none';
                 document.getElementById('pv-boxMeses').style.display = meses > 0 ? 'flex' : 'none';
                 document.getElementById('pv-boxDias').style.display = dias > 0 ? 'flex' : 'none';
@@ -911,16 +980,6 @@
             currentSlide = (currentSlide + dir + pvPhotosArray.length) % pvPhotosArray.length;
             document.getElementById('pv-carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
             document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
-        }
-
-        const pvQuizData = [{ question: "¿Cuál es nuestro lugar favorito?", options: ["Parque", "Café", "Cualquier lugar juntos", "Playa"], correct: 2 }];
-        function loadPvQuizQuestion() {
-            document.getElementById('pv-quizQuestion').innerText = pvQuizData[0].question;
-            const container = document.getElementById('pv-quizOptions');
-            container.innerHTML = '';
-            pvQuizData[0].options.forEach((opt) => {
-                container.innerHTML += `<button class="w-full text-left p-2.5 rounded-xl bg-burgundy-900 text-xs text-rose-100">${opt}</button>`;
-            });
         }
 
         async function validarCuponOMaestro() {
