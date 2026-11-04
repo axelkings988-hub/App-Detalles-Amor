@@ -7,7 +7,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Orbitron:wght@900&display=swap" rel="stylesheet">
+    <!-- Importación de tipografías: Plus Jakarta Sans, Orbitron y Fredoka -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Orbitron:wght@900&family=Fredoka:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <!-- Firebase SDKs -->
@@ -44,6 +45,15 @@
             100% { filter: drop-shadow(0 0 12px rgba(255,174,0,1)) drop-shadow(0 0 25px rgba(0,102,255,0.9)); }
         }
 
+        /* Estilo de Nombre Destacado con Fredoka y Neón Dorado */
+        .nombre-destacado {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.9), 0 0 20px rgba(245, 158, 11, 0.7);
+        }
+
         /* Animación de rotación para el candado */
         @keyframes girarCandado {
             0% { transform: rotate(0deg) scale(1); }
@@ -58,7 +68,7 @@
             transition: background 0.8s ease-in-out;
         }
 
-        /* Fondo para la Edición Romántica con filtro tenue para MÁXIMO BRILLO del GIF */
+        /* Fondo para la Edición Romántica con filtro tenue para máximo brillo del GIF */
         .bg-pareja-revelado {
             background-image: linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.20)), url('./gif-besos-de-amor.gif') !important;
             background-size: cover !important;
@@ -88,14 +98,18 @@
 </head>
 <body id="bodyBg" class="p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
 
-    <!-- CONTENEDOR PRINCIPAL: Borde exterior removido y fondo transparente para máxima integración -->
+    <!-- CONTENEDOR PRINCIPAL -->
     <div id="mainContainer" class="w-full max-w-md p-2 text-center space-y-4 relative overflow-hidden">
         
-        <!-- CABECERA: PARA / DE (CONSERVADO) -->
+        <!-- CABECERA: APLICACIÓN DE FUEDE FREDOKA Y ESTILO NEÓN EN NOMBRES -->
         <div class="space-y-1">
             <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md">Sorpresa Protegida</span>
-            <h2 class="text-sm font-semibold opacity-100 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">Para: <span id="txtPara" class="font-extrabold text-amber-200">...</span></h2>
-            <p class="text-xs text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">De parte de: <span id="txtDe" class="font-bold text-white">...</span></p>
+            <div class="text-sm font-semibold opacity-100 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] pt-1">
+                Para: <span id="txtPara" class="nombre-destacado">...</span>
+            </div>
+            <div class="text-xs text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                De parte de: <span id="txtDe" class="nombre-destacado text-lg">...</span>
+            </div>
         </div>
 
         <!-- CANDADO DE PROTECCIÓN ANIMADO -->
@@ -128,7 +142,7 @@
             <p class="text-[10px] italic text-amber-200/90 drop-shadow">🔒 Protegido con candado hasta finalizar el tiempo.</p>
         </div>
 
-        <!-- MODO REVELADO: Ocupa el tamaño de la foto limpia sin cuadros anidados -->
+        <!-- MODO REVELADO -->
         <div id="revealedBox" class="hidden w-full">
             <div id="contenidoSorpresaContainer" class="w-full text-center relative overflow-hidden">
                 <!-- Se inyecta la sorpresa elegida -->
@@ -160,7 +174,6 @@
 
         let datosGlobales = {};
 
-        // GIFS DE FUEGOS ARTIFICIALES
         const fondosFuegosArtificiales = {
             familiar: "https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif",
             cumpleaños: "https://media.giphy.com/media/3o7tT127O8vXzE2F6U/giphy.gif"
@@ -226,11 +239,9 @@
             document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
-            // Muestra letrero LED Gigante
             document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
-            // Aplicar fondo resplandeciente para Estilo Pareja o Fuegos Artificiales para otros
             const body = document.getElementById('bodyBg');
             if(data.estilo === 'pareja') {
                 body.className = "p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-pareja-revelado";
@@ -248,7 +259,6 @@
                         <audio controls class="w-full shadow-lg rounded-xl"><source src="${data.contenidoSorpresa}" type="audio/mp3">Tu navegador no soporta audio.</audio>
                     </div>`;
             } else if(data.tipoSorpresa === 'foto') {
-                // Foto limpia sin marcos múltiples ni cuadros negros anidados
                 container.innerHTML = `
                     <div class="w-full">
                         <p class="text-xs mb-2 font-extrabold text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">🖼️ Foto Secreta Revelada</p>
@@ -279,7 +289,6 @@
             if(typeof confetti === 'function') confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
         }
 
-        /* LÓGICA DEL LIENZO INTERACTIVO RASCA Y GANA */
         function initScratchCard() {
             const canvas = document.getElementById('scratchCanvas');
             if(!canvas) return;
