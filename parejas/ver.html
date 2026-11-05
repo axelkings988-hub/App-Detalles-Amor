@@ -43,6 +43,7 @@
         </div>
     </div>
 
+    <!-- PANTALLA DE ACCESO PROTEGIDO Y PISTA DE AYUDA -->
     <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-30">
         <div class="w-full max-w-sm bg-burgundy-900/85 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
             <div class="w-14 h-14 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/40">
@@ -356,7 +357,6 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
-                // REGLA ESTÉTICA: Ocultar bloques en 0 excepto minutos y segundos
                 document.getElementById('boxAnos').style.display = anos > 0 ? 'flex' : 'none';
                 document.getElementById('boxMeses').style.display = meses > 0 ? 'flex' : 'none';
                 document.getElementById('boxDias').style.display = dias > 0 ? 'flex' : 'none';
