@@ -22,6 +22,12 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            /* Permite el desplazamiento natural de la página sin trabarse */
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         /* Efectos Glow Neón para las Tarjetas */
@@ -68,22 +74,29 @@
         .card-transition {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        /* Margen superior forzado en CSS para garantizar que baje exactamente lo requerido */
+        .contenedor-tarjetas {
+            margin-top: 38vh; /* Empuja los cuadros hacia abajo basados en la pantalla */
+            width: 100%;
+            max-width: 24rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-between h-screen text-white relative overflow-hidden">
+<body>
 
-    <!-- ESPACIADOR SUPERIOR AMPLIADO (Baja los cuadros de texto) -->
-    <div class="w-full h-30 md:h-40 pointer-events-none"></div>
-
-    <!-- CONTENEDOR PRINCIPAL SIN DESBORDAMIENTO -->
-    <div class="w-full max-w-sm text-center space-y-3 my-auto">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="contenedor-tarjetas text-center space-y-3">
         
         <!-- LISTA DE MÓDULOS -->
         <div class="space-y-3 text-left">
 
             <!-- MÓDULO 1: PAREJAS -->
-            <a href="parejas/" class="card-pink card-transition flex items-center p-3 rounded-2xl group relative overflow-hidden block">
-                <div class="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500 text-lg mr-3 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="parejas/" class="card-pink card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-heart"></i>
                 </div>
                 <div class="flex-1 pr-2">
@@ -93,8 +106,8 @@
             </a>
 
             <!-- MÓDULO 2: MENSAJE TEMPORIZADOR -->
-            <a href="temporizador/" class="card-gold card-transition flex items-center p-3 rounded-2xl group relative overflow-hidden block">
-                <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-lg mr-3 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="temporizador/" class="card-gold card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="flex-1 pr-2">
@@ -104,8 +117,8 @@
             </a>
 
             <!-- MÓDULO 3: MASCOTAS -->
-            <a href="mascotas/" class="card-cyan card-transition flex items-center p-3 rounded-2xl group relative overflow-hidden block">
-                <div class="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-lg mr-3 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="mascotas/" class="card-cyan card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-paw"></i>
                 </div>
                 <div class="flex-1 pr-2">
@@ -115,8 +128,8 @@
             </a>
 
             <!-- MÓDULO 4: ATENCIÓN AL CLIENTE / SOPORTE WHATSAPP -->
-            <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-3 rounded-2xl group relative overflow-hidden block">
-                <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-lg mr-3 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-brands fa-whatsapp"></i>
                 </div>
                 <div class="flex-1 pr-2">
@@ -127,11 +140,11 @@
 
         </div>
 
-    </div>
+        <!-- PIE DE PÁGINA -->
+        <div class="pt-4 text-[9px] text-slate-300 font-medium text-center">
+            Desarrollado con pasión • Protección y Detalles • by kingsAngels
+        </div>
 
-    <!-- PIE DE PÁGINA FIJO -->
-    <div class="text-[9px] text-slate-300 font-medium pb-1 text-center">
-        Desarrollado con pasión • Protección y Detalles • by kingsAngels
     </div>
 
 </body>
