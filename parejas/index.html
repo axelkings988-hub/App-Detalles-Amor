@@ -134,6 +134,35 @@
                 <input type="text" id="nombreProyectoInput" placeholder="Ej. Sorpresa Aniversario Ana" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
+            <!-- SISTEMA DE PRIVACIDAD Y CONTRASEÑA OPCIONAL -->
+            <hr class="border-rose-500/20 my-2">
+            <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
+                <label class="text-xs font-semibold text-rose-200 block">🔒 ¿Proteger detalle con contraseña?</label>
+                <div class="flex items-center gap-6 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
+                        <input type="radio" name="protegerOpcion" value="si" onclick="togglePasswordOptions(true)" class="accent-rose-500"> Sí
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-rose-200">
+                        <input type="radio" name="protegerOpcion" value="no" checked onclick="togglePasswordOptions(false)" class="accent-rose-500"> No
+                    </label>
+                </div>
+                <p id="descripcionOpcion" class="text-[11px] text-rose-300/80 italic pt-1">
+                    🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.
+                </p>
+
+                <div id="passwordFieldsContainer" class="hidden space-y-3 pt-3 border-t border-rose-500/20">
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-semibold text-rose-200">Contraseña:</label>
+                        <input type="password" id="detallePassword" placeholder="Ingresa contraseña secreta" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-semibold text-rose-200">Pista (en caso de olvido):</label>
+                        <input type="text" id="detallePista" placeholder="Ej. Fecha de nuestro aniversario" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                    </div>
+                </div>
+            </div>
+            <hr class="border-rose-500/20 my-2">
+
             <div class="space-y-1">
                 <label class="text-xs font-semibold text-rose-200">1. NOMBRES EN LA TARJETA:</label>
                 <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
@@ -165,7 +194,7 @@
                 <textarea id="mensajeInput" rows="4" placeholder="Escribe tu mensaje aquí..." required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500 resize-none"></textarea>
             </div>
 
-            <!-- GRABACIÓN DE VOZ (Con cuenta regresiva de 10s y botón detener) -->
+            <!-- GRABACIÓN DE VOZ -->
             <div class="space-y-2 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20 text-center">
                 <label class="text-xs font-semibold text-rose-200 block">5. NOTA DE VOZ (MÁXIMO 10 SEGUNDOS):</label>
                 <div class="flex items-center justify-center gap-3 pt-1">
@@ -264,6 +293,13 @@
                 </button>
             </div>
         </div>
+
+        <!-- BOTÓN DE ELIMINACIÓN PERMANENTE EN EL PANEL -->
+        <div class="pt-2 no-print">
+            <button onclick="eliminarProyectoPermanentemente(proyectoActualId)" class="w-full py-2.5 bg-burgundy-950 text-rose-400 hover:text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/30 hover:border-rose-500/60 transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-trash-alt"></i> Eliminar proyecto y datos permanentemente
+            </button>
+        </div>
     </div>
 
     <!-- SECCIÓN 4: VISTA PREVIA EN PANTALLA COMPLETA -->
@@ -329,7 +365,7 @@
                     </div>
                 </section>
 
-                <!-- TRIVIA DE PAREJA (5 Preguntas completas) -->
+                <!-- TRIVIA DE PAREJA -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-question-circle text-gold-400"></i> Trivia de Pareja</h3>
@@ -449,6 +485,20 @@
             } 
         });
 
+        function togglePasswordOptions(esSi) {
+            const container = document.getElementById('passwordFieldsContainer');
+            const desc = document.getElementById('descripcionOpcion');
+            if (esSi) {
+                container.classList.remove('hidden');
+                desc.innerText = "🔒 Ahora tu QR está protegido. Al escanear, pedirá una contraseña para poder ver el contenido.";
+            } else {
+                container.classList.add('hidden');
+                desc.innerText = "🔓 Tu detalle QR es público, cualquier persona puede leer el código QR.";
+                document.getElementById('detallePassword').value = '';
+                document.getElementById('detallePista').value = '';
+            }
+        }
+
         function obtenerProyectosLocales() {
             try { return JSON.parse(localStorage.getItem("misProyectosAmor") || "[]"); } catch(e) { return []; }
         }
@@ -479,7 +529,7 @@
                         <button onclick="cargarProyecto('${proj.firebaseId}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-xl shadow">
                             Ver
                         </button>
-                        <button onclick="eliminarProyecto('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
+                        <button onclick="eliminarProyectoPermanentemente('${proj.firebaseId}')" class="px-2.5 py-1.5 bg-burgundy-900 text-rose-400 hover:text-white text-[11px] rounded-xl border border-rose-500/30">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
@@ -488,11 +538,67 @@
             });
         }
 
+        // ELIMINACIÓN PERMANENTE Y LIMPIEZA TOTAL (Supabase + Firebase + LocalStorage)
+        async function eliminarProyectoPermanentemente(firebaseId) {
+            if (!firebaseId) return;
+
+            const confirmar = confirm("¿Estás seguro de eliminar este proyecto?\n\nEsta acción borrará todas tus fotos, mensajes y el enlace público para siempre y no se puede deshacer.");
+            if (!confirmar) return;
+
+            try {
+                const docRef = db.collection("detalles").doc(firebaseId);
+                const docSnap = await docRef.get();
+
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    
+                    // 1. Borrar fotos en Supabase
+                    if (data.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
+                        for (const fotoUrl of data.fotos) {
+                            try {
+                                const urlObj = new URL(fotoUrl);
+                                const pathSegments = urlObj.pathname.split('/');
+                                const bucketIndex = pathSegments.indexOf('detalles-fotos');
+                                if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
+                                    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+                                    await supabaseClient.storage.from('detalles-fotos').remove([filePath]);
+                                }
+                            } catch (err) {
+                                console.warn("No se pudo eliminar una foto de Supabase:", err);
+                            }
+                        }
+                    }
+
+                    // 2. Borrar documento en Firestore
+                    await docRef.delete();
+                }
+
+                // 3. Borrar del localStorage
+                let proyectos = obtenerProyectosLocales();
+                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
+                guardarProyectosLocales(proyectos);
+
+                proyectoActualId = null;
+                proyectoDatosCache = null;
+                if (localStorage.getItem("ultimoDetalleId") === firebaseId) {
+                    localStorage.removeItem("ultimoDetalleId");
+                }
+
+                alert("🗑️ El proyecto y todos sus archivos asociados fueron eliminados permanentemente.");
+                volverAlDashboardDesdePanel();
+
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                alert("⚠️ Ocurrió un error al intentar eliminar los datos: " + error.message);
+            }
+        }
+
         function mostrarFormularioCreacion() {
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('createForm').reset();
+            togglePasswordOptions(false);
             document.getElementById('formTitleText').innerText = "Nuevo Proyecto";
             recordedAudioBase64 = null;
             proyectoActualId = null;
@@ -517,6 +623,16 @@
                     document.getElementById('fechaInput').value = proyectoDatosCache.fecha || '';
                     document.getElementById('mensajeInput').value = proyectoDatosCache.mensaje || '';
                     
+                    if (proyectoDatosCache.privado && proyectoDatosCache.password) {
+                        document.querySelector('input[name="protegerOpcion"][value="si"]').checked = true;
+                        togglePasswordOptions(true);
+                        document.getElementById('detallePassword').value = proyectoDatosCache.password;
+                        document.getElementById('detallePista').value = proyectoDatosCache.pista || '';
+                    } else {
+                        document.querySelector('input[name="protegerOpcion"][value="no"]').checked = true;
+                        togglePasswordOptions(false);
+                    }
+
                     if (proyectoDatosCache.activarContador) {
                         document.getElementById('activarContadorCheck').checked = true;
                         document.getElementById('fechaEspecificaContainer').classList.remove('hidden');
@@ -686,7 +802,6 @@
         }
         function adjustPvVolume(val) { pvBgMusic.volume = val; }
 
-        // GRABACIÓN DE VOZ (10 segundos estables y botón detener)
         async function toggleRecording() {
             const recordBtn = document.getElementById('recordBtn');
             const recordText = document.getElementById('recordText');
@@ -753,7 +868,6 @@
         let pvPhotosArray = [];
         let currentSlide = 0;
 
-        // FUNCIÓN GUARDAR PROYECTO ESTABLE (Basada en el código antiguo que sí sube fotos)
         async function guardarProyectoYMostrarPanel() {
             const photosFiles = document.getElementById('photosInput').files;
             
@@ -789,6 +903,18 @@
                 const nombres = document.getElementById('nombresInput').value.trim();
                 const fecha = document.getElementById('fechaInput').value.trim();
                 const mensaje = document.getElementById('mensajeInput').value.trim();
+                
+                const protegerSeleccionado = document.querySelector('input[name="protegerOpcion"]:checked').value === 'si';
+                const passwordVal = protegerSeleccionado ? document.getElementById('detallePassword').value.trim() : null;
+                const pistaVal = protegerSeleccionado ? document.getElementById('detallePista').value.trim() : null;
+
+                if (protegerSeleccionado && !passwordVal) {
+                    alert("⚠️ Por favor ingresa una contraseña para proteger el detalle.");
+                    document.getElementById('statusBox').classList.add('hidden');
+                    document.getElementById('createForm').classList.remove('hidden');
+                    return;
+                }
+
                 const activarContador = document.getElementById('activarContadorCheck').checked;
                 const fechaEspecialTimestamp = activarContador ? document.getElementById('fechaEspecialTimestampInput').value : "";
 
@@ -798,6 +924,9 @@
                     nombres: nombres,
                     fecha: fecha,
                     mensaje: mensaje,
+                    privado: protegerSeleccionado,
+                    password: passwordVal,
+                    pista: pistaVal,
                     activarContador: activarContador,
                     fechaEspecialTimestamp: fechaEspecialTimestamp,
                     voiceNoteBase64: recordedAudioBase64 || (proyectoDatosCache ? proyectoDatosCache.voiceNoteBase64 : null),
@@ -864,15 +993,6 @@
                 }
             } catch(e) {
                 alert("Error al cargar el proyecto.");
-            }
-        }
-
-        function eliminarProyecto(firebaseId) {
-            if (confirm("¿Estás seguro de eliminar este proyecto guardado?")) {
-                let proyectos = obtenerProyectosLocales();
-                proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
-                guardarProyectosLocales(proyectos);
-                renderizarProyectosGuardados();
             }
         }
 
@@ -1050,7 +1170,6 @@
             document.getElementById('pv-carouselIndicator').innerText = `${currentSlide + 1} / ${pvPhotosArray.length}`;
         }
 
-        // TRIVIA DE PAREJA (5 Preguntas completas y funcionales)
         const pvQuizData = [
             { question: "¿Cuál es el lugar que más disfrutamos visitar juntos?", options: ["Un lugar tranquilo para platicar", "Un restaurante o cafetería", "Cualquier lugar si estoy a tu lado", "Un viaje de aventura"], correct: 2 },
             { question: "¿Cuál fue nuestra primera impresión mutua?", options: ["Nervios pero mucha química", "Risas desde el primer momento", "Timidez al principio", "Conexión instantánea"], correct: 0 },
@@ -1087,9 +1206,9 @@
             for (let i = 0; i < buttons.length; i++) {
                 buttons[i].disabled = true;
                 if (i === correct) {
-                    buttons[i].style.background = '#065f46'; // Verde acierto
+                    buttons[i].style.background = '#065f46';
                 } else if (i === selected) {
-                    buttons[i].style.background = '#991b1b'; // Rojo fallo
+                    buttons[i].style.background = '#991b1b';
                 }
             }
 
