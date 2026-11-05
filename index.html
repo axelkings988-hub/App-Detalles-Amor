@@ -7,7 +7,7 @@
 
     <!-- Google AdSense SDK & Meta de Verificación -->
     <meta name="google-adsense-account" content="ca-pub-2082458944224549">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.adsense.com/pagead/js/adsbygoogle.js?client=ca-pub-2082458944224549" crossorigin="anonymous"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,6 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #05050a;
-            /* Imagen de fondo desde tu repositorio */
             background-image: url("1793883420453.jpg");
             background-attachment: fixed;
             background-size: cover;
@@ -71,14 +70,16 @@
         }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-center min-h-screen text-white relative overflow-x-hidden">
+<body class="p-4 flex flex-col items-center justify-between min-h-screen text-white relative overflow-x-hidden">
+
+    <!-- ESPACIADOR SUPERIOR (Empuja los elementos hacia abajo) -->
+    <div class="w-full h-32 md:h-40"></div>
 
     <!-- CONTENEDOR PRINCIPAL -->
-    <div class="w-full max-w-sm text-center space-y-6 my-auto">
-        
+    <div class="w-full max-w-sm text-center space-y-4 mb-auto">
         
         <!-- LISTA DE MÓDULOS -->
-        <div class="space-y-4 text-left pt-2">
+        <div class="space-y-4 text-left">
 
             <!-- MÓDULO 1: PAREJAS -->
             <a href="parejas/" class="card-pink card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
@@ -127,7 +128,7 @@
         </div>
 
         <!-- PIE DE PÁGINA -->
-        <div class="pt-4 text-[10px] text-slate-400 font-medium">
+        <div class="pt-6 text-[10px] text-slate-300 font-medium pb-2">
             Desarrollado con pasión • Protección y Detalles • by kingsAngels
         </div>
 
