@@ -70,65 +70,68 @@
         }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center justify-start min-h-screen text-white relative overflow-x-hidden">
+<body class="p-4 flex flex-col items-center justify-between h-screen text-white relative overflow-hidden">
 
-    <!-- CONTENEDOR PRINCIPAL CON MARGEN SUPERIOR EXTREMO -->
-    <div class="w-full max-w-sm text-center space-y-4 mt-72 md:mt-80 mb-8">
+    <!-- ESPACIADOR SUPERIOR PARA BAJAR LAS TARJETAS -->
+    <div class="w-full h-36 md:h-44 pointer-events-none"></div>
+
+    <!-- CONTENEDOR PRINCIPAL SIN DESBORDAMIENTO -->
+    <div class="w-full max-w-sm text-center space-y-3 my-auto">
         
         <!-- LISTA DE MÓDULOS -->
-        <div class="space-y-4 text-left">
+        <div class="space-y-3 text-left">
 
             <!-- MÓDULO 1: PAREJAS -->
-            <a href="parejas/" class="card-pink card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
-                <div class="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="parejas/" class="card-pink card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-heart"></i>
                 </div>
                 <div class="flex-1 pr-2">
-                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-pink-600 transition-colors">Minisitio de Parejas</h2>
-                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Sorprende a tu pareja con detalles románticos.</p>
+                    <h2 class="text-xs font-extrabold text-slate-900 group-hover:text-pink-600 transition-colors">Minisitio de Parejas</h2>
+                    <p class="text-[10px] text-slate-600 font-medium leading-tight">Sorprende a tu pareja con detalles románticos.</p>
                 </div>
             </a>
 
             <!-- MÓDULO 2: MENSAJE TEMPORIZADOR -->
-            <a href="temporizador/" class="card-gold card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
-                <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="temporizador/" class="card-gold card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="flex-1 pr-2">
-                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-amber-600 transition-colors">Mensaje Temporizador</h2>
-                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Envía mensajes con cuenta regresiva especial.</p>
+                    <h2 class="text-xs font-extrabold text-slate-900 group-hover:text-amber-600 transition-colors">Mensaje Temporizador</h2>
+                    <p class="text-[10px] text-slate-600 font-medium leading-tight">Envía mensajes con cuenta regresiva especial.</p>
                 </div>
             </a>
 
             <!-- MÓDULO 3: MASCOTAS -->
-            <a href="mascotas/" class="card-cyan card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
-                <div class="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="mascotas/" class="card-cyan card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-paw"></i>
                 </div>
                 <div class="flex-1 pr-2">
-                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-cyan-600 transition-colors">Placa QR de Mascota</h2>
-                    <p class="text-[11px] text-slate-600 font-medium leading-tight">Genera medallas con colores neón y perfil de emergencia.</p>
+                    <h2 class="text-xs font-extrabold text-slate-900 group-hover:text-cyan-600 transition-colors">Placa QR de Mascota</h2>
+                    <p class="text-[10px] text-slate-600 font-medium leading-tight">Genera medallas con colores neón y perfil de emergencia.</p>
                 </div>
             </a>
 
             <!-- MÓDULO 4: ATENCIÓN AL CLIENTE / SOPORTE WHATSAPP -->
-            <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-4 rounded-2xl group relative overflow-hidden block">
-                <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-2xl mr-4 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-brands fa-whatsapp"></i>
                 </div>
                 <div class="flex-1 pr-2">
-                    <h2 class="text-sm font-extrabold text-slate-900 group-hover:text-green-600 transition-colors">Atención al Cliente</h2>
-                    <p class="text-[11px] text-slate-600 font-medium leading-tight">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte por WhatsApp.</p>
+                    <h2 class="text-xs font-extrabold text-slate-900 group-hover:text-green-600 transition-colors">Atención al Cliente</h2>
+                    <p class="text-[10px] text-slate-600 font-medium leading-tight">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte por WhatsApp.</p>
                 </div>
             </a>
 
         </div>
 
-        <!-- PIE DE PÁGINA -->
-        <div class="pt-6 text-[10px] text-slate-300 font-medium pb-4">
-            Desarrollado con pasión • Protección y Detalles • by kingsAngels
-        </div>
+    </div>
 
+    <!-- PIE DE PÁGINA FIJO -->
+    <div class="text-[9px] text-slate-300 font-medium pb-1 text-center">
+        Desarrollado con pasión • Protección y Detalles • by kingsAngels
     </div>
 
 </body>
