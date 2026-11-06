@@ -230,48 +230,20 @@
             <div class="w-12"></div>
         </div>
 
-        <!-- ESTATUS DE PRUEBA / DÍAS RESTANTES + BOTÓN DESBLOQUEAR QR -->
-        <div id="trialStatusBanner" class="bg-burgundy-950/80 border border-rose-500/30 p-4 rounded-2xl text-center space-y-3">
-            <p id="trialStatusText" class="text-xs font-semibold text-rose-200">⏱️ Periodo de prueba activo (7 días restantes).</p>
-            <button onclick="procesarPagoMercadoPago()" class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
-                <span>🔓 Desbloquear QR / $25.00 MXN</span>
+        <!-- BOTÓN DE ACTIVACIÓN MANUAL DE PRUEBA GRATUITA -->
+        <div id="activateTrialSection" class="bg-burgundy-950/80 border border-rose-500/30 p-4 rounded-2xl text-center space-y-3 no-print">
+            <button onclick="activarPruebaGratuita()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <i class="fas fa-rocket"></i> 🚀 ACTIVAR CÓDIGO QR GRATIS
             </button>
+            <p class="text-[11px] text-rose-300/80 italic">Activa tu prueba de 7 días para generar el QR oficial al instante.</p>
         </div>
 
-        <button onclick="abrirVistaPreviaPantallaCompleta()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 no-print">
-            <i class="fas fa-eye text-sm"></i> 👁️ Ver Vista Previa en Pantalla Completa
-        </button>
-
-        <div id="paySection" class="bg-burgundy-950/60 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4 no-print">
-            <h3 class="text-sm font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
-            <p class="text-xs text-rose-300/80">Desbloquea el enlace permanente para siempre.</p>
-
-            <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                <span id="payBtnText">💳 Hacer Permanente / $25.00 MXN</span>
-            </button>
-
-            <div class="pt-3 border-t border-rose-500/20 space-y-2 text-left">
-                <label class="text-[11px] font-semibold text-rose-200 block">Agrega cupón de regalo:</label>
-                <div class="flex gap-2">
-                    <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
-                    <button onclick="validarCuponOMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
-                        Canjear
-                    </button>
-                </div>
-            </div>
-
-            <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check-circle"></i>
-                <span>✨ Ya realicé mi pago, desbloquear ahora</span>
-            </button>
-
-            <button onclick="editarDatosProyecto()" class="w-full py-2.5 bg-burgundy-900 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-800 transition-colors flex items-center justify-center gap-2">
-                <i class="fas fa-edit"></i> Editar datos del proyecto
-            </button>
-        </div>
-
+        <!-- RESULTADO / QR MOSTRADO TRAS ACTIVAR -->
         <div id="resultBox" class="hidden bg-burgundy-950/80 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4">
-            <h3 class="text-sm font-bold text-rose-200 no-print">¡Tu detalle ya está permanente! 🎉</h3>
+            <!-- LEYENDA CÁLIDA SOLICITADA -->
+            <p class="text-xs font-medium text-rose-200 bg-rose-950/60 p-2.5 rounded-xl border border-rose-500/20">
+                ✨ Regalo activo por 7 días — Hazlo permanente para siempre por $25 MXN.
+            </p>
             
             <div id="printablePostal" class="relative inline-block rounded-2xl overflow-hidden shadow-2xl bg-burgundy-950 border border-rose-500/40 p-3 mx-auto">
                 <img src="diseño-postal.jpg" alt="Postal Romántica" class="w-full max-w-[280px] h-auto object-cover rounded-xl block mx-auto">
@@ -302,6 +274,39 @@
             </div>
         </div>
 
+        <button onclick="abrirVistaPreviaPantallaCompleta()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 no-print">
+            <i class="fas fa-eye text-sm"></i> 👁️ Ver Vista Previa en Pantalla Completa
+        </button>
+
+        <!-- SECCIÓN DE PAGO (PERMANENTE / $25 MXN) -->
+        <div id="paySection" class="bg-burgundy-950/60 border border-rose-500/30 p-5 rounded-2xl text-center space-y-4 no-print">
+            <h3 class="text-sm font-bold text-rose-100">¿Te gustó el resultado? ❤️</h3>
+            <p class="text-xs text-rose-300/80">Hazlo permanente para siempre para evitar que el enlace caduque.</p>
+
+            <button id="payBtn" onclick="procesarPagoMercadoPago()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <span id="payBtnText">💳 Hacer Permanente / $25.00 MXN</span>
+            </button>
+
+            <div class="pt-3 border-t border-rose-500/20 space-y-2 text-left">
+                <label class="text-[11px] font-semibold text-rose-200 block">Agrega cupón de regalo:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="codigoMaestroInput" placeholder="Ingresa tu código" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 uppercase tracking-widest focus:outline-none focus:border-rose-500">
+                    <button onclick="validarCuponOMaestro()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow whitespace-nowrap">
+                        Canjear
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="verificarPagoAutomatico()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-circle"></i>
+                <span>✨ Ya realicé mi pago, desbloquear ahora</span>
+            </button>
+
+            <button onclick="editarDatosProyecto()" class="w-full py-2.5 bg-burgundy-900 text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/40 hover:bg-burgundy-800 transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-edit"></i> Editar datos del proyecto
+            </button>
+        </div>
+
         <!-- BOTÓN DE ELIMINACIÓN PERMANENTE EN EL PANEL -->
         <div class="pt-2 no-print">
             <button onclick="eliminarProyectoPermanentemente(proyectoActualId)" class="w-full py-2.5 bg-burgundy-950 text-rose-400 hover:text-rose-200 text-xs font-semibold rounded-xl border border-rose-500/30 hover:border-rose-500/60 transition-colors flex items-center justify-center gap-2">
@@ -312,6 +317,34 @@
 
     <!-- SECCIÓN 4: VISTA PREVIA EN PANTALLA COMPLETA -->
     <div id="previewContainer" class="hidden w-full min-h-screen fixed inset-0 z-40 bg-burgundy-950/95 backdrop-blur-2xl overflow-y-auto px-4 py-16 space-y-6">
+        
+        <!-- PANTALLA DE CONTRASEÑA EN VISTA PREVIA (SI APLICA) -->
+        <div id="pv-passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center absolute inset-0 z-50 bg-burgundy-950/95">
+            <div class="w-full max-w-sm bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
+                <div class="w-14 h-14 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/40">
+                    <i class="fas fa-lock text-rose-400 text-xl"></i>
+                </div>
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-bold font-cursive text-rose-100">Vista Protegida</h2>
+                    <p class="text-xs text-rose-300/80">Este proyecto tiene contraseña. Ingrésala para probarlo:</p>
+                </div>
+                <div class="space-y-3 pt-2">
+                    <input type="password" id="pv-accessPasswordInput" placeholder="Ingresa la contraseña" class="w-full px-4 py-3 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 text-center focus:outline-none focus:border-rose-500">
+                    <button onclick="verificarPasswordPv()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg">
+                        Desbloquear Vista Previa
+                    </button>
+                </div>
+                <div id="pv-hintContainer" class="hidden pt-2 border-t border-rose-500/20 text-center">
+                    <p class="text-[11px] text-rose-300/70 italic" id="pv-hintTextDisplay"></p>
+                </div>
+                <div>
+                    <button onclick="mostrarPistaPv()" class="text-[11px] text-rose-300 hover:text-rose-200 underline">
+                        <i class="fas fa-lightbulb text-gold-400 mr-1"></i> Ver pista
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="w-full max-w-lg mx-auto space-y-6">
             <div class="flex items-center justify-between">
                 <button onclick="cerrarVistaPrevia()" class="text-xs text-rose-300 bg-burgundy-900 px-3 py-2 rounded-xl border border-rose-500/30 shadow flex items-center gap-1.5">
@@ -488,8 +521,8 @@
                     
                     if (docSnap.exists) {
                         proyectoActualId = docId;
-                        alert("🎉 ¡Pago confirmado y cronómetro de 7 días iniciado! Tu código QR ha sido desbloqueado.");
-                        mostrarPanelGestion(docSnap.data(), true);
+                        alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu proyecto ahora es permanente.");
+                        mostrarPanelGestion(docSnap.data());
                     }
                 } catch(e) {}
             } 
@@ -599,6 +632,7 @@
         }
 
         async function mostrarFormularioCreacion() {
+            // Control Antifraude: 1 sola prueba activa por dispositivo/IP
             const pruebaActivaId = localStorage.getItem("proyectoPruebaActivoId");
             if (pruebaActivaId && pruebaActivaId !== proyectoActualId) {
                 try {
@@ -628,10 +662,7 @@
         }
 
         async function editarDatosProyecto() {
-            if (!proyectoActualId) {
-                alert("No hay un proyecto activo para editar.");
-                return;
-            }
+            if (!proyectoActualId) return;
 
             try {
                 const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
@@ -673,9 +704,7 @@
                     document.getElementById('formContainer').classList.remove('hidden');
                     document.getElementById('formTitleText').innerText = "Editar Proyecto";
                 }
-            } catch(e) {
-                alert("No se pudieron cargar los datos para editar.");
-            }
+            } catch(e) {}
         }
 
         function volverAlDashboard() {
@@ -713,64 +742,34 @@
 
         async function comprimirImagen(file) {
             return new Promise((resolve) => {
-                if (!file || !file.type.startsWith('image/')) {
-                    resolve(file);
-                    return;
-                }
-
+                if (!file || !file.type.startsWith('image/')) { resolve(file); return; }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                
                 reader.onload = (event) => {
                     const img = new Image();
                     img.src = event.target.result;
-                    
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-
-                            const MAX_WIDTH = 1600;
-                            const MAX_HEIGHT = 1600;
-
+                            let width = img.width, height = img.height;
+                            const MAX_WIDTH = 1600, MAX_HEIGHT = 1600;
                             if (width > height) {
-                                if (width > MAX_WIDTH) {
-                                    height = Math.round((height * MAX_WIDTH) / width);
-                                    width = MAX_WIDTH;
-                                }
+                                if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
                             } else {
-                                if (height > MAX_HEIGHT) {
-                                    width = Math.round((width * MAX_HEIGHT) / height);
-                                    height = MAX_HEIGHT;
-                                }
+                                if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
                             }
-
-                            canvas.width = width;
-                            canvas.height = height;
-
+                            canvas.width = width; canvas.height = height;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-
                             canvas.toBlob((blob) => {
-                                if (!blob) {
-                                    resolve(file);
-                                    return;
-                                }
-                                const compressedFile = new File([blob], file.name, {
-                                    type: 'image/jpeg',
-                                    lastModified: Date.now()
-                                });
-                                resolve(compressedFile);
+                                if (!blob) { resolve(file); return; }
+                                resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
                             }, 'image/jpeg', 0.8);
-
-                        } catch (e) {
-                            resolve(file);
-                        }
+                        } catch (e) { resolve(file); }
                     };
-                    img.onerror = () => { resolve(file); };
+                    img.onerror = () => resolve(file);
                 };
-                reader.onerror = () => { resolve(file); };
+                reader.onerror = () => resolve(file);
             });
         }
 
@@ -781,23 +780,12 @@
                 const fileName = `${Date.now()}_${cleanName}.${fileExt}`;
                 const filePath = `fotos/${fileName}`;
 
-                const { data, error } = await supabaseClient.storage
-                    .from('detalles-fotos')
-                    .upload(filePath, file, {
-                        cacheControl: '3600',
-                        upsert: false
-                    });
-
+                const { error } = await supabaseClient.storage.from('detalles-fotos').upload(filePath, file, { cacheControl: '3600', upsert: false });
                 if (error) return null;
 
-                const { data: publicData } = supabaseClient.storage
-                    .from('detalles-fotos')
-                    .getPublicUrl(filePath);
-
+                const { data: publicData } = supabaseClient.storage.from('detalles-fotos').getPublicUrl(filePath);
                 return publicData ? publicData.publicUrl : null;
-            } catch (err) {
-                return null;
-            }
+            } catch (err) { return null; }
         }
 
         const pvBgMusic = document.getElementById('pv-bgMusic');
@@ -827,20 +815,14 @@
             const recordIcon = document.getElementById('recordIcon');
             const timerLabel = document.getElementById('timerLabel');
 
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                detenerGrabacion();
-                return;
-            }
+            if (mediaRecorder && mediaRecorder.state === "recording") { detenerGrabacion(); return; }
 
             try {
                 audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(audioStream);
                 audioChunks = [];
 
-                mediaRecorder.ondataavailable = event => {
-                    if (event.data.size > 0) audioChunks.push(event.data);
-                };
-
+                mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     const reader = new FileReader();
@@ -866,16 +848,12 @@
                 let timeLeft = 10;
                 timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
                 clearInterval(countdownInterval);
-
                 countdownInterval = setInterval(() => {
                     timeLeft--;
                     timerLabel.innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
                     if (timeLeft <= 0) detenerGrabacion();
                 }, 1000);
-
-            } catch (e) {
-                alert("⚠️ No se pudo acceder al micrófono.");
-            }
+            } catch (e) { alert("⚠️ No se pudo acceder al micrófono."); }
         }
 
         function detenerGrabacion() {
@@ -889,7 +867,6 @@
 
         async function guardarProyectoYMostrarPanel() {
             const photosFiles = document.getElementById('photosInput').files;
-            
             document.getElementById('createForm').classList.add('hidden');
             document.getElementById('statusBox').classList.remove('hidden');
             document.getElementById('statusText').innerText = "Iniciando proceso...";
@@ -906,13 +883,9 @@
                     for (let i = 0; i < maxFotos; i++) {
                         document.getElementById('statusText').innerText = `Optimizando foto ${i + 1} de ${maxFotos}...`;
                         const fotoOptimizada = await comprimirImagen(photosFiles[i]);
-                        
                         document.getElementById('statusText').innerText = `Subiendo foto ${i + 1} de ${maxFotos} a Supabase...`;
                         const publicUrl = await subirFotoSupabase(fotoOptimizada);
-                        
-                        if (publicUrl) {
-                            urlsFotos.push(publicUrl);
-                        }
+                        if (publicUrl) urlsFotos.push(publicUrl);
                     }
                 }
 
@@ -938,8 +911,6 @@
                 const fechaEspecialTimestamp = activarContador ? document.getElementById('fechaEspecialTimestampInput').value : "";
 
                 let docRef;
-                let fechaCreacionServer = proyectoDatosCache && proyectoDatosCache.creado ? proyectoDatosCache.creado : firebase.firestore.FieldValue.serverTimestamp();
-                
                 const datosAEnviar = {
                     nombreProyecto: nombreProj,
                     nombres: nombres,
@@ -952,16 +923,10 @@
                     fechaEspecialTimestamp: fechaEspecialTimestamp,
                     voiceNoteBase64: recordedAudioBase64 || (proyectoDatosCache ? proyectoDatosCache.voiceNoteBase64 : null),
                     pagado: proyectoDatosCache ? (proyectoDatosCache.pagado || false) : false,
-                    creado: fechaCreacionServer
+                    creado: proyectoDatosCache && proyectoDatosCache.creado ? proyectoDatosCache.creado : firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                if (!proyectoDatosCache || !proyectoDatosCache.createdAtMs) {
-                    datosAEnviar.createdAtMs = Date.now();
-                }
-
-                if (urlsFotos.length > 0) {
-                    datosAEnviar.fotos = urlsFotos;
-                }
+                if (urlsFotos.length > 0) datosAEnviar.fotos = urlsFotos;
 
                 if (proyectoActualId) {
                     docRef = db.collection("detalles").doc(proyectoActualId);
@@ -969,6 +934,7 @@
                 } else {
                     docRef = await db.collection("detalles").add(datosAEnviar);
                     proyectoActualId = docRef.id;
+                    // Registramos la prueba activa en este dispositivo para control antifraude
                     localStorage.setItem("proyectoPruebaActivoId", proyectoActualId);
                 }
 
@@ -980,11 +946,7 @@
                     proyectos[existenteIndex].nombreProyecto = nombreProj;
                     proyectos[existenteIndex].nombres = nombres;
                 } else {
-                    proyectos.unshift({
-                        firebaseId: proyectoActualId,
-                        nombreProyecto: nombreProj,
-                        nombres: nombres
-                    });
+                    proyectos.unshift({ firebaseId: proyectoActualId, nombreProyecto: nombreProj, nombres: nombres });
                 }
                 guardarProyectosLocales(proyectos);
 
@@ -994,7 +956,7 @@
                 document.getElementById('statusBox').classList.add('hidden');
                 document.getElementById('createForm').classList.remove('hidden');
                 
-                mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
+                mostrarPanelGestion(proyectoDatosCache);
 
             } catch (error) {
                 alert("⚠️ Ocurrió un error al guardar el proyecto: " + error.message);
@@ -1013,54 +975,76 @@
                     proyectoDatosCache = docSnap.data();
                     document.getElementById('homeDashboard').classList.add('hidden');
                     document.getElementById('formContainer').classList.add('hidden');
-                    mostrarPanelGestion(proyectoDatosCache, proyectoDatosCache.pagado === true);
+                    mostrarPanelGestion(proyectoDatosCache);
                 } else {
                     alert("No se encontró el proyecto en la base de datos.");
                 }
-            } catch(e) {
-                alert("Error al cargar el proyecto.");
-            }
+            } catch(e) {}
         }
 
-        function mostrarPanelGestion(data, yaPagado) {
+        // PANEL DE GESTIÓN CON ACTIVACIÓN MANUAL DE PRUEBA
+        function mostrarPanelGestion(data) {
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('panelContainer').classList.remove('hidden');
 
-            const paySection = document.getElementById('paySection');
+            const activateTrialSection = document.getElementById('activateTrialSection');
             const resultBox = document.getElementById('resultBox');
-            const trialStatusBanner = document.getElementById('trialStatusBanner');
-            const trialStatusText = document.getElementById('trialStatusText');
+            const paySection = document.getElementById('paySection');
 
-            if (yaPagado) {
-                trialStatusBanner.classList.add('hidden');
+            const estaActivado = data.activacionPruebaManual === true || data.pagado === true;
+
+            if (data.pagado === true) {
+                // Ya pagado / permanente
+                activateTrialSection.classList.add('hidden');
                 paySection.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                
+                const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
+                document.getElementById('finalLink').href = finalLink;
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), { text: finalLink, width: 95, height: 95 });
+            } else if (estaActivado) {
+                // Prueba de 7 días ya activada manualmente
+                activateTrialSection.classList.add('hidden');
+                paySection.classList.remove('hidden');
                 resultBox.classList.remove('hidden');
 
                 const finalLink = `https://axelkings988-hub.github.io/App-Detalles-Amor/parejas/ver.html?id=${proyectoActualId}`;
                 document.getElementById('finalLink').href = finalLink;
-                
                 document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), {
-                    text: finalLink,
-                    width: 95,
-                    height: 95
-                });
+                new QRCode(document.getElementById("qrcode"), { text: finalLink, width: 95, height: 95 });
             } else {
-                trialStatusBanner.classList.remove('hidden');
-                paySection.classList.remove('hidden');
+                // Aún no activa la prueba gratuita (muestra el botón amigable)
+                activateTrialSection.classList.remove('hidden');
                 resultBox.classList.add('hidden');
-
-                const createdAt = data.createdAtMs || (data.creado ? data.creado.toMillis() : Date.now());
-                const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
-                let diasRestantes = Math.ceil(7 - diasTranscurridos);
-                if (diasRestantes < 0) diasRestantes = 0;
-
-                trialStatusText.innerHTML = `⏱️ Periodo de prueba activo (${diasRestantes} ${diasRestantes === 1 ? 'día' : 'días'} restantes).`;
+                paySection.classList.add('hidden');
             }
         }
 
+        // ACCIÓN DEL BOTÓN [ 🚀 ACTIVAR CÓDIGO QR GRATIS ]
+        async function activarPruebaGratuita() {
+            if (!proyectoActualId) return;
+
+            try {
+                const timestampActualMs = Date.now();
+                await db.collection("detalles").doc(proyectoActualId).update({
+                    activacionPruebaManual: true,
+                    createdAtMs: timestampActualMs
+                });
+
+                proyectoDatosCache.activacionPruebaManual = true;
+                proyectoDatosCache.createdAtMs = timestampActualMs;
+
+                alert("🚀 ¡Código QR activado con éxito! Tienes 7 días de prueba gratuita.");
+                mostrarPanelGestion(proyectoDatosCache);
+            } catch (e) {
+                alert("⚠️ No se pudo activar la prueba. Inténtalo de nuevo.");
+            }
+        }
+
+        // VALIDACIÓN DE CONTRASEÑA EN VISTA PREVIA
         function abrirVistaPreviaPantallaCompleta() {
             if (!proyectoDatosCache) return;
 
@@ -1069,8 +1053,35 @@
 
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.remove('hidden');
-            document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
 
+            // Comprobar si tiene contraseña
+            if (proyectoDatosCache.privado && proyectoDatosCache.password) {
+                document.getElementById('pv-passwordScreen').classList.remove('hidden');
+                document.getElementById('pv-accessPasswordInput').value = '';
+                document.getElementById('pv-hintContainer').classList.add('hidden');
+            } else {
+                document.getElementById('pv-passwordScreen').classList.add('hidden');
+                renderizarContenidoVistaPrevia();
+            }
+        }
+
+        function verificarPasswordPv() {
+            const passInput = document.getElementById('pv-accessPasswordInput').value.trim();
+            if (passInput === proyectoDatosCache.password) {
+                document.getElementById('pv-passwordScreen').classList.add('hidden');
+                renderizarContenidoVistaPrevia();
+            } else {
+                alert("❌ Contraseña incorrecta.");
+            }
+        }
+
+        function mostrarPistaPv() {
+            document.getElementById('pv-hintContainer').classList.remove('hidden');
+            document.getElementById('pv-hintTextDisplay').innerText = `💡 Pista: "${proyectoDatosCache.pista || 'Ninguna'}"`;
+        }
+
+        function renderizarContenidoVistaPrevia() {
+            document.getElementById('pv-musicPlayerContainer').classList.remove('hidden');
             document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${proyectoDatosCache.nombres}`;
             
             const dateEl = document.getElementById('pv-mainDate');
@@ -1234,21 +1245,15 @@
         function checkPvAnswer(selected, correct) {
             const optionsContainer = document.getElementById('pv-quizOptions');
             const buttons = optionsContainer.getElementsByTagName('button');
-            
             for (let i = 0; i < buttons.length; i++) {
                 buttons[i].disabled = true;
-                if (i === correct) {
-                    buttons[i].style.background = '#065f46';
-                } else if (i === selected) {
-                    buttons[i].style.background = '#991b1b';
-                }
+                if (i === correct) buttons[i].style.background = '#065f46';
+                else if (i === selected) buttons[i].style.background = '#991b1b';
             }
-
             if (selected === correct) {
                 pvQuizScore += 20;
                 document.getElementById('pv-quizScore').innerText = `Puntos: ${pvQuizScore}`;
             }
-
             setTimeout(() => {
                 pvCurrentQuizIndex++;
                 if (pvCurrentQuizIndex < pvQuizData.length) {
@@ -1303,17 +1308,14 @@
                 const docSnap = await db.collection("detalles").doc(proyectoActualId).get();
                 if (docSnap.exists && docSnap.data().pagado === true) {
                     localStorage.removeItem("proyectoPruebaActivoId");
-                    mostrarPanelGestion(docSnap.data(), true);
+                    mostrarPanelGestion(docSnap.data());
                 } else {
                     const codigoOperacion = prompt("Ingresa el número de operación o comprobante de tu pago en Mercado Pago:");
                     if (codigoOperacion && codigoOperacion.trim().length > 3) {
-                        await db.collection("detalles").doc(proyectoActualId).update({
-                            pagado: true,
-                            pagoIdUnico: codigoOperacion.trim()
-                        });
+                        await db.collection("detalles").doc(proyectoActualId).update({ pagado: true, pagoIdUnico: codigoOperacion.trim() });
                         localStorage.removeItem("proyectoPruebaActivoId");
                         const updatedSnap = await db.collection("detalles").doc(proyectoActualId).get();
-                        mostrarPanelGestion(updatedSnap.data(), true);
+                        mostrarPanelGestion(updatedSnap.data());
                         alert("🎉 ¡Comprobante validado correctamente!");
                     }
                 }
