@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE ACCESO PROTEGIDO Y PISTA DE AYUDA -->
+    <!-- PANTALLA DE ACCESO PROTEGIDO Y PISTA DE AYUDA (VALIDACIÓN EXPLÍCITA) -->
     <div id="passwordScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-30">
         <div class="w-full max-w-sm bg-burgundy-900/85 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-5">
             <div class="w-14 h-14 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border border-rose-500/40">
@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE EXPIRACIÓN (SI PASARON LOS 7 DÍAS Y NO SE PAGó) -->
+    <!-- PANTALLA DE EXPIRACIÓN -->
     <div id="expiredScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-30">
         <div class="w-full max-w-sm bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-4">
             <div class="w-14 h-14 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto border border-amber-500/40">
@@ -126,7 +126,6 @@
             </div>
             <p id="tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Haz clic o toca aquí!</p>
             
-            <!-- AVISO DISCRETO DE PRUEBA (SE REVELA TRAS LOS 10 TOQUES SI NO ESTÁ PAGADO) -->
             <div id="trialExpirationNotice" class="hidden mt-4 pt-3 border-t border-rose-500/20 text-center">
                 <p id="trialNoticeText" class="text-[11px] text-amber-300 font-medium leading-relaxed"></p>
             </div>
@@ -252,14 +251,12 @@
                 if (doc.exists) {
                     proyectoGlobalData = doc.data();
                     
-                    // VALIDACIÓN DE LOS 7 DÍAS (LIMPIEZA AUTOMÁTICA EN SEGUNDO PLANO SI EXPIRÓ Y NO ESTÁ PAGADO)
                     const pagado = proyectoGlobalData.pagado === true;
                     if (!pagado) {
                         const createdAt = proyectoGlobalData.createdAtMs || (proyectoGlobalData.creado ? proyectoGlobalData.creado.toMillis() : Date.now());
                         const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
 
                         if (diasTranscurridos > 7) {
-                            // Ejecutar rutina de limpieza automática en segundo plano (Supabase + Firebase)
                             try {
                                 if (proyectoGlobalData.fotos && Array.isArray(proyectoGlobalData.fotos)) {
                                     for (const fotoUrl of proyectoGlobalData.fotos) {
@@ -273,9 +270,7 @@
                                     }
                                 }
                                 await db.collection("detalles").doc(docId).delete();
-                            } catch (err) {
-                                console.warn("Error en limpieza automática:", err);
-                            }
+                            } catch (err) {}
 
                             document.getElementById('loadingScreen').classList.add('hidden');
                             document.getElementById('expiredScreen').classList.remove('hidden');
@@ -284,9 +279,13 @@
                     }
 
                     document.getElementById('loadingScreen').classList.add('hidden');
+                    
+                    // VALIDACIÓN EXPLÍCITA DE CONTRASEÑA EN LA VISTA PÚBLICA
                     if (proyectoGlobalData.privado && proyectoGlobalData.password) {
                         document.getElementById('passwordScreen').classList.remove('hidden');
-                    } else { inicializarProyectoCompleto(); }
+                    } else { 
+                        inicializarProyectoCompleto(); 
+                    }
                 } else {
                     document.getElementById('loadingScreen').classList.add('hidden');
                     document.getElementById('expiredScreen').classList.remove('hidden');
@@ -451,7 +450,6 @@
                 if (heartClicks === 10) {
                     if (typeof confetti === 'function') confetti();
 
-                    // Si el proyecto NO está pagado, calculamos los días restantes para mostrarlos discretamente al completar los 10 toques
                     if (proyectoGlobalData && proyectoGlobalData.pagado !== true) {
                         const createdAt = proyectoGlobalData.createdAtMs || (proyectoGlobalData.creado ? proyectoGlobalData.creado.toMillis() : Date.now());
                         const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
