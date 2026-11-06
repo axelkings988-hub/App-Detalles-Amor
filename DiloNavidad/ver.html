@@ -54,19 +54,24 @@
 
     <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-6">
         
+        <!-- BARRA SUPERIOR CON BOTÓN ATRÁS EN ESQUINA SUPERIOR IZQUIERDA -->
+        <div class="flex items-center justify-between">
+            <a href="index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
+                <i class="fas fa-arrow-left"></i> Volver a Proyectos
+            </a>
+            <!-- BOTÓN DE PREVISUALIZACIÓN MÁGICA -->
+            <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
+                <i class="fas fa-eye"></i> Previsualizar 25 Dic
+            </button>
+        </div>
+
         <div class="text-center space-y-2">
             <h1 id="treeTitle" class="text-3xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-200 to-white">
                 Árbol Navideño
             </h1>
-            <div class="flex flex-col items-center gap-2">
-                <div id="countdownBox" class="inline-flex items-center gap-2 px-4 py-1.5 bg-christmas-900/90 border border-gold-500/30 rounded-full text-xs text-gold-400 font-mono shadow-lg">
-                    <i class="fas fa-clock text-[10px]"></i>
-                    <span id="countdownText">Calculando tiempo...</span>
-                </div>
-                <!-- BOTÓN DE PREVISUALIZACIÓN MÁGICA -->
-                <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
-                    <i class="fas fa-eye"></i> Previsualizar Efecto 25 Dic
-                </button>
+            <div id="countdownBox" class="inline-flex items-center gap-2 px-4 py-1.5 bg-christmas-900/90 border border-gold-500/30 rounded-full text-xs text-gold-400 font-mono shadow-lg">
+                <i class="fas fa-clock text-[10px]"></i>
+                <span id="countdownText">Calculando tiempo...</span>
             </div>
         </div>
 
@@ -77,16 +82,15 @@
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
-                <!-- Esferas del Árbol -->
                 <div id="spheresGrid" class="absolute inset-0 grid grid-cols-2 gap-3 p-6 items-center justify-items-center overflow-y-auto"></div>
             </div>
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                👆 Toca la esfera que te corresponde para hacerla tuya.
+                👆 Toca tu esfera para reclamar tu espacio exclusivo.
             </p>
         </div>
     </main>
 
-    <!-- MODAL DE EDICIÓN / DUEÑO DE ESFERA -->
+    <!-- MODAL DE EDICIÓN DE ESFERA -->
     <div id="sphereModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-christmas-900 border border-gold-500/60 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
@@ -97,7 +101,6 @@
             </div>
             <h3 class="text-base font-serif font-bold text-white" id="modalSphereTitle">Tu Esfera</h3>
             
-            <!-- Modo Edición Personal -->
             <div id="editModeSection" class="space-y-3 text-left">
                 <p class="text-[11px] text-emerald-200/90 text-center">¡Este espacio es tuyo! Modifica tu nombre, mensaje, sube tu foto y graba un audio de 10 segundos:</p>
                 
@@ -107,7 +110,7 @@
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gold-400">Tu Mensaje / Carta (Protegido hasta el 25)</label>
+                    <label class="text-[10px] font-bold text-gold-400">Tu Carta / Mensaje (Protegido hasta el 25)</label>
                     <textarea id="editMsg" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-16 resize-none"></textarea>
                 </div>
 
@@ -122,7 +125,6 @@
                     </div>
                 </div>
 
-                <!-- GRABADORA DE AUDIO (Máximo 10 segundos) -->
                 <div class="space-y-1 pt-1 border-t border-emerald-500/20">
                     <label class="text-[10px] font-bold text-gold-400 flex items-center justify-between">
                         <span>Audio Dedicatoria (Máx. 10s)</span>
@@ -140,12 +142,11 @@
                     <audio id="audioPlayback" controls class="w-full hidden mt-1 h-8"></audio>
                 </div>
 
-                <button onclick="saveSphereChanges()" id="saveSphereBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow transition-transform active:scale-95 mt-2">
+                <button onclick="saveSphereChanges()" id="saveSphereBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow mt-2">
                     Guardar Mis Cambios
                 </button>
             </div>
 
-            <!-- Modo Revelación (A partir del 25 o Previsualización) -->
             <div id="revealModeSection" class="hidden space-y-3">
                 <div id="revealContent" class="space-y-3"></div>
             </div>
@@ -179,14 +180,14 @@
         const docId = urlParams.get('id');
 
         if (!docId) {
-            showError("Enlace incompleto. Falta el identificador del árbol.");
+            alert("Enlace incompleto.");
+            window.location.href = "index.html";
         } else {
             cargarDatosArbol();
         }
 
         function cargarDatosArbol() {
-            db.collection("arboles_navidad").doc(docId).get()
-            .then((doc) => {
+            db.collection("arboles_navidad").doc(docId).onSnapshot((doc) => {
                 if (doc.exists) {
                     treeData = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
@@ -197,29 +198,15 @@
                     renderSpheres();
                     initSnow();
                 } else {
-                    showError("Este árbol ya no existe.");
+                    alert("Este árbol ya no existe.");
+                    window.location.href = "index.html";
                 }
-            })
-            .catch((err) => {
-                console.error(err);
-                showError("Error al conectar con la base de datos.");
             });
-        }
-
-        function showError(msg) {
-            document.getElementById('loadingScreen').innerHTML = `
-                <div class="w-full max-w-sm bg-christmas-900/80 p-8 rounded-3xl border border-gold-500/20 space-y-3">
-                    <h2 class="text-sm font-bold text-gold-400">Aviso</h2>
-                    <p class="text-xs text-emerald-200">${msg}</p>
-                    <a href="index.html" class="inline-block mt-2 px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Crear Árbol</a>
-                </div>
-            `;
         }
 
         function checkDateAndUnlock() {
             const now = new Date();
             const christmasDate = new Date(now.getFullYear(), 11, 25, 0, 0, 0);
-
             if (now >= christmasDate || isPreviewMode) {
                 isChristmasUnlocked = true;
                 triggerMagicGlow();
@@ -233,11 +220,11 @@
             isPreviewMode = !isPreviewMode;
             const btn = document.getElementById('previewBtn');
             if (isPreviewMode) {
-                btn.innerHTML = `<i class="fas fa-eye-slash"></i> Salir de Previsualización`;
-                btn.className = "text-[10px] bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5 cursor-pointer";
+                btn.innerHTML = `<i class="fas fa-eye-slash"></i> Salir Vista 25 Dic`;
+                btn.className = "text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             } else {
-                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar Efecto 25 Dic`;
-                btn.className = "text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5 cursor-pointer";
+                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar 25 Dic`;
+                btn.className = "text-[10px] bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             }
             checkDateAndUnlock();
             renderSpheres();
@@ -248,16 +235,12 @@
                 if (isChristmasUnlocked || isPreviewMode) return;
                 const now = new Date();
                 const diff = targetDate - now;
-                if (diff <= 0) {
-                    isChristmasUnlocked = true;
-                    triggerMagicGlow();
-                    return;
-                }
+                if (diff <= 0) { isChristmasUnlocked = true; triggerMagicGlow(); return; }
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
                 const minutes = Math.floor((diff / 1000 / 60) % 60);
                 const seconds = Math.floor((diff / 1000) % 60);
-                document.getElementById('countdownText').innerText = `Faltan ${days}d ${hours}h ${minutes}m ${seconds}s para Navidad`;
+                document.getElementById('countdownText').innerText = `Faltan ${days}d ${hours}h ${minutes}m ${seconds}s`;
             }
             update();
             setInterval(update, 1000);
@@ -267,11 +250,11 @@
             document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Efecto Navideño Activo ✨`;
             document.getElementById('treeSvg').classList.add('animate-pulse');
             document.getElementById('topStar').classList.add('text-white', 'scale-125');
-            document.getElementById('treeStatusHint').innerText = "✨ ¡El árbol está iluminado! Toca tu esfera para ver tu sorpresa.";
+            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca tu esfera para ver sorpresas.";
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // LÓGICA DE ESFERA ÚNICA: El invitado toca su esfera, las demás desaparecen
+        // LÓGICA DE BLOQUEO DE ESFERAS OCUPADAS Y SELECCIÓN ÚNICA
         function renderSpheres() {
             const grid = document.getElementById('spheresGrid');
             grid.innerHTML = '';
@@ -287,25 +270,47 @@
                 grid.innerHTML = `<p class="col-span-2 text-[11px] text-gold-400 font-bold mb-1">🌟 Tu Espacio Exclusivo</p>`;
                 
                 const btn = document.createElement('button');
-                btn.className = "col-span-2 px-5 py-2.5 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2 hover:bg-gold-500 hover:text-christmas-950 mx-auto cursor-pointer";
+                btn.className = "col-span-2 px-5 py-2.5 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl flex items-center justify-center gap-2 mx-auto cursor-pointer";
                 btn.innerHTML = `<i class="fas fa-circle text-xs text-red-500"></i> ${esfera.nombre}`;
                 btn.onclick = () => openSphereModal(idx);
                 grid.appendChild(btn);
 
-                document.getElementById('treeStatusHint').innerText = "✨ Toca tu esfera para editar tus datos o ver tu sorpresa.";
+                document.getElementById('treeStatusHint').innerText = "✨ Toca tu esfera para editar tus datos.";
             } else {
                 document.getElementById('treeStatusHint').innerText = "👆 Toca la esfera que te corresponde para hacerla tuya.";
                 
                 treeData.esferas.forEach((esfera, idx) => {
                     const btn = document.createElement('button');
-                    btn.className = "px-3 py-1.5 bg-christmas-950/90 border border-gold-500/40 rounded-full text-[11px] font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gold-500 hover:text-christmas-950 truncate max-w-[120px] cursor-pointer";
-                    btn.innerHTML = `<i class="fas fa-circle text-[8px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
-                    
-                    btn.onclick = () => {
-                        localStorage.setItem(`arbol_esfera_${docId}`, idx);
-                        renderSpheres();
-                        openSphereModal(idx);
-                    };
+                    const estaOcupada = esfera.ocupadaPor && esfera.ocupadaPor !== localStorage.getItem(`device_id_${docId}`);
+
+                    if (estaOcupada) {
+                        // Esfera ocupada por otra persona
+                        btn.className = "px-3 py-1.5 bg-slate-900/60 border border-slate-700 rounded-full text-[11px] font-bold text-slate-400 cursor-not-allowed opacity-60 truncate max-w-[120px]";
+                        btn.innerHTML = `<i class="fas fa-lock text-[8px] text-slate-500"></i> <span class="truncate">${esfera.nombre}</span>`;
+                        btn.title = "Esta esfera ya fue elegida por otro invitado";
+                    } else {
+                        // Esfera disponible
+                        btn.className = "px-3 py-1.5 bg-christmas-950/90 border border-gold-500/40 rounded-full text-[11px] font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gold-500 hover:text-christmas-950 truncate max-w-[120px] cursor-pointer";
+                        btn.innerHTML = `<i class="fas fa-circle text-[8px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
+                        
+                        btn.onclick = () => {
+                            // Asignar en Firebase como ocupada por este dispositivo
+                            let deviceId = localStorage.getItem(`device_id_${docId}`);
+                            if(!deviceId) {
+                                deviceId = 'dev_' + Math.random().toString(36.substring(2));
+                                localStorage.setItem(`device_id_${docId}`, deviceId);
+                            }
+
+                            treeData.esferas[idx].ocupadaPor = deviceId;
+                            db.collection("arboles_navidad").doc(docId).update({
+                                esferas: treeData.esferas
+                            }).then(() => {
+                                localStorage.setItem(`arbol_esfera_${docId}`, idx);
+                                renderSpheres();
+                                openSphereModal(idx);
+                            });
+                        };
+                    }
                     grid.appendChild(btn);
                 });
             }
@@ -325,22 +330,12 @@
                 editSec.classList.add('hidden');
                 revealSec.classList.remove('hidden');
 
-                let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed">${esfera.mensaje || "Sin carta o mensaje."}</p>`;
+                let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed">${esfera.mensaje || "Sin mensaje."}</p>`;
                 if (esfera.foto) {
-                    content = `
-                        <div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3">
-                            <img src="${esfera.foto}" class="w-full h-full object-cover">
-                        </div>
-                        ${content}
-                    `;
+                    content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3"><img src="${esfera.foto}" class="w-full h-full object-cover"></div>${content}`;
                 }
                 if (esfera.audio) {
-                    content += `
-                        <div class="mt-3 p-3 bg-christmas-950 rounded-xl border border-gold-500/30">
-                            <p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p>
-                            <audio controls src="${esfera.audio}" class="w-full h-8"></audio>
-                        </div>
-                    `;
+                    content += `<div class="mt-3 p-3 bg-christmas-950 rounded-xl border border-gold-500/30"><p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p><audio controls src="${esfera.audio}" class="w-full h-8"></audio></div>`;
                 }
                 document.getElementById('revealContent').innerHTML = content;
             } else {
@@ -363,34 +358,28 @@
                 if (esfera.audio) {
                     audioPlayback.src = esfera.audio;
                     audioPlayback.classList.remove('hidden');
-                    document.getElementById('audioStatus').innerText = "Audio guardado previamente.";
+                    document.getElementById('audioStatus').innerText = "Audio guardado.";
                 } else {
                     audioPlayback.classList.add('hidden');
                     document.getElementById('audioStatus').innerText = "";
                 }
             }
-
             document.getElementById('sphereModal').classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('sphereModal').classList.add('hidden');
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-            }
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
             clearInterval(recordTimer);
         }
 
-        // FUNCIONES DE GRABACIÓN DE AUDIO (10 SEGUNDOS MÁXIMO)
         function startRecording() {
             audioChunks = [];
-            navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start();
 
                 document.getElementById('recBtn').disabled = true;
-                document.getElementById('recBtn').classList.add('opacity-50');
                 document.getElementById('stopBtn').disabled = false;
                 document.getElementById('stopBtn').classList.remove('cursor-not-allowed', 'bg-slate-700', 'text-slate-400');
                 document.getElementById('stopBtn').classList.add('bg-amber-600', 'text-white');
@@ -401,15 +390,10 @@
                 recordTimer = setInterval(() => {
                     timeLeft--;
                     document.getElementById('timerDisplay').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-                    if (timeLeft <= 0) {
-                        stopRecording();
-                    }
+                    if (timeLeft <= 0) stopRecording();
                 }, 1000);
 
-                mediaRecorder.ondataavailable = e => {
-                    audioChunks.push(e.data);
-                };
-
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => {
                     clearInterval(recordTimer);
                     const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
@@ -420,26 +404,17 @@
                         const audioPlayback = document.getElementById('audioPlayback');
                         audioPlayback.src = recordedAudioBase64;
                         audioPlayback.classList.remove('hidden');
-                        document.getElementById('audioStatus').innerText = "¡Audio grabado con éxito!";
+                        document.getElementById('audioStatus').innerText = "¡Audio grabado!";
                     };
-                    
-                    // Apagar micrófono
                     stream.getTracks().forEach(track => track.stop());
                 };
-            })
-            .catch(err => {
-                alert("No se pudo acceder al micrófono. Revisa los permisos de tu navegador.");
-                console.error(err);
-            });
+            }).catch(err => alert("No se pudo acceder al micrófono."));
         }
 
         function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-            }
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
             clearInterval(recordTimer);
             document.getElementById('recBtn').disabled = false;
-            document.getElementById('recBtn').classList.remove('opacity-50');
             document.getElementById('stopBtn').disabled = true;
             document.getElementById('stopBtn').classList.add('cursor-not-allowed', 'bg-slate-700', 'text-slate-400');
             document.getElementById('stopBtn').classList.remove('bg-amber-600', 'text-white');
@@ -457,15 +432,9 @@
                     const ctx = canvas.getContext('2d');
                     let width = img.width, height = img.height;
                     const maxDim = 600;
-                    if (width > height && width > maxDim) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else if (height > maxDim) {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
+                    if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
+                    else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+                    canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     newPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
@@ -481,7 +450,6 @@
         function saveSphereChanges() {
             const newName = document.getElementById('editName').value.trim();
             const newMsg = document.getElementById('editMsg').value.trim();
-
             if (!newName) { alert("El nombre no puede estar vacío."); return; }
 
             treeData.esferas[selectedSphereIndex].nombre = newName;
@@ -495,16 +463,12 @@
 
             db.collection("arboles_navidad").doc(docId).update({
                 esferas: treeData.esferas
-            })
-            .then(() => {
-                alert("¡Cambios y audio guardados con éxito!");
+            }).then(() => {
+                alert("¡Cambios guardados con éxito!");
                 closeModal();
-                renderSpheres();
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
-            })
-            .catch((err) => {
-                console.error(err);
+            }).catch((err) => {
                 alert("Error al actualizar.");
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
@@ -519,8 +483,7 @@
                 flake.style.left = `${Math.random() * 100}%`;
                 flake.style.top = `${Math.random() * -20}%`;
                 const size = 2 + Math.random() * 3;
-                flake.style.width = `${size}px`;
-                flake.style.height = `${size}px`;
+                flake.style.width = `${size}px`; flake.style.height = `${size}px`;
                 flake.style.animationDuration = `${6 + Math.random() * 4}s`;
                 flake.style.animationDelay = `${Math.random() * 5}s`;
                 container.appendChild(flake);
