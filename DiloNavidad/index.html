@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Librería QRCode oficial -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -41,7 +40,6 @@
 
     <div class="max-w-md mx-auto space-y-6">
         
-        <!-- ENCABEZADO -->
         <div class="text-center space-y-2">
             <span class="inline-block px-3 py-1 bg-gold-500/20 text-gold-400 border border-gold-500/30 rounded-full text-xs font-semibold uppercase tracking-widest">
                 🎄 Edición Navideña
@@ -52,10 +50,8 @@
             <p class="text-xs text-emerald-200/80">Selecciona tu paquete y arma tu árbol colaborativo</p>
         </div>
 
-        <!-- FORMULARIO DE CREACIÓN -->
         <div class="bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-6">
             
-            <!-- SELECCIÓN DE PAQUETE DE INTEGRANTES (PUNTO 3) -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                     <i class="fas fa-users text-xs"></i> Selecciona el Paquete de Miembros
@@ -68,7 +64,6 @@
                 </select>
             </div>
 
-            <!-- TÍTULO FIJO DEL ÁRBOL -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                     <i class="fas fa-star text-xs"></i> Título Principal (Inalterable)
@@ -76,7 +71,6 @@
                 <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
             </div>
 
-            <!-- ESTILO VISUAL -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                     <i class="fas fa-palette text-xs"></i> Estilo Visual del Árbol
@@ -88,7 +82,6 @@
                 </select>
             </div>
 
-            <!-- ESFERAS DINÁMICAS -->
             <div class="space-y-3 pt-2 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
@@ -102,13 +95,11 @@
                 <div id="spheresContainer" class="space-y-4 max-h-[300px] overflow-y-auto pr-1"></div>
             </div>
 
-            <!-- BOTÓN GUARDAR -->
             <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 hover:to-amber-500 text-christmas-950 font-bold text-xs rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2">
                 <i class="fas fa-wand-magic-sparkles"></i> Crear Árbol y Generar QR
             </button>
         </div>
 
-        <!-- MODAL DE RESULTADO CON QR (PUNTO 1) -->
         <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-christmas-900 border border-gold-500/40 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl">
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 text-gold-400 flex items-center justify-center mx-auto text-xl">
@@ -117,7 +108,6 @@
                 <h3 class="text-lg font-serif font-bold text-white">¡Tu Árbol está Listo!</h3>
                 <p class="text-xs text-emerald-200/80">Escanea el código o comparte el enlace con tus invitados.</p>
                 
-                <!-- CONTENEDOR VISUAL DEL CÓDIGO QR -->
                 <div class="bg-white p-3 rounded-2xl w-40 h-40 mx-auto flex items-center justify-center shadow-inner" id="qrcodeContainer"></div>
 
                 <div class="bg-christmas-950 p-2.5 rounded-xl border border-emerald-500/20 break-all text-[10px] text-gold-400 font-mono select-all" id="shareLink"></div>
@@ -156,7 +146,6 @@
 
             const container = document.getElementById('spheresContainer');
             if (container.children.length > maxLimit) {
-                alert(`Has cambiado a un paquete de ${maxLimit} personas. Se ajustarán las esferas excedentes.`);
                 while (container.children.length > maxLimit) {
                     container.removeChild(container.lastChild);
                 }
@@ -167,7 +156,7 @@
         function addSphereField() {
             const container = document.getElementById('spheresContainer');
             if (container.children.length >= maxLimit) {
-                alert(`Has alcanzado el límite máximo de ${maxLimit} esferas para este paquete.`);
+                alert(`Límite máximo de ${maxLimit} esferas alcanzado.`);
                 return;
             }
             const index = container.children.length;
@@ -179,57 +168,15 @@
                     <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded font-bold">Esfera #${index + 1}</span>
                     <button onclick="this.parentElement.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i></button>
                 </div>
-                <input type="text" placeholder="Nombre para la esfera (Ej: Mamá)" class="sphere-name w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
+                <input type="text" placeholder="Nombre (Ej: Mamá)" class="sphere-name w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 <textarea placeholder="Mensaje inicial..." class="sphere-msg w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-14 resize-none"></textarea>
-                <div class="flex items-center gap-2">
-                    <label class="flex-1 cursor-pointer bg-christmas-900 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
-                        <i class="fas fa-camera mr-1"></i> <span class="file-label">Subir Foto</span>
-                        <input type="file" accept="image/*" class="hidden sphere-file" onchange="compressImage(this)">
-                    </label>
-                    <div class="preview-thumb w-9 h-9 rounded-xl bg-christmas-900 border border-emerald-500/30 hidden flex items-center justify-center overflow-hidden"></div>
-                </div>
             `;
             container.appendChild(div);
             updateCount();
         }
 
         function updateCount() {
-            const count = document.getElementById('spheresContainer').children.length;
-            document.getElementById('sphereCount').innerText = count;
-        }
-
-        function compressImage(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    let width = img.width, height = img.height;
-                    const maxDim = 600;
-                    if (width > height && width > maxDim) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else if (height > maxDim) {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    const compressed = canvas.toDataURL('image/jpeg', 0.7);
-                    input.dataset.base64 = compressed;
-
-                    const thumb = input.closest('div').querySelector('.preview-thumb');
-                    thumb.classList.remove('hidden');
-                    thumb.innerHTML = `<img src="${compressed}" class="w-full h-full object-cover">`;
-                    input.closest('label').querySelector('.file-label').innerText = "¡Foto Lista!";
-                }
-            }
-            reader.readAsDataURL(file);
+            document.getElementById('sphereCount').innerText = document.getElementById('spheresContainer').children.length;
         }
 
         function saveTreeToFirebase() {
@@ -244,10 +191,9 @@
             for (let item of containerItems) {
                 const name = item.querySelector('.sphere-name').value.trim();
                 const msg = item.querySelector('.sphere-msg').value.trim();
-                const photo = item.querySelector('.sphere-file').dataset.base64 || "";
 
                 if (!name) { alert("Todas las esferas deben tener nombre."); return; }
-                spheresArray.push({ nombre: name, mensaje: msg, foto: photo });
+                spheresArray.push({ nombre: name, mensaje: msg, foto: "", audio: "" });
             }
 
             const saveBtn = document.getElementById('saveBtn');
@@ -264,13 +210,13 @@
 
             db.collection("arboles_navidad").add(treeData)
             .then((docRef) => {
-                const currentUrl = window.location.href.replace('index.html', 'ver.html');
-                const finalUrl = `${currentUrl}?id=${docRef.id}`;
+                const loc = window.location;
+                const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
+                const finalUrl = `${loc.protocol}//${loc.host}${basePath}/ver.html?id=${docRef.id}`;
                 
                 document.getElementById('shareLink').innerText = finalUrl;
-                document.getElementById('whatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("🎄 ¡Hola! Han creado un Árbol de Navidad Oculto para nosotros. Entra aquí para elegir tu esfera: " + finalUrl)}`;
+                document.getElementById('whatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("🎄 ¡Hola! Entra aquí para elegir tu esfera en nuestro Árbol de Navidad Oculto: " + finalUrl)}`;
                 
-                // Generar QR visual garantizado
                 document.getElementById('qrcodeContainer').innerHTML = "";
                 new QRCode(document.getElementById("qrcodeContainer"), {
                     text: finalUrl,
