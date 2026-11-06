@@ -1,1 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Árbol de Navidad Oculto | Dilo D' QRazón</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        christmas: { 900: '#0B2217', 950: '#05130D' },
+                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #05130D 0%, #0B2217 50%, #0F2E20 100%); color: #F3F4F6; min-height: 100vh; overflow-x: hidden; }
+        .font-serif { font-family: 'Cinzel', serif; }
+        .snowflake { position: absolute; background: white; border-radius: 50%; pointer-events: none; animation: fall linear infinite; opacity: 0.8; }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0); }
+            100% { transform: translateY(110vh) translateX(20px); }
+        }
+        .tree-glow { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.6)); }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-5deg); }
+            75% { transform: translateX(5px) rotate(5deg); }
+        }
+        .shake-anim { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="antialiased pb-20 px-4 pt-6 relative">
+
+    <!-- EFECTO DE NIEVE -->
+    <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- PANTALLA DE CARGA / ERROR -->
+    <div id="loadingScreen" class="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center relative z-20">
+        <div class="w-full max-w-sm bg-christmas-900/80 backdrop-blur-xl border border-gold-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400 mx-auto"></div>
+            <p class="text-xs text-emerald-200" id="loadingText">Preparando la magia navideña...</p>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL DEL ÁRBOL -->
+    <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-6">
+        
+        <!-- ENCABEZADO Y TÍTULO -->
+        <div class="text-center space-y-2">
+            <h1 id="treeTitle" class="text-3xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-200 to-white">
+                Árbol Navideño
+            </h1>
+            <div id="countdownBox" class="inline-flex items-center gap-2 px-4 py-1.5 bg-christmas-900/90 border border-gold-500/30 rounded-full text-xs text-gold-400 font-mono shadow-lg">
+                <i class="fas fa-clock text-[10px]"></i>
+                <span id="countdownText">Calculando tiempo...</span>
+            </div>
+        </div>
+
+        <!-- ÁRBOL MINIMALISTA E ILUSTRADO -->
+        <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
+            
+            <div id="treeGraphicContainer" class="relative w-64 h-80 mx-auto flex flex-col items-center justify-center">
+                <!-- Estrella superior -->
+                <i id="topStar" class="fas fa-star text-3xl text-gold-400 mb-2 transition-all duration-700"></i>
+                
+                <!-- SVG del Árbol Minimalista -->
+                <svg viewBox="0 0 200 240" class="w-48 h-56 tree-glow transition-all duration-700" id="treeSvg">
+                    <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
+                    <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
+                </svg>
+
+                <!-- Contenedor de Esferas Interactivas sobre el árbol -->
+                <div id="spheresGrid" class="absolute inset-0 grid grid-cols-2 gap-4 p-8 items-center justify-items-center">
+                    <!-- Se inyectan dinámicamente -->
+                </div>
+            </div>
+
+            <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
+                🔒 Toca cualquier esfera. Los mensajes se revelarán este 25 de diciembre.
+            </p>
+        </div>
+    </main>
+
+    <!-- MODAL DE MENSAJE PROTEGIDO (ANTES DEL 25) -->
+    <div id="lockedModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-christmas-900 border border-gold-500/40 w-full max-w-xs rounded-3xl p-6 text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 text-gold-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3 class="text-base font-serif font-bold text-white" id="lockedSphereName">Esfera Protegida</h3>
+            <p class="text-xs text-emerald-200/80 leading-relaxed">
+                "Este mensaje está protegido. El árbol brillará y revelará sus secretos el 25 de diciembre. 🎄✨"
+            </p>
+            <button onclick="closeLockedModal()" class="w-full py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow transition-transform active:scale-95">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE REVELACIÓN (A PARTIR DEL 25) -->
+    <div id="revealModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-christmas-900 border border-gold-500/60 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl relative overflow-hidden">
+            <button onclick="closeRevealModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+            <span class="inline-block px-3 py-1 bg-gold-500/20 text-gold-400 border border-gold-500/30 rounded-full text-[10px] font-bold uppercase tracking-widest" id="modalSphereTitle">
+                Sorpresa Navideña
+            </span>
+            <div id="modalSphereContent" class="space-y-3">
+                <!-- Foto y mensaje revelado -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Principal -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
+            authDomain: "appdetallesamor.firebaseapp.com",
+            projectId: "appdetallesamor",
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618",
+            measurementId: "G-ZTGDLNQXSF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let treeData = null;
+        let isChristmasUnlocked = false;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const docId = urlParams.get('id');
+
+        if (!docId) {
+            showError("No se encontró el identificador del árbol en el enlace.");
+        } else {
+            db.collection("arboles_navidad").doc(docId).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    treeData = doc.data();
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    
+                    document.getElementById('treeTitle').innerText = treeData.titulo;
+                    
+                    checkDateAndUnlock();
+                    renderSpheres();
+                    initSnow();
+                } else {
+                    showError("Este árbol de Navidad ya no existe o fue eliminado.");
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+                showError("Error al conectar con la base de datos.");
+            });
+        }
+
+        function showError(msg) {
+            document.getElementById('loadingScreen').innerHTML = `
+                <div class="w-full max-w-sm bg-christmas-900/80 p-8 rounded-3xl border border-gold-500/20 space-y-3">
+                    <h2 class="text-sm font-bold text-gold-400">Aviso importante</h2>
+                    <p class="text-xs text-emerald-200">${msg}</p>
+                    <a href="index.html" class="inline-block mt-2 px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Crear Nuevo Árbol</a>
+                </div>
+            `;
+        }
+
+        // Validación de fecha (25 de Diciembre en adelante)
+        function checkDateAndUnlock() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            // Fecha objetivo: 25 de Diciembre a las 00:00 hrs
+            const christmasDate = new Date(currentYear, 11, 25, 0, 0, 0);
+
+            // Si ya pasó el 25 de diciembre de este año
+            if (now >= christmasDate) {
+                isChristmasUnlocked = true;
+                triggerMagicGlow();
+            } else {
+                startCountdown(christmasDate);
+            }
+        }
+
+        function startCountdown(targetDate) {
+            function update() {
+                const now = new Date();
+                const diff = targetDate - now;
+
+                if (diff <= 0) {
+                    isChristmasUnlocked = true;
+                    triggerMagicGlow();
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / 1000 / 60) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                document.getElementById('countdownText').innerText = `Faltan ${days}d ${hours}h ${minutes}m ${seconds}s para Navidad`;
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        function triggerMagicGlow() {
+            document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Feliz Navidad! Mensajes desbloqueados ✨`;
+            document.getElementById('treeSvg').classList.add('animate-pulse');
+            document.getElementById('topStar').classList.add('text-white', 'scale-125');
+            document.getElementById('treeStatusHint').innerText = "✨ ¡El árbol está iluminado! Toca las esferas para ver los secretos.";
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        // Renderizar Esferas en el árbol
+        function renderSpheres() {
+            const grid = document.getElementById('spheresGrid');
+            grid.innerHTML = '';
+
+            if (!treeData.esferas || treeData.esferas.length === 0) return;
+
+            treeData.esferas.forEach((esfera, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-1.5 bg-christmas-950/90 border border-gold-500/40 rounded-full text-[11px] font-bold text-gold-400 shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gold-500 hover:text-christmas-950";
+                btn.innerHTML = `<i class="fas fa-circle text-[8px] text-red-500"></i> ${esfera.nombre}`;
+                
+                btn.onclick = () => handleSphereClick(esfera, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleSphereClick(esfera, btnElement) {
+            if (isChristmasUnlocked) {
+                // MODO REVELACIÓN (25 de diciembre en adelante)
+                document.getElementById('modalSphereTitle').innerText = `Esfera de ${esfera.nombre}`;
+                
+                let contentHtml = `<p class="text-xs text-emerald-100 font-sans leading-relaxed">${esfera.mensaje || "Sin mensaje escrito."}</p>`;
+                if (esfera.foto) {
+                    contentHtml = `
+                        <div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-56 bg-christmas-950 mb-3">
+                            <img src="${esfera.foto}" class="w-full h-full object-cover">
+                        </div>
+                        ${contentHtml}
+                    `;
+                }
+
+                document.getElementById('modalSphereContent').innerHTML = contentHtml;
+                document.getElementById('revealModal').classList.remove('hidden');
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+                }
+            } else {
+                // MODO BLOQUEADO (Antes del 25 de diciembre)
+                btnElement.classList.add('shake-anim');
+                setTimeout(() => btnElement.classList.remove('shake-anim'), 300);
+
+                document.getElementById('lockedSphereName').innerText = `Esfera de ${esfera.nombre}`;
+                document.getElementById('lockedModal').classList.remove('hidden');
+            }
+        }
+
+        function closeLockedModal() {
+            document.getElementById('lockedModal').classList.add('hidden');
+        }
+
+        function closeRevealModal() {
+            document.getElementById('revealModal').classList.add('hidden');
+        }
+
+        // Generar Nieve sutil
+        function initSnow() {
+            const container = document.getElementById('snowContainer');
+            for (let i = 0; i < 25; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake';
+                flake.style.left = `${Math.random() * 100}%`;
+                flake.style.top = `${Math.random() * -20}%`;
+                const size = 2 + Math.random() * 4;
+                flake.style.width = `${size}px`;
+                flake.style.height = `${size}px`;
+                flake.style.animationDuration = `${5 + Math.random() * 5}s`;
+                flake.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(flake);
+            }
+        }
+    </script>
+</body>
+</html>
 
