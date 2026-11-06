@@ -45,7 +45,6 @@
 
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- PANTALLA DE CARGA -->
     <div id="loadingScreen" class="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400 mx-auto"></div>
@@ -53,7 +52,6 @@
         </div>
     </div>
 
-    <!-- CONTENIDO DEL INVITADO -->
     <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-6">
         
         <div class="text-center space-y-2">
@@ -65,8 +63,8 @@
                     <i class="fas fa-clock text-[10px]"></i>
                     <span id="countdownText">Calculando tiempo...</span>
                 </div>
-                <!-- BOTÓN DE PREVISUALIZACIÓN MÁGICA (PUNTO 4) -->
-                <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5">
+                <!-- BOTÓN DE PREVISUALIZACIÓN MÁGICA -->
+                <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
                     <i class="fas fa-eye"></i> Previsualizar Efecto 25 Dic
                 </button>
             </div>
@@ -79,18 +77,18 @@
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
-                <!-- Aquí se cargan las esferas -->
+                <!-- Esferas del Árbol -->
                 <div id="spheresGrid" class="absolute inset-0 grid grid-cols-2 gap-3 p-6 items-center justify-items-center overflow-y-auto"></div>
             </div>
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                👆 Toca tu esfera para reclamar tu espacio exclusivo.
+                👆 Toca la esfera que te corresponde para hacerla tuya.
             </p>
         </div>
     </main>
 
-    <!-- MODAL DE EDICIÓN / DUEÑO DE ESFERA (PUNTO 5) -->
+    <!-- MODAL DE EDICIÓN / DUEÑO DE ESFERA -->
     <div id="sphereModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-christmas-900 border border-gold-500/60 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl relative">
+        <div class="bg-christmas-900 border border-gold-500/60 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
                 <i class="fas fa-times text-xs"></i>
             </button>
@@ -101,31 +99,53 @@
             
             <!-- Modo Edición Personal -->
             <div id="editModeSection" class="space-y-3 text-left">
-                <p class="text-[11px] text-emerald-200/90 text-center">¡Este espacio es tuyo! Modifica tu nombre, mensaje o foto:</p>
+                <p class="text-[11px] text-emerald-200/90 text-center">¡Este espacio es tuyo! Modifica tu nombre, mensaje, sube tu foto y graba un audio de 10 segundos:</p>
+                
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Nombre</label>
                     <input type="text" id="editName" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 </div>
+
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gold-400">Tu Mensaje Secreto (Protegido hasta el 25)</label>
+                    <label class="text-[10px] font-bold text-gold-400">Tu Mensaje / Carta (Protegido hasta el 25)</label>
                     <textarea id="editMsg" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-16 resize-none"></textarea>
                 </div>
+
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Foto Especial</label>
                     <div class="flex items-center gap-2">
                         <label class="flex-1 cursor-pointer bg-christmas-950 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
-                            <i class="fas fa-camera mr-1"></i> <span id="fileLabel">Cambiar Foto</span>
+                            <i class="fas fa-camera mr-1"></i> <span id="fileLabel">Subir Foto</span>
                             <input type="file" accept="image/*" class="hidden" id="editFile" onchange="compressImage(this)">
                         </label>
                         <div id="previewThumb" class="w-9 h-9 rounded-xl bg-christmas-950 border border-emerald-500/30 hidden flex items-center justify-center overflow-hidden"></div>
                     </div>
                 </div>
-                <button onclick="saveSphereChanges()" id="saveSphereBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow transition-transform active:scale-95">
+
+                <!-- GRABADORA DE AUDIO (Máximo 10 segundos) -->
+                <div class="space-y-1 pt-1 border-t border-emerald-500/20">
+                    <label class="text-[10px] font-bold text-gold-400 flex items-center justify-between">
+                        <span>Audio Dedicatoria (Máx. 10s)</span>
+                        <span id="timerDisplay" class="text-red-400 font-mono">00:10</span>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="startRecording()" id="recBtn" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 active:scale-95">
+                            <i class="fas fa-microphone"></i> Grabar Audio
+                        </button>
+                        <button type="button" onclick="stopRecording()" id="stopBtn" disabled class="px-3 py-2 bg-slate-700 text-slate-400 font-bold text-[11px] rounded-xl flex items-center justify-center gap-1 cursor-not-allowed">
+                            <i class="fas fa-stop"></i> Detener
+                        </button>
+                    </div>
+                    <div id="audioStatus" class="text-[10px] text-emerald-300 text-center italic"></div>
+                    <audio id="audioPlayback" controls class="w-full hidden mt-1 h-8"></audio>
+                </div>
+
+                <button onclick="saveSphereChanges()" id="saveSphereBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow transition-transform active:scale-95 mt-2">
                     Guardar Mis Cambios
                 </button>
             </div>
 
-            <!-- Modo Revelación (25 de Diciembre o Previsualización activa) -->
+            <!-- Modo Revelación (A partir del 25 o Previsualización) -->
             <div id="revealModeSection" class="hidden space-y-3">
                 <div id="revealContent" class="space-y-3"></div>
             </div>
@@ -150,6 +170,10 @@
         let isChristmasUnlocked = false;
         let isPreviewMode = false;
         let newPhotoBase64 = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioBase64 = null;
+        let recordTimer = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
@@ -157,6 +181,10 @@
         if (!docId) {
             showError("Enlace incompleto. Falta el identificador del árbol.");
         } else {
+            cargarDatosArbol();
+        }
+
+        function cargarDatosArbol() {
             db.collection("arboles_navidad").doc(docId).get()
             .then((doc) => {
                 if (doc.exists) {
@@ -206,12 +234,13 @@
             const btn = document.getElementById('previewBtn');
             if (isPreviewMode) {
                 btn.innerHTML = `<i class="fas fa-eye-slash"></i> Salir de Previsualización`;
-                btn.className = "text-[10px] bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5";
+                btn.className = "text-[10px] bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5 cursor-pointer";
             } else {
                 btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar Efecto 25 Dic`;
-                btn.className = "text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5";
+                btn.className = "text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5 cursor-pointer";
             }
             checkDateAndUnlock();
+            renderSpheres();
         }
 
         function startCountdown(targetDate) {
@@ -242,12 +271,12 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // LÓGICA DE ESFERA ÚNICA (PUNTO 5): El invitado elige su esfera y las demás desaparecen
+        // LÓGICA DE ESFERA ÚNICA: El invitado toca su esfera, las demás desaparecen
         function renderSpheres() {
             const grid = document.getElementById('spheresGrid');
             grid.innerHTML = '';
 
-            if (!treeData.esferas) return;
+            if (!treeData || !treeData.esferas) return;
 
             const savedMyIndex = localStorage.getItem(`arbol_esfera_${docId}`);
 
@@ -258,7 +287,7 @@
                 grid.innerHTML = `<p class="col-span-2 text-[11px] text-gold-400 font-bold mb-1">🌟 Tu Espacio Exclusivo</p>`;
                 
                 const btn = document.createElement('button');
-                btn.className = "col-span-2 px-5 py-2.5 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2 hover:bg-gold-500 hover:text-christmas-950 mx-auto";
+                btn.className = "col-span-2 px-5 py-2.5 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2 hover:bg-gold-500 hover:text-christmas-950 mx-auto cursor-pointer";
                 btn.innerHTML = `<i class="fas fa-circle text-xs text-red-500"></i> ${esfera.nombre}`;
                 btn.onclick = () => openSphereModal(idx);
                 grid.appendChild(btn);
@@ -269,7 +298,7 @@
                 
                 treeData.esferas.forEach((esfera, idx) => {
                     const btn = document.createElement('button');
-                    btn.className = "px-3 py-1.5 bg-christmas-950/90 border border-gold-500/40 rounded-full text-[11px] font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gold-500 hover:text-christmas-950 truncate max-w-[120px]";
+                    btn.className = "px-3 py-1.5 bg-christmas-950/90 border border-gold-500/40 rounded-full text-[11px] font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gold-500 hover:text-christmas-950 truncate max-w-[120px] cursor-pointer";
                     btn.innerHTML = `<i class="fas fa-circle text-[8px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
                     
                     btn.onclick = () => {
@@ -287,6 +316,7 @@
             const esfera = treeData.esferas[idx];
             document.getElementById('modalSphereTitle').innerText = `Esfera de ${esfera.nombre}`;
             newPhotoBase64 = null;
+            recordedAudioBase64 = esfera.audio || null;
 
             const editSec = document.getElementById('editModeSection');
             const revealSec = document.getElementById('revealModeSection');
@@ -295,13 +325,21 @@
                 editSec.classList.add('hidden');
                 revealSec.classList.remove('hidden');
 
-                let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed">${esfera.mensaje || "Sin mensaje."}</p>`;
+                let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed">${esfera.mensaje || "Sin carta o mensaje."}</p>`;
                 if (esfera.foto) {
                     content = `
                         <div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3">
                             <img src="${esfera.foto}" class="w-full h-full object-cover">
                         </div>
                         ${content}
+                    `;
+                }
+                if (esfera.audio) {
+                    content += `
+                        <div class="mt-3 p-3 bg-christmas-950 rounded-xl border border-gold-500/30">
+                            <p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p>
+                            <audio controls src="${esfera.audio}" class="w-full h-8"></audio>
+                        </div>
                     `;
                 }
                 document.getElementById('revealContent').innerHTML = content;
@@ -320,6 +358,16 @@
                 } else {
                     thumb.classList.add('hidden');
                 }
+
+                const audioPlayback = document.getElementById('audioPlayback');
+                if (esfera.audio) {
+                    audioPlayback.src = esfera.audio;
+                    audioPlayback.classList.remove('hidden');
+                    document.getElementById('audioStatus').innerText = "Audio guardado previamente.";
+                } else {
+                    audioPlayback.classList.add('hidden');
+                    document.getElementById('audioStatus').innerText = "";
+                }
             }
 
             document.getElementById('sphereModal').classList.remove('hidden');
@@ -327,6 +375,74 @@
 
         function closeModal() {
             document.getElementById('sphereModal').classList.add('hidden');
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+            clearInterval(recordTimer);
+        }
+
+        // FUNCIONES DE GRABACIÓN DE AUDIO (10 SEGUNDOS MÁXIMO)
+        function startRecording() {
+            audioChunks = [];
+            navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+
+                document.getElementById('recBtn').disabled = true;
+                document.getElementById('recBtn').classList.add('opacity-50');
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('stopBtn').classList.remove('cursor-not-allowed', 'bg-slate-700', 'text-slate-400');
+                document.getElementById('stopBtn').classList.add('bg-amber-600', 'text-white');
+
+                let timeLeft = 10;
+                document.getElementById('timerDisplay').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                
+                recordTimer = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timerDisplay').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                    if (timeLeft <= 0) {
+                        stopRecording();
+                    }
+                }, 1000);
+
+                mediaRecorder.ondataavailable = e => {
+                    audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    clearInterval(recordTimer);
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        const audioPlayback = document.getElementById('audioPlayback');
+                        audioPlayback.src = recordedAudioBase64;
+                        audioPlayback.classList.remove('hidden');
+                        document.getElementById('audioStatus').innerText = "¡Audio grabado con éxito!";
+                    };
+                    
+                    // Apagar micrófono
+                    stream.getTracks().forEach(track => track.stop());
+                };
+            })
+            .catch(err => {
+                alert("No se pudo acceder al micrófono. Revisa los permisos de tu navegador.");
+                console.error(err);
+            });
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+            clearInterval(recordTimer);
+            document.getElementById('recBtn').disabled = false;
+            document.getElementById('recBtn').classList.remove('opacity-50');
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('stopBtn').classList.add('cursor-not-allowed', 'bg-slate-700', 'text-slate-400');
+            document.getElementById('stopBtn').classList.remove('bg-amber-600', 'text-white');
         }
 
         function compressImage(input) {
@@ -371,6 +487,7 @@
             treeData.esferas[selectedSphereIndex].nombre = newName;
             treeData.esferas[selectedSphereIndex].mensaje = newMsg;
             if (newPhotoBase64) treeData.esferas[selectedSphereIndex].foto = newPhotoBase64;
+            if (recordedAudioBase64) treeData.esferas[selectedSphereIndex].audio = recordedAudioBase64;
 
             const btn = document.getElementById('saveSphereBtn');
             btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Guardando...`;
@@ -380,7 +497,7 @@
                 esferas: treeData.esferas
             })
             .then(() => {
-                alert("¡Cambios guardados con éxito!");
+                alert("¡Cambios y audio guardados con éxito!");
                 closeModal();
                 renderSpheres();
                 btn.innerHTML = `Guardar Mis Cambios`;
