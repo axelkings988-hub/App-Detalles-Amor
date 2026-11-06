@@ -43,21 +43,19 @@
 </head>
 <body class="antialiased pb-20 px-4 pt-6 relative">
 
-    <!-- EFECTO DE NIEVE -->
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- PANTALLA DE CARGA / ERROR -->
+    <!-- PANTALLA DE CARGA -->
     <div id="loadingScreen" class="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400 mx-auto"></div>
-            <p class="text-xs text-emerald-200" id="loadingText">Cargando el Árbol Navideño...</p>
+            <p class="text-xs text-emerald-200" id="loadingText">Entrando al Árbol Navideño...</p>
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- CONTENIDO DEL INVITADO -->
     <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-6">
         
-        <!-- TÍTULO FIJO Y CUENTA REGRESIVA -->
         <div class="text-center space-y-2">
             <h1 id="treeTitle" class="text-3xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-200 to-white">
                 Árbol Navideño
@@ -67,14 +65,13 @@
                     <i class="fas fa-clock text-[10px]"></i>
                     <span id="countdownText">Calculando tiempo...</span>
                 </div>
-                <!-- BOTÓN DE PREVISUALIZACIÓN MÁGICA -->
+                <!-- BOTÓN DE PREVISUALIZACIÓN MÁGICA (PUNTO 4) -->
                 <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold transition-colors flex items-center gap-1.5">
                     <i class="fas fa-eye"></i> Previsualizar Efecto 25 Dic
                 </button>
             </div>
         </div>
 
-        <!-- ÁRBOL Y ESFERAS -->
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
             <div class="relative w-64 h-80 mx-auto flex flex-col items-center justify-center">
                 <i id="topStar" class="fas fa-star text-3xl text-gold-400 mb-2 transition-all duration-700"></i>
@@ -82,16 +79,16 @@
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
-                <!-- Contenedor donde aparecerán las esferas -->
+                <!-- Aquí se cargan las esferas -->
                 <div id="spheresGrid" class="absolute inset-0 grid grid-cols-2 gap-3 p-6 items-center justify-items-center overflow-y-auto"></div>
             </div>
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                ✨ Toca tu esfera para ser el dueño de tu espacio y personalizarlo.
+                👆 Toca tu esfera para reclamar tu espacio exclusivo.
             </p>
         </div>
     </main>
 
-    <!-- MODAL DE EDICIÓN / VISTA DE ESFERA (MODO ESFERA ÚNICA) -->
+    <!-- MODAL DE EDICIÓN / DUEÑO DE ESFERA (PUNTO 5) -->
     <div id="sphereModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-christmas-900 border border-gold-500/60 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl relative">
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
@@ -102,9 +99,9 @@
             </div>
             <h3 class="text-base font-serif font-bold text-white" id="modalSphereTitle">Tu Esfera</h3>
             
-            <!-- Modo Edición Personal (Antes del 25 o en Previsualización) -->
+            <!-- Modo Edición Personal -->
             <div id="editModeSection" class="space-y-3 text-left">
-                <p class="text-[11px] text-emerald-200/90 text-center">¡Has reclamado este espacio! Edita tu nombre, mensaje o foto:</p>
+                <p class="text-[11px] text-emerald-200/90 text-center">¡Este espacio es tuyo! Modifica tu nombre, mensaje o foto:</p>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Nombre</label>
                     <input type="text" id="editName" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
@@ -128,7 +125,7 @@
                 </button>
             </div>
 
-            <!-- Modo Revelación (A partir del 25 o con Previsualización activa) -->
+            <!-- Modo Revelación (25 de Diciembre o Previsualización activa) -->
             <div id="revealModeSection" class="hidden space-y-3">
                 <div id="revealContent" class="space-y-3"></div>
             </div>
@@ -158,7 +155,7 @@
         const docId = urlParams.get('id');
 
         if (!docId) {
-            showError("No se encontró el identificador del árbol en el enlace.");
+            showError("Enlace incompleto. Falta el identificador del árbol.");
         } else {
             db.collection("arboles_navidad").doc(docId).get()
             .then((doc) => {
@@ -166,14 +163,13 @@
                     treeData = doc.data();
                     document.getElementById('loadingScreen').classList.add('hidden');
                     document.getElementById('mainContent').classList.remove('hidden');
-                    
                     document.getElementById('treeTitle').innerText = treeData.titulo;
                     
                     checkDateAndUnlock();
                     renderSpheres();
                     initSnow();
                 } else {
-                    showError("Este árbol ya no existe o fue eliminado.");
+                    showError("Este árbol ya no existe.");
                 }
             })
             .catch((err) => {
@@ -246,18 +242,16 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // LÓGICA DE ESFERA ÚNICA: El invitado elige su esfera y las demás desaparecen
+        // LÓGICA DE ESFERA ÚNICA (PUNTO 5): El invitado elige su esfera y las demás desaparecen
         function renderSpheres() {
             const grid = document.getElementById('spheresGrid');
             grid.innerHTML = '';
 
             if (!treeData.esferas) return;
 
-            // Verificamos si este dispositivo ya eligió una esfera previamente en este árbol
             const savedMyIndex = localStorage.getItem(`arbol_esfera_${docId}`);
 
             if (savedMyIndex !== null && treeData.esferas[savedMyIndex]) {
-                // MODO ESFERA ÚNICA: Solo muestra la esfera que eligió este usuario
                 const idx = parseInt(savedMyIndex);
                 const esfera = treeData.esferas[idx];
 
@@ -271,7 +265,6 @@
 
                 document.getElementById('treeStatusHint').innerText = "✨ Toca tu esfera para editar tus datos o ver tu sorpresa.";
             } else {
-                // MODO SELECCIÓN: Muestra todas para que el invitado elija la suya
                 document.getElementById('treeStatusHint').innerText = "👆 Toca la esfera que te corresponde para hacerla tuya.";
                 
                 treeData.esferas.forEach((esfera, idx) => {
@@ -280,9 +273,8 @@
                     btn.innerHTML = `<i class="fas fa-circle text-[8px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
                     
                     btn.onclick = () => {
-                        // Guardar en el dispositivo del invitado que esta es su esfera
                         localStorage.setItem(`arbol_esfera_${docId}`, idx);
-                        renderSpheres(); // Recargar para ocultar las demás
+                        renderSpheres();
                         openSphereModal(idx);
                     };
                     grid.appendChild(btn);
@@ -340,7 +332,6 @@
         function compressImage(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function (e) {
                 const img = new Image();
@@ -348,10 +339,8 @@
                 img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    let width = img.width;
-                    let height = img.height;
+                    let width = img.width, height = img.height;
                     const maxDim = 600;
-
                     if (width > height && width > maxDim) {
                         height = Math.round((height * maxDim) / width);
                         width = maxDim;
@@ -359,11 +348,9 @@
                         width = Math.round((width * maxDim) / height);
                         height = maxDim;
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
-                    
                     newPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
                     const thumb = document.getElementById('previewThumb');
@@ -379,16 +366,11 @@
             const newName = document.getElementById('editName').value.trim();
             const newMsg = document.getElementById('editMsg').value.trim();
 
-            if (!newName) {
-                alert("El nombre de la esfera no puede estar vacío.");
-                return;
-            }
+            if (!newName) { alert("El nombre no puede estar vacío."); return; }
 
             treeData.esferas[selectedSphereIndex].nombre = newName;
             treeData.esferas[selectedSphereIndex].mensaje = newMsg;
-            if (newPhotoBase64) {
-                treeData.esferas[selectedSphereIndex].foto = newPhotoBase64;
-            }
+            if (newPhotoBase64) treeData.esferas[selectedSphereIndex].foto = newPhotoBase64;
 
             const btn = document.getElementById('saveSphereBtn');
             btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Guardando...`;
@@ -398,7 +380,7 @@
                 esferas: treeData.esferas
             })
             .then(() => {
-                alert("¡Tus cambios se guardaron correctamente!");
+                alert("¡Cambios guardados con éxito!");
                 closeModal();
                 renderSpheres();
                 btn.innerHTML = `Guardar Mis Cambios`;
@@ -406,7 +388,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                alert("Error al actualizar la esfera.");
+                alert("Error al actualizar.");
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
             });
