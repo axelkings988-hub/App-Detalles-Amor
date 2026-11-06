@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Librería para generar el Código QR -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Librería QRCode oficial -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -22,8 +22,7 @@
                 extend: {
                     colors: {
                         christmas: { 900: '#0B2217', 950: '#05130D' },
-                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' },
-                        ruby: { 600: '#DC2626', 700: '#B91C1C' }
+                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
                     },
                     fontFamily: {
                         serif: ['"Cinzel"', 'serif'],
@@ -50,13 +49,13 @@
             <h1 class="text-3xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-200 to-white">
                 Árbol de Navidad Oculto
             </h1>
-            <p class="text-xs text-emerald-200/80">Configura tu árbol colaborativo por niveles</p>
+            <p class="text-xs text-emerald-200/80">Selecciona tu paquete y arma tu árbol colaborativo</p>
         </div>
 
-        <!-- FORMULARIO PRINCIPAL -->
+        <!-- FORMULARIO DE CREACIÓN -->
         <div class="bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-6">
             
-            <!-- PASO 1: SELECCIÓN DE PAQUETE / NIVEL DE USUARIOS -->
+            <!-- SELECCIÓN DE PAQUETE DE INTEGRANTES (PUNTO 3) -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                     <i class="fas fa-users text-xs"></i> Selecciona el Paquete de Miembros
@@ -69,16 +68,15 @@
                 </select>
             </div>
 
-            <!-- PASO 2: TÍTULO FIJO DEL ÁRBOL -->
+            <!-- TÍTULO FIJO DEL ÁRBOL -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                    <i class="fas fa-star text-xs"></i> Título Principal (Fijo e Inalterable)
+                    <i class="fas fa-star text-xs"></i> Título Principal (Inalterable)
                 </label>
                 <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
-                <p class="text-[10px] text-emerald-300/70">Este título quedará fijo para todos los integrantes que accedan.</p>
             </div>
 
-            <!-- PASO 3: ESTILO VISUAL -->
+            <!-- ESTILO VISUAL -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                     <i class="fas fa-palette text-xs"></i> Estilo Visual del Árbol
@@ -90,20 +88,18 @@
                 </select>
             </div>
 
-            <!-- PASO 4: ESFERAS DINÁMICAS -->
+            <!-- ESFERAS DINÁMICAS -->
             <div class="space-y-3 pt-2 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                         <i class="fas fa-circle-nodes text-xs"></i> Esferas (<span id="sphereCount">0</span> / <span id="maxTierLimit">5</span> máx)
                     </label>
-                    <button onclick="addSphereField()" id="addSphereBtn" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow transition-transform active:scale-95 flex items-center gap-1.5">
+                    <button onclick="addSphereField()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow transition-transform active:scale-95 flex items-center gap-1.5">
                         <i class="fas fa-plus"></i> Agregar Esfera
                     </button>
                 </div>
 
-                <div id="spheresContainer" class="space-y-4 max-h-[320px] overflow-y-auto pr-1">
-                    <!-- Aquí se inyectan los campos -->
-                </div>
+                <div id="spheresContainer" class="space-y-4 max-h-[300px] overflow-y-auto pr-1"></div>
             </div>
 
             <!-- BOTÓN GUARDAR -->
@@ -112,17 +108,17 @@
             </button>
         </div>
 
-        <!-- MODAL DE RESULTADO / QR -->
-        <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <!-- MODAL DE RESULTADO CON QR (PUNTO 1) -->
+        <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-christmas-900 border border-gold-500/40 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl">
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 text-gold-400 flex items-center justify-center mx-auto text-xl">
                     <i class="fas fa-check"></i>
                 </div>
                 <h3 class="text-lg font-serif font-bold text-white">¡Tu Árbol está Listo!</h3>
-                <p class="text-xs text-emerald-200/80">Comparte este código QR o enlace con tu familia.</p>
+                <p class="text-xs text-emerald-200/80">Escanea el código o comparte el enlace con tus invitados.</p>
                 
-                <!-- Contenedor del Código QR generado -->
-                <div id="qrcode" class="bg-white p-3 rounded-2xl mx-auto w-fit flex items-center justify-center shadow-inner"></div>
+                <!-- CONTENEDOR VISUAL DEL CÓDIGO QR -->
+                <div class="bg-white p-3 rounded-2xl w-40 h-40 mx-auto flex items-center justify-center shadow-inner" id="qrcodeContainer"></div>
 
                 <div class="bg-christmas-950 p-2.5 rounded-xl border border-emerald-500/20 break-all text-[10px] text-gold-400 font-mono select-all" id="shareLink"></div>
                 
@@ -136,7 +132,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -185,7 +180,7 @@
                     <button onclick="this.parentElement.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i></button>
                 </div>
                 <input type="text" placeholder="Nombre para la esfera (Ej: Mamá)" class="sphere-name w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                <textarea placeholder="Mensaje inicial o dedicatoria..." class="sphere-msg w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-14 resize-none"></textarea>
+                <textarea placeholder="Mensaje inicial..." class="sphere-msg w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-14 resize-none"></textarea>
                 <div class="flex items-center gap-2">
                     <label class="flex-1 cursor-pointer bg-christmas-900 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
                         <i class="fas fa-camera mr-1"></i> <span class="file-label">Subir Foto</span>
@@ -206,7 +201,6 @@
         function compressImage(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function (e) {
                 const img = new Image();
@@ -214,10 +208,8 @@
                 img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    let width = img.width;
-                    let height = img.height;
+                    let width = img.width, height = img.height;
                     const maxDim = 600;
-
                     if (width > height && width > maxDim) {
                         height = Math.round((height * maxDim) / width);
                         width = maxDim;
@@ -225,17 +217,15 @@
                         width = Math.round((width * maxDim) / height);
                         height = maxDim;
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    input.dataset.base64 = compressedDataUrl;
+                    const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                    input.dataset.base64 = compressed;
 
                     const thumb = input.closest('div').querySelector('.preview-thumb');
                     thumb.classList.remove('hidden');
-                    thumb.innerHTML = `<img src="${compressedDataUrl}" class="w-full h-full object-cover">`;
+                    thumb.innerHTML = `<img src="${compressed}" class="w-full h-full object-cover">`;
                     input.closest('label').querySelector('.file-label').innerText = "¡Foto Lista!";
                 }
             }
@@ -247,37 +237,21 @@
             const style = document.getElementById('treeStyle').value;
             const containerItems = document.getElementById('spheresContainer').children;
 
-            if (!title) {
-                alert("Por favor ingresa un título principal para el árbol.");
-                return;
-            }
-            if (containerItems.length === 0) {
-                alert("Agrega al menos una esfera.");
-                return;
-            }
+            if (!title) { alert("Ingresa un título principal."); return; }
+            if (containerItems.length === 0) { alert("Agrega al menos una esfera."); return; }
 
             const spheresArray = [];
             for (let item of containerItems) {
                 const name = item.querySelector('.sphere-name').value.trim();
                 const msg = item.querySelector('.sphere-msg').value.trim();
-                const fileInput = item.querySelector('.sphere-file');
-                const photo = fileInput.dataset.base64 || "";
+                const photo = item.querySelector('.sphere-file').dataset.base64 || "";
 
-                if (!name) {
-                    alert("Todas las esferas deben tener un nombre asignado.");
-                    return;
-                }
-
-                spheresArray.push({
-                    nombre: name,
-                    mensaje: msg,
-                    foto: photo,
-                    revelado: false
-                });
+                if (!name) { alert("Todas las esferas deben tener nombre."); return; }
+                spheresArray.push({ nombre: name, mensaje: msg, foto: photo });
             }
 
             const saveBtn = document.getElementById('saveBtn');
-            saveBtn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Guardando árbol...`;
+            saveBtn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Guardando...`;
             saveBtn.disabled = true;
 
             const treeData = {
@@ -294,11 +268,11 @@
                 const finalUrl = `${currentUrl}?id=${docRef.id}`;
                 
                 document.getElementById('shareLink').innerText = finalUrl;
-                document.getElementById('whatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("🎄 ¡Hola! Han creado un Árbol de Navidad Oculto para nosotros. Ábrelo aquí: " + finalUrl)}`;
+                document.getElementById('whatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("🎄 ¡Hola! Han creado un Árbol de Navidad Oculto para nosotros. Entra aquí para elegir tu esfera: " + finalUrl)}`;
                 
-                // Generar QR visual automáticamente
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), {
+                // Generar QR visual garantizado
+                document.getElementById('qrcodeContainer').innerHTML = "";
+                new QRCode(document.getElementById("qrcodeContainer"), {
                     text: finalUrl,
                     width: 130,
                     height: 130,
@@ -310,18 +284,17 @@
                 document.getElementById('resultModal').classList.remove('hidden');
                 if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             })
-            .catch((error) => {
-                console.error("Error al guardar:", error);
-                alert("Hubo un error al guardar en la base de datos.");
+            .catch((err) => {
+                console.error(err);
+                alert("Error al guardar.");
                 saveBtn.innerHTML = `Crear Árbol y Generar QR`;
                 saveBtn.disabled = false;
             });
         }
 
         function copyLink() {
-            const link = document.getElementById('shareLink').innerText;
-            navigator.clipboard.writeText(link);
-            alert("¡Enlace copiado al portapapeles!");
+            navigator.clipboard.writeText(document.getElementById('shareLink').innerText);
+            alert("¡Enlace copiado!");
         }
 
         window.onload = () => { addSphereField(); };
