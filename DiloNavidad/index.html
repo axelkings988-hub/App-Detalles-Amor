@@ -48,21 +48,35 @@
             <h1 class="text-3xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-200 to-white">
                 Árbol de Navidad Oculto
             </h1>
-            <p class="text-xs text-emerald-200/80">Crea el regalo colaborativo en menos de 2 minutos</p>
+            <p class="text-xs text-emerald-200/80">Configura tu árbol colaborativo por niveles</p>
         </div>
 
         <!-- FORMULARIO PRINCIPAL -->
-        <div class="bg-christmas-900/80 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-6">
+        <div class="bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-6">
             
-            <!-- PASO 1: TÍTULO -->
+            <!-- PASO 1: SELECCIÓN DE PAQUETE / NIVEL DE USUARIOS -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                    <i class="fas fa-star text-xs"></i> Título Principal del Árbol
+                    <i class="fas fa-users text-xs"></i> Selecciona el Paquete de Miembros
                 </label>
-                <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
+                <select id="userTier" onchange="updateTierLimit()" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
+                    <option value="5">🎄 Paquete Básico (1 a 5 personas)</option>
+                    <option value="10">🌟 Paquete Familiar (6 a 10 personas)</option>
+                    <option value="20">🎁 Paquete Extendido (11 a 20 personas)</option>
+                    <option value="30">✨ Mega Árbol / Oficina (21 a 30 personas)</option>
+                </select>
             </div>
 
-            <!-- PASO 2: ESTILO -->
+            <!-- PASO 2: TÍTULO FIJO DEL ÁRBOL -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
+                    <i class="fas fa-star text-xs"></i> Título Principal (Fijo e Inalterable)
+                </label>
+                <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
+                <p class="text-[10px] text-emerald-300/70">Este título quedará fijo para todos los integrantes que accedan.</p>
+            </div>
+
+            <!-- PASO 3: ESTILO VISUAL -->
             <div class="space-y-2">
                 <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
                     <i class="fas fa-palette text-xs"></i> Estilo Visual del Árbol
@@ -74,25 +88,25 @@
                 </select>
             </div>
 
-            <!-- PASO 3: ESFERAS DINÁMICAS -->
+            <!-- PASO 4: ESFERAS DINÁMICAS (CONTROLADAS POR EL LÍMITE) -->
             <div class="space-y-3 pt-2 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                        <i class="fas fa-circle-nodes text-xs"></i> Esferas del Árbol (<span id="sphereCount">0</span>)
+                        <i class="fas fa-circle-nodes text-xs"></i> Esferas (<span id="sphereCount">0</span> / <span id="maxTierLimit">5</span> máx)
                     </label>
-                    <button onclick="addSphereField()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow transition-transform active:scale-95 flex items-center gap-1.5">
+                    <button onclick="addSphereField()" id="addSphereBtn" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow transition-transform active:scale-95 flex items-center gap-1.5">
                         <i class="fas fa-plus"></i> Agregar Esfera
                     </button>
                 </div>
 
-                <div id="spheresContainer" class="space-y-4 max-h-[350px] overflow-y-auto pr-1">
-                    <!-- Aquí se inyectan los campos dinámicos -->
+                <div id="spheresContainer" class="space-y-4 max-h-[320px] overflow-y-auto pr-1">
+                    <!-- Aquí se inyectan los campos -->
                 </div>
             </div>
 
             <!-- BOTÓN GUARDAR -->
             <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 hover:to-amber-500 text-christmas-950 font-bold text-xs rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2">
-                <i class="fas fa-wand-magic-sparkles"></i> Crear Árbol y Generar QR
+                <i class="fas fa-wand-magic-sparkles"></i> Crear Árbol y Generar Enlace QR
             </button>
         </div>
 
@@ -103,7 +117,7 @@
                     <i class="fas fa-check"></i>
                 </div>
                 <h3 class="text-lg font-serif font-bold text-white">¡Tu Árbol está Listo!</h3>
-                <p class="text-xs text-emerald-200/80">Comparte este enlace o código QR con tu familia. Las sorpresas se revelarán este 25 de diciembre.</p>
+                <p class="text-xs text-emerald-200/80">Comparte este enlace. Cada integrante podrá entrar a su esfera asignada.</p>
                 
                 <div class="bg-christmas-950 p-3 rounded-xl border border-emerald-500/20 break-all text-[11px] text-gold-400 font-mono select-all" id="shareLink"></div>
                 
@@ -120,7 +134,6 @@
 
     </div>
 
-    <!-- Script de Compresión y Firebase -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
@@ -134,10 +147,29 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let spheresData = [];
+        let maxLimit = 5;
+
+        function updateTierLimit() {
+            const select = document.getElementById('userTier');
+            maxLimit = parseInt(select.value);
+            document.getElementById('maxTierLimit').innerText = maxLimit;
+
+            const container = document.getElementById('spheresContainer');
+            if (container.children.length > maxLimit) {
+                alert(`Has cambiado a un paquete de ${maxLimit} personas. Se ajustarán las esferas excedentes.`);
+                while (container.children.length > maxLimit) {
+                    container.removeChild(container.lastChild);
+                }
+                updateCount();
+            }
+        }
 
         function addSphereField() {
             const container = document.getElementById('spheresContainer');
+            if (container.children.length >= maxLimit) {
+                alert(`Has alcanzado el límite máximo de ${maxLimit} esferas para este paquete.`);
+                return;
+            }
             const index = container.children.length;
 
             const div = document.createElement('div');
@@ -148,7 +180,7 @@
                     <button onclick="this.parentElement.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i></button>
                 </div>
                 <input type="text" placeholder="Nombre para la esfera (Ej: Mamá)" class="sphere-name w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                <textarea placeholder="Mensaje secreto o dedicatoria..." class="sphere-msg w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-16 resize-none"></textarea>
+                <textarea placeholder="Mensaje inicial o dedicatoria..." class="sphere-msg w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-14 resize-none"></textarea>
                 <div class="flex items-center gap-2">
                     <label class="flex-1 cursor-pointer bg-christmas-900 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
                         <i class="fas fa-camera mr-1"></i> <span class="file-label">Subir Foto</span>
@@ -166,7 +198,6 @@
             document.getElementById('sphereCount').innerText = count;
         }
 
-        // Compresor automático de imagen en Base64
         function compressImage(input) {
             const file = input.files[0];
             if (!file) return;
@@ -213,11 +244,11 @@
             const containerItems = document.getElementById('spheresContainer').children;
 
             if (!title) {
-                alert("Por favor ingresa un título para el árbol.");
+                alert("Por favor ingresa un título principal para el árbol.");
                 return;
             }
             if (containerItems.length === 0) {
-                alert("Agrega al menos una esfera para la familia.");
+                alert("Agrega al menos una esfera.");
                 return;
             }
 
@@ -248,6 +279,7 @@
             const treeData = {
                 titulo: title,
                 estilo: style,
+                limiteUsuarios: maxLimit,
                 esferas: spheresArray,
                 fechaCreacion: new Date().toISOString()
             };
@@ -268,7 +300,7 @@
             .catch((error) => {
                 console.error("Error al guardar:", error);
                 alert("Hubo un error al guardar en la base de datos.");
-                saveBtn.innerHTML = `Crear Árbol y Generar QR`;
+                saveBtn.innerHTML = `Crear Árbol y Generar Enlace QR`;
                 saveBtn.disabled = false;
             });
         }
@@ -279,9 +311,7 @@
             alert("¡Enlace copiado al portapapeles!");
         }
 
-        // Agregar una esfera por defecto al cargar
         window.onload = () => { addSphereField(); };
     </script>
 </body>
 </html>
-
