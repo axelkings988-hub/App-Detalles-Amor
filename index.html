@@ -22,7 +22,6 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            /* Permite el desplazamiento natural de la página sin trabarse */
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -61,6 +60,16 @@
             transform: translateY(-3px);
         }
 
+        .card-red {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(254, 242, 242, 0.9) 100%);
+            border: 2px solid #DC2626;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), inset 0 0 15px rgba(220, 38, 38, 0.2);
+        }
+        .card-red:hover {
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.8), inset 0 0 20px rgba(220, 38, 38, 0.3);
+            transform: translateY(-3px);
+        }
+
         .card-green {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.9) 100%);
             border: 2px solid #22C55E;
@@ -75,9 +84,8 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Margen superior ajustado para bajar más los cuadros de texto */
         .contenedor-tarjetas {
-            margin-top: 46vh; /* Empuja los cuadros de texto más hacia abajo */
+            margin-top: 42vh; /* Ajustado ligeramente para dar espacio al nuevo módulo */
             width: 100%;
             max-width: 24rem;
             padding-left: 1rem;
@@ -105,7 +113,18 @@
                 </div>
             </a>
 
-            <!-- MÓDULO 2: MENSAJE TEMPORIZADOR -->
+            <!-- MÓDULO 2: ÁRBOL NAVIDEÑO (NUEVO) -->
+            <a href="DiloNavidad/" class="card-red card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
+                <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-tree"></i>
+                </div>
+                <div class="flex-1 pr-2">
+                    <h2 class="text-xs font-extrabold text-slate-900 group-hover:text-red-600 transition-colors">Árbol de Navidad Oculto</h2>
+                    <p class="text-[10px] text-slate-600 font-medium leading-tight">Crea un árbol colaborativo con esferas sorpresa.</p>
+                </div>
+            </a>
+
+            <!-- MÓDULO 3: MENSAJE TEMPORIZADOR -->
             <a href="temporizador/" class="card-gold card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
                 <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-clock"></i>
@@ -116,7 +135,7 @@
                 </div>
             </a>
 
-            <!-- MÓDULO 3: MASCOTAS -->
+            <!-- MÓDULO 4: MASCOTAS -->
             <a href="mascotas/" class="card-cyan card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
                 <div class="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-paw"></i>
@@ -127,7 +146,7 @@
                 </div>
             </a>
 
-            <!-- MÓDULO 4: ATENCIÓN AL CLIENTE / SOPORTE WHATSAPP -->
+            <!-- MÓDULO 5: ATENCIÓN AL CLIENTE / SOPORTE WHATSAPP -->
             <a href="https://wa.me/528128869036?text=Hola,%20realic%C3%A9%20el%20pago%20de%20mi%20detalle%20pero%20no%20puedo%20ver%20mi%20c%C3%B3digo%20QR." target="_blank" class="card-green card-transition flex items-center p-3.5 rounded-2xl group relative overflow-hidden block">
                 <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-xl mr-3.5 flex-shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                     <i class="fa-brands fa-whatsapp"></i>
