@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Crear Árbol de Navidad Oculto | Dilo D' QRazón</title>
+    <title>Mis Árboles Navideños | Dilo D' QRazón</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -36,46 +36,65 @@
         .font-serif { font-family: 'Cinzel', serif; }
     </style>
 </head>
-<body class="antialiased pb-20 px-4 pt-8">
+<body class="antialiased pb-20 px-4 pt-6">
 
     <div class="max-w-md mx-auto space-y-6">
         
-        <div class="text-center space-y-2">
-            <span class="inline-block px-3 py-1 bg-gold-500/20 text-gold-400 border border-gold-500/30 rounded-full text-xs font-semibold uppercase tracking-widest">
-                🎄 Edición Navideña
-            </span>
-            <h1 class="text-3xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-200 to-white">
-                Árbol de Navidad Oculto
-            </h1>
-            <p class="text-xs text-emerald-200/80">Selecciona tu paquete y arma tu árbol colaborativo</p>
+        <!-- BARRA SUPERIOR CON BOTÓN ATRÁS AL MENÚ PRINCIPAL -->
+        <div class="flex items-center justify-between">
+            <a href="../index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
+                <i class="fas fa-arrow-left"></i> Menú Principal
+            </a>
+            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.0</span>
         </div>
 
-        <div class="bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-6">
+        <!-- SECCIÓN 1: MENÚ DE PROYECTOS REALIZADOS -->
+        <div id="projectsSection" class="bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-serif font-bold text-gold-400 flex items-center gap-2">
+                    <i class="fas fa-folder-tree"></i> Tus Árboles Creados
+                </h2>
+                <button onclick="showCreateForm()" class="px-3 py-1.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 text-xs font-bold rounded-xl shadow transition-transform active:scale-95 flex items-center gap-1">
+                    <i class="fas fa-plus"></i> Nuevo Árbol
+                </button>
+            </div>
             
+            <div id="projectsList" class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+                <p class="text-xs text-emerald-200/70 text-center py-4">Buscando tus árboles guardados en este dispositivo...</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: FORMULARIO DE NUEVO PROYECTO (OCULTO INICIALMENTE) -->
+        <div id="createFormSection" class="hidden bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-6 relative">
+            
+            <!-- Botón Atrás hacia Proyectos Realizados -->
+            <button onclick="showProjectsMenu()" class="absolute top-4 left-4 text-xs text-gold-400 hover:text-white flex items-center gap-1">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+
+            <div class="text-center space-y-1 pt-4">
+                <h1 class="text-xl font-serif font-bold text-white">Nuevo Árbol Navideño</h1>
+                <p class="text-[11px] text-emerald-200/80">Configura los espacios para tu familia o equipo</p>
+            </div>
+
             <div class="space-y-2">
-                <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                    <i class="fas fa-users text-xs"></i> Selecciona el Paquete de Miembros
-                </label>
-                <select id="userTier" onchange="updateTierLimit()" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
-                    <option value="5">🎄 Paquete Básico (1 a 5 personas)</option>
-                    <option value="10">🌟 Paquete Familiar (6 a 10 personas)</option>
-                    <option value="20">🎁 Paquete Extendido (11 a 20 personas)</option>
-                    <option value="30">✨ Mega Árbol / Oficina (21 a 30 personas)</option>
+                <label class="text-xs font-bold text-gold-400">Paquete de Miembros</label>
+                <select id="userTier" onchange="updateTierLimit()" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500">
+                    <option value="5">🎄 Básico (1 a 5 personas)</option>
+                    <option value="10">🌟 Familiar (6 a 10 personas)</option>
+                    <option value="20">🎁 Extendido (11 a 20 personas)</option>
+                    <option value="30">✨ Mega / Oficina (21 a 30 personas)</option>
                 </select>
             </div>
 
             <div class="space-y-2">
-                <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                    <i class="fas fa-star text-xs"></i> Título Principal (Inalterable)
-                </label>
-                <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
+                <label class="text-xs font-bold text-gold-400">Título Principal (Inalterable)</label>
+                <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500">
             </div>
 
             <div class="space-y-2">
-                <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                    <i class="fas fa-palette text-xs"></i> Estilo Visual del Árbol
-                </label>
-                <select id="treeStyle" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500 transition-colors">
+                <label class="text-xs font-bold text-gold-400">Estilo Visual</label>
+                <select id="treeStyle" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-gold-500">
                     <option value="gold">✨ Elegante Dorado (Clásico)</option>
                     <option value="snow">❄️ Nevado Tradicional</option>
                     <option value="modern">🌲 Minimalista Moderno</option>
@@ -84,42 +103,33 @@
 
             <div class="space-y-3 pt-2 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-gold-400 flex items-center gap-2">
-                        <i class="fas fa-circle-nodes text-xs"></i> Esferas (<span id="sphereCount">0</span> / <span id="maxTierLimit">5</span> máx)
-                    </label>
-                    <button onclick="addSphereField()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow transition-transform active:scale-95 flex items-center gap-1.5">
-                        <i class="fas fa-plus"></i> Agregar Esfera
+                    <label class="text-xs font-bold text-gold-400">Nombres de Esferas (<span id="sphereCount">0</span> / <span id="maxTierLimit">5</span> máx)</label>
+                    <button onclick="addSphereField()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow">
+                        <i class="fas fa-plus"></i> Agregar Nombre
                     </button>
                 </div>
-
-                <div id="spheresContainer" class="space-y-4 max-h-[300px] overflow-y-auto pr-1"></div>
+                <div id="spheresContainer" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1"></div>
             </div>
 
-            <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 hover:to-amber-500 text-christmas-950 font-bold text-xs rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2">
-                <i class="fas fa-wand-magic-sparkles"></i> Crear Árbol y Generar QR
+            <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow-xl">
+                Crear Árbol y Generar QR
             </button>
         </div>
 
+        <!-- MODAL DE RESULTADO CON QR -->
         <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-christmas-900 border border-gold-500/40 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl">
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 text-gold-400 flex items-center justify-center mx-auto text-xl">
                     <i class="fas fa-check"></i>
                 </div>
-                <h3 class="text-lg font-serif font-bold text-white">¡Tu Árbol está Listo!</h3>
-                <p class="text-xs text-emerald-200/80">Escanea el código o comparte el enlace con tus invitados.</p>
-                
+                <h3 class="text-lg font-serif font-bold text-white">¡Árbol Creado con Éxito!</h3>
                 <div class="bg-white p-3 rounded-2xl w-40 h-40 mx-auto flex items-center justify-center shadow-inner" id="qrcodeContainer"></div>
-
                 <div class="bg-christmas-950 p-2.5 rounded-xl border border-emerald-500/20 break-all text-[10px] text-gold-400 font-mono select-all" id="shareLink"></div>
-                
                 <div class="flex gap-2 pt-2">
-                    <button onclick="copyLink()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-transform active:scale-95">
-                        <i class="fas fa-copy mr-1"></i> Copiar
-                    </button>
-                    <a id="whatsappBtn" href="#" target="_blank" class="flex-1 py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-1">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </a>
+                    <button onclick="copyLink()" class="flex-1 py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl">Copiar Enlace</button>
+                    <a id="whatsappBtn" href="#" target="_blank" class="flex-1 py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1">WhatsApp</a>
                 </div>
+                <button onclick="location.reload()" class="w-full py-2 bg-christmas-950 text-gold-400 text-xs font-bold rounded-xl border border-gold-500/30">Volver a Mis Proyectos</button>
             </div>
         </div>
     </div>
@@ -139,18 +149,69 @@
 
         let maxLimit = 5;
 
-        function updateTierLimit() {
-            const select = document.getElementById('userTier');
-            maxLimit = parseInt(select.value);
-            document.getElementById('maxTierLimit').innerText = maxLimit;
+        window.onload = () => {
+            loadMyProjects();
+        };
 
-            const container = document.getElementById('spheresContainer');
-            if (container.children.length > maxLimit) {
-                while (container.children.length > maxLimit) {
-                    container.removeChild(container.lastChild);
-                }
-                updateCount();
+        function loadMyProjects() {
+            const listContainer = document.getElementById('projectsList');
+            // Recuperar IDs de árboles guardados en este celular
+            let savedIds = JSON.parse(localStorage.getItem('mis_arboles_navidad') || '[]');
+
+            if (savedIds.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-emerald-200/60 text-center py-6">Aún no has creado ningún árbol en este dispositivo.</p>`;
+                return;
             }
+
+            listContainer.innerHTML = "";
+            savedIds.forEach(id => {
+                db.collection("arboles_navidad").doc(id).get().then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const loc = window.location;
+                        const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
+                        const url = `${loc.protocol}//${loc.host}${basePath}/ver.html?id=${id}`;
+
+                        const item = document.createElement('div');
+                        item.className = "bg-christmas-950/80 p-3 rounded-2xl border border-emerald-500/20 flex items-center justify-between gap-2";
+                        item.innerHTML = `
+                            <div class="text-left overflow-hidden">
+                                <h4 class="text-xs font-bold text-gold-400 truncate">${data.titulo}</h4>
+                                <p class="text-[10px] text-emerald-300/70">${data.esferas.length} esferas configuradas</p>
+                            </div>
+                            <div class="flex gap-1.5 flex-shrink-0">
+                                <a href="ver.html?id=${id}" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-xl">Abrir</a>
+                                <button onclick="navigator.clipboard.writeText('${url}'); alert('¡Enlace copiado!');" class="px-2.5 py-1.5 bg-christmas-900 text-gold-400 border border-gold-500/30 text-[11px] font-bold rounded-xl"><i class="fas fa-copy"></i></button>
+                            </div>
+                        `;
+                        listContainer.appendChild(item);
+                    }
+                }).catch(e => console.error(e));
+            });
+        }
+
+        function showCreateForm() {
+            document.getElementById('projectsSection').classList.add('hidden');
+            document.getElementById('createFormSection').classList.remove('hidden');
+            if (document.getElementById('spheresContainer').children.length === 0) {
+                addSphereField();
+            }
+        }
+
+        function showProjectsMenu() {
+            document.getElementById('createFormSection').classList.add('hidden');
+            document.getElementById('projectsSection').classList.remove('hidden');
+            loadMyProjects();
+        }
+
+        function updateTierLimit() {
+            maxLimit = parseInt(document.getElementById('userTier').value);
+            document.getElementById('maxTierLimit').innerText = maxLimit;
+            const container = document.getElementById('spheresContainer');
+            while (container.children.length > maxLimit) {
+                container.removeChild(container.lastChild);
+            }
+            updateCount();
         }
 
         function addSphereField() {
@@ -160,16 +221,12 @@
                 return;
             }
             const index = container.children.length;
-
             const div = document.createElement('div');
-            div.className = "bg-christmas-950/60 p-4 rounded-2xl border border-emerald-500/20 space-y-3 relative";
+            div.className = "bg-christmas-950/60 p-3 rounded-xl border border-emerald-500/20 flex items-center gap-2";
             div.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded font-bold">Esfera #${index + 1}</span>
-                    <button onclick="this.parentElement.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs"><i class="fas fa-trash"></i></button>
-                </div>
-                <input type="text" placeholder="Nombre (Ej: Mamá)" class="sphere-name w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                <textarea placeholder="Mensaje inicial..." class="sphere-msg w-full bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-14 resize-none"></textarea>
+                <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-1 rounded font-bold">#${index + 1}</span>
+                <input type="text" placeholder="Nombre para la esfera (Ej: Carlos)" class="sphere-name flex-1 bg-christmas-900 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
+                <button onclick="this.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs px-2"><i class="fas fa-trash"></i></button>
             `;
             container.appendChild(div);
             updateCount();
@@ -185,15 +242,19 @@
             const containerItems = document.getElementById('spheresContainer').children;
 
             if (!title) { alert("Ingresa un título principal."); return; }
-            if (containerItems.length === 0) { alert("Agrega al menos una esfera."); return; }
+            if (containerItems.length === 0) { alert("Agrega al menos un nombre de esfera."); return; }
 
             const spheresArray = [];
             for (let item of containerItems) {
                 const name = item.querySelector('.sphere-name').value.trim();
-                const msg = item.querySelector('.sphere-msg').value.trim();
-
                 if (!name) { alert("Todas las esferas deben tener nombre."); return; }
-                spheresArray.push({ nombre: name, mensaje: msg, foto: "", audio: "" });
+                spheresArray.push({ 
+                    nombre: name, 
+                    mensaje: "", 
+                    foto: "", 
+                    audio: "", 
+                    ocupadaPor: null 
+                });
             }
 
             const saveBtn = document.getElementById('saveBtn');
@@ -210,6 +271,13 @@
 
             db.collection("arboles_navidad").add(treeData)
             .then((docRef) => {
+                // Guardar ID localmente en el celular del creador para su historial de proyectos
+                let savedIds = JSON.parse(localStorage.getItem('mis_arboles_navidad') || '[]');
+                if (!savedIds.includes(docRef.id)) {
+                    savedIds.push(docRef.id);
+                    localStorage.setItem('mis_arboles_navidad', JSON.stringify(savedIds));
+                }
+
                 const loc = window.location;
                 const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
                 const finalUrl = `${loc.protocol}//${loc.host}${basePath}/ver.html?id=${docRef.id}`;
@@ -219,12 +287,7 @@
                 
                 document.getElementById('qrcodeContainer').innerHTML = "";
                 new QRCode(document.getElementById("qrcodeContainer"), {
-                    text: finalUrl,
-                    width: 130,
-                    height: 130,
-                    colorDark: "#05130D",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
+                    text: finalUrl, width: 130, height: 130, colorDark: "#05130D", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
                 });
 
                 document.getElementById('resultModal').classList.remove('hidden');
@@ -232,7 +295,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                alert("Error al guardar.");
+                alert("Error al guardar en base de datos.");
                 saveBtn.innerHTML = `Crear Árbol y Generar QR`;
                 saveBtn.disabled = false;
             });
@@ -242,8 +305,6 @@
             navigator.clipboard.writeText(document.getElementById('shareLink').innerText);
             alert("¡Enlace copiado!");
         }
-
-        window.onload = () => { addSphereField(); };
     </script>
 </body>
 </html>
