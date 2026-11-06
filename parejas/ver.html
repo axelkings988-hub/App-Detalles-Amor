@@ -10,8 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+    <!-- Firebase y Supabase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
@@ -70,6 +72,19 @@
         </div>
     </div>
 
+    <!-- PANTALLA DE EXPIRACIÓN (SI PASARON LOS 7 DÍAS Y NO SE PAGó) -->
+    <div id="expiredScreen" class="hidden min-h-screen flex flex-col items-center justify-center p-6 text-center relative z-30">
+        <div class="w-full max-w-sm bg-burgundy-900/90 backdrop-blur-xl border border-rose-500/30 p-8 rounded-3xl shadow-2xl space-y-4">
+            <div class="w-14 h-14 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto border border-amber-500/40">
+                <i class="fas fa-hourglass-end text-amber-400 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold font-cursive text-rose-100">Detalle Expirado</h2>
+            <p class="text-xs text-rose-300/90 leading-relaxed">
+                Este detalle de prueba ha finalizado su periodo de 7 días y sus archivos han sido liberados del servidor.
+            </p>
+        </div>
+    </div>
+
     <div id="musicPlayerContainer" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm">
         <div class="bg-burgundy-950/85 backdrop-blur-md border border-rose-500/30 rounded-full px-4 py-2.5 flex items-center justify-between shadow-2xl">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -110,6 +125,11 @@
                 <span id="clickCounter" class="relative z-10 text-xl font-bold text-white drop-shadow-md">0 / 10</span>
             </div>
             <p id="tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Haz clic o toca aquí!</p>
+            
+            <!-- AVISO DISCRETO DE PRUEBA (SE REVELA TRAS LOS 10 TOQUES SI NO ESTÁ PAGADO) -->
+            <div id="trialExpirationNotice" class="hidden mt-4 pt-3 border-t border-rose-500/20 text-center">
+                <p id="trialNoticeText" class="text-[11px] text-amber-300 font-medium leading-relaxed"></p>
+            </div>
         </div>
     </section>
 
@@ -217,19 +237,59 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        const SUPABASE_URL = "https://wqeesqlpgredszsmjcvx.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxZWVzcWxwZ3JlZHN6c21qY3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMTIzMDAsImV4cCI6MjEwODg4ODMwMH0.Vn9zQn3BN6S3y50LCU8qXIJqeztO3iC2g8L1qZqhcGI";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let photosArray = [], currentSlide = 0, totalSlides = 1, proyectoGlobalData = null, countdownInterval = null;
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
-        if (!docId) { alert("ID no encontrado"); }
-        else {
-            db.collection("detalles").doc(docId).get().then((doc) => {
+        if (!docId) { 
+            alert("ID no encontrado"); 
+        } else {
+            db.collection("detalles").doc(docId).get().then(async (doc) => {
                 if (doc.exists) {
                     proyectoGlobalData = doc.data();
+                    
+                    // VALIDACIÓN DE LOS 7 DÍAS (LIMPIEZA AUTOMÁTICA EN SEGUNDO PLANO SI EXPIRÓ Y NO ESTÁ PAGADO)
+                    const pagado = proyectoGlobalData.pagado === true;
+                    if (!pagado) {
+                        const createdAt = proyectoGlobalData.createdAtMs || (proyectoGlobalData.creado ? proyectoGlobalData.creado.toMillis() : Date.now());
+                        const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
+
+                        if (diasTranscurridos > 7) {
+                            // Ejecutar rutina de limpieza automática en segundo plano (Supabase + Firebase)
+                            try {
+                                if (proyectoGlobalData.fotos && Array.isArray(proyectoGlobalData.fotos)) {
+                                    for (const fotoUrl of proyectoGlobalData.fotos) {
+                                        const urlObj = new URL(fotoUrl);
+                                        const pathSegments = urlObj.pathname.split('/');
+                                        const bucketIndex = pathSegments.indexOf('detalles-fotos');
+                                        if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
+                                            const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+                                            await supabaseClient.storage.from('detalles-fotos').remove([filePath]);
+                                        }
+                                    }
+                                }
+                                await db.collection("detalles").doc(docId).delete();
+                            } catch (err) {
+                                console.warn("Error en limpieza automática:", err);
+                            }
+
+                            document.getElementById('loadingScreen').classList.add('hidden');
+                            document.getElementById('expiredScreen').classList.remove('hidden');
+                            return;
+                        }
+                    }
+
                     document.getElementById('loadingScreen').classList.add('hidden');
                     if (proyectoGlobalData.privado && proyectoGlobalData.password) {
                         document.getElementById('passwordScreen').classList.remove('hidden');
                     } else { inicializarProyectoCompleto(); }
+                } else {
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('expiredScreen').classList.remove('hidden');
                 }
             });
         }
@@ -387,8 +447,23 @@
                 heartClicks++;
                 document.getElementById('heartFill').style.height = `${heartClicks * 10}%`;
                 document.getElementById('clickCounter').innerText = `${heartClicks} / 10`;
+                
                 if (heartClicks === 10) {
                     if (typeof confetti === 'function') confetti();
+
+                    // Si el proyecto NO está pagado, calculamos los días restantes para mostrarlos discretamente al completar los 10 toques
+                    if (proyectoGlobalData && proyectoGlobalData.pagado !== true) {
+                        const createdAt = proyectoGlobalData.createdAtMs || (proyectoGlobalData.creado ? proyectoGlobalData.creado.toMillis() : Date.now());
+                        const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
+                        let diasRestantes = Math.ceil(7 - diasTranscurridos);
+                        if (diasRestantes < 0) diasRestantes = 0;
+
+                        const noticeBox = document.getElementById('trialExpirationNotice');
+                        const noticeText = document.getElementById('trialNoticeText');
+                        noticeText.innerText = `⚠️ Este es un detalle de prueba que expira en ${diasRestantes} ${diasRestantes === 1 ? 'día' : 'días'}. Consérvalo para siempre por solo $25 MXN.`;
+                        noticeBox.classList.remove('hidden');
+                    }
+
                     setTimeout(() => {
                         document.getElementById('heart-game-section').classList.add('hidden');
                         document.getElementById('mainContent').classList.remove('hidden');
