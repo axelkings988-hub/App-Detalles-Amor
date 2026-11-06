@@ -230,9 +230,12 @@
             <div class="w-12"></div>
         </div>
 
-        <!-- ESTATUS DE PRUEBA / DÍAS RESTANTES -->
-        <div id="trialStatusBanner" class="bg-burgundy-950/80 border border-rose-500/30 p-3 rounded-xl text-center">
+        <!-- ESTATUS DE PRUEBA / DÍAS RESTANTES + BOTÓN DESBLOQUEAR QR -->
+        <div id="trialStatusBanner" class="bg-burgundy-950/80 border border-rose-500/30 p-4 rounded-2xl text-center space-y-3">
             <p id="trialStatusText" class="text-xs font-semibold text-rose-200">⏱️ Periodo de prueba activo (7 días restantes).</p>
+            <button onclick="procesarPagoMercadoPago()" class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+                <span>🔓 Desbloquear QR / $25.00 MXN</span>
+            </button>
         </div>
 
         <button onclick="abrirVistaPreviaPantallaCompleta()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 no-print">
@@ -479,15 +482,13 @@
                     if (collectionId) updateData.pagoIdUnico = collectionId;
 
                     await db.collection("detalles").doc(docId).update(updateData);
-                    
-                    // Al pagar, liberamos la prueba activa de este dispositivo
                     localStorage.removeItem("proyectoPruebaActivoId");
 
                     const docSnap = await db.collection("detalles").doc(docId).get();
                     
                     if (docSnap.exists) {
                         proyectoActualId = docId;
-                        alert("🎉 ¡Pago confirmado y verificado exitosamente! Tu proyecto ahora es permanente.");
+                        alert("🎉 ¡Pago confirmado y cronómetro de 7 días iniciado! Tu código QR ha sido desbloqueado.");
                         mostrarPanelGestion(docSnap.data(), true);
                     }
                 } catch(e) {}
@@ -547,7 +548,6 @@
             });
         }
 
-        // ELIMINACIÓN PERMANENTE Y LIMPIEZA TOTAL (Supabase + Firebase + LocalStorage)
         async function eliminarProyectoPermanentemente(firebaseId) {
             if (!firebaseId) return;
 
@@ -560,8 +560,6 @@
 
                 if (docSnap.exists) {
                     const data = docSnap.data();
-                    
-                    // 1. Borrar fotos en Supabase
                     if (data.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
                         for (const fotoUrl of data.fotos) {
                             try {
@@ -572,17 +570,12 @@
                                     const filePath = pathSegments.slice(bucketIndex + 1).join('/');
                                     await supabaseClient.storage.from('detalles-fotos').remove([filePath]);
                                 }
-                            } catch (err) {
-                                console.warn("No se pudo eliminar una foto de Supabase:", err);
-                            }
+                            } catch (err) {}
                         }
                     }
-
-                    // 2. Borrar documento en Firestore
                     await docRef.delete();
                 }
 
-                // 3. Borrar del localStorage
                 let proyectos = obtenerProyectosLocales();
                 proyectos = proyectos.filter(p => p.firebaseId !== firebaseId);
                 guardarProyectosLocales(proyectos);
@@ -601,13 +594,11 @@
                 volverAlDashboardDesdePanel();
 
             } catch (error) {
-                console.error("Error al eliminar:", error);
                 alert("⚠️ Ocurrió un error al intentar eliminar los datos: " + error.message);
             }
         }
 
         async function mostrarFormularioCreacion() {
-            // Validar restricción de 1 prueba gratuita por dispositivo
             const pruebaActivaId = localStorage.getItem("proyectoPruebaActivoId");
             if (pruebaActivaId && pruebaActivaId !== proyectoActualId) {
                 try {
@@ -964,7 +955,6 @@
                     creado: fechaCreacionServer
                 };
 
-                // Si es un proyecto completamente nuevo y no tiene fecha de creación en cache, guardamos timestamp actual en milisegundos para calcular los 7 días exactos
                 if (!proyectoDatosCache || !proyectoDatosCache.createdAtMs) {
                     datosAEnviar.createdAtMs = Date.now();
                 }
@@ -979,7 +969,6 @@
                 } else {
                     docRef = await db.collection("detalles").add(datosAEnviar);
                     proyectoActualId = docRef.id;
-                    // Registramos en localStorage que este dispositivo tiene esta prueba activa
                     localStorage.setItem("proyectoPruebaActivoId", proyectoActualId);
                 }
 
@@ -1063,7 +1052,6 @@
                 paySection.classList.remove('hidden');
                 resultBox.classList.add('hidden');
 
-                // Calcular días restantes de los 7 días de prueba
                 const createdAt = data.createdAtMs || (data.creado ? data.creado.toMillis() : Date.now());
                 const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
                 let diasRestantes = Math.ceil(7 - diasTranscurridos);
@@ -1115,7 +1103,6 @@
             document.getElementById('pv-quizScore').innerText = `Puntos: 0`;
             loadPvQuizQuestion();
 
-            // En la vista previa del creador, dejamos visible el corazón de prueba
             document.getElementById('pv-heart-section').classList.remove('hidden');
             document.getElementById('pv-mainContent').classList.add('hidden');
         }
