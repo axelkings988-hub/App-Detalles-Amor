@@ -40,7 +40,7 @@
         }
         .tree-glow { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); }
         
-        /* ESTILOS DE ESFERAS ESTILO FOTO DE REFERENCIA */
+        /* ESTILOS DE ESFERAS */
         .sphere-ornament {
             border-radius: 50%;
             position: relative;
@@ -71,7 +71,7 @@
         .sphere-ruby { background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f); }
         .sphere-emerald { background: radial-gradient(circle at 30% 30%, #69f0ae, #1b5e20); }
 
-        /* Halo de luz muy sutil y elegante para esferas que tienen mensaje */
+        /* Halo de luz sutil para esferas con mensaje */
         .sphere-subtle-glow {
             box-shadow: 0 0 12px 3px rgba(251, 191, 36, 0.7), inset -3px -3px 6px rgba(0,0,0,0.5);
             border: 1px solid rgba(251, 191, 36, 0.8);
@@ -111,17 +111,22 @@
         </div>
 
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
-            <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500 pt-6" style="height: 460px;">
-                <!-- ESTRELLA DESPEJADA Y ELEVADA EN LA PUNTA -->
-                <i id="topStar" class="fas fa-star text-3xl text-gold-400 mb-3 transition-all duration-700 z-20"></i>
+            <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500 pt-4" style="height: 440px;">
                 
-                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-64 tree-glow transition-all duration-700 absolute top-12" style="height: 340px;">
+                <!-- ESTRELLA FIJA Y ABSOLUTA EN LA PUNTA SUPERIOR EXACTA DEL PINO -->
+                <div class="absolute top-3 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center pointer-events-none">
+                    <i id="topStar" class="fas fa-star text-3xl text-gold-400 transition-all duration-700 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]"></i>
+                </div>
+                
+                <!-- SVG DEL ÁRBOL -->
+                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-64 tree-glow transition-all duration-700 absolute top-10" style="height: 340px;">
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0A2F20" stroke="#F59E0B" stroke-width="2.5"/>
                     <path d="M 100 25 Q 135 60 170 90 M 170 90 Q 100 120 30 90 M 30 90 Q 105 150 180 150 M 180 150 Q 95 180 10 210" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
 
-                <div id="spheresContainer" class="absolute inset-0 pointer-events-none z-30"></div>
+                <!-- CONTENEDOR DE ESFERAS DISTRIBUIDAS DENTRO DEL CUERPO DEL PINO -->
+                <div id="spheresContainer" class="absolute inset-0 top-10 pointer-events-none z-30" style="height: 340px;"></div>
             </div>
             
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
@@ -136,7 +141,7 @@
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
                 <i class="fas fa-times text-xs"></i>
             </button>
-            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-gold-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
                 <i class="fas fa-globe-americas"></i>
             </div>
             <h3 class="text-lg font-serif font-bold text-white" id="modalSphereTitle">Esfera</h3>
@@ -199,4 +204,395 @@
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
             authDomain: "appdetallesamor.firebaseapp.com",
             projectId: "appdetallesamor",
-            storageBucket
+            storageBucket: "appdetallesamor.firebasestorage.app",
+            messagingSenderId: "917968456649",
+            appId: "1:917968456649:web:32261e841942825685b618",
+            measurementId: "G-ZTGDLNQXSF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let treeData = null;
+        let selectedSphereIndex = null;
+        let isChristmasUnlocked = false;
+        let isPreviewMode = false;
+        let newPhotoBase64 = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioBase64 = null;
+        let recordTimer = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const docId = urlParams.get('id');
+
+        if (!docId) {
+            document.getElementById('loaderSpinner').classList.add('hidden');
+            document.getElementById('loadingText').innerHTML = `
+                <span class="text-red-400 font-bold block mb-2">⚠️ Enlace incompleto.</span>
+                <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Ir a Proyectos</a>
+            `;
+        } else {
+            cargarDatosArbol();
+        }
+
+        function cargarDatosArbol() {
+            db.collection("arboles_navidad").doc(docId).onSnapshot((doc) => {
+                if (doc.exists) {
+                    treeData = doc.data();
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    document.getElementById('treeTitle').innerText = treeData.titulo;
+                    
+                    checkDateAndUnlock();
+                    renderSpheres();
+                    initSnow();
+                } else {
+                    document.getElementById('loaderSpinner').classList.add('hidden');
+                    document.getElementById('loadingText').innerHTML = `
+                        <span class="text-red-400 font-bold block mb-2">⚠️ Este árbol ya no existe.</span>
+                        <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Crear Árbol</a>
+                    `;
+                }
+            });
+        }
+
+        function checkDateAndUnlock() {
+            const now = new Date();
+            const christmasDate = new Date(now.getFullYear(), 11, 25, 0, 0, 0);
+            if (now >= christmasDate || isPreviewMode) {
+                isChristmasUnlocked = true;
+                triggerMagicGlow();
+            } else {
+                isChristmasUnlocked = false;
+                startCountdown(christmasDate);
+            }
+        }
+
+        function togglePreviewMode() {
+            isPreviewMode = !isPreviewMode;
+            const btn = document.getElementById('previewBtn');
+            if (isPreviewMode) {
+                btn.innerHTML = `<i class="fas fa-eye-slash"></i> Salir Vista 25 Dic`;
+                btn.className = "text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
+            } else {
+                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar 25 Dic`;
+                btn.className = "text-[10px] bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
+            }
+            checkDateAndUnlock();
+            renderSpheres();
+        }
+
+        function startCountdown(targetDate) {
+            function update() {
+                if (isChristmasUnlocked || isPreviewMode) return;
+                const now = new Date();
+                const diff = targetDate - now;
+                if (diff <= 0) { isChristmasUnlocked = true; triggerMagicGlow(); return; }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / 1000 / 60) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+                document.getElementById('countdownText').innerText = `Faltan ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        function triggerMagicGlow() {
+            document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Efecto Navideño Activo ✨`;
+            document.getElementById('treeSvgElement').classList.add('animate-pulse');
+            document.getElementById('topStar').classList.add('text-white', 'scale-125');
+            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca las esferas para abrirlas.";
+            if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+        }
+
+        // MAPA DE COORDENADAS PERFECTAMENTE DISTRIBUIDAS DEBAJO DE LA PUNTA
+        const mapaCoordenadasTotal = [
+            { x: 50, y: 24 }, // 1 (Primer nivel superior, debajo de la estrella)
+            { x: 40, y: 36 }, { x: 60, y: 36 }, // 2, 3
+            { x: 31, y: 49 }, { x: 50, y: 49 }, { x: 69, y: 49 }, // 4, 5, 6
+            { x: 24, y: 62 }, { x: 39, y: 62 }, { x: 61, y: 62 }, { x: 76, y: 62 }, // 7 - 10
+            { x: 19, y: 74 }, { x: 33, y: 74 }, { x: 45, y: 74 }, { x: 55, y: 74 }, { x: 67, y: 74 }, { x: 81, y: 74 }, // 11 - 16
+            { x: 16, y: 86 }, { x: 28, y: 86 }, { x: 39, y: 86 }, { x: 50, y: 86 }, { x: 61, y: 86 }, { x: 72, y: 86 }, { x: 84, y: 86 }, // 17 - 23
+            { x: 14, y: 94 }, { x: 24, y: 94 }, { x: 37, y: 94 }, { x: 50, y: 94 }, { x: 63, y: 94 }, { x: 76, y: 94 }, { x: 86, y: 94 }  // 24 - 30 (Base)
+        ];
+
+        const estilosEsferas = ['sphere-gold', 'sphere-ruby', 'sphere-silver', 'sphere-emerald', 'sphere-gold', 'sphere-ruby'];
+
+        function renderSpheres() {
+            const container = document.getElementById('spheresContainer');
+            container.innerHTML = '';
+
+            if (!treeData || !treeData.esferas) return;
+
+            const totalConfigurado = treeData.esferas.length; 
+            const totalMostrarEnPino = Math.max(10, totalConfigurado); 
+            const esferaSize = totalMostrarEnPino > 20 ? 20 : (totalMostrarEnPino > 10 ? 23 : 26);
+
+            for (let idx = 0; idx < totalMostrarEnPino; idx++) {
+                const pos = mapaCoordenadasTotal[idx] || { x: 50, y: 85 };
+                const claseColor = estilosEsferas[idx % estilosEsferas.length];
+
+                if (idx < totalConfigurado) {
+                    const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
+                    const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group";
+                    wrapper.style.left = `${pos.x}%`;
+                    wrapper.style.top = `${pos.y}%`;
+                    wrapper.style.transform = 'translate(-50%, -50%)';
+
+                    wrapper.innerHTML = `
+                        <div class="sphere-ornament ${claseColor} ${tieneContenido ? 'sphere-subtle-glow' : ''}" style="width: ${esferaSize}px; height: ${esferaSize}px;">
+                            <i class="fas fa-star text-[6px] text-white/80 drop-shadow"></i>
+                        </div>
+                        <span class="text-[7px] font-bold text-gold-400 mt-0.5 max-w-[65px] truncate bg-black/70 px-1 rounded border border-gold-500/20">${esfera.nombre}</span>
+                    `;
+                    wrapper.onclick = () => openSphereActionModal(idx);
+                    container.appendChild(wrapper);
+                } else {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "absolute pointer-events-none";
+                    wrapper.style.left = `${pos.x}%`;
+                    wrapper.style.top = `${pos.y}%`;
+                    wrapper.style.transform = 'translate(-50%, -50%)';
+
+                    wrapper.innerHTML = `
+                        <div class="sphere-ornament ${claseColor} opacity-75" style="width: ${esferaSize - 4}px; height: ${esferaSize - 4}px;"></div>
+                    `;
+                    container.appendChild(wrapper);
+                }
+            }
+        }
+
+        function openSphereActionModal(idx) {
+            selectedSphereIndex = idx;
+            const esfera = treeData.esferas[idx];
+            document.getElementById('modalSphereTitle').innerText = `Esfera de ${esfera.nombre}`;
+            
+            const ownerSec = document.getElementById('ownerActionSection');
+            const editSec = document.getElementById('editModeSection');
+            const revealSec = document.getElementById('revealModeSection');
+
+            ownerSec.classList.remove('hidden');
+            editSec.classList.add('hidden');
+            revealSec.classList.add('hidden');
+
+            const myDeviceId = localStorage.getItem(`device_id_${docId}`) || 'dev_' + Math.random();
+            const esMia = esfera.ocupadaPor === myDeviceId;
+            const estaOcupadaPorOtro = esfera.ocupadaPor && !esMia;
+
+            const actionBtns = document.getElementById('actionButtonsContainer');
+            actionBtns.innerHTML = '';
+
+            if (isChristmasUnlocked) {
+                document.getElementById('ownerActionText').innerText = `Contenido secreto de ${esfera.nombre}:`;
+                
+                const openBtn = document.createElement('button');
+                openBtn.className = "w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
+                openBtn.innerHTML = `<i class="fas fa-gift"></i> Abrir Contenido`;
+                openBtn.onclick = () => showRevealContent(idx);
+                actionBtns.appendChild(openBtn);
+            } else {
+                if (estaOcupadaPorOtro) {
+                    document.getElementById('ownerActionText').innerText = `Esta esfera ya fue reclamada por ${esfera.nombre}.`;
+                } else if (esMia) {
+                    document.getElementById('ownerActionText').innerText = `¡Esta es tu esfera asignada!`;
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.className = "w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
+                    editBtn.innerHTML = `<i class="fas fa-edit"></i> Editar Mi Carta / Foto / Audio`;
+                    editBtn.onclick = () => showEditForm(idx);
+                    actionBtns.appendChild(editBtn);
+                } else {
+                    document.getElementById('ownerActionText').innerText = `¿Esta esfera es tu espacio? Reclámalo para hacerlo tuyo.`;
+                    
+                    const claimBtn = document.createElement('button');
+                    claimBtn.className = "w-full py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
+                    claimBtn.innerHTML = `<i class="fas fa-hand-pointer"></i> Reclamar y Editar`;
+                    claimBtn.onclick = () => {
+                        let devId = localStorage.getItem(`device_id_${docId}`);
+                        if(!devId) {
+                            devId = 'dev_' + Math.random().toString(36).substring(2);
+                            localStorage.setItem(`device_id_${docId}`, devId);
+                        }
+                        treeData.esferas[idx].ocupadaPor = devId;
+                        db.collection("arboles_navidad").doc(docId).update({ esferas: treeData.esferas }).then(() => {
+                            showEditForm(idx);
+                        });
+                    };
+                    actionBtns.appendChild(claimBtn);
+                }
+            }
+            document.getElementById('sphereModal').classList.remove('hidden');
+        }
+
+        function showEditForm(idx) {
+            const esfera = treeData.esferas[idx];
+            document.getElementById('ownerActionSection').classList.add('hidden');
+            document.getElementById('editModeSection').classList.remove('hidden');
+
+            document.getElementById('editName').value = esfera.nombre || '';
+            document.getElementById('editMsg').value = esfera.mensaje || '';
+            document.getElementById('fileLabel').innerText = esfera.foto ? "Cambiar Foto" : "Subir Foto";
+            
+            const thumb = document.getElementById('previewThumb');
+            if (esfera.foto) {
+                thumb.classList.remove('hidden');
+                thumb.innerHTML = `<img src="${esfera.foto}" class="w-full h-full object-cover">`;
+            } else {
+                thumb.classList.add('hidden');
+            }
+
+            const audioPlayback = document.getElementById('audioPlayback');
+            if (esfera.audio) {
+                audioPlayback.src = esfera.audio;
+                audioPlayback.classList.remove('hidden');
+                document.getElementById('audioStatus').innerText = "Audio guardado.";
+            } else {
+                audioPlayback.classList.add('hidden');
+                document.getElementById('audioStatus').innerText = "";
+            }
+        }
+
+        function showRevealContent(idx) {
+            const esfera = treeData.esferas[idx];
+            document.getElementById('ownerActionSection').classList.add('hidden');
+            document.getElementById('revealModeSection').classList.remove('hidden');
+
+            let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed bg-christmas-950 p-3 rounded-xl border border-gold-500/30">📜 <b>Carta / Deseos:</b><br>${esfera.mensaje || "Sin mensaje."}</p>`;
+            if (esfera.foto) {
+                content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3 flex items-center justify-center"><img src="${esfera.foto}" class="w-full h-full object-cover"></div>${content}`;
+            }
+            if (esfera.audio) {
+                content += `<div class="p-3 bg-christmas-950 rounded-xl border border-gold-500/30"><p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p><audio controls src="${esfera.audio}" class="w-full h-8"></audio></div>`;
+            }
+            document.getElementById('revealContent').innerHTML = content;
+        }
+
+        function closeModal() {
+            document.getElementById('sphereModal').classList.add('hidden');
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            clearInterval(recordTimer);
+        }
+
+        function startRecording() {
+            audioChunks = [];
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+
+                document.getElementById('recBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('stopBtn').classList.remove('cursor-not-allowed', 'bg-slate-700', 'text-slate-400');
+                document.getElementById('stopBtn').classList.add('bg-amber-600', 'text-white');
+
+                let timeLeft = 10;
+                document.getElementById('timerDisplay').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                
+                recordTimer = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timerDisplay').innerText = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+                    if (timeLeft <= 0) stopRecording();
+                }, 1000);
+
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    clearInterval(recordTimer);
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        recordedAudioBase64 = reader.result;
+                        const audioPlayback = document.getElementById('audioPlayback');
+                        audioPlayback.src = recordedAudioBase64;
+                        audioPlayback.classList.remove('hidden');
+                        document.getElementById('audioStatus').innerText = "¡Audio grabado!";
+                    };
+                    stream.getTracks().forEach(track => track.stop());
+                };
+            }).catch(err => alert("No se pudo acceder al micrófono."));
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            clearInterval(recordTimer);
+            document.getElementById('recBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('stopBtn').classList.add('cursor-not-allowed', 'bg-slate-700', 'text-slate-400');
+            document.getElementById('stopBtn').classList.remove('bg-amber-600', 'text-white');
+        }
+
+        function compressImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let width = img.width, height = img.height;
+                    const maxDim = 600;
+                    if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
+                    else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    newPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                    const thumb = document.getElementById('previewThumb');
+                    thumb.classList.remove('hidden');
+                    thumb.innerHTML = `<img src="${newPhotoBase64}" class="w-full h-full object-cover">`;
+                    document.getElementById('fileLabel').innerText = "¡Lista!";
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function saveSphereChanges() {
+            const newName = document.getElementById('editName').value.trim();
+            const newMsg = document.getElementById('editMsg').value.trim();
+            if (!newName) { alert("El nombre no puede estar vacío."); return; }
+
+            treeData.esferas[selectedSphereIndex].nombre = newName;
+            treeData.esferas[selectedSphereIndex].mensaje = newMsg;
+            if (newPhotoBase64) treeData.esferas[selectedSphereIndex].foto = newPhotoBase64;
+            if (recordedAudioBase64) treeData.esferas[selectedSphereIndex].audio = recordedAudioBase64;
+
+            const btn = document.getElementById('saveSphereBtn');
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Guardando...`;
+            btn.disabled = true;
+
+            db.collection("arboles_navidad").doc(docId).update({
+                esferas: treeData.esferas
+            }).then(() => {
+                alert("¡Cambios guardados con éxito!");
+                closeModal();
+                btn.innerHTML = `Guardar Mis Cambios`;
+                btn.disabled = false;
+            }).catch((err) => {
+                alert("Error al actualizar.");
+                btn.innerHTML = `Guardar Mis Cambios`;
+                btn.disabled = false;
+            });
+        }
+
+        function initSnow() {
+            const container = document.getElementById('snowContainer');
+            for (let i = 0; i < 20; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake';
+                flake.style.left = `${Math.random() * 100}%`;
+                flake.style.top = `${Math.random() * -20}%`;
+                const size = 2 + Math.random() * 3;
+                flake.style.width = `${size}px`; flake.style.height = `${size}px`;
+                flake.style.animationDuration = `${6 + Math.random() * 4}s`;
+                flake.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(flake);
+            }
+        }
+    </script>
+</body>
+</html>
