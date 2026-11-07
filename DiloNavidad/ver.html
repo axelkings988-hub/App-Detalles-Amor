@@ -20,8 +20,7 @@
                 extend: {
                     colors: {
                         christmas: { 900: '#0B2217', 950: '#05130D' },
-                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' },
-                        ruby: { 600: '#DC2626', 700: '#B91C1C' }
+                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
                     },
                     fontFamily: {
                         serif: ['"Cinzel"', 'serif'],
@@ -39,30 +38,55 @@
             0% { transform: translateY(-10vh) translateX(0); }
             100% { transform: translateY(110vh) translateX(20px); }
         }
-        .tree-glow { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.6)); }
+        .tree-glow { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); }
         
-        .sphere-ball {
-            background: radial-gradient(circle at 30% 30%, #ff5252, #b71c1c);
+        /* ESTILOS DE ESFERAS ESTILO FOTO DE REFERENCIA */
+        .sphere-ornament {
             border-radius: 50%;
-            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.5), 0 3px 6px rgba(0,0,0,0.4);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset -4px -4px 8px rgba(0,0,0,0.4);
         }
-        .sphere-ball::before {
+        .sphere-ornament::before {
             content: '';
             position: absolute;
-            top: -3px;
+            top: -4px;
             left: calc(50% - 4px);
             width: 8px;
             height: 5px;
             background: #F59E0B;
             border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
-        .sphere-ball:hover { transform: scale(1.15); }
+        .sphere-ornament:hover { transform: scale(1.18); }
+
+        /* Variantes de color y textura imitando el árbol decorado */
+        .sphere-gold {
+            background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17);
+        }
+        .sphere-silver {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #90a4ae);
+        }
+        .sphere-ruby {
+            background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f);
+        }
+        .sphere-emerald {
+            background: radial-gradient(circle at 30% 30%, #69f0ae, #1b5e20);
+        }
+
+        /* Resplandor parpadeante para esferas que ya tienen mensaje o foto */
+        .sphere-active-glow {
+            box-shadow: 0 0 15px 4px rgba(251, 191, 36, 0.9), inset -3px -3px 6px rgba(0,0,0,0.5);
+            animation: pulseGlow 2s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { filter: brightness(1); box-shadow: 0 0 10px 2px rgba(251, 191, 36, 0.7); }
+            100% { filter: brightness(1.2); box-shadow: 0 0 20px 6px rgba(251, 191, 36, 1); }
+        }
     </style>
 </head>
 <body class="antialiased pb-20 px-4 pt-6 relative">
@@ -98,22 +122,21 @@
         </div>
 
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
-            <!-- CONTENEDOR DINÁMICO DEL ÁRBOL (Cuyo alto se expande si hay más personas) -->
-            <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500" style="height: 340px;">
+            <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500" style="height: 440px;">
                 <i id="topStar" class="fas fa-star text-3xl text-gold-400 mb-2 transition-all duration-700"></i>
                 
-                <!-- SVG DEL ÁRBOL DINÁMICO -->
-                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-56 tree-glow transition-all duration-700" style="height: 260px;" id="treeSvg">
-                    <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
+                <!-- SVG DEL ÁRBOL CON GUIÓN DE LUCES INTERNAS -->
+                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-64 tree-glow transition-all duration-700" style="height: 340px;">
+                    <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0A2F20" stroke="#F59E0B" stroke-width="2.5"/>
+                    <path d="M 100 25 Q 135 60 170 90 M 170 90 Q 100 120 30 90 M 30 90 Q 105 150 180 150 M 180 150 Q 95 180 10 210" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
 
-                <!-- CONTENEDOR DE ESFERAS -->
                 <div id="spheresContainer" class="absolute inset-0 pointer-events-none"></div>
             </div>
             
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                🎄 Toca una esfera sobre el árbol para ver su propietario o abrirlas en Navidad.
+                🎄 Toca una esfera sobre el árbol para reclamarla o ver su contenido.
             </p>
         </div>
     </main>
@@ -124,7 +147,7 @@
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
                 <i class="fas fa-times text-xs"></i>
             </button>
-            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-gold-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
                 <i class="fas fa-globe-americas"></i>
             </div>
             <h3 class="text-lg font-serif font-bold text-white" id="modalSphereTitle">Esfera</h3>
@@ -226,7 +249,6 @@
                     document.getElementById('mainContent').classList.remove('hidden');
                     document.getElementById('treeTitle').innerText = treeData.titulo;
                     
-                    ajustarTamanoPinoSegunPersonas();
                     checkDateAndUnlock();
                     renderSpheres();
                     initSnow();
@@ -238,29 +260,6 @@
                     `;
                 }
             });
-        }
-
-        // AUMENTAR TAMAÑO DEL PINO DE FORMA DINÁMICA SEGÚN EL NÚMERO DE PERSONAS
-        function ajustarTamanoPinoSegunPersonas() {
-            if (!treeData || !treeData.esferas) return;
-            const total = treeData.esferas.length;
-
-            const wrapper = document.getElementById('treeContainerWrapper');
-            const svgEl = document.getElementById('treeSvgElement');
-
-            if (total > 20) {
-                wrapper.style.height = '440px';
-                svgEl.style.height = '350px';
-                svgEl.style.width = '240px';
-            } else if (total > 10) {
-                wrapper.style.height = '390px';
-                svgEl.style.height = '310px';
-                svgEl.style.width = '210px';
-            } else {
-                wrapper.style.height = '340px';
-                svgEl.style.height = '260px';
-                svgEl.style.width = '190px';
-            }
         }
 
         function checkDateAndUnlock() {
@@ -313,23 +312,35 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // DISTRIBUCIÓN ESCALONADA CON TAMAÑO DE ESFERA INTELIGENTE
+        // 20 POSICIONES FIJAS EN EL PINO QUE SE ACTIVAN SEGÚN EL NÚMERO SELECCIONADO
+        const mapaCoordenadas20 = [
+            { x: 50, y: 16 }, // 1
+            { x: 41, y: 28 }, { x: 59, y: 28 }, // 2, 3
+            { x: 32, y: 42 }, { x: 50, y: 42 }, { x: 68, y: 42 }, // 4, 5, 6
+            { x: 24, y: 56 }, { x: 39, y: 56 }, { x: 61, y: 56 }, { x: 76, y: 56 }, // 7 - 10
+            { x: 19, y: 70 }, { x: 33, y: 70 }, { x: 45, y: 70 }, { x: 55, y: 70 }, { x: 67, y: 70 }, { x: 81, y: 70 }, // 11 - 16
+            { x: 16, y: 84 }, { x: 38, y: 84 }, { x: 62, y: 84 }, { x: 84, y: 84 }  // 17 - 20
+        ];
+
+        // Estilos de esferas rotativos para dar variedad (dorado, plateado, rubí, esmeralda)
+        const estilosEsferas = ['sphere-gold', 'sphere-ruby', 'sphere-silver', 'sphere-emerald', 'sphere-gold', 'sphere-ruby'];
+
         function renderSpheres() {
             const container = document.getElementById('spheresContainer');
             container.innerHTML = '';
 
             if (!treeData || !treeData.esferas) return;
 
-            const total = treeData.esferas.length;
-            
-            let sphereSize = 36;
-            if (total > 20) sphereSize = 24;
-            else if (total > 10) sphereSize = 29;
+            const totalActivas = treeData.esferas.length;
+            let sphereSize = totalActivas > 12 ? 24 : (totalActivas > 6 ? 28 : 34);
 
-            const coordenadas = generarCoordenadasPiramidales(total);
+            for (let idx = 0; idx < totalActivas; idx++) {
+                const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
+                const pos = mapaCoordenadas20[idx] || { x: 50, y: 50 };
+                const claseColor = estilosEsferas[idx % estilosEsferas.length];
 
-            treeData.esferas.forEach((esfera, idx) => {
-                const pos = coordenadas[idx] || { x: 50, y: 50 };
+                // Verificar si tiene contenido (mensaje, foto o audio) para activar el resplandor dorado
+                const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
 
                 const wrapper = document.createElement('div');
                 wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group";
@@ -338,45 +349,14 @@
                 wrapper.style.transform = 'translate(-50%, -50%)';
 
                 wrapper.innerHTML = `
-                    <div class="sphere-ball shadow-md" style="width: ${sphereSize}px; height: ${sphereSize}px;">
-                        <i class="fas fa-star text-[7px] text-yellow-300 drop-shadow"></i>
+                    <div class="sphere-ornament ${claseColor} ${tieneContenido ? 'sphere-active-glow' : ''}" style="width: ${sphereSize}px; height: ${sphereSize}px;">
+                        <i class="fas fa-star text-[6px] text-white/80 drop-shadow"></i>
                     </div>
-                    <span class="text-[8px] font-bold text-gold-400 mt-0.5 max-w-[65px] truncate bg-black/60 px-1 rounded border border-gold-500/20">${esfera.nombre}</span>
+                    <span class="text-[8px] font-bold text-gold-400 mt-0.5 max-w-[65px] truncate bg-black/70 px-1 rounded border border-gold-500/20">${esfera.nombre}</span>
                 `;
                 wrapper.onclick = () => openSphereActionModal(idx);
                 container.appendChild(wrapper);
-            });
-        }
-
-        function generarCoordenadasPiramidales(numEsferas) {
-            let coords = [];
-            let filasConfig = [
-                { y: 20, minX: 42, maxX: 58 }, // Punta
-                { y: 38, minX: 30, maxX: 70 }, // Nivel superior
-                { y: 56, minX: 20, maxX: 80 }, // Nivel medio
-                { y: 78, minX: 14, maxX: 86 }  // Base amplia
-            ];
-
-            // Si hay más personas, distribuimos de manera más holgada en el área del pino
-            let index = 0;
-            const porFila = Math.ceil(numEsferas / filasConfig.length);
-
-            filasConfig.forEach((fila, filaIdx) => {
-                let countInRow = (filaIdx === filasConfig.length - 1) ? (numEsferas - index) : Math.min(porFila, numEsferas - index);
-                if (countInRow <= 0) countInRow = 1;
-
-                for (let i = 0; i < countInRow && index < numEsferas; i++) {
-                    let x = countInRow === 1 ? 50 : fila.minX + (i * (fila.maxX - fila.minX) / (countInRow - 1));
-                    coords.push({ x: x, y: fila.y + (Math.random() * 3 - 1.5) });
-                    index++;
-                }
-            });
-
-            while(coords.length < numEsferas) {
-                coords.push({ x: 25 + Math.random() * 50, y: 75 + Math.random() * 10 });
             }
-
-            return coords;
         }
 
         function openSphereActionModal(idx) {
