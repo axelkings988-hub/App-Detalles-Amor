@@ -36,10 +36,17 @@
         .font-serif { font-family: 'Cinzel', serif; }
     </style>
 </head>
-<body class="antialiased pb-20 px-4 pt-6">
+<body class="antialiased pb-20 px-4 pt-4">
 
-    <div class="max-w-md mx-auto space-y-6">
+    <div class="max-w-md mx-auto space-y-4">
         
+        <!-- CONTENEDOR DE ANUNCIOS ADSTERRA (BARRA SUPERIOR) -->
+        <div id="adBannerContainer" class="w-full flex justify-center bg-christmas-900/60 backdrop-blur-md border border-gold-500/20 py-2 rounded-2xl overflow-hidden shadow-lg">
+            <div id="adWrapper" style="min-width: 320px; min-height: 50px; display: flex; justify-content: center; align-items: center;">
+                <span class="text-[9px] text-amber-300/40 uppercase tracking-widest">Cargando anuncio...</span>
+            </div>
+        </div>
+
         <!-- BARRA SUPERIOR CON BOTÓN ATRÁS AL MENÚ PRINCIPAL -->
         <div class="flex items-center justify-between">
             <a href="../index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
@@ -65,7 +72,7 @@
         </div>
 
         <!-- SECCIÓN 2: FORMULARIO DE NUEVO PROYECTO (OCULTO INICIALMENTE) -->
-        <div id="createFormSection" class="hidden bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-5 relative">
+        <div id="createFormSection" class="hidden bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-4 relative">
             
             <button onclick="showProjectsMenu()" class="absolute top-4 left-4 text-xs text-gold-400 hover:text-white flex items-center gap-1 cursor-pointer">
                 <i class="fas fa-arrow-left"></i> Volver
@@ -76,9 +83,9 @@
                 <p class="text-[11px] text-emerald-200/80">Configura los espacios y la fecha de revelación</p>
             </div>
 
-            <div class="space-y-1.5">
+            <div class="space-y-1">
                 <label class="text-xs font-bold text-gold-400">Paquete de Miembros</label>
-                <select id="userTier" onchange="updateTierLimit()" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500">
+                <select id="userTier" onchange="updateTierLimit()" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                     <option value="5">🎄 Básico (1 a 5 personas)</option>
                     <option value="10">🌟 Familiar (6 a 10 personas)</option>
                     <option value="20">🎁 Extendido (11 a 20 personas)</option>
@@ -86,43 +93,42 @@
                 </select>
             </div>
 
-            <div class="space-y-1.5">
+            <div class="space-y-1">
                 <label class="text-xs font-bold text-gold-400">Título Principal</label>
-                <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500">
+                <input type="text" id="treeTitle" placeholder="Ej: Familia Reyes Hernández" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
             </div>
 
-            <!-- NUEVOS CAMPOS: FECHA Y HORA DE ACTIVACIÓN -->
             <div class="grid grid-cols-2 gap-3">
-                <div class="space-y-1.5">
+                <div class="space-y-1">
                     <label class="text-[11px] font-bold text-gold-400">Fecha de Activación</label>
                     <input type="date" id="unlockDate" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 </div>
-                <div class="space-y-1.5">
+                <div class="space-y-1">
                     <label class="text-[11px] font-bold text-gold-400">Hora Exacta</label>
                     <input type="time" id="unlockTime" value="00:00" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 </div>
             </div>
 
-            <div class="space-y-1.5">
+            <div class="space-y-1">
                 <label class="text-xs font-bold text-gold-400">Estilo Visual</label>
-                <select id="treeStyle" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gold-500">
+                <select id="treeStyle" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                     <option value="gold">✨ Elegante Dorado (Clásico)</option>
                     <option value="snow">❄️ Nevado Tradicional</option>
                     <option value="modern">🌲 Minimalista Moderno</option>
                 </select>
             </div>
 
-            <div class="space-y-3 pt-2 border-t border-emerald-500/20">
+            <div class="space-y-2 pt-1 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-gold-400">Nombres de Esferas (<span id="sphereCount">0</span> / <span id="maxTierLimit">5</span> máx)</label>
+                    <label class="text-xs font-bold text-gold-400">Nombres (<span id="sphereCount">0</span> / <span id="maxTierLimit">5</span> máx)</label>
                     <button onclick="addSphereField()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow cursor-pointer">
-                        <i class="fas fa-plus"></i> Agregar Nombre
+                        <i class="fas fa-plus"></i> Agregar
                     </button>
                 </div>
-                <div id="spheresContainer" class="space-y-2 max-h-[180px] overflow-y-auto pr-1"></div>
+                <div id="spheresContainer" class="space-y-2 max-h-[150px] overflow-y-auto pr-1"></div>
             </div>
 
-            <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3.5 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow-xl cursor-pointer">
+            <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow-xl cursor-pointer">
                 Crear Árbol y Generar QR
             </button>
         </div>
@@ -145,6 +151,37 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE EJECUCIÓN DIFERIDA ADSTERRA -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function() {
+                try {
+                    const wrapper = document.getElementById('adWrapper');
+                    if (wrapper) {
+                        wrapper.innerHTML = '';
+                        window.atOptions = {
+                            'key' : '5df8950ef937373e7a705c085c8daeea',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                        const script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
+                        script.async = true;
+                        script.onerror = function() {
+                            wrapper.innerHTML = '<span class="text-[9px] text-amber-300/40">Modo sin conexión</span>';
+                        };
+                        wrapper.appendChild(script);
+                    }
+                } catch(e) {
+                    console.log("Adsterra load protected:", e);
+                }
+            }, 800);
+        });
+    </script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
@@ -161,7 +198,6 @@
         let maxLimit = 5;
 
         window.onload = () => {
-            // Establecer por defecto el 25 de diciembre del año actual como fecha sugerida
             const currentYear = new Date().getFullYear();
             document.getElementById('unlockDate').value = `${currentYear}-12-25`;
             loadMyProjects();
@@ -260,7 +296,6 @@
             if (!dateVal || !timeVal) { alert("Selecciona la fecha y hora de activación."); return; }
             if (containerItems.length === 0) { alert("Agrega al menos un nombre de esfera."); return; }
 
-            // Combinar fecha y hora seleccionada en un formato ISO UTC / Local
             const unlockDateTimeISO = `${dateVal}T${timeVal}:00`;
 
             const spheresArray = [];
@@ -283,7 +318,7 @@
             const treeData = {
                 titulo: title,
                 estilo: style,
-                fechaDesbloqueo: unlockDateTimeISO, // Se guarda la fecha elegida
+                fechaDesbloqueo: unlockDateTimeISO,
                 limiteUsuarios: maxLimit,
                 esferas: spheresArray,
                 fechaCreacion: new Date().toISOString()
