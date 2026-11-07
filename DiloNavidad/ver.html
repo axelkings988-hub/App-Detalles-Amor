@@ -40,7 +40,6 @@
         }
         .tree-glow { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); }
         
-        /* ESTILOS DE ESFERAS */
         .sphere-ornament {
             border-radius: 50%;
             position: relative;
@@ -64,7 +63,6 @@
         .sphere-interactive { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
         .sphere-interactive:hover { transform: scale(1.18); }
 
-        /* PALETA DE COLORES VIBRANTES */
         .sphere-gold { background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17); }
         .sphere-ruby { background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f); }
         .sphere-silver { background: radial-gradient(circle at 30% 30%, #ffffff, #78909c); }
@@ -117,7 +115,7 @@
                 <i class="fas fa-arrow-left"></i> Volver a Proyectos
             </a>
             <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
-                <i class="fas fa-eye"></i> Previsualizar 25 Dic
+                <i class="fas fa-eye"></i> Previsualizar Activación
             </button>
         </div>
 
@@ -179,7 +177,7 @@
                     <input type="text" id="editName" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gold-400">Tu Carta / Deseos (Protegido hasta el 25)</label>
+                    <label class="text-[10px] font-bold text-gold-400">Tu Carta / Deseos (Protegido hasta la revelación)</label>
                     <textarea id="editMsg" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-16 resize-none"></textarea>
                 </div>
                 <div class="space-y-1">
@@ -238,13 +236,13 @@
         let selectedSphereIndex = null;
         let isChristmasUnlocked = false;
         let isPreviewMode = false;
+        let targetUnlockDate = null; // Fecha objetivo personalizada
         let newPhotoBase64 = null;
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
         let recordTimer = null;
 
-        // DISPOSITIVO FIJO Y PERMANENTE
         let myDeviceId = localStorage.getItem(`device_id_${window.location.pathname}`);
         if (!myDeviceId) {
             myDeviceId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -272,6 +270,13 @@
                     document.getElementById('mainContent').classList.remove('hidden');
                     document.getElementById('treeTitle').innerText = treeData.titulo;
                     
+                    // Asignar fecha de desbloqueo configurada (si no tiene, por defecto usa 25 dic del año actual)
+                    if (treeData.fechaDesbloqueo) {
+                        targetUnlockDate = new Date(treeData.fechaDesbloqueo);
+                    } else {
+                        targetUnlockDate = new Date(new Date().getFullYear(), 11, 25, 0, 0, 0);
+                    }
+
                     checkDateAndUnlock();
                     renderSpheres();
                     renderNeonLights();
@@ -288,13 +293,12 @@
 
         function checkDateAndUnlock() {
             const now = new Date();
-            const christmasDate = new Date(now.getFullYear(), 11, 25, 0, 0, 0);
-            if (now >= christmasDate || isPreviewMode) {
+            if (now >= targetUnlockDate || isPreviewMode) {
                 isChristmasUnlocked = true;
                 triggerMagicGlow();
             } else {
                 isChristmasUnlocked = false;
-                startCountdown(christmasDate);
+                startCountdown(targetUnlockDate);
             }
         }
 
@@ -302,10 +306,10 @@
             isPreviewMode = !isPreviewMode;
             const btn = document.getElementById('previewBtn');
             if (isPreviewMode) {
-                btn.innerHTML = `<i class="fas fa-eye-slash"></i> Salir Vista 25 Dic`;
+                btn.innerHTML = `<i class="fas fa-eye-slash"></i> Salir Previsualización`;
                 btn.className = "text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             } else {
-                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar 25 Dic`;
+                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar Activación`;
                 btn.className = "text-[10px] bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             }
             checkDateAndUnlock();
@@ -329,19 +333,19 @@
         }
 
         function triggerMagicGlow() {
-            document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Efecto Navideño Activo ✨`;
+            document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Árbol Activado y Revelado ✨`;
             document.getElementById('treeSvgElement').classList.add('animate-pulse');
             document.getElementById('topStar').classList.add('text-white', 'scale-125');
-            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca tu esfera para abrirla.";
+            document.getElementById('treeStatusHint').innerText = "✨ ¡Listo para abrir las esferas!";
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // VERIFICADOR DE FECHA LÍMITE DE EDICIÓN (Congela 2 días antes de Navidad: 23 de Dic a las 23:59)
+        // FECHA LÍMITE DE EDICIÓN: 2 horas antes de la fecha elegida de activación
         function checkEditDeadline() {
-            if (isPreviewMode) return false; // El modo previsualización del admin salta el bloqueo
+            if (isPreviewMode) return false;
             const now = new Date();
-            const deadline = new Date(now.getFullYear(), 11, 23, 23, 59, 59);
-            return now > deadline;
+            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 60 * 60 * 1000)); // 2 horas antes
+            return now > editDeadline;
         }
 
         const mapaCoordenadas20 = [
@@ -584,7 +588,6 @@
             clearInterval(recordTimer);
         }
 
-        // VALIDACIÓN ROBUSTA DE MICRÓFONO PARA MÓVILES (iOS / Android)
         function startRecording() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 alert("Tu navegador o dispositivo no soporta grabación de audio integrada.");
@@ -627,7 +630,7 @@
                 };
             }).catch(err => {
                 console.error(err);
-                alert("⚠️ No se pudo acceder al micrófono. Por favor, verifica y permite el acceso al micrófono en los ajustes de privacidad de tu navegador o dispositivo.");
+                alert("⚠️ No se pudo acceder al micrófono. Verifica los permisos de acceso en tu navegador.");
             });
         }
 
