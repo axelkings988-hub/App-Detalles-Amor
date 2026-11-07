@@ -20,7 +20,8 @@
                 extend: {
                     colors: {
                         christmas: { 900: '#0B2217', 950: '#05130D' },
-                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
+                        gold: { 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' },
+                        ruby: { 600: '#DC2626', 700: '#B91C1C' }
                     },
                     fontFamily: {
                         serif: ['"Cinzel"', 'serif'],
@@ -39,6 +40,30 @@
             100% { transform: translateY(110vh) translateX(20px); }
         }
         .tree-glow { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.6)); }
+        .sphere-ball {
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle at 30% 30%, #ff5252, #b71c1c);
+            border-radius: 50%;
+            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.4);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .sphere-ball::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 14px;
+            width: 10px;
+            height: 6px;
+            background: #F59E0B;
+            border-radius: 2px;
+        }
+        .sphere-ball:hover { transform: scale(1.1); }
     </style>
 </head>
 <body class="antialiased pb-20 px-4 pt-6 relative">
@@ -80,39 +105,42 @@
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
-                <!-- Contenedor dinámico de esferas -->
-                <div id="spheresGrid" class="absolute inset-0 p-4 items-center justify-items-center overflow-y-auto"></div>
+                <!-- Cuadrícula de esferas reales -->
+                <div id="spheresGrid" class="absolute inset-0 p-6 items-center justify-items-center overflow-y-auto"></div>
             </div>
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                👆 Toca la esfera que te corresponde para hacerla tuya.
+                🎄 Toca una esfera para ver su propietario u abrirlas en Navidad.
             </p>
         </div>
     </main>
 
-    <!-- MODAL DE EDICIÓN DE ESFERA -->
+    <!-- MODAL DE INTERACCIÓN DE LA ESFERA -->
     <div id="sphereModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-christmas-900 border border-gold-500/60 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
                 <i class="fas fa-times text-xs"></i>
             </button>
-            <div class="w-10 h-10 rounded-full bg-gold-500/20 text-gold-400 border border-gold-500/40 flex items-center justify-center mx-auto">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
                 <i class="fas fa-globe-americas"></i>
             </div>
-            <h3 class="text-base font-serif font-bold text-white" id="modalSphereTitle">Tu Esfera</h3>
+            <h3 class="text-lg font-serif font-bold text-white" id="modalSphereTitle">Esfera</h3>
             
-            <div id="editModeSection" class="space-y-3 text-left">
-                <p class="text-[11px] text-emerald-200/90 text-center">¡Este espacio es tuyo! Modifica tu nombre, mensaje, sube tu foto y graba un audio de 10 segundos:</p>
-                
+            <!-- VISTA 1: Selector de propiedad o edición personal -->
+            <div id="ownerActionSection" class="space-y-3">
+                <p id="ownerActionText" class="text-xs text-emerald-200/90"></p>
+                <div id="actionButtonsContainer" class="space-y-2 pt-2"></div>
+            </div>
+
+            <!-- VISTA 2: Edición personal del invitado -->
+            <div id="editModeSection" class="hidden space-y-3 text-left">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Nombre</label>
                     <input type="text" id="editName" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 </div>
-
                 <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-gold-400">Tu Carta / Mensaje (Protegido hasta el 25)</label>
+                    <label class="text-[10px] font-bold text-gold-400">Tu Carta / Deseos (Protegido hasta el 25)</label>
                     <textarea id="editMsg" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500 h-16 resize-none"></textarea>
                 </div>
-
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Foto Especial</label>
                     <div class="flex items-center gap-2">
@@ -130,10 +158,10 @@
                         <span id="timerDisplay" class="text-red-400 font-mono">00:10</span>
                     </label>
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="startRecording()" id="recBtn" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 active:scale-95">
-                            <i class="fas fa-microphone"></i> Grabar Audio
+                        <button type="button" onclick="startRecording()" id="recBtn" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5">
+                            <i class="fas fa-microphone"></i> Grabar
                         </button>
-                        <button type="button" onclick="stopRecording()" id="stopBtn" disabled class="px-3 py-2 bg-slate-700 text-slate-400 font-bold text-[11px] rounded-xl flex items-center justify-center gap-1 cursor-not-allowed">
+                        <button type="button" onclick="stopRecording()" id="stopBtn" disabled class="px-3 py-2 bg-slate-700 text-slate-400 font-bold text-[11px] rounded-xl flex items-center justify-center cursor-not-allowed">
                             <i class="fas fa-stop"></i> Detener
                         </button>
                     </div>
@@ -146,8 +174,9 @@
                 </button>
             </div>
 
+            <!-- VISTA 3: Revelación de contenido multimedia (25 Dic o Previsualización) -->
             <div id="revealModeSection" class="hidden space-y-3">
-                <div id="revealContent" class="space-y-3"></div>
+                <div id="revealContent" class="space-y-3 text-left"></div>
             </div>
         </div>
     </div>
@@ -181,7 +210,7 @@
         if (!docId) {
             document.getElementById('loaderSpinner').classList.add('hidden');
             document.getElementById('loadingText').innerHTML = `
-                <span class="text-red-400 font-bold block mb-2">⚠️ Enlace incompleto o sin ID de árbol.</span>
+                <span class="text-red-400 font-bold block mb-2">⚠️ Enlace incompleto.</span>
                 <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Ir a Proyectos</a>
             `;
         } else {
@@ -202,14 +231,10 @@
                 } else {
                     document.getElementById('loaderSpinner').classList.add('hidden');
                     document.getElementById('loadingText').innerHTML = `
-                        <span class="text-red-400 font-bold block mb-2">⚠️ Este árbol ya no existe o fue eliminado.</span>
-                        <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Crear Nuevo Árbol</a>
+                        <span class="text-red-400 font-bold block mb-2">⚠️ Este árbol ya no existe.</span>
+                        <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Crear Árbol</a>
                     `;
                 }
-            }, (error) => {
-                console.error(error);
-                document.getElementById('loaderSpinner').classList.add('hidden');
-                document.getElementById('loadingText').innerText = "Error de conexión. Revisa tu internet.";
             });
         }
 
@@ -259,129 +284,154 @@
             document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Efecto Navideño Activo ✨`;
             document.getElementById('treeSvg').classList.add('animate-pulse');
             document.getElementById('topStar').classList.add('text-white', 'scale-125');
-            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca tu esfera para ver sorpresas.";
+            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca las esferas para abrirlas.";
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // LÓGICA ADAPTATIVA: 3 columnas para árboles grandes (10-30 personas), 2 columnas para pequeños
+        // RENDERIZADO DE ESFERAS REALES EN EL PINAR
         function renderSpheres() {
             const grid = document.getElementById('spheresGrid');
             grid.innerHTML = '';
 
             if (!treeData || !treeData.esferas) return;
 
-            const totalEsferas = treeData.esferas.length;
-            // Si hay más de 10 esferas usamos 3 columnas compactas, de lo contrario 2 columnas
-            if (totalEsferas > 10) {
-                grid.className = "absolute inset-0 grid grid-cols-3 gap-1.5 p-3 items-center justify-items-center overflow-y-auto";
-            } else {
-                grid.className = "absolute inset-0 grid grid-cols-2 gap-3 p-6 items-center justify-items-center overflow-y-auto";
-            }
+            const total = treeData.esferas.length;
+            grid.className = total > 10 
+                ? "absolute inset-0 grid grid-cols-4 gap-2 p-4 items-center justify-items-center overflow-y-auto"
+                : "absolute inset-0 grid grid-cols-3 gap-3 p-6 items-center justify-items-center overflow-y-auto";
 
-            const savedMyIndex = localStorage.getItem(`arbol_esfera_${docId}`);
-
-            if (savedMyIndex !== null && treeData.esferas[savedMyIndex]) {
-                const idx = parseInt(savedMyIndex);
-                const esfera = treeData.esferas[idx];
-
-                grid.className = "absolute inset-0 flex flex-col items-center justify-center p-4";
-                grid.innerHTML = `<p class="text-[11px] text-gold-400 font-bold mb-2">🌟 Tu Espacio Exclusivo</p>`;
-                
-                const btn = document.createElement('button');
-                btn.className = "px-6 py-3 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl flex items-center justify-center gap-2 cursor-pointer";
-                btn.innerHTML = `<i class="fas fa-circle text-xs text-red-500"></i> ${esfera.nombre}`;
-                btn.onclick = () => openSphereModal(idx);
-                grid.appendChild(btn);
-
-                document.getElementById('treeStatusHint').innerText = "✨ Toca tu esfera para editar tus datos.";
-            } else {
-                document.getElementById('treeStatusHint').innerText = "👆 Toca la esfera que te corresponde para hacerla tuya.";
-                
-                treeData.esferas.forEach((esfera, idx) => {
-                    const btn = document.createElement('button');
-                    const estaOcupada = esfera.ocupadaPor && esfera.ocupadaPor !== localStorage.getItem(`device_id_${docId}`);
-
-                    const maxWClass = totalEsferas > 10 ? 'max-w-[95px] text-[10px] px-2 py-1' : 'max-w-[120px] text-[11px] px-3 py-1.5';
-
-                    if (estaOcupada) {
-                        btn.className = `${maxWClass} bg-slate-900/60 border border-slate-700 rounded-full font-bold text-slate-400 cursor-not-allowed opacity-60 truncate`;
-                        btn.innerHTML = `<i class="fas fa-lock text-[7px] text-slate-500"></i> <span class="truncate">${esfera.nombre}</span>`;
-                        btn.title = "Esta esfera ya fue elegida por otro invitado";
-                    } else {
-                        btn.className = `${maxWClass} bg-christmas-950/90 border border-gold-500/40 rounded-full font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1 hover:bg-gold-500 hover:text-christmas-950 truncate cursor-pointer`;
-                        btn.innerHTML = `<i class="fas fa-circle text-[7px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
-                        
-                        btn.onclick = () => {
-                            let deviceId = localStorage.getItem(`device_id_${docId}`);
-                            if(!deviceId) {
-                                deviceId = 'dev_' + Math.random().toString(36).substring(2);
-                                localStorage.setItem(`device_id_${docId}`, deviceId);
-                            }
-
-                            treeData.esferas[idx].ocupadaPor = deviceId;
-                            db.collection("arboles_navidad").doc(docId).update({
-                                esferas: treeData.esferas
-                            }).then(() => {
-                                localStorage.setItem(`arbol_esfera_${docId}`, idx);
-                                renderSpheres();
-                                openSphereModal(idx);
-                            });
-                        };
-                    }
-                    grid.appendChild(btn);
-                });
-            }
+            treeData.esferas.forEach((esfera, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex flex-col items-center cursor-pointer group";
+                wrapper.innerHTML = `
+                    <div class="sphere-ball">
+                        <i class="fas fa-star text-[9px] text-yellow-300 drop-shadow"></i>
+                    </div>
+                    <span class="text-[9px] font-bold text-gold-400 mt-1 max-w-[50px] truncate bg-black/40 px-1.5 rounded">${esfera.nombre}</span>
+                `;
+                wrapper.onclick = () => openSphereActionModal(idx);
+                grid.appendChild(wrapper);
+            });
         }
 
-        function openSphereModal(idx) {
+        // MODAL DE ACCIÓN AL TOCAR LA ESFERA
+        function openSphereActionModal(idx) {
             selectedSphereIndex = idx;
             const esfera = treeData.esferas[idx];
             document.getElementById('modalSphereTitle').innerText = `Esfera de ${esfera.nombre}`;
-            newPhotoBase64 = null;
-            recordedAudioBase64 = esfera.audio || null;
-
+            
+            const ownerSec = document.getElementById('ownerActionSection');
             const editSec = document.getElementById('editModeSection');
             const revealSec = document.getElementById('revealModeSection');
 
+            ownerSec.classList.remove('hidden');
+            editSec.classList.add('hidden');
+            revealSec.classList.add('hidden');
+
+            const myDeviceId = localStorage.getItem(`device_id_${docId}`) || 'dev_' + Math.random();
+            const esMia = esfera.ocupadaPor === myDeviceId;
+            const estaOcupadaPorOtro = esfera.ocupadaPor && !esMia;
+
+            const actionBtns = document.getElementById('actionButtonsContainer');
+            actionBtns.innerHTML = '';
+
             if (isChristmasUnlocked) {
-                editSec.classList.add('hidden');
-                revealSec.classList.remove('hidden');
-
-                let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed">${esfera.mensaje || "Sin mensaje."}</p>`;
-                if (esfera.foto) {
-                    content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3"><img src="${esfera.foto}" class="w-full h-full object-cover"></div>${content}`;
-                }
-                if (esfera.audio) {
-                    content += `<div class="mt-3 p-3 bg-christmas-950 rounded-xl border border-gold-500/30"><p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p><audio controls src="${esfera.audio}" class="w-full h-8"></audio></div>`;
-                }
-                document.getElementById('revealContent').innerHTML = content;
-            } else {
-                editSec.classList.remove('hidden');
-                revealSec.classList.add('hidden');
-
-                document.getElementById('editName').value = esfera.nombre || '';
-                document.getElementById('editMsg').value = esfera.mensaje || '';
-                document.getElementById('fileLabel').innerText = esfera.foto ? "Cambiar Foto" : "Subir Foto";
+                // MODO REVELACIÓN (Navidad o Previsualización)
+                document.getElementById('ownerActionText').innerText = `Contenido secreto de ${esfera.nombre}:`;
                 
-                const thumb = document.getElementById('previewThumb');
-                if (esfera.foto) {
-                    thumb.classList.remove('hidden');
-                    thumb.innerHTML = `<img src="${esfera.foto}" class="w-full h-full object-cover">`;
-                } else {
-                    thumb.classList.add('hidden');
-                }
+                const openBtn = document.createElement('button');
+                openBtn.className = "w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
+                openBtn.innerHTML = `<i class="fas fa-gift"></i> Abrir Contenido`;
+                openBtn.onclick = () => showRevealContent(idx);
+                actionBtns.appendChild(openBtn);
 
-                const audioPlayback = document.getElementById('audioPlayback');
-                if (esfera.audio) {
-                    audioPlayback.src = esfera.audio;
-                    audioPlayback.classList.remove('hidden');
-                    document.getElementById('audioStatus').innerText = "Audio guardado.";
+            } else {
+                // MODO PRE-NAVIDAD
+                if (estaOcupadaPorOtro) {
+                    document.getElementById('ownerActionText').innerText = `Esta esfera ya fue reclamada por ${esfera.nombre}. ¡Es su espacio exclusivo!`;
+                } else if (esMia) {
+                    document.getElementById('ownerActionText').innerText = `¡Esta es tu esfera asignada! Puedes editar tu información cuando desees.`;
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.className = "w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
+                    editBtn.innerHTML = `<i class="fas fa-edit"></i> Editar Mi Carta / Foto / Audio`;
+                    editBtn.onclick = () => showEditForm(idx);
+                    actionBtns.appendChild(editBtn);
                 } else {
-                    audioPlayback.classList.add('hidden');
-                    document.getElementById('audioStatus').innerText = "";
+                    document.getElementById('ownerActionText').innerText = `¿Esta esfera es tu espacio? Reclámalo para hacerlo tuyo y subir tus recuerdos.`;
+                    
+                    const claimBtn = document.createElement('button');
+                    claimBtn.className = "w-full py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
+                    claimBtn.innerHTML = `<i class="fas fa-hand-pointer"></i> Reclamar y Editar`;
+                    claimBtn.onclick = () => {
+                        let devId = localStorage.getItem(`device_id_${docId}`);
+                        if(!devId) {
+                            devId = 'dev_' + Math.random().toString(36).substring(2);
+                            localStorage.setItem(`device_id_${docId}`, devId);
+                        }
+                        treeData.esferas[idx].ocupadaPor = devId;
+                        db.collection("arboles_navidad").doc(docId).update({ esferas: treeData.esferas }).then(() => {
+                            showEditForm(idx);
+                        });
+                    };
+                    actionBtns.appendChild(claimBtn);
                 }
             }
+
             document.getElementById('sphereModal').classList.remove('hidden');
+        }
+
+        function showEditForm(idx) {
+            const esfera = treeData.esferas[idx];
+            document.getElementById('ownerActionSection').classList.add('hidden');
+            document.getElementById('editModeSection').classList.remove('hidden');
+
+            document.getElementById('editName').value = esfera.nombre || '';
+            document.getElementById('editMsg').value = esfera.mensaje || '';
+            document.getElementById('fileLabel').innerText = esfera.foto ? "Cambiar Foto" : "Subir Foto";
+            
+            const thumb = document.getElementById('previewThumb');
+            if (esfera.foto) {
+                thumb.classList.remove('hidden');
+                thumb.innerHTML = `<img src="${esfera.foto}" class="w-full h-full object-cover">`;
+            } else {
+                thumb.classList.add('hidden');
+            }
+
+            const audioPlayback = document.getElementById('audioPlayback');
+            if (esfera.audio) {
+                audioPlayback.src = esfera.audio;
+                audioPlayback.classList.remove('hidden');
+                document.getElementById('audioStatus').innerText = "Audio guardado.";
+            } else {
+                audioPlayback.classList.add('hidden');
+                document.getElementById('audioStatus').innerText = "";
+            }
+        }
+
+        function showRevealContent(idx) {
+            const esfera = treeData.esferas[idx];
+            document.getElementById('ownerActionSection').classList.add('hidden');
+            document.getElementById('revealModeSection').classList.remove('hidden');
+
+            let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed bg-christmas-950 p-3 rounded-xl border border-gold-500/30">📜 <b>Carta / Deseos:</b><br>${esfera.mensaje || "Sin mensaje."}</p>`;
+            if (esfera.foto) {
+                content = `
+                    <div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3 flex items-center justify-center">
+                        <img src="${esfera.foto}" class="w-full h-full object-cover">
+                    </div>
+                    ${content}
+                `;
+            }
+            if (esfera.audio) {
+                content += `
+                    <div class="p-3 bg-christmas-950 rounded-xl border border-gold-500/30">
+                        <p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p>
+                        <audio controls src="${esfera.audio}" class="w-full h-8"></audio>
+                    </div>
+                `;
+            }
+            document.getElementById('revealContent').innerHTML = content;
         }
 
         function closeModal() {
