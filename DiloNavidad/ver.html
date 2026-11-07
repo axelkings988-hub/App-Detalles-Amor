@@ -40,7 +40,7 @@
         }
         .tree-glow { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); }
         
-        /* ESTILOS DE ESFERAS (CON BRILLO VIVO Y SIN OPACIDAD) */
+        /* ESTILOS DE ESFERAS */
         .sphere-ornament {
             border-radius: 50%;
             position: relative;
@@ -64,7 +64,7 @@
         .sphere-interactive { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
         .sphere-interactive:hover { transform: scale(1.18); }
 
-        /* NUEVA Y AMPLIA PALETA DE COLORES VIBRANTES */
+        /* PALETA DE COLORES VIBRANTES */
         .sphere-gold { background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17); }
         .sphere-ruby { background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f); }
         .sphere-silver { background: radial-gradient(circle at 30% 30%, #ffffff, #78909c); }
@@ -79,6 +79,25 @@
             box-shadow: 0 0 12px 3px rgba(251, 191, 36, 0.7), inset -3px -3px 6px rgba(0,0,0,0.5);
             border: 1px solid rgba(251, 191, 36, 0.8);
         }
+
+        /* EFECTO NEÓN Y TITILEO PARA LAS LUCECITAS SOBRE LAS LÍNEAS */
+        @keyframes neonBlink {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); filter: drop-shadow(0 0 2px rgba(255, 235, 59, 0.5)); }
+            50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 8px rgba(255, 235, 59, 1)); }
+        }
+        .neon-light {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: neonBlink 1.8s infinite ease-in-out;
+            z-index: 25;
+            pointer-events: none;
+        }
+        .neon-light:nth-child(2n) { animation-duration: 1.2s; background-color: #ffeb3b; }
+        .neon-light:nth-child(3n) { animation-duration: 2.2s; background-color: #69f0ae; }
+        .neon-light:nth-child(4n) { animation-duration: 1.5s; background-color: #ff80ab; }
     </style>
 </head>
 <body class="antialiased pb-20 px-4 pt-6 relative">
@@ -128,6 +147,10 @@
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
 
+                <!-- CONTENEDOR DE LUCECITAS NEÓN SOBRE LAS LÍNEAS -->
+                <div id="neonLightsContainer" class="absolute inset-0 top-8 pointer-events-none z-25" style="height: 340px;"></div>
+
+                <!-- CONTENEDOR DE ESFERAS -->
                 <div id="spheresContainer" class="absolute inset-0 top-8 pointer-events-none z-30" style="height: 340px;"></div>
             </div>
             
@@ -247,6 +270,7 @@
                     
                     checkDateAndUnlock();
                     renderSpheres();
+                    renderNeonLights();
                     initSnow();
                 } else {
                     document.getElementById('loaderSpinner').classList.add('hidden');
@@ -308,7 +332,7 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // MAPA BASE DE 20 ESFERAS
+        // MAPAS DE COORDENADAS DE ESFERAS
         const mapaCoordenadas20 = [
             { x: 50, y: 22 }, { x: 42, y: 32 }, { x: 58, y: 32 },
             { x: 34, y: 43 }, { x: 50, y: 43 }, { x: 66, y: 43 },
@@ -317,7 +341,6 @@
             { x: 17, y: 81 }, { x: 38, y: 81 }, { x: 62, y: 81 }, { x: 83, y: 81 }
         ];
 
-        // MAPA EXTENDIDO DE 30 ESFERAS (SI EL USUARIO CONFIGURÓ MÁS DE 20)
         const mapaCoordenadas30 = [
             { x: 50, y: 20 }, { x: 43, y: 28 }, { x: 57, y: 28 },
             { x: 36, y: 37 }, { x: 50, y: 37 }, { x: 64, y: 37 },
@@ -327,11 +350,38 @@
             { x: 16, y: 74 }, { x: 26, y: 74 }, { x: 38, y: 74 }, { x: 50, y: 74 }, { x: 62, y: 74 }, { x: 74, y: 74 }, { x: 84, y: 74 }
         ];
 
-        // VARIEDAD AMPLIADA DE 8 COLORES VIBRANTES
         const estilosEsferas = [
             'sphere-gold', 'sphere-ruby', 'sphere-emerald', 'sphere-sapphire', 
             'sphere-silver', 'sphere-amethyst', 'sphere-copper', 'sphere-rose'
         ];
+
+        // COORDENADAS EXACTAS SOBRE LAS LÍNEAS PUNTEADAS PARA LAS LUCECITAS NEÓN
+        const lucesNeonPuntadas = [
+            // Línea superior (de punta a derecha e izquierda)
+            { x: 52, y: 24 }, { x: 56, y: 30 }, { x: 62, y: 38 }, { x: 68, y: 45 }, { x: 74, y: 52 },
+            { x: 48, y: 24 }, { x: 44, y: 30 }, { x: 38, y: 38 }, { x: 32, y: 45 }, { x: 26, y: 52 },
+            // Línea media
+            { x: 32, y: 53 }, { x: 40, y: 51 }, { x: 50, y: 50 }, { x: 60, y: 51 }, { x: 68, y: 53 },
+            { x: 70, y: 54 }, { x: 76, y: 60 }, { x: 82, y: 67 },
+            { x: 30, y: 54 }, { x: 24, y: 60 }, { x: 18, y: 67 },
+            // Línea inferior
+            { x: 18, y: 68 }, { x: 30, y: 67 }, { x: 42, y: 66 }, { x: 50, y: 66 }, { x: 58, y: 66 }, { x: 70, y: 67 }, { x: 82, y: 68 },
+            { x: 84, y: 70 }, { x: 88, y: 76 },
+            { x: 16, y: 70 }, { x: 12, y: 76 }
+        ];
+
+        function renderNeonLights() {
+            const container = document.getElementById('neonLightsContainer');
+            container.innerHTML = '';
+            
+            lucesNeonPuntadas.forEach((luz, index) => {
+                const lightEl = document.createElement('div');
+                lightEl.className = 'neon-light';
+                lightEl.style.left = `${luz.x}%`;
+                lightEl.style.top = `${luz.y}%`;
+                container.appendChild(lightEl);
+            });
+        }
 
         function renderSpheres() {
             const container = document.getElementById('spheresContainer');
@@ -347,14 +397,18 @@
 
             const wrapperDiv = document.getElementById('treeContainerWrapper');
             const svgEl = document.getElementById('treeSvgElement');
+            const neonContainer = document.getElementById('neonLightsContainer');
+
             if (usar30) {
                 wrapperDiv.style.height = '480px';
                 svgEl.style.height = '390px';
                 container.style.height = '390px';
+                neonContainer.style.height = '390px';
             } else {
                 wrapperDiv.style.height = '440px';
                 svgEl.style.height = '340px';
                 container.style.height = '340px';
+                neonContainer.style.height = '340px';
             }
 
             for (let idx = 0; idx < totalMostrarEnPino; idx++) {
@@ -366,7 +420,6 @@
                 wrapper.style.top = `${pos.y}%`;
                 wrapper.style.transform = 'translate(-50%, -50%)';
 
-                // Si está dentro del número configurado por el usuario (ACTIVAS)
                 if (idx < totalConfigurado) {
                     const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
                     const nombreMostrado = esfera.nombre || `Participante ${idx + 1}`;
@@ -381,7 +434,6 @@
                     `;
                     wrapper.onclick = () => openSphereActionModal(idx);
                 } else {
-                    // ESFERAS RESTANTES: DECORATIVAS, CON EL MISMO BRILLO VIVO PERO BLOQUEADAS
                     wrapper.className = "absolute flex flex-col items-center pointer-events-none";
                     wrapper.innerHTML = `
                         <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize}px; height: ${esferaSize}px;"></div>
