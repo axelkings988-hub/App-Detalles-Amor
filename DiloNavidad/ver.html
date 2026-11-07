@@ -722,7 +722,7 @@
                 const filePath = `fotos/${fileName}`;
 
                 const { error } = await supabaseClient.storage
-                    .from('fotos-navidad')
+                    .from('arboles-navidad')
                     .upload(filePath, file, { cacheControl: '3600', upsert: false });
                     
                 if (error) {
@@ -731,7 +731,7 @@
                 }
 
                 const { data: publicData } = supabaseClient.storage
-                    .from('fotos-navidad')
+                    .from('arboles-navidad')
                     .getPublicUrl(filePath);
                     
                 return publicData ? publicData.publicUrl : null;
