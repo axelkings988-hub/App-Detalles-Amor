@@ -65,27 +65,15 @@
         .sphere-ornament:hover { transform: scale(1.18); }
 
         /* Variantes de color y textura imitando el árbol decorado */
-        .sphere-gold {
-            background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17);
-        }
-        .sphere-silver {
-            background: radial-gradient(circle at 30% 30%, #ffffff, #90a4ae);
-        }
-        .sphere-ruby {
-            background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f);
-        }
-        .sphere-emerald {
-            background: radial-gradient(circle at 30% 30%, #69f0ae, #1b5e20);
-        }
+        .sphere-gold { background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17); }
+        .sphere-silver { background: radial-gradient(circle at 30% 30%, #ffffff, #90a4ae); }
+        .sphere-ruby { background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f); }
+        .sphere-emerald { background: radial-gradient(circle at 30% 30%, #69f0ae, #1b5e20); }
 
-        /* Resplandor parpadeante para esferas que ya tienen mensaje o foto */
-        .sphere-active-glow {
-            box-shadow: 0 0 15px 4px rgba(251, 191, 36, 0.9), inset -3px -3px 6px rgba(0,0,0,0.5);
-            animation: pulseGlow 2s infinite alternate;
-        }
-        @keyframes pulseGlow {
-            0% { filter: brightness(1); box-shadow: 0 0 10px 2px rgba(251, 191, 36, 0.7); }
-            100% { filter: brightness(1.2); box-shadow: 0 0 20px 6px rgba(251, 191, 36, 1); }
+        /* Halo de luz muy sutil y elegante para esferas que tienen mensaje */
+        .sphere-subtle-glow {
+            box-shadow: 0 0 10px 2px rgba(251, 191, 36, 0.5), inset -3px -3px 6px rgba(0,0,0,0.5);
+            border: 1px solid rgba(251, 191, 36, 0.6);
         }
     </style>
 </head>
@@ -125,7 +113,6 @@
             <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500" style="height: 440px;">
                 <i id="topStar" class="fas fa-star text-3xl text-gold-400 mb-2 transition-all duration-700"></i>
                 
-                <!-- SVG DEL ÁRBOL CON GUIÓN DE LUCES INTERNAS -->
                 <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-64 tree-glow transition-all duration-700" style="height: 340px;">
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0A2F20" stroke="#F59E0B" stroke-width="2.5"/>
                     <path d="M 100 25 Q 135 60 170 90 M 170 90 Q 100 120 30 90 M 30 90 Q 105 150 180 150 M 180 150 Q 95 180 10 210" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
@@ -312,18 +299,16 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // 20 POSICIONES FIJAS EN EL PINO QUE SE ACTIVAN SEGÚN EL NÚMERO SELECCIONADO
-        const mapaCoordenadas20 = [
-            { x: 50, y: 16 }, // 1
-            { x: 41, y: 28 }, { x: 59, y: 28 }, // 2, 3
-            { x: 32, y: 42 }, { x: 50, y: 42 }, { x: 68, y: 42 }, // 4, 5, 6
-            { x: 24, y: 56 }, { x: 39, y: 56 }, { x: 61, y: 56 }, { x: 76, y: 56 }, // 7 - 10
-            { x: 19, y: 70 }, { x: 33, y: 70 }, { x: 45, y: 70 }, { x: 55, y: 70 }, { x: 67, y: 70 }, { x: 81, y: 70 }, // 11 - 16
-            { x: 16, y: 84 }, { x: 38, y: 84 }, { x: 62, y: 84 }, { x: 84, y: 84 }  // 17 - 20
+        // 10 POSICIONES FIJAS PRINCIPALES DISTRIBUIDAS ARTÍSTICAMENTE EN EL PINO
+        const mapaCoordenadas10 = [
+            { x: 50, y: 18 }, // 1 (Punta)
+            { x: 38, y: 32 }, { x: 62, y: 32 }, // 2, 3
+            { x: 28, y: 48 }, { x: 50, y: 48 }, { x: 72, y: 48 }, // 4, 5, 6
+            { x: 22, y: 65 }, { x: 78, y: 65 }, // 7, 8
+            { x: 35, y: 82 }, { x: 65, y: 82 }  // 9, 10 (Base)
         ];
 
-        // Estilos de esferas rotativos para dar variedad (dorado, plateado, rubí, esmeralda)
-        const estilosEsferas = ['sphere-gold', 'sphere-ruby', 'sphere-silver', 'sphere-emerald', 'sphere-gold', 'sphere-ruby'];
+        const estilosEsferas = ['sphere-gold', 'sphere-ruby', 'sphere-silver', 'sphere-emerald', 'sphere-gold', 'sphere-ruby', 'sphere-silver'];
 
         function renderSpheres() {
             const container = document.getElementById('spheresContainer');
@@ -331,31 +316,46 @@
 
             if (!treeData || !treeData.esferas) return;
 
-            const totalActivas = treeData.esferas.length;
-            let sphereSize = totalActivas > 12 ? 24 : (totalActivas > 6 ? 28 : 34);
+            const totalConfigurado = treeData.esferas.length; // Cantidad total elegida (ej. 2 hasta 10)
+            const esferaSize = 28; // Tamaño estándar estético tipo foto de referencia
 
-            for (let idx = 0; idx < totalActivas; idx++) {
-                const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
-                const pos = mapaCoordenadas20[idx] || { x: 50, y: 50 };
+            // SIEMPRE DIBUJAMOS LAS 10 POSICIONES DEL PINO
+            for (let idx = 0; idx < 10; idx++) {
+                const pos = mapaCoordenadas10[idx];
                 const claseColor = estilosEsferas[idx % estilosEsferas.length];
 
-                // Verificar si tiene contenido (mensaje, foto o audio) para activar el resplandor dorado
-                const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
+                // Si la posición está dentro del límite configurado por el usuario, es una esfera interactiva activa
+                if (idx < totalConfigurado) {
+                    const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
+                    const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
 
-                const wrapper = document.createElement('div');
-                wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group";
-                wrapper.style.left = `${pos.x}%`;
-                wrapper.style.top = `${pos.y}%`;
-                wrapper.style.transform = 'translate(-50%, -50%)';
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group";
+                    wrapper.style.left = `${pos.x}%`;
+                    wrapper.style.top = `${pos.y}%`;
+                    wrapper.style.transform = 'translate(-50%, -50%)';
 
-                wrapper.innerHTML = `
-                    <div class="sphere-ornament ${claseColor} ${tieneContenido ? 'sphere-active-glow' : ''}" style="width: ${sphereSize}px; height: ${sphereSize}px;">
-                        <i class="fas fa-star text-[6px] text-white/80 drop-shadow"></i>
-                    </div>
-                    <span class="text-[8px] font-bold text-gold-400 mt-0.5 max-w-[65px] truncate bg-black/70 px-1 rounded border border-gold-500/20">${esfera.nombre}</span>
-                `;
-                wrapper.onclick = () => openSphereActionModal(idx);
-                container.appendChild(wrapper);
+                    wrapper.innerHTML = `
+                        <div class="sphere-ornament ${claseColor} ${tieneContenido ? 'sphere-subtle-glow' : ''}" style="width: ${sphereSize}px; height: ${sphereSize}px;">
+                            <i class="fas fa-star text-[6px] text-white/80 drop-shadow"></i>
+                        </div>
+                        <span class="text-[8px] font-bold text-gold-400 mt-0.5 max-w-[65px] truncate bg-black/70 px-1 rounded border border-gold-500/20">${esfera.nombre}</span>
+                    `;
+                    wrapper.onclick = () => openSphereActionModal(idx);
+                    container.appendChild(wrapper);
+                } else {
+                    // Si excede el número configurado, dejamos una esfera decorativa fija de relleno en el pino
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "absolute pointer-events-none";
+                    wrapper.style.left = `${pos.x}%`;
+                    wrapper.style.top = `${pos.y}%`;
+                    wrapper.style.transform = 'translate(-50%, -50%)';
+
+                    wrapper.innerHTML = `
+                        <div class="sphere-ornament ${claseColor} opacity-75" style="width: ${sphereSize - 4}px; height: ${sphereSize - 4}px;"></div>
+                    `;
+                    container.appendChild(wrapper);
+                }
             }
         }
 
