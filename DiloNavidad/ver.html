@@ -14,6 +14,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -192,7 +195,7 @@
                     <div class="flex items-center gap-2">
                         <label id="fileUploadLabel" class="flex-1 cursor-pointer bg-christmas-950 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
                             <i class="fas fa-camera mr-1"></i> <span id="fileLabel">Subir Foto</span>
-                            <input type="file" accept="image/*" class="hidden" id="editFile" onchange="compressImage(this)">
+                            <input type="file" accept="image/*" class="hidden" id="editFile" onchange="handleFileSelect(this)">
                         </label>
                         <div id="previewThumb" class="w-9 h-9 rounded-xl bg-christmas-950 border border-emerald-500/30 hidden flex items-center justify-center overflow-hidden"></div>
                     </div>
@@ -268,12 +271,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // CONFIGURACIÓN DE SUPABASE
+        const SUPABASE_URL = 'https://wqeesqlpgredszsmjcvx.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'AQUÍ_PEGAS_TU_LLAVE_ANON_LARGA'; // <-- Pega aquí tu llave anon/public de Supabase
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let treeData = null;
         let selectedSphereIndex = null;
         let isChristmasUnlocked = false;
         let isPreviewMode = false;
         let targetUnlockDate = null;
-        let newPhotoBase64 = null;
+        let selectedFileObject = null; // Archivo temporal para Supabase
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
@@ -313,7 +321,7 @@
                     }
 
                     checkDateAndUnlock();
-                    manageAdsVisibility(); // Evaluar si se muestran los anuncios según la fecha límite de edición
+                    manageAdsVisibility();
                     renderSpheres();
                     renderNeonLights();
                     initSnow();
@@ -377,15 +385,13 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // LÍMITE DE EDICIÓN: 2 días antes de la fecha elegida de activación
         function checkEditDeadline() {
             if (isPreviewMode) return false;
             const now = new Date();
-            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 días antes
+            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 24 * 60 * 60 * 1000));
             return now > editDeadline;
         }
 
-        // GESTIÓN DE ANUNCIOS: Se muestran mientras la edición esté activa; se ocultan cuando la edición se desactiva por fecha límite
         function manageAdsVisibility() {
             const bannerContainer = document.getElementById('adBannerContainer');
             if (checkEditDeadline()) {
@@ -567,6 +573,7 @@
             const esfera = treeData.esferas[idx];
             document.getElementById('ownerActionSection').classList.add('hidden');
             document.getElementById('editModeSection').classList.remove('hidden');
+            selectedFileObject = null;
 
             const isLockedByDeadline = checkEditDeadline();
             const warningEl = document.getElementById('deadlineWarning');
@@ -691,34 +698,50 @@
             document.getElementById('stopBtn').classList.remove('bg-amber-600', 'text-white');
         }
 
-        function compressImage(input) {
+        function handleFileSelect(input) {
             const file = input.files[0];
             if (!file) return;
+            
+            selectedFileObject = file;
+
             const reader = new FileReader();
             reader.onload = function (e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    let width = img.width, height = img.height;
-                    const maxDim = 600;
-                    if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
-                    else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
-                    canvas.width = width; canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    newPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-                    const thumb = document.getElementById('previewThumb');
-                    thumb.classList.remove('hidden');
-                    thumb.innerHTML = `<img src="${newPhotoBase64}" class="w-full h-full object-cover">`;
-                    document.getElementById('fileLabel').innerText = "¡Lista!";
-                }
+                const thumb = document.getElementById('previewThumb');
+                thumb.classList.remove('hidden');
+                thumb.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                document.getElementById('fileLabel').innerText = "¡Foto lista!";
             }
             reader.readAsDataURL(file);
         }
 
-        function saveSphereChanges() {
+        async function subirFotoSupabase(file) {
+            try {
+                const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
+                const cleanName = file.name ? file.name.replace(/[^a-zA-Z0-9]/g, "_") : 'foto';
+                const fileName = `${Date.now()}_${cleanName}.${fileExt}`;
+                const filePath = `fotos/${fileName}`;
+
+                const { error } = await supabaseClient.storage
+                    .from('fotos-navidad')
+                    .upload(filePath, file, { cacheControl: '3600', upsert: false });
+                    
+                if (error) {
+                    console.error("Error subiendo a Supabase:", error);
+                    return null;
+                }
+
+                const { data: publicData } = supabaseClient.storage
+                    .from('fotos-navidad')
+                    .getPublicUrl(filePath);
+                    
+                return publicData ? publicData.publicUrl : null;
+            } catch (err) { 
+                console.error("Excepción en Supabase:", err);
+                return null; 
+            }
+        }
+
+        async function saveSphereChanges() {
             if (checkEditDeadline()) {
                 alert("El período de edición ha finalizado. Ya no se pueden guardar cambios.");
                 return;
@@ -728,14 +751,22 @@
             const newMsg = document.getElementById('editMsg').value.trim();
             if (!newName) { alert("El nombre no puede estar vacío."); return; }
 
+            const btn = document.getElementById('saveSphereBtn');
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Subiendo imagen y guardando...`;
+            btn.disabled = true;
+
+            if (selectedFileObject) {
+                const publicPhotoUrl = await subirFotoSupabase(selectedFileObject);
+                if (publicPhotoUrl) {
+                    treeData.esferas[selectedSphereIndex].foto = publicPhotoUrl;
+                } else {
+                    alert("⚠️ Hubo un problema al subir la foto a Supabase, pero se guardarán tus otros cambios.");
+                }
+            }
+
             treeData.esferas[selectedSphereIndex].nombre = newName;
             treeData.esferas[selectedSphereIndex].mensaje = newMsg;
-            if (newPhotoBase64) treeData.esferas[selectedSphereIndex].foto = newPhotoBase64;
             if (recordedAudioBase64) treeData.esferas[selectedSphereIndex].audio = recordedAudioBase64;
-
-            const btn = document.getElementById('saveSphereBtn');
-            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Guardando...`;
-            btn.disabled = true;
 
             db.collection("arboles_navidad").doc(docId).update({
                 esferas: treeData.esferas
@@ -744,8 +775,10 @@
                 closeModal();
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
+                selectedFileObject = null;
             }).catch((err) => {
-                alert("Error al actualizar.");
+                console.error(err);
+                alert("Error al actualizar en la base de datos.");
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
             });
