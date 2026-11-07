@@ -228,41 +228,31 @@
 
     <!-- SCRIPT DE EJECUCIÓN DIFERIDA ADSTERRA -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Verificar si el invitado ya guardó sus datos previamente en este dispositivo
-            const isSaved = localStorage.getItem(`ads_hidden_${window.location.search}`);
-            if (isSaved) {
-                const bannerContainer = document.getElementById('adBannerContainer');
-                if (bannerContainer) bannerContainer.style.display = 'none';
-                return;
-            }
-
-            setTimeout(function() {
-                try {
-                    const wrapper = document.getElementById('adWrapper');
-                    if (wrapper) {
-                        wrapper.innerHTML = '';
-                        window.atOptions = {
-                            'key' : '5df8950ef937373e7a705c085c8daeea',
-                            'format' : 'iframe',
-                            'height' : 50,
-                            'width' : 320,
-                            'params' : {}
-                        };
-                        const script = document.createElement('script');
-                        script.type = 'text/javascript';
-                        script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
-                        script.async = true;
-                        script.onerror = function() {
-                            wrapper.innerHTML = '<span class="text-[9px] text-amber-300/40">Modo sin conexión</span>';
-                        };
-                        wrapper.appendChild(script);
-                    }
-                } catch(e) {
-                    console.log("Adsterra load protected:", e);
+        function loadAdsterraBanner() {
+            try {
+                const wrapper = document.getElementById('adWrapper');
+                if (wrapper && wrapper.innerHTML.indexOf('iframe') === -1) {
+                    wrapper.innerHTML = '';
+                    window.atOptions = {
+                        'key' : '5df8950ef937373e7a705c085c8daeea',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
+                    script.async = true;
+                    script.onerror = function() {
+                        wrapper.innerHTML = '<span class="text-[9px] text-amber-300/40">Modo sin conexión</span>';
+                    };
+                    wrapper.appendChild(script);
                 }
-            }, 800);
-        });
+            } catch(e) {
+                console.log("Adsterra load protected:", e);
+            }
+        }
     </script>
 
     <script>
@@ -323,6 +313,7 @@
                     }
 
                     checkDateAndUnlock();
+                    manageAdsVisibility(); // Evaluar si se muestran los anuncios según la fecha límite de edición
                     renderSpheres();
                     renderNeonLights();
                     initSnow();
@@ -358,6 +349,7 @@
                 btn.className = "text-[10px] bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             }
             checkDateAndUnlock();
+            manageAdsVisibility();
             renderSpheres();
         }
 
@@ -385,11 +377,23 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
+        // LÍMITE DE EDICIÓN: 2 días antes de la fecha elegida de activación
         function checkEditDeadline() {
             if (isPreviewMode) return false;
             const now = new Date();
-            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 60 * 60 * 1000));
+            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 días antes
             return now > editDeadline;
+        }
+
+        // GESTIÓN DE ANUNCIOS: Se muestran mientras la edición esté activa; se ocultan cuando la edición se desactiva por fecha límite
+        function manageAdsVisibility() {
+            const bannerContainer = document.getElementById('adBannerContainer');
+            if (checkEditDeadline()) {
+                if (bannerContainer) bannerContainer.style.display = 'none';
+            } else {
+                if (bannerContainer) bannerContainer.style.display = 'flex';
+                setTimeout(loadAdsterraBanner, 800);
+            }
         }
 
         const mapaCoordenadas20 = [
@@ -737,12 +741,6 @@
                 esferas: treeData.esferas
             }).then(() => {
                 alert("¡Cambios guardados con éxito!");
-                
-                // OCULTAR LOS ANUNCIOS PERMANENTE PARA ESTE INVITADO DESPUÉS DE GUARDAR
-                localStorage.setItem(`ads_hidden_${window.location.search}`, 'true');
-                const bannerContainer = document.getElementById('adBannerContainer');
-                if (bannerContainer) bannerContainer.style.display = 'none';
-
                 closeModal();
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
