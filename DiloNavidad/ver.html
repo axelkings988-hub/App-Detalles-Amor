@@ -47,7 +47,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset -4px -4px 8px rgba(0,0,0,0.4);
             z-index: 30;
@@ -63,7 +62,8 @@
             border-radius: 2px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
-        .sphere-ornament:hover { transform: scale(1.18); }
+        .sphere-interactive { cursor: pointer; }
+        .sphere-interactive:hover { transform: scale(1.18); }
 
         /* Variantes de color y textura */
         .sphere-gold { background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17); }
@@ -111,10 +111,9 @@
         </div>
 
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
-            <!-- CONTENEDOR DINÁMICO DEL ÁRBOL -->
             <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500 pt-4" style="height: 440px;">
                 
-                <!-- ESTRELLA FIJA Y ABSOLUTA EN LA PUNTA SUPERIOR -->
+                <!-- ESTRELLA FIJA EN LA PUNTA SUPERIOR -->
                 <div class="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center pointer-events-none">
                     <i id="topStar" class="fas fa-star text-3xl text-gold-400 transition-all duration-700 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]"></i>
                 </div>
@@ -126,12 +125,11 @@
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
 
-                <!-- CONTENEDOR DE ESFERAS -->
                 <div id="spheresContainer" class="absolute inset-0 top-8 pointer-events-none z-30" style="height: 340px;"></div>
             </div>
             
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                🎄 Toca una esfera sobre el árbol para reclamarla o ver su contenido.
+                🎄 Toca una esfera activa sobre el árbol para reclamarla o ver su contenido.
             </p>
         </div>
     </main>
@@ -303,11 +301,11 @@
             document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Efecto Navideño Activo ✨`;
             document.getElementById('treeSvgElement').classList.add('animate-pulse');
             document.getElementById('topStar').classList.add('text-white', 'scale-125');
-            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca las esferas para abrirlas.";
+            document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca las esferas activas para abrirlas.";
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // MAPA BASE DE EXACTAMENTE 20 ESFERAS PREDETERMINADAS
+        // MAPA BASE DE 20 ESFERAS
         const mapaCoordenadas20 = [
             { x: 50, y: 22 }, { x: 42, y: 32 }, { x: 58, y: 32 },
             { x: 34, y: 43 }, { x: 50, y: 43 }, { x: 66, y: 43 },
@@ -316,7 +314,7 @@
             { x: 17, y: 81 }, { x: 38, y: 81 }, { x: 62, y: 81 }, { x: 83, y: 81 }
         ];
 
-        // MAPA EXTENDIDO DE 30 ESFERAS PREDETERMINADAS (CUANDO EL USUARIO PIDE MÁS DE 20)
+        // MAPA EXTENDIDO DE 30 ESFERAS (SI EL USUARIO CONFIGURÓ MÁS DE 20)
         const mapaCoordenadas30 = [
             { x: 50, y: 20 }, { x: 43, y: 28 }, { x: 57, y: 28 },
             { x: 36, y: 37 }, { x: 50, y: 37 }, { x: 64, y: 37 },
@@ -334,15 +332,12 @@
 
             if (!treeData || !treeData.esferas) return;
 
-            const totalConfigurado = treeData.esferas.length; 
-            
-            // Lógica de 20 o 30 esferas predeterminadas cubriendo el pino
+            const totalConfigurado = treeData.esferas.length; // El número exacto que solicitó el usuario (ej. 3)
             const usar30 = totalConfigurado > 20;
             const mapaActivo = usar30 ? mapaCoordenadas30 : mapaCoordenadas20;
             const totalMostrarEnPino = usar30 ? Math.max(30, totalConfigurado) : 20;
             const esferaSize = usar30 ? 18 : 22;
 
-            // Ajustar altura del contenedor visual según el tamaño del árbol
             const wrapperDiv = document.getElementById('treeContainerWrapper');
             const svgEl = document.getElementById('treeSvgElement');
             if (usar30) {
@@ -355,23 +350,22 @@
                 container.style.height = '340px';
             }
 
-            // DIBUJAMOS EL TOTAL DE ESFERAS PREDETERMINADAS (20 O 30)
             for (let idx = 0; idx < totalMostrarEnPino; idx++) {
                 const pos = mapaActivo[idx] || { x: 50, y: 85 };
                 const claseColor = estilosEsferas[idx % estilosEsferas.length];
 
-                // Si la posición tiene datos creados por el usuario
-                if (idx < totalConfigurado && treeData.esferas[idx]) {
-                    const esfera = treeData.esferas[idx];
+                const wrapper = document.createElement('div');
+                wrapper.style.left = `${pos.x}%`;
+                wrapper.style.top = `${pos.y}%`;
+                wrapper.style.transform = 'translate(-50%, -50%)';
+
+                // VERIFICAMOS SI ESTÁ DENTRO DEL NÚMERO SOLICITADO POR EL USUARIO
+                if (idx < totalConfigurado) {
+                    const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
                     const nombreMostrado = esfera.nombre || `Participante ${idx + 1}`;
                     const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
 
-                    const wrapper = document.createElement('div');
-                    wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group";
-                    wrapper.style.left = `${pos.x}%`;
-                    wrapper.style.top = `${pos.y}%`;
-                    wrapper.style.transform = 'translate(-50%, -50%)';
-
+                    wrapper.className = "absolute flex flex-col items-center pointer-events-auto sphere-interactive group";
                     wrapper.innerHTML = `
                         <div class="sphere-ornament ${claseColor} ${tieneContenido ? 'sphere-subtle-glow' : ''}" style="width: ${esferaSize}px; height: ${esferaSize}px;">
                             <i class="fas fa-star text-[5px] text-white/80 drop-shadow"></i>
@@ -379,39 +373,19 @@
                         <span class="text-[7px] font-bold text-gold-400 mt-0.5 max-w-[60px] truncate bg-black/70 px-1 rounded border border-gold-500/20">${nombreMostrado}</span>
                     `;
                     wrapper.onclick = () => openSphereActionModal(idx);
-                    container.appendChild(wrapper);
                 } else {
-                    // POSICIONES DE RELLENO PREDETERMINADAS (Cuando el usuario configuró menos integrantes de los permitidos)
-                    const wrapper = document.createElement('div');
-                    wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group opacity-90";
-                    wrapper.style.left = `${pos.x}%`;
-                    wrapper.style.top = `${pos.y}%`;
-                    wrapper.style.transform = 'translate(-50%, -50%)';
-
-                    // Si el usuario da clic en una esfera vacía de relleno, la habilitamos automáticamente en el árbol
+                    // ESFERAS RESTANTES: BLOQUEADAS, SOLO DECORATIVAS Y SIN ETIQUETA DE DISPONIBLE
+                    wrapper.className = "absolute flex flex-col items-center pointer-events-none opacity-60";
                     wrapper.innerHTML = `
-                        <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize}px; height: ${esferaSize}px;">
-                            <i class="fas fa-plus text-[5px] text-white/60"></i>
-                        </div>
-                        <span class="text-[7px] font-bold text-emerald-300 mt-0.5 max-w-[60px] truncate bg-black/70 px-1 rounded border border-emerald-500/20">Disponible</span>
+                        <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize - 3}px; height: ${esferaSize - 3}px;"></div>
                     `;
-                    wrapper.onclick = () => {
-                        // Si hace clic en una vacía, la inicializamos para que pueda reclamarla
-                        if (!treeData.esferas[idx]) {
-                            treeData.esferas[idx] = { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
-                        }
-                        openSphereActionModal(idx);
-                    };
-                    container.appendChild(wrapper);
                 }
+                container.appendChild(wrapper);
             }
         }
 
         function openSphereActionModal(idx) {
             selectedSphereIndex = idx;
-            if (!treeData.esferas[idx]) {
-                treeData.esferas[idx] = { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
-            }
             const esfera = treeData.esferas[idx];
             document.getElementById('modalSphereTitle').innerText = `Esfera de ${esfera.nombre}`;
             
