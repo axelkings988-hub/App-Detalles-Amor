@@ -45,7 +45,6 @@
 
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- PANTALLA DE CARGA -->
     <div id="loadingScreen" class="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center relative z-20">
         <div class="w-full max-w-sm bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-8 rounded-3xl shadow-2xl space-y-4">
             <div id="loaderSpinner" class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400 mx-auto"></div>
@@ -53,7 +52,6 @@
         </div>
     </div>
 
-    <!-- CONTENIDO DEL INVITADO -->
     <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-6">
         
         <div class="flex items-center justify-between">
@@ -82,7 +80,8 @@
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
-                <div id="spheresGrid" class="absolute inset-0 grid grid-cols-2 gap-3 p-6 items-center justify-items-center overflow-y-auto"></div>
+                <!-- Contenedor dinámico de esferas -->
+                <div id="spheresGrid" class="absolute inset-0 p-4 items-center justify-items-center overflow-y-auto"></div>
             </div>
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
                 👆 Toca la esfera que te corresponde para hacerla tuya.
@@ -179,12 +178,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
-        // Verificación rápida si falta el ID en el enlace
         if (!docId) {
             document.getElementById('loaderSpinner').classList.add('hidden');
             document.getElementById('loadingText').innerHTML = `
                 <span class="text-red-400 font-bold block mb-2">⚠️ Enlace incompleto o sin ID de árbol.</span>
-                <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Ir al Menú de Proyectos</a>
+                <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Ir a Proyectos</a>
             `;
         } else {
             cargarDatosArbol();
@@ -211,7 +209,7 @@
             }, (error) => {
                 console.error(error);
                 document.getElementById('loaderSpinner').classList.add('hidden');
-                document.getElementById('loadingText').innerText = "Error de conexión con la base de datos. Revisa tu internet.";
+                document.getElementById('loadingText').innerText = "Error de conexión. Revisa tu internet.";
             });
         }
 
@@ -265,11 +263,20 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
+        // LÓGICA ADAPTATIVA: 3 columnas para árboles grandes (10-30 personas), 2 columnas para pequeños
         function renderSpheres() {
             const grid = document.getElementById('spheresGrid');
             grid.innerHTML = '';
 
             if (!treeData || !treeData.esferas) return;
+
+            const totalEsferas = treeData.esferas.length;
+            // Si hay más de 10 esferas usamos 3 columnas compactas, de lo contrario 2 columnas
+            if (totalEsferas > 10) {
+                grid.className = "absolute inset-0 grid grid-cols-3 gap-1.5 p-3 items-center justify-items-center overflow-y-auto";
+            } else {
+                grid.className = "absolute inset-0 grid grid-cols-2 gap-3 p-6 items-center justify-items-center overflow-y-auto";
+            }
 
             const savedMyIndex = localStorage.getItem(`arbol_esfera_${docId}`);
 
@@ -277,10 +284,11 @@
                 const idx = parseInt(savedMyIndex);
                 const esfera = treeData.esferas[idx];
 
-                grid.innerHTML = `<p class="col-span-2 text-[11px] text-gold-400 font-bold mb-1">🌟 Tu Espacio Exclusivo</p>`;
+                grid.className = "absolute inset-0 flex flex-col items-center justify-center p-4";
+                grid.innerHTML = `<p class="text-[11px] text-gold-400 font-bold mb-2">🌟 Tu Espacio Exclusivo</p>`;
                 
                 const btn = document.createElement('button');
-                btn.className = "col-span-2 px-5 py-2.5 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl flex items-center justify-center gap-2 mx-auto cursor-pointer";
+                btn.className = "px-6 py-3 bg-christmas-950 border-2 border-gold-500 rounded-2xl text-xs font-bold text-gold-400 shadow-xl flex items-center justify-center gap-2 cursor-pointer";
                 btn.innerHTML = `<i class="fas fa-circle text-xs text-red-500"></i> ${esfera.nombre}`;
                 btn.onclick = () => openSphereModal(idx);
                 grid.appendChild(btn);
@@ -293,13 +301,15 @@
                     const btn = document.createElement('button');
                     const estaOcupada = esfera.ocupadaPor && esfera.ocupadaPor !== localStorage.getItem(`device_id_${docId}`);
 
+                    const maxWClass = totalEsferas > 10 ? 'max-w-[95px] text-[10px] px-2 py-1' : 'max-w-[120px] text-[11px] px-3 py-1.5';
+
                     if (estaOcupada) {
-                        btn.className = "px-3 py-1.5 bg-slate-900/60 border border-slate-700 rounded-full text-[11px] font-bold text-slate-400 cursor-not-allowed opacity-60 truncate max-w-[120px]";
-                        btn.innerHTML = `<i class="fas fa-lock text-[8px] text-slate-500"></i> <span class="truncate">${esfera.nombre}</span>`;
+                        btn.className = `${maxWClass} bg-slate-900/60 border border-slate-700 rounded-full font-bold text-slate-400 cursor-not-allowed opacity-60 truncate`;
+                        btn.innerHTML = `<i class="fas fa-lock text-[7px] text-slate-500"></i> <span class="truncate">${esfera.nombre}</span>`;
                         btn.title = "Esta esfera ya fue elegida por otro invitado";
                     } else {
-                        btn.className = "px-3 py-1.5 bg-christmas-950/90 border border-gold-500/40 rounded-full text-[11px] font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1.5 hover:bg-gold-500 hover:text-christmas-950 truncate max-w-[120px] cursor-pointer";
-                        btn.innerHTML = `<i class="fas fa-circle text-[8px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
+                        btn.className = `${maxWClass} bg-christmas-950/90 border border-gold-500/40 rounded-full font-bold text-gold-400 shadow active:scale-95 transition-transform flex items-center gap-1 hover:bg-gold-500 hover:text-christmas-950 truncate cursor-pointer`;
+                        btn.innerHTML = `<i class="fas fa-circle text-[7px] text-red-500"></i> <span class="truncate">${esfera.nombre}</span>`;
                         
                         btn.onclick = () => {
                             let deviceId = localStorage.getItem(`device_id_${docId}`);
