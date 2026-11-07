@@ -197,7 +197,6 @@
                             <i class="fas fa-camera mr-1"></i> <span id="fileLabel">Subir Foto</span>
                             <input type="file" accept="image/*" class="hidden" id="editFile" onchange="handleFileSelect(this)">
                         </label>
-                        <!-- Miniatura adaptada con object-contain -->
                         <div id="previewThumb" class="w-9 h-9 rounded-xl bg-black/60 border border-emerald-500/30 hidden flex items-center justify-center overflow-hidden"></div>
                     </div>
                 </div>
@@ -630,8 +629,8 @@
 
             let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed bg-christmas-950 p-3 rounded-xl border border-gold-500/30">📜 <b>Carta / Deseos:</b><br>${esfera.mensaje || "Sin mensaje."}</p>`;
             if (esfera.foto) {
-                // Adaptado con object-contain para mostrar la foto completa sin recortes
-                content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-56 bg-christmas-950 mb-3 flex items-center justify-center"><img src="${esfera.foto}" class="w-full h-full object-contain"></div>${content}`;
+                // Adaptado con w-full h-auto y max-h-72 para que la foto se muestre completa sin recortes
+                content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 bg-christmas-950 mb-3 flex items-center justify-center p-1"><img src="${esfera.foto}" class="w-full h-auto max-h-72 object-contain mx-auto rounded-xl"></div>${content}`;
             }
             if (esfera.audio) {
                 content += `<div class="p-3 bg-christmas-950 rounded-xl border border-gold-500/30"><p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p><audio controls src="${esfera.audio}" class="w-full h-8"></audio></div>`;
@@ -710,7 +709,6 @@
             reader.onload = function (e) {
                 const thumb = document.getElementById('previewThumb');
                 thumb.classList.remove('hidden');
-                // Miniatura adaptada con object-contain
                 thumb.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-contain">`;
                 document.getElementById('fileLabel').innerText = "¡Foto lista!";
             }
