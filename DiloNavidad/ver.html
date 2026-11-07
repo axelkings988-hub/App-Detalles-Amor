@@ -171,6 +171,9 @@
             </div>
 
             <div id="editModeSection" class="hidden space-y-3 text-left">
+                <div id="deadlineWarning" class="hidden p-2.5 bg-amber-500/20 border border-amber-500/40 rounded-xl text-[11px] text-amber-300 text-center font-semibold">
+                    ⚠️ El período de edición ha finalizado (Fecha límite alcanzada).
+                </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Nombre</label>
                     <input type="text" id="editName" class="w-full bg-christmas-950 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
@@ -182,7 +185,7 @@
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Foto Especial</label>
                     <div class="flex items-center gap-2">
-                        <label class="flex-1 cursor-pointer bg-christmas-950 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
+                        <label id="fileUploadLabel" class="flex-1 cursor-pointer bg-christmas-950 hover:bg-christmas-800 border border-emerald-500/30 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-300 transition-colors">
                             <i class="fas fa-camera mr-1"></i> <span id="fileLabel">Subir Foto</span>
                             <input type="file" accept="image/*" class="hidden" id="editFile" onchange="compressImage(this)">
                         </label>
@@ -190,13 +193,13 @@
                     </div>
                 </div>
 
-                <div class="space-y-1 pt-1 border-t border-emerald-500/20">
+                <div class="space-y-1 pt-1 border-t border-emerald-500/20" id="audioSectionContainer">
                     <label class="text-[10px] font-bold text-gold-400 flex items-center justify-between">
                         <span>Audio Dedicatoria (Máx. 10s)</span>
                         <span id="timerDisplay" class="text-red-400 font-mono">00:10</span>
                     </label>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="startRecording()" id="recBtn" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5">
+                    <div class="flex items-center gap-2" id="audioButtonsRow">
+                        <button type="button" onclick="startRecording()" id="recBtn" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 cursor-pointer">
                             <i class="fas fa-microphone"></i> Grabar
                         </button>
                         <button type="button" onclick="stopRecording()" id="stopBtn" disabled class="px-3 py-2 bg-slate-700 text-slate-400 font-bold text-[11px] rounded-xl flex items-center justify-center cursor-not-allowed">
@@ -207,7 +210,7 @@
                     <audio id="audioPlayback" controls class="w-full hidden mt-1 h-8"></audio>
                 </div>
 
-                <button onclick="saveSphereChanges()" id="saveSphereBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow mt-2">
+                <button onclick="saveSphereChanges()" id="saveSphereBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow mt-2 cursor-pointer">
                     Guardar Mis Cambios
                 </button>
             </div>
@@ -241,7 +244,7 @@
         let recordedAudioBase64 = null;
         let recordTimer = null;
 
-        // OBTENER O GENERAR UN DEVICE_ID FIJO Y PERMANENTE EN LOCALSTORAGE
+        // DISPOSITIVO FIJO Y PERMANENTE
         let myDeviceId = localStorage.getItem(`device_id_${window.location.pathname}`);
         if (!myDeviceId) {
             myDeviceId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -333,6 +336,14 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
+        // VERIFICADOR DE FECHA LÍMITE DE EDICIÓN (Congela 2 días antes de Navidad: 23 de Dic a las 23:59)
+        function checkEditDeadline() {
+            if (isPreviewMode) return false; // El modo previsualización del admin salta el bloqueo
+            const now = new Date();
+            const deadline = new Date(now.getFullYear(), 11, 23, 23, 59, 59);
+            return now > deadline;
+        }
+
         const mapaCoordenadas20 = [
             { x: 50, y: 22 }, { x: 42, y: 32 }, { x: 58, y: 32 },
             { x: 34, y: 43 }, { x: 50, y: 43 }, { x: 66, y: 43 },
@@ -392,7 +403,6 @@
             const totalMostrarEnPino = usar30 ? Math.max(30, totalConfigurado) : 20;
             const esferaSize = usar30 ? 18 : 22;
 
-            // VERIFICAR SI ESTE DISPOSITIVO YA TIENE UNA ESFERA RECLAMADA EN ESTE ÁRBOL
             let miEsferaIndex = -1;
             treeData.esferas.forEach((e, idx) => {
                 if (e.ocupadaPor === myDeviceId) miEsferaIndex = idx;
@@ -413,13 +423,9 @@
                     const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
 
                     const esMia = esfera.ocupadaPor === myDeviceId;
-                    const estaOcupadaPorOtro = esfera.ocupadaPor && !esMia;
-
-                    // REGLA DE BLOQUEO: Si ya tengo una esfera, las demás que estén libres quedan bloqueadas para mí.
                     const bloqueadaParaMi = (miEsferaIndex !== -1 && !esMia);
 
                     if (bloqueadaParaMi) {
-                        // Esfera activa pero bloqueada porque ya reclamé otra en este dispositivo
                         wrapper.className = "absolute flex flex-col items-center pointer-events-none opacity-40";
                         wrapper.innerHTML = `
                             <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize}px; height: ${esferaSize}px;"></div>
@@ -436,7 +442,6 @@
                         wrapper.onclick = () => openSphereActionModal(idx);
                     }
                 } else {
-                    // Esferas decorativas sobrantes
                     wrapper.className = "absolute flex flex-col items-center pointer-events-none";
                     wrapper.innerHTML = `
                         <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize}px; height: ${esferaSize}px;"></div>
@@ -462,7 +467,6 @@
             const esMia = esfera.ocupadaPor === myDeviceId;
             const estaOcupadaPorOtro = esfera.ocupadaPor && !esMia;
 
-            // Verificar si este dispositivo ya tiene OTRA esfera asignada
             let yaTengoOtraEsfera = false;
             treeData.esferas.forEach((e, i) => {
                 if (i !== idx && e.ocupadaPor === myDeviceId) yaTengoOtraEsfera = true;
@@ -512,8 +516,32 @@
             document.getElementById('ownerActionSection').classList.add('hidden');
             document.getElementById('editModeSection').classList.remove('hidden');
 
-            document.getElementById('editName').value = esfera.nombre || '';
-            document.getElementById('editMsg').value = esfera.mensaje || '';
+            const isLockedByDeadline = checkEditDeadline();
+            const warningEl = document.getElementById('deadlineWarning');
+            const saveBtn = document.getElementById('saveSphereBtn');
+            const nameInput = document.getElementById('editName');
+            const msgInput = document.getElementById('editMsg');
+            const fileUploadLabel = document.getElementById('fileUploadLabel');
+            const audioButtonsRow = document.getElementById('audioButtonsRow');
+
+            if (isLockedByDeadline) {
+                warningEl.classList.remove('hidden');
+                saveBtn.classList.add('hidden');
+                nameInput.disabled = true;
+                msgInput.disabled = true;
+                fileUploadLabel.classList.add('opacity-50', 'pointer-events-none');
+                audioButtonsRow.classList.add('opacity-50', 'pointer-events-none');
+            } else {
+                warningEl.classList.add('hidden');
+                saveBtn.classList.remove('hidden');
+                nameInput.disabled = false;
+                msgInput.disabled = false;
+                fileUploadLabel.classList.remove('opacity-50', 'pointer-events-none');
+                audioButtonsRow.classList.remove('opacity-50', 'pointer-events-none');
+            }
+
+            nameInput.value = esfera.nombre || '';
+            msgInput.value = esfera.mensaje || '';
             document.getElementById('fileLabel').innerText = esfera.foto ? "Cambiar Foto" : "Subir Foto";
             
             const thumb = document.getElementById('previewThumb');
@@ -556,7 +584,13 @@
             clearInterval(recordTimer);
         }
 
+        // VALIDACIÓN ROBUSTA DE MICRÓFONO PARA MÓVILES (iOS / Android)
         function startRecording() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Tu navegador o dispositivo no soporta grabación de audio integrada.");
+                return;
+            }
+
             audioChunks = [];
             navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
                 mediaRecorder = new MediaRecorder(stream);
@@ -587,11 +621,14 @@
                         const audioPlayback = document.getElementById('audioPlayback');
                         audioPlayback.src = recordedAudioBase64;
                         audioPlayback.classList.remove('hidden');
-                        document.getElementById('audioStatus').innerText = "¡Audio grabado!";
+                        document.getElementById('audioStatus').innerText = "¡Audio grabado con éxito!";
                     };
                     stream.getTracks().forEach(track => track.stop());
                 };
-            }).catch(err => alert("No se pudo acceder al micrófono."));
+            }).catch(err => {
+                console.error(err);
+                alert("⚠️ No se pudo acceder al micrófono. Por favor, verifica y permite el acceso al micrófono en los ajustes de privacidad de tu navegador o dispositivo.");
+            });
         }
 
         function stopRecording() {
@@ -631,6 +668,11 @@
         }
 
         function saveSphereChanges() {
+            if (checkEditDeadline()) {
+                alert("El período de edición ha finalizado. Ya no se pueden guardar cambios.");
+                return;
+            }
+
             const newName = document.getElementById('editName').value.trim();
             const newMsg = document.getElementById('editMsg').value.trim();
             if (!newName) { alert("El nombre no puede estar vacío."); return; }
@@ -660,6 +702,7 @@
 
         function initSnow() {
             const container = document.getElementById('snowContainer');
+            container.innerHTML = '';
             for (let i = 0; i < 20; i++) {
                 const flake = document.createElement('div');
                 flake.className = 'snowflake';
