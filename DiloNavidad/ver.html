@@ -40,12 +40,11 @@
             100% { transform: translateY(110vh) translateX(20px); }
         }
         .tree-glow { filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.6)); }
+        
         .sphere-ball {
-            width: 38px;
-            height: 38px;
             background: radial-gradient(circle at 30% 30%, #ff5252, #b71c1c);
             border-radius: 50%;
-            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.4);
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.5), 0 3px 6px rgba(0,0,0,0.4);
             position: relative;
             display: flex;
             align-items: center;
@@ -56,14 +55,14 @@
         .sphere-ball::before {
             content: '';
             position: absolute;
-            top: -4px;
-            left: 14px;
-            width: 10px;
-            height: 6px;
+            top: -3px;
+            left: calc(50% - 4px);
+            width: 8px;
+            height: 5px;
             background: #F59E0B;
             border-radius: 2px;
         }
-        .sphere-ball:hover { transform: scale(1.1); }
+        .sphere-ball:hover { transform: scale(1.15); }
     </style>
 </head>
 <body class="antialiased pb-20 px-4 pt-6 relative">
@@ -99,17 +98,22 @@
         </div>
 
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
-            <div class="relative w-64 h-80 mx-auto flex flex-col items-center justify-center">
+            <!-- CONTENEDOR DINÁMICO DEL ÁRBOL (Cuyo alto se expande si hay más personas) -->
+            <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500" style="height: 340px;">
                 <i id="topStar" class="fas fa-star text-3xl text-gold-400 mb-2 transition-all duration-700"></i>
-                <svg viewBox="0 0 200 240" class="w-48 h-56 tree-glow transition-all duration-700" id="treeSvg">
+                
+                <!-- SVG DEL ÁRBOL DINÁMICO -->
+                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-56 tree-glow transition-all duration-700" style="height: 260px;" id="treeSvg">
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0E3B2A" stroke="#F59E0B" stroke-width="2"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
-                <!-- Cuadrícula de esferas reales -->
-                <div id="spheresGrid" class="absolute inset-0 p-6 items-center justify-items-center overflow-y-auto"></div>
+
+                <!-- CONTENEDOR DE ESFERAS -->
+                <div id="spheresContainer" class="absolute inset-0 pointer-events-none"></div>
             </div>
+            
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
-                🎄 Toca una esfera para ver su propietario u abrirlas en Navidad.
+                🎄 Toca una esfera sobre el árbol para ver su propietario o abrirlas en Navidad.
             </p>
         </div>
     </main>
@@ -120,18 +124,16 @@
             <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-christmas-950 text-gold-400 flex items-center justify-center border border-gold-500/30">
                 <i class="fas fa-times text-xs"></i>
             </button>
-            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-red-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
+            <div class="w-12 h-12 rounded-full bg-red-600/20 text-red-400 border border-gold-500/40 flex items-center justify-center mx-auto text-lg shadow-inner">
                 <i class="fas fa-globe-americas"></i>
             </div>
             <h3 class="text-lg font-serif font-bold text-white" id="modalSphereTitle">Esfera</h3>
             
-            <!-- VISTA 1: Selector de propiedad o edición personal -->
             <div id="ownerActionSection" class="space-y-3">
                 <p id="ownerActionText" class="text-xs text-emerald-200/90"></p>
                 <div id="actionButtonsContainer" class="space-y-2 pt-2"></div>
             </div>
 
-            <!-- VISTA 2: Edición personal del invitado -->
             <div id="editModeSection" class="hidden space-y-3 text-left">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Nombre</label>
@@ -174,7 +176,6 @@
                 </button>
             </div>
 
-            <!-- VISTA 3: Revelación de contenido multimedia (25 Dic o Previsualización) -->
             <div id="revealModeSection" class="hidden space-y-3">
                 <div id="revealContent" class="space-y-3 text-left"></div>
             </div>
@@ -225,6 +226,7 @@
                     document.getElementById('mainContent').classList.remove('hidden');
                     document.getElementById('treeTitle').innerText = treeData.titulo;
                     
+                    ajustarTamanoPinoSegunPersonas();
                     checkDateAndUnlock();
                     renderSpheres();
                     initSnow();
@@ -236,6 +238,29 @@
                     `;
                 }
             });
+        }
+
+        // AUMENTAR TAMAÑO DEL PINO DE FORMA DINÁMICA SEGÚN EL NÚMERO DE PERSONAS
+        function ajustarTamanoPinoSegunPersonas() {
+            if (!treeData || !treeData.esferas) return;
+            const total = treeData.esferas.length;
+
+            const wrapper = document.getElementById('treeContainerWrapper');
+            const svgEl = document.getElementById('treeSvgElement');
+
+            if (total > 20) {
+                wrapper.style.height = '440px';
+                svgEl.style.height = '350px';
+                svgEl.style.width = '240px';
+            } else if (total > 10) {
+                wrapper.style.height = '390px';
+                svgEl.style.height = '310px';
+                svgEl.style.width = '210px';
+            } else {
+                wrapper.style.height = '340px';
+                svgEl.style.height = '260px';
+                svgEl.style.width = '190px';
+            }
         }
 
         function checkDateAndUnlock() {
@@ -282,39 +307,78 @@
 
         function triggerMagicGlow() {
             document.getElementById('countdownBox').innerHTML = `<i class="fas fa-gift text-xs"></i> ¡Efecto Navideño Activo ✨`;
-            document.getElementById('treeSvg').classList.add('animate-pulse');
+            document.getElementById('treeSvgElement').classList.add('animate-pulse');
             document.getElementById('topStar').classList.add('text-white', 'scale-125');
             document.getElementById('treeStatusHint').innerText = "✨ ¡Árbol iluminado! Toca las esferas para abrirlas.";
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // RENDERIZADO DE ESFERAS REALES EN EL PINAR
+        // DISTRIBUCIÓN ESCALONADA CON TAMAÑO DE ESFERA INTELIGENTE
         function renderSpheres() {
-            const grid = document.getElementById('spheresGrid');
-            grid.innerHTML = '';
+            const container = document.getElementById('spheresContainer');
+            container.innerHTML = '';
 
             if (!treeData || !treeData.esferas) return;
 
             const total = treeData.esferas.length;
-            grid.className = total > 10 
-                ? "absolute inset-0 grid grid-cols-4 gap-2 p-4 items-center justify-items-center overflow-y-auto"
-                : "absolute inset-0 grid grid-cols-3 gap-3 p-6 items-center justify-items-center overflow-y-auto";
+            
+            let sphereSize = 36;
+            if (total > 20) sphereSize = 24;
+            else if (total > 10) sphereSize = 29;
+
+            const coordenadas = generarCoordenadasPiramidales(total);
 
             treeData.esferas.forEach((esfera, idx) => {
+                const pos = coordenadas[idx] || { x: 50, y: 50 };
+
                 const wrapper = document.createElement('div');
-                wrapper.className = "flex flex-col items-center cursor-pointer group";
+                wrapper.className = "absolute flex flex-col items-center pointer-events-auto cursor-pointer group";
+                wrapper.style.left = `${pos.x}%`;
+                wrapper.style.top = `${pos.y}%`;
+                wrapper.style.transform = 'translate(-50%, -50%)';
+
                 wrapper.innerHTML = `
-                    <div class="sphere-ball">
-                        <i class="fas fa-star text-[9px] text-yellow-300 drop-shadow"></i>
+                    <div class="sphere-ball shadow-md" style="width: ${sphereSize}px; height: ${sphereSize}px;">
+                        <i class="fas fa-star text-[7px] text-yellow-300 drop-shadow"></i>
                     </div>
-                    <span class="text-[9px] font-bold text-gold-400 mt-1 max-w-[50px] truncate bg-black/40 px-1.5 rounded">${esfera.nombre}</span>
+                    <span class="text-[8px] font-bold text-gold-400 mt-0.5 max-w-[65px] truncate bg-black/60 px-1 rounded border border-gold-500/20">${esfera.nombre}</span>
                 `;
                 wrapper.onclick = () => openSphereActionModal(idx);
-                grid.appendChild(wrapper);
+                container.appendChild(wrapper);
             });
         }
 
-        // MODAL DE ACCIÓN AL TOCAR LA ESFERA
+        function generarCoordenadasPiramidales(numEsferas) {
+            let coords = [];
+            let filasConfig = [
+                { y: 20, minX: 42, maxX: 58 }, // Punta
+                { y: 38, minX: 30, maxX: 70 }, // Nivel superior
+                { y: 56, minX: 20, maxX: 80 }, // Nivel medio
+                { y: 78, minX: 14, maxX: 86 }  // Base amplia
+            ];
+
+            // Si hay más personas, distribuimos de manera más holgada en el área del pino
+            let index = 0;
+            const porFila = Math.ceil(numEsferas / filasConfig.length);
+
+            filasConfig.forEach((fila, filaIdx) => {
+                let countInRow = (filaIdx === filasConfig.length - 1) ? (numEsferas - index) : Math.min(porFila, numEsferas - index);
+                if (countInRow <= 0) countInRow = 1;
+
+                for (let i = 0; i < countInRow && index < numEsferas; i++) {
+                    let x = countInRow === 1 ? 50 : fila.minX + (i * (fila.maxX - fila.minX) / (countInRow - 1));
+                    coords.push({ x: x, y: fila.y + (Math.random() * 3 - 1.5) });
+                    index++;
+                }
+            });
+
+            while(coords.length < numEsferas) {
+                coords.push({ x: 25 + Math.random() * 50, y: 75 + Math.random() * 10 });
+            }
+
+            return coords;
+        }
+
         function openSphereActionModal(idx) {
             selectedSphereIndex = idx;
             const esfera = treeData.esferas[idx];
@@ -336,7 +400,6 @@
             actionBtns.innerHTML = '';
 
             if (isChristmasUnlocked) {
-                // MODO REVELACIÓN (Navidad o Previsualización)
                 document.getElementById('ownerActionText').innerText = `Contenido secreto de ${esfera.nombre}:`;
                 
                 const openBtn = document.createElement('button');
@@ -344,13 +407,11 @@
                 openBtn.innerHTML = `<i class="fas fa-gift"></i> Abrir Contenido`;
                 openBtn.onclick = () => showRevealContent(idx);
                 actionBtns.appendChild(openBtn);
-
             } else {
-                // MODO PRE-NAVIDAD
                 if (estaOcupadaPorOtro) {
-                    document.getElementById('ownerActionText').innerText = `Esta esfera ya fue reclamada por ${esfera.nombre}. ¡Es su espacio exclusivo!`;
+                    document.getElementById('ownerActionText').innerText = `Esta esfera ya fue reclamada por ${esfera.nombre}.`;
                 } else if (esMia) {
-                    document.getElementById('ownerActionText').innerText = `¡Esta es tu esfera asignada! Puedes editar tu información cuando desees.`;
+                    document.getElementById('ownerActionText').innerText = `¡Esta es tu esfera asignada!`;
                     
                     const editBtn = document.createElement('button');
                     editBtn.className = "w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
@@ -358,7 +419,7 @@
                     editBtn.onclick = () => showEditForm(idx);
                     actionBtns.appendChild(editBtn);
                 } else {
-                    document.getElementById('ownerActionText').innerText = `¿Esta esfera es tu espacio? Reclámalo para hacerlo tuyo y subir tus recuerdos.`;
+                    document.getElementById('ownerActionText').innerText = `¿Esta esfera es tu espacio? Reclámalo para hacerlo tuyo.`;
                     
                     const claimBtn = document.createElement('button');
                     claimBtn.className = "w-full py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer";
@@ -377,7 +438,6 @@
                     actionBtns.appendChild(claimBtn);
                 }
             }
-
             document.getElementById('sphereModal').classList.remove('hidden');
         }
 
@@ -416,20 +476,10 @@
 
             let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed bg-christmas-950 p-3 rounded-xl border border-gold-500/30">📜 <b>Carta / Deseos:</b><br>${esfera.mensaje || "Sin mensaje."}</p>`;
             if (esfera.foto) {
-                content = `
-                    <div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3 flex items-center justify-center">
-                        <img src="${esfera.foto}" class="w-full h-full object-cover">
-                    </div>
-                    ${content}
-                `;
+                content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3 flex items-center justify-center"><img src="${esfera.foto}" class="w-full h-full object-cover"></div>${content}`;
             }
             if (esfera.audio) {
-                content += `
-                    <div class="p-3 bg-christmas-950 rounded-xl border border-gold-500/30">
-                        <p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p>
-                        <audio controls src="${esfera.audio}" class="w-full h-8"></audio>
-                    </div>
-                `;
+                content += `<div class="p-3 bg-christmas-950 rounded-xl border border-gold-500/30"><p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p><audio controls src="${esfera.audio}" class="w-full h-8"></audio></div>`;
             }
             document.getElementById('revealContent').innerHTML = content;
         }
