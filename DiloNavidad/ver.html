@@ -40,15 +40,14 @@
         }
         .tree-glow { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); }
         
-        /* ESTILOS DE ESFERAS */
+        /* ESTILOS DE ESFERAS (CON BRILLO VIVO Y SIN OPACIDAD) */
         .sphere-ornament {
             border-radius: 50%;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset -4px -4px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset -4px -4px 8px rgba(0,0,0,0.4);
             z-index: 30;
         }
         .sphere-ornament::before {
@@ -62,14 +61,18 @@
             border-radius: 2px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
-        .sphere-interactive { cursor: pointer; }
+        .sphere-interactive { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
         .sphere-interactive:hover { transform: scale(1.18); }
 
-        /* Variantes de color y textura */
+        /* NUEVA Y AMPLIA PALETA DE COLORES VIBRANTES */
         .sphere-gold { background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57f17); }
-        .sphere-silver { background: radial-gradient(circle at 30% 30%, #ffffff, #90a4ae); }
         .sphere-ruby { background: radial-gradient(circle at 30% 30%, #ff5252, #880e4f); }
+        .sphere-silver { background: radial-gradient(circle at 30% 30%, #ffffff, #78909c); }
         .sphere-emerald { background: radial-gradient(circle at 30% 30%, #69f0ae, #1b5e20); }
+        .sphere-sapphire { background: radial-gradient(circle at 30% 30%, #448aff, #0d47a1); }
+        .sphere-amethyst { background: radial-gradient(circle at 30% 30%, #e040fb, #4a148c); }
+        .sphere-copper { background: radial-gradient(circle at 30% 30%, #ffab40, #bf360c); }
+        .sphere-rose { background: radial-gradient(circle at 30% 30%, #ff80ab, #c2185b); }
 
         /* Halo de luz sutil para esferas con mensaje */
         .sphere-subtle-glow {
@@ -324,7 +327,11 @@
             { x: 16, y: 74 }, { x: 26, y: 74 }, { x: 38, y: 74 }, { x: 50, y: 74 }, { x: 62, y: 74 }, { x: 74, y: 74 }, { x: 84, y: 74 }
         ];
 
-        const estilosEsferas = ['sphere-gold', 'sphere-ruby', 'sphere-silver', 'sphere-emerald', 'sphere-gold', 'sphere-ruby'];
+        // VARIEDAD AMPLIADA DE 8 COLORES VIBRANTES
+        const estilosEsferas = [
+            'sphere-gold', 'sphere-ruby', 'sphere-emerald', 'sphere-sapphire', 
+            'sphere-silver', 'sphere-amethyst', 'sphere-copper', 'sphere-rose'
+        ];
 
         function renderSpheres() {
             const container = document.getElementById('spheresContainer');
@@ -332,7 +339,7 @@
 
             if (!treeData || !treeData.esferas) return;
 
-            const totalConfigurado = treeData.esferas.length; // El número exacto que solicitó el usuario (ej. 3)
+            const totalConfigurado = treeData.esferas.length; 
             const usar30 = totalConfigurado > 20;
             const mapaActivo = usar30 ? mapaCoordenadas30 : mapaCoordenadas20;
             const totalMostrarEnPino = usar30 ? Math.max(30, totalConfigurado) : 20;
@@ -359,7 +366,7 @@
                 wrapper.style.top = `${pos.y}%`;
                 wrapper.style.transform = 'translate(-50%, -50%)';
 
-                // VERIFICAMOS SI ESTÁ DENTRO DEL NÚMERO SOLICITADO POR EL USUARIO
+                // Si está dentro del número configurado por el usuario (ACTIVAS)
                 if (idx < totalConfigurado) {
                     const esfera = treeData.esferas[idx] || { nombre: `Participante ${idx + 1}`, ocupadaPor: null, mensaje: '', foto: '', audio: '' };
                     const nombreMostrado = esfera.nombre || `Participante ${idx + 1}`;
@@ -374,10 +381,10 @@
                     `;
                     wrapper.onclick = () => openSphereActionModal(idx);
                 } else {
-                    // ESFERAS RESTANTES: BLOQUEADAS, SOLO DECORATIVAS Y SIN ETIQUETA DE DISPONIBLE
-                    wrapper.className = "absolute flex flex-col items-center pointer-events-none opacity-60";
+                    // ESFERAS RESTANTES: DECORATIVAS, CON EL MISMO BRILLO VIVO PERO BLOQUEADAS
+                    wrapper.className = "absolute flex flex-col items-center pointer-events-none";
                     wrapper.innerHTML = `
-                        <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize - 3}px; height: ${esferaSize - 3}px;"></div>
+                        <div class="sphere-ornament ${claseColor}" style="width: ${esferaSize}px; height: ${esferaSize}px;"></div>
                     `;
                 }
                 container.appendChild(wrapper);
