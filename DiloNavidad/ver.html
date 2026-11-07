@@ -197,7 +197,8 @@
                             <i class="fas fa-camera mr-1"></i> <span id="fileLabel">Subir Foto</span>
                             <input type="file" accept="image/*" class="hidden" id="editFile" onchange="handleFileSelect(this)">
                         </label>
-                        <div id="previewThumb" class="w-9 h-9 rounded-xl bg-christmas-950 border border-emerald-500/30 hidden flex items-center justify-center overflow-hidden"></div>
+                        <!-- Miniatura adaptada con object-contain -->
+                        <div id="previewThumb" class="w-9 h-9 rounded-xl bg-black/60 border border-emerald-500/30 hidden flex items-center justify-center overflow-hidden"></div>
                     </div>
                 </div>
 
@@ -606,7 +607,7 @@
             const thumb = document.getElementById('previewThumb');
             if (esfera.foto) {
                 thumb.classList.remove('hidden');
-                thumb.innerHTML = `<img src="${esfera.foto}" class="w-full h-full object-cover">`;
+                thumb.innerHTML = `<img src="${esfera.foto}" class="w-full h-full object-contain">`;
             } else {
                 thumb.classList.add('hidden');
             }
@@ -629,7 +630,8 @@
 
             let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed bg-christmas-950 p-3 rounded-xl border border-gold-500/30">📜 <b>Carta / Deseos:</b><br>${esfera.mensaje || "Sin mensaje."}</p>`;
             if (esfera.foto) {
-                content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-48 bg-christmas-950 mb-3 flex items-center justify-center"><img src="${esfera.foto}" class="w-full h-full object-cover"></div>${content}`;
+                // Adaptado con object-contain para mostrar la foto completa sin recortes
+                content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 max-h-56 bg-christmas-950 mb-3 flex items-center justify-center"><img src="${esfera.foto}" class="w-full h-full object-contain"></div>${content}`;
             }
             if (esfera.audio) {
                 content += `<div class="p-3 bg-christmas-950 rounded-xl border border-gold-500/30"><p class="text-[10px] text-gold-400 font-bold mb-1">🎵 Audio Dedicatoria:</p><audio controls src="${esfera.audio}" class="w-full h-8"></audio></div>`;
@@ -708,7 +710,8 @@
             reader.onload = function (e) {
                 const thumb = document.getElementById('previewThumb');
                 thumb.classList.remove('hidden');
-                thumb.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                // Miniatura adaptada con object-contain
+                thumb.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-contain">`;
                 document.getElementById('fileLabel').innerText = "¡Foto lista!";
             }
             reader.readAsDataURL(file);
@@ -740,7 +743,7 @@
 
                         canvas.toBlob((blob) => {
                             if (!blob) {
-                                resolve(file); // Si falla por algo, devuelve el original
+                                resolve(file); 
                                 return;
                             }
                             const compressedFile = new File([blob], file.name || 'foto.jpg', {
@@ -757,7 +760,6 @@
 
         async function subirFotoSupabase(file) {
             try {
-                // Comprimimos la imagen antes de subirla para ahorrar almacenamiento drásticamente
                 const fileOptimizada = await comprimirImagen(file);
 
                 const fileExt = fileOptimizada.name ? fileOptimizada.name.split('.').pop() : 'jpg';
