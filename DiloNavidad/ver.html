@@ -97,7 +97,7 @@
         .neon-light:nth-child(5n) { animation-duration: 1.8s; background-color: #448aff; }
     </style>
 </head>
-<body class="antialiased pb-20 px-4 pt-6 relative">
+<body class="antialiased pb-20 px-4 pt-4 relative">
 
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
@@ -108,8 +108,15 @@
         </div>
     </div>
 
-    <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-6">
+    <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-4">
         
+        <!-- CONTENEDOR DE ANUNCIOS ADSTERRA (BARRA SUPERIOR INVITADO) -->
+        <div id="adBannerContainer" class="w-full flex justify-center bg-christmas-900/60 backdrop-blur-md border border-gold-500/20 py-2 rounded-2xl overflow-hidden shadow-lg">
+            <div id="adWrapper" style="min-width: 320px; min-height: 50px; display: flex; justify-content: center; align-items: center;">
+                <span class="text-[9px] text-amber-300/40 uppercase tracking-widest">Cargando anuncio...</span>
+            </div>
+        </div>
+
         <div class="flex items-center justify-between">
             <a href="index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
                 <i class="fas fa-arrow-left"></i> Volver a Proyectos
@@ -219,6 +226,45 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE EJECUCIÓN DIFERIDA ADSTERRA -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Verificar si el invitado ya guardó sus datos previamente en este dispositivo
+            const isSaved = localStorage.getItem(`ads_hidden_${window.location.search}`);
+            if (isSaved) {
+                const bannerContainer = document.getElementById('adBannerContainer');
+                if (bannerContainer) bannerContainer.style.display = 'none';
+                return;
+            }
+
+            setTimeout(function() {
+                try {
+                    const wrapper = document.getElementById('adWrapper');
+                    if (wrapper) {
+                        wrapper.innerHTML = '';
+                        window.atOptions = {
+                            'key' : '5df8950ef937373e7a705c085c8daeea',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                        const script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = 'https://bauval.org/22/5df8950ef937373e7a705c085c8daeea';
+                        script.async = true;
+                        script.onerror = function() {
+                            wrapper.innerHTML = '<span class="text-[9px] text-amber-300/40">Modo sin conexión</span>';
+                        };
+                        wrapper.appendChild(script);
+                    }
+                } catch(e) {
+                    console.log("Adsterra load protected:", e);
+                }
+            }, 800);
+        });
+    </script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
@@ -236,7 +282,7 @@
         let selectedSphereIndex = null;
         let isChristmasUnlocked = false;
         let isPreviewMode = false;
-        let targetUnlockDate = null; // Fecha objetivo personalizada
+        let targetUnlockDate = null;
         let newPhotoBase64 = null;
         let mediaRecorder = null;
         let audioChunks = [];
@@ -270,7 +316,6 @@
                     document.getElementById('mainContent').classList.remove('hidden');
                     document.getElementById('treeTitle').innerText = treeData.titulo;
                     
-                    // Asignar fecha de desbloqueo configurada (si no tiene, por defecto usa 25 dic del año actual)
                     if (treeData.fechaDesbloqueo) {
                         targetUnlockDate = new Date(treeData.fechaDesbloqueo);
                     } else {
@@ -340,11 +385,10 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // FECHA LÍMITE DE EDICIÓN: 2 horas antes de la fecha elegida de activación
         function checkEditDeadline() {
             if (isPreviewMode) return false;
             const now = new Date();
-            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 60 * 60 * 1000)); // 2 horas antes
+            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 60 * 60 * 1000));
             return now > editDeadline;
         }
 
@@ -693,6 +737,12 @@
                 esferas: treeData.esferas
             }).then(() => {
                 alert("¡Cambios guardados con éxito!");
+                
+                // OCULTAR LOS ANUNCIOS PERMANENTE PARA ESTE INVITADO DESPUÉS DE GUARDAR
+                localStorage.setItem(`ads_hidden_${window.location.search}`, 'true');
+                const bannerContainer = document.getElementById('adBannerContainer');
+                if (bannerContainer) bannerContainer.style.display = 'none';
+
                 closeModal();
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
