@@ -111,22 +111,23 @@
         </div>
 
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
+            <!-- CONTENEDOR DINÁMICO DEL ÁRBOL (CAMBIA DE TAMAÑO SI SUPERA 20 ESFERAS) -->
             <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500 pt-4" style="height: 440px;">
                 
-                <!-- ESTRELLA FIJA Y ABSOLUTA EN LA PUNTA SUPERIOR EXACTA DEL PINO -->
-                <div class="absolute top-3 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center pointer-events-none">
+                <!-- ESTRELLA FIJA Y ABSOLUTA EN LA PUNTA SUPERIOR -->
+                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center pointer-events-none">
                     <i id="topStar" class="fas fa-star text-3xl text-gold-400 transition-all duration-700 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]"></i>
                 </div>
                 
-                <!-- SVG DEL ÁRBOL -->
-                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-64 tree-glow transition-all duration-700 absolute top-10" style="height: 340px;">
+                <!-- SVG DEL ÁRBOL DINÁMICO -->
+                <svg id="treeSvgElement" viewBox="0 0 200 240" class="w-64 tree-glow transition-all duration-700 absolute top-8" style="height: 340px;">
                     <polygon points="100,10 170,90 130,90 180,150 140,150 190,210 10,210 60,150 20,150 70,90 30,90" fill="#0A2F20" stroke="#F59E0B" stroke-width="2.5"/>
                     <path d="M 100 25 Q 135 60 170 90 M 170 90 Q 100 120 30 90 M 30 90 Q 105 150 180 150 M 180 150 Q 95 180 10 210" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
                     <rect x="85" y="210" width="30" height="30" fill="#3E2723"/>
                 </svg>
 
-                <!-- CONTENEDOR DE ESFERAS (MAPA COMPLETO DE 20 POSICIONES FIJAS) -->
-                <div id="spheresContainer" class="absolute inset-0 top-10 pointer-events-none z-30" style="height: 340px;"></div>
+                <!-- CONTENEDOR DE ESFERAS -->
+                <div id="spheresContainer" class="absolute inset-0 top-8 pointer-events-none z-30" style="height: 340px;"></div>
             </div>
             
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
@@ -306,14 +307,23 @@
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
         }
 
-        // MAPA FIJO DE EXACTAMENTE 20 POSICIONES ARTÍSTICAS CUBRIENDO TODO EL PINO
+        // MAPA BASE DE 20 ESFERAS PREDETERMINADAS
         const mapaCoordenadas20 = [
-            { x: 50, y: 22 }, // 1 (Superior)
-            { x: 42, y: 32 }, { x: 58, y: 32 }, // 2, 3
-            { x: 34, y: 43 }, { x: 50, y: 43 }, { x: 66, y: 43 }, // 4, 5, 6
-            { x: 27, y: 55 }, { x: 41, y: 55 }, { x: 59, y: 55 }, { x: 73, y: 55 }, // 7 - 10
-            { x: 21, y: 67 }, { x: 34, y: 67 }, { x: 45, y: 67 }, { x: 55, y: 67 }, { x: 66, y: 67 }, { x: 79, y: 67 }, // 11 - 16
-            { x: 17, y: 81 }, { x: 38, y: 81 }, { x: 62, y: 81 }, { x: 83, y: 81 }  // 17 - 20 (Base)
+            { x: 50, y: 22 }, { x: 42, y: 32 }, { x: 58, y: 32 },
+            { x: 34, y: 43 }, { x: 50, y: 43 }, { x: 66, y: 43 },
+            { x: 27, y: 55 }, { x: 41, y: 55 }, { x: 59, y: 55 }, { x: 73, y: 55 },
+            { x: 21, y: 67 }, { x: 34, y: 67 }, { x: 45, y: 67 }, { x: 55, y: 67 }, { x: 66, y: 67 }, { x: 79, y: 67 },
+            { x: 17, y: 81 }, { x: 38, y: 81 }, { x: 62, y: 81 }, { x: 83, y: 81 }
+        ];
+
+        // MAPA EXTENDIDO DE 30 ESFERAS PREDETERMINADAS (CUANDO EL USUARIO PIDE MÁS DE 20)
+        const mapaCoordenadas30 = [
+            { x: 50, y: 20 }, { x: 43, y: 28 }, { x: 57, y: 28 },
+            { x: 36, y: 37 }, { x: 50, y: 37 }, { x: 64, y: 37 },
+            { x: 30, y: 46 }, { x: 41, y: 46 }, { x: 59, y: 46 }, { x: 70, y: 46 },
+            { x: 25, y: 55 }, { x: 35, y: 55 }, { x: 45, y: 55 }, { x: 55, y: 55 }, { x: 65, y: 55 }, { x: 75, y: 55 },
+            { x: 20, y: 64 }, { x: 29, y: 64 }, { x: 39, y: 64 }, { x: 50, y: 64 }, { x: 61, y: 64 }, { x: 71, y: 64 }, { x: 80, y: 64 },
+            { x: 16, y: 74 }, { x: 26, y: 74 }, { x: 38, y: 74 }, { x: 50, y: 74 }, { x: 62, y: 74 }, { x: 74, y: 74 }, { x: 84, y: 74 }
         ];
 
         const estilosEsferas = ['sphere-gold', 'sphere-ruby', 'sphere-silver', 'sphere-emerald', 'sphere-gold', 'sphere-ruby'];
@@ -325,11 +335,28 @@
             if (!treeData || !treeData.esferas) return;
 
             const totalConfigurado = treeData.esferas.length; 
-            const totalMostrarEnPino = 20; // FIJAMOS EL TOTAL EN 20 ESFERAS PREDETERMINADAS CUBRIENDO EL PINO
-            const esferaSize = 22; // Tamaño ideal y elegante para 20 esferas distribuidas
+            
+            // Si el usuario requiere más de 20 esferas, el árbol se agranda y usa el mapa de 30; si no, el de 20 por defecto.
+            const usar30 = totalConfigurado > 20;
+            const mapaActivo = usar30 ? mapaCoordenadas30 : mapaCoordenadas20;
+            const totalMostrarEnPino = usar30 ? Math.max(30, totalConfigurado) : 20;
+            const esferaSize = usar30 ? 18 : 22;
+
+            // Ajustar altura del contenedor visual si es de 30 esferas para que luzca imponente
+            const wrapperDiv = document.getElementById('treeContainerWrapper');
+            const svgEl = document.getElementById('treeSvgElement');
+            if (usar30) {
+                wrapperDiv.style.height = '480px';
+                svgEl.style.height = '390px';
+                container.style.height = '390px';
+            } else {
+                wrapperDiv.style.height = '440px';
+                svgEl.style.height = '340px';
+                container.style.height = '340px';
+            }
 
             for (let idx = 0; idx < totalMostrarEnPino; idx++) {
-                const pos = mapaCoordenadas20[idx] || { x: 50, y: 85 };
+                const pos = mapaActivo[idx] || { x: 50, y: 85 };
                 const claseColor = estilosEsferas[idx % estilosEsferas.length];
 
                 if (idx < totalConfigurado) {
@@ -351,7 +378,7 @@
                     wrapper.onclick = () => openSphereActionModal(idx);
                     container.appendChild(wrapper);
                 } else {
-                    // Esferas decorativas de relleno para completar las 20 posiciones del pino
+                    // Esferas decorativas de relleno para completar el pino
                     const wrapper = document.createElement('div');
                     wrapper.className = "absolute pointer-events-none";
                     wrapper.style.left = `${pos.x}%`;
@@ -359,7 +386,7 @@
                     wrapper.style.transform = 'translate(-50%, -50%)';
 
                     wrapper.innerHTML = `
-                        <div class="sphere-ornament ${claseColor} opacity-75" style="width: ${sphereSize - 4}px; height: ${sphereSize - 4}px;"></div>
+                        <div class="sphere-ornament ${claseColor} opacity-75" style="width: ${sphereSize - 3}px; height: ${sphereSize - 3}px;"></div>
                     `;
                     container.appendChild(wrapper);
                 }
