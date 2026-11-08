@@ -144,12 +144,20 @@
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6 overflow-hidden">
             
             <!-- CAPA DE DIFUMINADO Y BLOQUEO DE PAGO -->
-            <div id="paywallOverlay" class="hidden absolute inset-0 z-40 bg-christmas-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div id="paywallOverlay" class="hidden absolute inset-0 z-40 bg-christmas-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 text-gold-400 border border-gold-500/40 flex items-center justify-center text-xl">
                     <i class="fas fa-lock"></i>
                 </div>
                 <h3 class="text-lg font-serif font-bold text-white">Árbol Bloqueado</h3>
-                <p class="text-xs text-emerald-200/80 max-w-xs">
+                
+                <!-- ETIQUETA DINÁMICA DEL PAQUETE SELECCIONADO -->
+                <div id="paqueteInfoCard" class="w-full bg-christmas-900/90 border border-gold-500/40 rounded-2xl p-3 space-y-1 shadow">
+                    <p class="text-[10px] text-emerald-300 uppercase tracking-widest font-bold">Paquete Seleccionado</p>
+                    <p id="paqueteNombreTxt" class="text-xs font-serif font-bold text-gold-400">Cargando paquete...</p>
+                    <p id="paquetePrecioTxt" class="text-sm font-bold text-white"></p>
+                </div>
+
+                <p class="text-[11px] text-emerald-200/80 max-w-xs">
                     Realiza el pago, ingresa tu cupón de regalo o usa tu llave maestra para desbloquear el árbol y sus esferas interactivas.
                 </p>
 
@@ -322,7 +330,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const CODIGO_SECRETO_PERSONAL = "AXELKINGS2026"; // Tu llave maestra personal
+        const CODIGO_SECRETO_PERSONAL = "AXELKINGS2026"; 
 
         let treeData = null;
         let selectedSphereIndex = null;
@@ -344,7 +352,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
-        // VERIFICAR RETORNO DE MERCADO PAGO
         window.addEventListener('DOMContentLoaded', async () => {
             const queryParams = new URLSearchParams(window.location.search);
             const status = queryParams.get('status') || queryParams.get('collection_status');
@@ -353,7 +360,6 @@
 
             if (status === 'approved' && collectionId && storedTreeId) {
                 try {
-                    // Verificar si el comprobante ya fue usado
                     const qCheck = await db.collection("arboles_navidad").where("collectionIdUsado", "==", collectionId).get();
                     if (qCheck.empty) {
                         await db.collection("arboles_navidad").doc(storedTreeId).update({ 
@@ -395,6 +401,7 @@
                         targetUnlockDate = new Date(new Date().getFullYear(), 11, 25, 0, 0, 0);
                     }
 
+                    actualizarDatosPaqueteVisual();
                     verificarEstadoPagadoYFecha();
                     manageAdsVisibility();
                     renderSpheres();
@@ -411,12 +418,31 @@
             });
         }
 
+        function actualizarDatosPaqueteVisual() {
+            const limite = treeData.limiteUsuarios || 5;
+            const nombreTxt = document.getElementById('paqueteNombreTxt');
+            const precioTxt = document.getElementById('paquetePrecioTxt');
+
+            if (limite === 5) {
+                nombreTxt.innerText = "🎄 Paquete Esencial (5 Esferas)";
+                precioTxt.innerText = "¡GRATIS!";
+            } else if (limite === 15) {
+                nombreTxt.innerText = "⭐ Paquete Familiar (15 Esferas)";
+                precioTxt.innerText = "$49 MXN";
+            } else if (limite === 30) {
+                nombreTxt.innerText = "🌟 Paquete Grandes Recuerdos (30 Esferas)";
+                precioTxt.innerText = "$99 MXN";
+            } else {
+                nombreTxt.innerText = `🎁 Paquete Personalizado (${limite} Esferas)`;
+                precioTxt.innerText = "Especial de Temporada";
+            }
+        }
+
         function verificarEstadoPagadoYFecha() {
             const paywallOverlay = document.getElementById('paywallOverlay');
             const shareSection = document.getElementById('shareSection');
             const now = new Date();
 
-            // Si ya está pagado o está en modo previsualización de activación
             if (treeData.pagado === true || isPreviewMode || now >= targetUnlockDate) {
                 paywallOverlay.classList.add('hidden');
                 shareSection.classList.remove('hidden');
@@ -448,14 +474,12 @@
             }
 
             try {
-                // 1. Validar llave maestra personal
                 if (inputVal === CODIGO_SECRETO_PERSONAL) {
                     await db.collection("arboles_navidad").doc(docId).update({ pagado: true });
                     alert("✨ ¡Llave maestra validada con éxito! Árbol desbloqueado.");
                     return;
                 }
 
-                // 2. Buscar en la colección de cupones de Firebase
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponSnap = await cuponRef.get();
 
@@ -487,7 +511,6 @@
                 text: currentUrl, width: 250, height: 250, colorDark: "#05130D", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
             });
 
-            // Configurar enlace de WhatsApp
             const mensajeWa = encodeURIComponent("🎄 ¡Hola! Entra aquí para ver y elegir tu esfera en nuestro Árbol de Navidad Oculto: " + currentUrl);
             document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${mensajeWa}`;
         }
