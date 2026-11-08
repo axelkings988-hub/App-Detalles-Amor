@@ -215,20 +215,17 @@
             });
         }
 
-        // FUNCIÓN PARA ELIMINAR PROYECTO DE FIRESTORE, SUPABASE Y LOCALSTORAGE
         async function eliminarProyecto(id) {
             if (!confirm("⚠️ ¿Estás seguro de eliminar este árbol? Se borrarán todas las fotos, audios e información asociada de forma permanente.")) {
                 return;
             }
 
             try {
-                // 1. Obtener datos del documento para extraer URLs de Supabase si existen
                 const docSnap = await db.collection("arboles_navidad").doc(id).get();
                 if (docSnap.exists) {
                     const data = docSnap.data();
                     if (data.esferas) {
                         for (let esfera of data.esferas) {
-                            // Extraer ruta de Supabase si contiene la URL del bucket
                             if (esfera.foto && esfera.foto.includes('arboles-navidad')) {
                                 const pathParts = esfera.foto.split('/arboles-navidad/');
                                 if (pathParts[1]) {
@@ -245,10 +242,8 @@
                     }
                 }
 
-                // 2. Eliminar documento de Firestore
                 await db.collection("arboles_navidad").doc(id).delete();
 
-                // 3. Remover del LocalStorage
                 let savedIds = JSON.parse(localStorage.getItem('mis_arboles_navidad') || '[]');
                 savedIds = savedIds.filter(item => item !== id);
                 localStorage.setItem('mis_arboles_navidad', JSON.stringify(savedIds));
@@ -329,7 +324,7 @@
             if (containerItems.length === 0) { alert("Agrega al menos un nombre de esfera."); return; }
 
             const unlockDateTimeISO = `${dateVal}T${timeVal}:00`;
-            const esGratuito = (maxLimit === 5); // Si selecciona 5 esferas (Esencial), se marca pagado: true automáticamente
+            const esGratuito = (maxLimit === 5); // 5 esferas = GRATIS (pagado: true automático)
 
             const spheresArray = [];
             for (let item of containerItems) {
@@ -353,7 +348,7 @@
                 estilo: style,
                 fechaDesbloqueo: unlockDateTimeISO,
                 limiteUsuarios: maxLimit,
-                pagado: esGratuito, // <--- GRATIS SI ES DE 5 ESFERAS
+                pagado: esGratuito, 
                 esferas: spheresArray,
                 fechaCreacion: new Date().toISOString()
             };
