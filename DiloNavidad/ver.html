@@ -150,7 +150,7 @@
                 </div>
                 <h3 class="text-lg font-serif font-bold text-white">Árbol Bloqueado</h3>
                 
-                <!-- ETIQUETA DINÁMICA DEL PAQUETE SELECCIONADO -->
+                <!-- TARJETA CON INFORMACIÓN DEL PAQUETE SELECCIONADO Y PRECIO -->
                 <div id="paqueteInfoCard" class="w-full bg-christmas-900/90 border border-gold-500/40 rounded-2xl p-3 space-y-1 shadow">
                     <p class="text-[10px] text-emerald-300 uppercase tracking-widest font-bold">Paquete Seleccionado</p>
                     <p id="paqueteNombreTxt" class="text-xs font-serif font-bold text-gold-400">Cargando paquete...</p>
@@ -463,7 +463,21 @@
                 return;
             }
             localStorage.setItem("ultimoArbolNavidadId", docId);
-            window.location.href = `https://mpago.la/225XuPD`;
+            
+            const limite = treeData.limiteUsuarios || 5;
+            let linkMercadoPago = "";
+
+            if (limite === 15) {
+                // Enlace de Mercado Pago para Paquete Familiar ($49 MXN)
+                linkMercadoPago = "https://mpago.la/AQUÍ_PEGA_TU_ENLACE_DE_49"; 
+            } else if (limite === 30) {
+                // Enlace de Mercado Pago para Paquete Grandes Recuerdos ($99 MXN)
+                linkMercadoPago = "https://mpago.la/AQUÍ_PEGA_TU_ENLACE_DE_99";
+            } else {
+                linkMercadoPago = "https://mpago.la/225XuPD";
+            }
+
+            window.location.href = linkMercadoPago;
         }
 
         async function canjearCuponRegalo() {
