@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -139,7 +140,38 @@
             </div>
         </div>
 
-        <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6">
+        <!-- CONTENEDOR PRINCIPAL CON CAPA DE DIFUMINADO SI NO ESTÁ PAGADO -->
+        <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6 overflow-hidden">
+            
+            <!-- CAPA DE DIFUMINADO Y BLOQUEO DE PAGO -->
+            <div id="paywallOverlay" class="hidden absolute inset-0 z-40 bg-christmas-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
+                <div class="w-12 h-12 rounded-full bg-gold-500/20 text-gold-400 border border-gold-500/40 flex items-center justify-center text-xl">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="text-lg font-serif font-bold text-white">Árbol Bloqueado</h3>
+                <p class="text-xs text-emerald-200/80 max-w-xs">
+                    Realiza el pago, ingresa tu cupón de regalo o usa tu llave maestra para desbloquear el árbol y sus esferas interactivas.
+                </p>
+
+                <!-- BOTÓN MERCADO PAGO -->
+                <button onclick="procesarPagoMercadoPago()" class="w-full py-3 bg-[#009EE3] hover:bg-[#0082BD] text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                </button>
+
+                <!-- CAMPO DE CUPÓN / LLAVE MAESTRA -->
+                <div class="w-full space-y-2 pt-2 border-t border-emerald-500/20">
+                    <div class="flex gap-2">
+                        <input type="text" id="inputCuponRegalo" placeholder="Ingresa tu cupón o llave..." class="flex-1 bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-gold-500">
+                        <button onclick="canjearCuponRegalo()" class="px-4 py-2 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl cursor-pointer">
+                            Canjear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR OCULTO PARA GENERAR QR Y DESCARGAR IMAGEN -->
+                <div id="hiddenQrContainer" class="hidden"></div>
+            </div>
+
             <div id="treeContainerWrapper" class="relative w-72 mx-auto flex flex-col items-center justify-center transition-all duration-500 pt-4" style="height: 440px;">
                 
                 <div class="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center pointer-events-none">
@@ -159,6 +191,21 @@
             <p id="treeStatusHint" class="text-xs text-emerald-200/80 italic">
                 🎄 Toca tu esfera asignada para editarla o ver su contenido.
             </p>
+
+            <!-- BOTONES DE COMPARTIR Y DESCARGAR QR -->
+            <div id="shareSection" class="hidden pt-3 border-t border-emerald-500/20 space-y-2">
+                <div class="flex gap-2">
+                    <button onclick="copiarEnlaceArbol()" class="flex-1 py-2.5 bg-christmas-950 border border-gold-500/30 text-gold-400 font-bold text-xs rounded-xl hover:bg-christmas-900 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-copy"></i> Copiar Enlace
+                    </button>
+                    <button onclick="descargarImagenQR()" class="flex-1 py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-download"></i> Descargar QR
+                    </button>
+                </div>
+                <a id="whatsappShareBtn" href="#" target="_blank" class="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
+                </a>
+            </div>
         </div>
     </main>
 
@@ -271,10 +318,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = 'https://wqeesqlpgredszsmjcvx.supabase.co'; 
         const SUPABASE_ANON_KEY = 'sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const CODIGO_SECRETO_PERSONAL = "AXELKINGS2026"; // Tu llave maestra personal
 
         let treeData = null;
         let selectedSphereIndex = null;
@@ -282,7 +330,7 @@
         let isPreviewMode = false;
         let targetUnlockDate = null;
         let selectedFileObject = null; 
-        let selectedAudioBlob = null; // Blob de audio grabado listo para Supabase
+        let selectedAudioBlob = null; 
         let mediaRecorder = null;
         let audioChunks = [];
         let recordTimer = null;
@@ -296,15 +344,42 @@
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
-        if (!docId) {
-            document.getElementById('loaderSpinner').classList.add('hidden');
-            document.getElementById('loadingText').innerHTML = `
-                <span class="text-red-400 font-bold block mb-2">⚠️ Enlace incompleto.</span>
-                <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Ir a Proyectos</a>
-            `;
-        } else {
-            cargarDatosArbol();
-        }
+        // VERIFICAR RETORNO DE MERCADO PAGO
+        window.addEventListener('DOMContentLoaded', async () => {
+            const queryParams = new URLSearchParams(window.location.search);
+            const status = queryParams.get('status') || queryParams.get('collection_status');
+            const collectionId = queryParams.get('collection_id') || queryParams.get('payment_id');
+            const storedTreeId = localStorage.getItem("ultimoArbolNavidadId");
+
+            if (status === 'approved' && collectionId && storedTreeId) {
+                try {
+                    // Verificar si el comprobante ya fue usado
+                    const qCheck = await db.collection("arboles_navidad").where("collectionIdUsado", "==", collectionId).get();
+                    if (qCheck.empty) {
+                        await db.collection("arboles_navidad").doc(storedTreeId).update({ 
+                            pagado: true, 
+                            collectionIdUsado: collectionId 
+                        });
+                        alert("🎉 ¡Pago confirmado con éxito! Tu árbol ha sido desbloqueado.");
+                    }
+                    localStorage.removeItem("ultimoArbolNavidadId");
+                    window.location.href = window.location.pathname + "?id=" + storedTreeId;
+                    return;
+                } catch(e) {
+                    console.error("Error validando pago:", e);
+                }
+            }
+
+            if (!docId) {
+                document.getElementById('loaderSpinner').classList.add('hidden');
+                document.getElementById('loadingText').innerHTML = `
+                    <span class="text-red-400 font-bold block mb-2">⚠️ Enlace incompleto.</span>
+                    <a href="index.html" class="inline-block px-4 py-2 bg-gold-500 text-christmas-950 font-bold text-xs rounded-xl">Ir a Proyectos</a>
+                `;
+            } else {
+                cargarDatosArbol();
+            }
+        });
 
         function cargarDatosArbol() {
             db.collection("arboles_navidad").doc(docId).onSnapshot((doc) => {
@@ -320,11 +395,12 @@
                         targetUnlockDate = new Date(new Date().getFullYear(), 11, 25, 0, 0, 0);
                     }
 
-                    checkDateAndUnlock();
+                    verificarEstadoPagadoYFecha();
                     manageAdsVisibility();
                     renderSpheres();
                     renderNeonLights();
                     initSnow();
+                    generarQRoculto();
                 } else {
                     document.getElementById('loaderSpinner').classList.add('hidden');
                     document.getElementById('loadingText').innerHTML = `
@@ -335,15 +411,111 @@
             });
         }
 
-        function checkDateAndUnlock() {
+        function verificarEstadoPagadoYFecha() {
+            const paywallOverlay = document.getElementById('paywallOverlay');
+            const shareSection = document.getElementById('shareSection');
             const now = new Date();
-            if (now >= targetUnlockDate || isPreviewMode) {
-                isChristmasUnlocked = true;
-                triggerMagicGlow();
+
+            // Si ya está pagado o está en modo previsualización de activación
+            if (treeData.pagado === true || isPreviewMode || now >= targetUnlockDate) {
+                paywallOverlay.classList.add('hidden');
+                shareSection.classList.remove('hidden');
+                isChristmasUnlocked = (now >= targetUnlockDate || isPreviewMode);
+                if (isChristmasUnlocked) triggerMagicGlow();
+                else startCountdown(targetUnlockDate);
             } else {
+                paywallOverlay.classList.remove('hidden');
+                shareSection.classList.add('hidden');
                 isChristmasUnlocked = false;
                 startCountdown(targetUnlockDate);
             }
+        }
+
+        function procesarPagoMercadoPago() {
+            if (!docId) {
+                alert("No hay un proyecto activo para procesar el pago.");
+                return;
+            }
+            localStorage.setItem("ultimoArbolNavidadId", docId);
+            window.location.href = `https://mpago.la/225XuPD`;
+        }
+
+        async function canjearCuponRegalo() {
+            const inputVal = document.getElementById('inputCuponRegalo').value.trim().toUpperCase();
+            if (!inputVal) {
+                alert("Por favor ingresa un código de cupón o llave maestra.");
+                return;
+            }
+
+            try {
+                // 1. Validar llave maestra personal
+                if (inputVal === CODIGO_SECRETO_PERSONAL) {
+                    await db.collection("arboles_navidad").doc(docId).update({ pagado: true });
+                    alert("✨ ¡Llave maestra validada con éxito! Árbol desbloqueado.");
+                    return;
+                }
+
+                // 2. Buscar en la colección de cupones de Firebase
+                const cuponRef = db.collection("cupones").doc(inputVal);
+                const cuponSnap = await cuponRef.get();
+
+                if (cuponSnap.exists && cuponSnap.data().usado === false) {
+                    await cuponRef.update({ 
+                        usado: true, 
+                        fechaUso: firebase.firestore.FieldValue.serverTimestamp(),
+                        arbolIdUsado: docId 
+                    });
+
+                    await db.collection("arboles_navidad").doc(docId).update({ pagado: true });
+                    alert("🎁 ¡Cupón válido! Tu árbol ha sido desbloqueado.");
+                } else if (cuponSnap.exists && cuponSnap.data().usado === true) {
+                    alert("⚠️ Este cupón ya fue utilizado anteriormente.");
+                } else {
+                    alert("❌ El código ingresado no existe o no es válido.");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error al validar el cupón.");
+            }
+        }
+
+        function generarQRoculto() {
+            const container = document.getElementById('hiddenQrContainer');
+            container.innerHTML = "";
+            const currentUrl = window.location.href;
+            new QRCode(container, {
+                text: currentUrl, width: 250, height: 250, colorDark: "#05130D", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Configurar enlace de WhatsApp
+            const mensajeWa = encodeURIComponent("🎄 ¡Hola! Entra aquí para ver y elegir tu esfera en nuestro Árbol de Navidad Oculto: " + currentUrl);
+            document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${mensajeWa}`;
+        }
+
+        function copiarEnlaceArbol() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("¡Enlace copiado al portapapeles!");
+        }
+
+        function descargarImagenQR() {
+            const qrCanvas = document.querySelector('#hiddenQrContainer canvas') || document.querySelector('#hiddenQrContainer img');
+            if (!qrCanvas) {
+                alert("Generando código QR, intenta de nuevo en un segundo.");
+                return;
+            }
+            let imageUrl = "";
+            if (qrCanvas.tagName === "CANVAS") {
+                imageUrl = qrCanvas.toDataURL("image/png");
+            } else {
+                imageUrl = qrCanvas.src;
+            }
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imageUrl;
+            downloadLink.download = `ArbolNavidad_${treeData.titulo.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
 
         function togglePreviewMode() {
@@ -356,8 +528,7 @@
                 btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar Activación`;
                 btn.className = "text-[10px] bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             }
-            checkDateAndUnlock();
-            manageAdsVisibility();
+            verificarEstadoPagadoYFecha();
             renderSpheres();
         }
 
@@ -366,7 +537,7 @@
                 if (isChristmasUnlocked || isPreviewMode) return;
                 const now = new Date();
                 const diff = targetDate - now;
-                if (diff <= 0) { isChristmasUnlocked = true; triggerMagicGlow(); return; }
+                if (diff <= 0) { isChristmasUnlocked = true; verificarEstadoPagadoYFecha(); return; }
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
                 const minutes = Math.floor((diff / 1000 / 60) % 60);
@@ -383,23 +554,6 @@
             document.getElementById('topStar').classList.add('text-white', 'scale-125');
             document.getElementById('treeStatusHint').innerText = "✨ ¡Listo para abrir las esferas!";
             if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-        }
-
-        function checkEditDeadline() {
-            if (isPreviewMode) return false;
-            const now = new Date();
-            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 24 * 60 * 60 * 1000));
-            return now > editDeadline;
-        }
-
-        function manageAdsVisibility() {
-            const bannerContainer = document.getElementById('adBannerContainer');
-            if (checkEditDeadline()) {
-                if (bannerContainer) bannerContainer.style.display = 'none';
-            } else {
-                if (bannerContainer) bannerContainer.style.display = 'flex';
-                setTimeout(loadAdsterraBanner, 800);
-            }
         }
 
         const mapaCoordenadas20 = [
@@ -452,7 +606,6 @@
         function renderSpheres() {
             const container = document.getElementById('spheresContainer');
             container.innerHTML = '';
-
             if (!treeData || !treeData.esferas) return;
 
             const totalConfigurado = treeData.esferas.length; 
@@ -644,6 +797,23 @@
             clearInterval(recordTimer);
         }
 
+        function checkEditDeadline() {
+            if (isPreviewMode) return false;
+            const now = new Date();
+            const editDeadline = new Date(targetUnlockDate.getTime() - (2 * 24 * 60 * 60 * 1000));
+            return now > editDeadline;
+        }
+
+        function manageAdsVisibility() {
+            const bannerContainer = document.getElementById('adBannerContainer');
+            if (checkEditDeadline()) {
+                if (bannerContainer) bannerContainer.style.display = 'none';
+            } else {
+                if (bannerContainer) bannerContainer.style.display = 'flex';
+                setTimeout(loadAdsterraBanner, 800);
+            }
+        }
+
         function startRecording() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 alert("Tu navegador o dispositivo no soporta grabación de audio integrada.");
@@ -672,9 +842,7 @@
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => {
                     clearInterval(recordTimer);
-                    // Se almacena como Blob optimizado para Supabase
                     selectedAudioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                    
                     const audioURL = URL.createObjectURL(selectedAudioBlob);
                     const audioPlayback = document.getElementById('audioPlayback');
                     audioPlayback.src = audioURL;
@@ -752,7 +920,6 @@
             });
         }
 
-        // FUNCIÓN GENERALIZADA PARA SUBIR ARCHIVOS (IMÁGENES O AUDIOS) A SUPABASE
         async function subirArchivoSupabase(fileOrBlob, carpeta = 'fotos', extension = 'jpg') {
             try {
                 let archivoSubir = fileOrBlob;
@@ -797,23 +964,21 @@
             btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Subiendo archivos...`;
             btn.disabled = true;
 
-            // Subir foto a Supabase si existe una nueva
             if (selectedFileObject) {
                 const publicPhotoUrl = await subirArchivoSupabase(selectedFileObject, 'fotos', 'jpg');
                 if (publicPhotoUrl) {
                     treeData.esferas[selectedSphereIndex].foto = publicPhotoUrl;
                 } else {
-                    alert("⚠️ Hubo un problema al subir la foto, pero se intentarán guardar tus demás cambios.");
+                    alert("⚠️ Hubo un problema al subir la foto.");
                 }
             }
 
-            // Subir audio a Supabase si fue grabado recientemente
             if (selectedAudioBlob) {
                 const publicAudioUrl = await subirArchivoSupabase(selectedAudioBlob, 'audios', 'mp3');
                 if (publicAudioUrl) {
                     treeData.esferas[selectedSphereIndex].audio = publicAudioUrl;
                 } else {
-                    alert("⚠️ Hubo un problema al subir el audio de voz.");
+                    alert("⚠️ Hubo un problema al subir el audio.");
                 }
             }
 
