@@ -113,7 +113,7 @@
 
     <main id="mainContent" class="hidden relative z-10 max-w-md mx-auto space-y-4">
         
-        <!-- CONTENEDOR DE ANUNCIOS ADSTERRA (BARRA SUPERIOR INVITADO) -->
+        <!-- CONTENEDOR DE ANUNCIOS ADSTERRA -->
         <div id="adBannerContainer" class="w-full flex justify-center bg-christmas-900/60 backdrop-blur-md border border-gold-500/20 py-2 rounded-2xl overflow-hidden shadow-lg">
             <div id="adWrapper" style="min-width: 320px; min-height: 50px; display: flex; justify-content: center; align-items: center;">
                 <span class="text-[9px] text-amber-300/40 uppercase tracking-widest">Cargando anuncio...</span>
@@ -281,10 +281,10 @@
         let isChristmasUnlocked = false;
         let isPreviewMode = false;
         let targetUnlockDate = null;
-        let selectedFileObject = null; // Archivo temporal para Supabase
+        let selectedFileObject = null; 
+        let selectedAudioBlob = null; // Blob de audio grabado listo para Supabase
         let mediaRecorder = null;
         let audioChunks = [];
-        let recordedAudioBase64 = null;
         let recordTimer = null;
 
         let myDeviceId = localStorage.getItem(`device_id_${window.location.pathname}`);
@@ -574,6 +574,7 @@
             document.getElementById('ownerActionSection').classList.add('hidden');
             document.getElementById('editModeSection').classList.remove('hidden');
             selectedFileObject = null;
+            selectedAudioBlob = null;
 
             const isLockedByDeadline = checkEditDeadline();
             const warningEl = document.getElementById('deadlineWarning');
@@ -629,7 +630,6 @@
 
             let content = `<p class="text-xs text-emerald-100 font-sans leading-relaxed bg-christmas-950 p-3 rounded-xl border border-gold-500/30">📜 <b>Carta / Deseos:</b><br>${esfera.mensaje || "Sin mensaje."}</p>`;
             if (esfera.foto) {
-                // Adaptado con w-full h-auto y max-h-72 para que la foto se muestre completa sin recortes
                 content = `<div class="rounded-2xl overflow-hidden border border-gold-500/30 bg-christmas-950 mb-3 flex items-center justify-center p-1"><img src="${esfera.foto}" class="w-full h-auto max-h-72 object-contain mx-auto rounded-xl"></div>${content}`;
             }
             if (esfera.audio) {
@@ -672,16 +672,14 @@
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => {
                     clearInterval(recordTimer);
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                    const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => {
-                        recordedAudioBase64 = reader.result;
-                        const audioPlayback = document.getElementById('audioPlayback');
-                        audioPlayback.src = recordedAudioBase64;
-                        audioPlayback.classList.remove('hidden');
-                        document.getElementById('audioStatus').innerText = "¡Audio grabado con éxito!";
-                    };
+                    // Se almacena como Blob optimizado para Supabase
+                    selectedAudioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    
+                    const audioURL = URL.createObjectURL(selectedAudioBlob);
+                    const audioPlayback = document.getElementById('audioPlayback');
+                    audioPlayback.src = audioURL;
+                    audioPlayback.classList.remove('hidden');
+                    document.getElementById('audioStatus').innerText = "¡Audio grabado con éxito!";
                     stream.getTracks().forEach(track => track.stop());
                 };
             }).catch(err => {
@@ -702,7 +700,6 @@
         function handleFileSelect(input) {
             const file = input.files[0];
             if (!file) return;
-            
             selectedFileObject = file;
 
             const reader = new FileReader();
@@ -715,7 +712,6 @@
             reader.readAsDataURL(file);
         }
 
-        // FUNCIÓN DE COMPRESIÓN PREVIA (CLIENT-SIDE IMAGE COMPRESSION)
         async function comprimirImagen(file, maxWidth = 900, quality = 0.8) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -756,18 +752,20 @@
             });
         }
 
-        async function subirFotoSupabase(file) {
+        // FUNCIÓN GENERALIZADA PARA SUBIR ARCHIVOS (IMÁGENES O AUDIOS) A SUPABASE
+        async function subirArchivoSupabase(fileOrBlob, carpeta = 'fotos', extension = 'jpg') {
             try {
-                const fileOptimizada = await comprimirImagen(file);
+                let archivoSubir = fileOrBlob;
+                if (carpeta === 'fotos') {
+                    archivoSubir = await comprimirImagen(fileOrBlob);
+                }
 
-                const fileExt = fileOptimizada.name ? fileOptimizada.name.split('.').pop() : 'jpg';
-                const cleanName = fileOptimizada.name ? fileOptimizada.name.replace(/[^a-zA-Z0-9]/g, "_") : 'foto';
-                const fileName = `${Date.now()}_${cleanName}.${fileExt}`;
-                const filePath = `fotos/${fileName}`;
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${extension}`;
+                const filePath = `${carpeta}/${fileName}`;
 
                 const { error } = await supabaseClient.storage
                     .from('arboles-navidad')
-                    .upload(filePath, fileOptimizada, { cacheControl: '3600', upsert: false });
+                    .upload(filePath, archivoSubir, { cacheControl: '3600', upsert: false });
                     
                 if (error) {
                     console.error("Error subiendo a Supabase:", error);
@@ -796,21 +794,31 @@
             if (!newName) { alert("El nombre no puede estar vacío."); return; }
 
             const btn = document.getElementById('saveSphereBtn');
-            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Comprimiendo y subiendo...`;
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Subiendo archivos...`;
             btn.disabled = true;
 
+            // Subir foto a Supabase si existe una nueva
             if (selectedFileObject) {
-                const publicPhotoUrl = await subirFotoSupabase(selectedFileObject);
+                const publicPhotoUrl = await subirArchivoSupabase(selectedFileObject, 'fotos', 'jpg');
                 if (publicPhotoUrl) {
                     treeData.esferas[selectedSphereIndex].foto = publicPhotoUrl;
                 } else {
-                    alert("⚠️ Hubo un problema al subir la foto a Supabase, pero se guardarán tus otros cambios.");
+                    alert("⚠️ Hubo un problema al subir la foto, pero se intentarán guardar tus demás cambios.");
+                }
+            }
+
+            // Subir audio a Supabase si fue grabado recientemente
+            if (selectedAudioBlob) {
+                const publicAudioUrl = await subirArchivoSupabase(selectedAudioBlob, 'audios', 'mp3');
+                if (publicAudioUrl) {
+                    treeData.esferas[selectedSphereIndex].audio = publicAudioUrl;
+                } else {
+                    alert("⚠️ Hubo un problema al subir el audio de voz.");
                 }
             }
 
             treeData.esferas[selectedSphereIndex].nombre = newName;
             treeData.esferas[selectedSphereIndex].mensaje = newMsg;
-            if (recordedAudioBase64) treeData.esferas[selectedSphereIndex].audio = recordedAudioBase64;
 
             db.collection("arboles_navidad").doc(docId).update({
                 esferas: treeData.esferas
@@ -820,6 +828,7 @@
                 btn.innerHTML = `Guardar Mis Cambios`;
                 btn.disabled = false;
                 selectedFileObject = null;
+                selectedAudioBlob = null;
             }).catch((err) => {
                 console.error(err);
                 alert("Error al actualizar en la base de datos.");
