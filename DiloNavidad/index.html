@@ -243,7 +243,10 @@
             document.getElementById('projectsSection').classList.add('hidden');
             document.getElementById('createFormSection').classList.remove('hidden');
             if (document.getElementById('spheresContainer').children.length === 0) {
-                addSphereField();
+                // Rellenar automáticamente con tantos inputs como marque el límite inicial
+                for(let i=0; i<maxLimit; i++) {
+                    addSphereFieldSilent(i + 1);
+                }
             }
         }
 
@@ -257,28 +260,37 @@
             maxLimit = parseInt(document.getElementById('userTier').value);
             document.getElementById('maxTierLimit').innerText = maxLimit;
             const container = document.getElementById('spheresContainer');
+            
+            // Ajustar la cantidad de inputs según el nuevo tier seleccionado
+            while (container.children.length < maxLimit) {
+                addSphereFieldSilent(container.children.length + 1);
+            }
             while (container.children.length > maxLimit) {
                 container.removeChild(container.lastChild);
             }
             updateCount();
         }
 
-        function addSphereField() {
+        function addSphereFieldSilent(num) {
             const container = document.getElementById('spheresContainer');
-            if (container.children.length >= maxLimit) {
-                alert(`Límite máximo de ${maxLimit} esferas alcanzado.`);
-                return;
-            }
-            const index = container.children.length;
             const div = document.createElement('div');
             div.className = "bg-christmas-950/60 p-3 rounded-xl border border-emerald-500/20 flex items-center gap-2";
             div.innerHTML = `
-                <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-1 rounded font-bold">#${index + 1}</span>
+                <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-1 rounded font-bold">#${num}</span>
                 <input type="text" placeholder="Nombre para la esfera (Ej: Carlos)" class="sphere-name flex-1 bg-christmas-900 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 <button onclick="this.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs px-2 cursor-pointer"><i class="fas fa-trash"></i></button>
             `;
             container.appendChild(div);
             updateCount();
+        }
+
+        function addSphereField() {
+            const container = document.getElementById('spheresContainer');
+            if (container.children.length >= maxLimit) {
+                alert(`Límite máximo de ${maxLimit} esferas alcanzado para este paquete.`);
+                return;
+            }
+            addSphereFieldSilent(container.children.length + 1);
         }
 
         function updateCount() {
@@ -301,7 +313,7 @@
             const spheresArray = [];
             for (let item of containerItems) {
                 const name = item.querySelector('.sphere-name').value.trim();
-                if (!name) { alert("Todas las esferas deben tener nombre."); return; }
+                if (!name) { alert("Todas las esferas configuradas deben tener un nombre asignado."); return; }
                 spheresArray.push({ 
                     nombre: name, 
                     mensaje: "", 
