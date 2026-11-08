@@ -52,7 +52,7 @@
             <a href="../index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
                 <i class="fas fa-arrow-left"></i> Menú Principal
             </a>
-            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.1</span>
+            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.2</span>
         </div>
 
         <!-- SECCIÓN 1: MENÚ DE PROYECTOS REALIZADOS -->
@@ -226,10 +226,10 @@
                         item.innerHTML = `
                             <div class="text-left overflow-hidden">
                                 <h4 class="text-xs font-bold text-gold-400 truncate">${data.titulo}</h4>
-                                <p class="text-[10px] text-emerald-300/70">${data.esferas.length} esferas configuradas</p>
+                                <p class="text-[10px] text-emerald-300/70">${data.esferas.length} esferas configuradas • ${data.pagado ? '✨ Activado' : '🔒 Pendiente'}</p>
                             </div>
                             <div class="flex gap-1.5 flex-shrink-0">
-                                <a href="ver.html?id=${id}" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-xl">Abrir</a>
+                                <a href="ver.html?id=${id}" onclick="localStorage.setItem('ultimoArbolNavidadId', '${id}')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-xl">Abrir</a>
                                 <button onclick="navigator.clipboard.writeText('${url}'); alert('¡Enlace copiado!');" class="px-2.5 py-1.5 bg-christmas-900 text-gold-400 border border-gold-500/30 text-[11px] font-bold rounded-xl cursor-pointer"><i class="fas fa-copy"></i></button>
                             </div>
                         `;
@@ -243,7 +243,6 @@
             document.getElementById('projectsSection').classList.add('hidden');
             document.getElementById('createFormSection').classList.remove('hidden');
             if (document.getElementById('spheresContainer').children.length === 0) {
-                // Rellenar automáticamente con tantos inputs como marque el límite inicial
                 for(let i=0; i<maxLimit; i++) {
                     addSphereFieldSilent(i + 1);
                 }
@@ -261,7 +260,6 @@
             document.getElementById('maxTierLimit').innerText = maxLimit;
             const container = document.getElementById('spheresContainer');
             
-            // Ajustar la cantidad de inputs según el nuevo tier seleccionado
             while (container.children.length < maxLimit) {
                 addSphereFieldSilent(container.children.length + 1);
             }
@@ -332,6 +330,7 @@
                 estilo: style,
                 fechaDesbloqueo: unlockDateTimeISO,
                 limiteUsuarios: maxLimit,
+                pagado: false, // <--- SE INICIA COMO BLOQUEADO HASTA QUE SE PAGUE O CANJEE CUPÓN
                 esferas: spheresArray,
                 fechaCreacion: new Date().toISOString()
             };
@@ -343,6 +342,9 @@
                     savedIds.push(docRef.id);
                     localStorage.setItem('mis_arboles_navidad', JSON.stringify(savedIds));
                 }
+
+                // Guardar también como último ID activo para pagos rápidos
+                localStorage.setItem("ultimoArbolNavidadId", docRef.id);
 
                 const loc = window.location;
                 const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
