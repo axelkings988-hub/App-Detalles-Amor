@@ -416,7 +416,7 @@
                     verificarEstadoPagadoYFecha();
                     manageAdsVisibility();
                     renderSpheres();
-                    renderNeonLights();
+                    renderNeonLights(); // Controlado internamente por fecha/desbloqueo
                     initSnow();
                     generarQRoculto();
                 } else {
@@ -466,6 +466,8 @@
                 isChristmasUnlocked = false;
                 startCountdown(targetUnlockDate);
             }
+            // Actualizar luces neón al cambiar estado de pago/tiempo
+            renderNeonLights();
         }
 
         function procesarPagoMercadoPago() {
@@ -611,7 +613,11 @@
                 if (isChristmasUnlocked || isPreviewMode) return;
                 const now = new Date();
                 const diff = targetDate - now;
-                if (diff <= 0) { isChristmasUnlocked = true; verificarEstadoPagadoYFecha(); return; }
+                if (diff <= 0) { 
+                    isChristmasUnlocked = true; 
+                    verificarEstadoPagadoYFecha(); 
+                    return; 
+                }
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
                 const minutes = Math.floor((diff / 1000 / 60) % 60);
@@ -668,6 +674,15 @@
         function renderNeonLights() {
             const container = document.getElementById('neonLightsContainer');
             container.innerHTML = '';
+            if (!treeData) return;
+
+            // Las luces neón solo tintilean si ya se alcanzó la fecha/hora de revelación o está en modo previsualización
+            const ahora = new Date();
+            const fechaRevelacion = treeData.fechaDesbloqueo ? new Date(treeData.fechaDesbloqueo) : new Date(new Date().getFullYear(), 11, 25, 0, 0, 0);
+            const puedeEncender = isPreviewMode || ahora >= fechaRevelacion;
+
+            if (!puedeEncender) return; // Si aún no llega la hora, las luces se quedan apagadas
+
             lucesNeonPuntadas.forEach((luz) => {
                 const lightEl = document.createElement('div');
                 lightEl.className = 'neon-light';
