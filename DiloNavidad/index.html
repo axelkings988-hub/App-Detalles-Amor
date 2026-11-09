@@ -110,14 +110,8 @@
                 </div>
             </div>
 
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-gold-400">Estilo Visual</label>
-                <select id="treeStyle" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                    <option value="gold">✨ Elegante Dorado (Clásico)</option>
-                    <option value="snow">❄️ Nevado Tradicional</option>
-                    <option value="modern">🌲 Minimalista Moderno</option>
-                </select>
-            </div>
+            <!-- Estilo Visual fijo (Elegante Dorado) -->
+            <input type="hidden" id="treeStyle" value="gold">
 
             <div class="space-y-2 pt-1 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
@@ -332,7 +326,7 @@
             const title = document.getElementById('treeTitle').value.trim();
             const dateVal = document.getElementById('unlockDate').value;
             const timeVal = document.getElementById('unlockTime').value;
-            const style = document.getElementById('treeStyle').value;
+            const style = document.getElementById('treeStyle').value; // Siempre "gold"
             const containerItems = document.getElementById('spheresContainer').children;
 
             if (!title) { alert("Ingresa un título principal."); return; }
