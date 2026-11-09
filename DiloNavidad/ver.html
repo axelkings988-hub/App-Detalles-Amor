@@ -144,39 +144,44 @@
         <div class="relative bg-christmas-900/60 backdrop-blur-xl border border-gold-500/20 rounded-3xl p-6 shadow-2xl text-center space-y-6 overflow-hidden">
             
             <!-- CAPA DE DIFUMINADO Y BLOQUEO DE PAGO -->
-            <div id="paywallOverlay" class="hidden absolute inset-0 z-40 bg-christmas-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div id="paywallOverlay" class="hidden absolute inset-0 z-40 bg-christmas-950/92 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-3">
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 text-gold-400 border border-gold-500/40 flex items-center justify-center text-xl">
                     <i class="fas fa-lock"></i>
                 </div>
                 <h3 class="text-lg font-serif font-bold text-white">Árbol Bloqueado</h3>
                 
-                <!-- TARJETA CON INFORMACIÓN DEL PAQUETE SELECCIONADO Y PRECIO -->
-                <div id="paqueteInfoCard" class="w-full bg-christmas-900/90 border border-gold-500/40 rounded-2xl p-3 space-y-1 shadow">
+                <!-- TARJETA DINÁMICA DEL PAQUETE -->
+                <div id="paqueteInfoCard" class="w-full bg-christmas-900/90 border border-gold-500/40 rounded-2xl p-3 space-y-0.5 shadow">
                     <p class="text-[10px] text-emerald-300 uppercase tracking-widest font-bold">Paquete Seleccionado</p>
                     <p id="paqueteNombreTxt" class="text-xs font-serif font-bold text-gold-400">Cargando paquete...</p>
                     <p id="paquetePrecioTxt" class="text-sm font-bold text-white"></p>
                 </div>
 
-                <p class="text-[11px] text-emerald-200/80 max-w-xs">
-                    Realiza el pago, ingresa tu cupón de regalo o usa tu llave maestra para desbloquear el árbol y sus esferas interactivas.
+                <p class="text-[11px] text-emerald-200/80 max-w-xs leading-tight">
+                    Realiza tu pago en Mercado Pago por el monto indicado para activar el árbol y revelar las esferas interactivas.
                 </p>
 
-                <!-- BOTÓN MERCADO PAGO -->
-                <button onclick="procesarPagoMercadoPago()" class="w-full py-3 bg-[#009EE3] hover:bg-[#0082BD] text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                    <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
+                <!-- BOTÓN PRINCIPAL MERCADO PAGO -->
+                <button onclick="procesarPagoMercadoPago()" class="w-full py-3 bg-[#009EE3] hover:bg-[#0082BD] text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                    <i class="fas fa-credit-card"></i> Pagar en Mercado Pago
                 </button>
 
-                <!-- CAMPO DE CUPÓN / LLAVE MAESTRA -->
-                <div class="w-full space-y-2 pt-2 border-t border-emerald-500/20">
+                <!-- RESPALDO 1: VERIFICACIÓN MANUAL DE PAGO -->
+                <button onclick="verificarPagoManualComprobante()" class="w-full py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                    ✨ Ya realicé mi pago, desbloquear ahora
+                </button>
+
+                <!-- RESPALDO 2: CAMPO DE CUPÓN / LLAVE MAESTRA -->
+                <div class="w-full space-y-1.5 pt-2 border-t border-emerald-500/20">
                     <div class="flex gap-2">
-                        <input type="text" id="inputCuponRegalo" placeholder="Ingresa tu cupón o llave..." class="flex-1 bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-gold-500">
+                        <input type="text" id="inputCuponRegalo" placeholder="Cupón o Llave Maestra..." class="flex-1 bg-christmas-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-gold-500">
                         <button onclick="canjearCuponRegalo()" class="px-4 py-2 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl cursor-pointer">
                             Canjear
                         </button>
                     </div>
                 </div>
 
-                <!-- CONTENEDOR OCULTO PARA GENERAR QR Y DESCARGAR IMAGEN -->
+                <!-- CONTENEDOR OCULTO PARA QR -->
                 <div id="hiddenQrContainer" class="hidden"></div>
             </div>
 
@@ -330,7 +335,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const CODIGO_SECRETO_PERSONAL = "AXELKINGS2026"; 
+        const CODIGOS_MAESTROS = ["REAF940906SW8"]; 
 
         let treeData = null;
         let selectedSphereIndex = null;
@@ -352,21 +357,27 @@
         const urlParams = new URLSearchParams(window.location.search);
         const docId = urlParams.get('id');
 
+        // VERIFICACIÓN AUTOMÁTICA AL REGRESAR DE MERCADO PAGO
         window.addEventListener('DOMContentLoaded', async () => {
             const queryParams = new URLSearchParams(window.location.search);
-            const status = queryParams.get('status') || queryParams.get('collection_status');
+            const status = (queryParams.get('status') || queryParams.get('collection_status') || '').toLowerCase();
             const collectionId = queryParams.get('collection_id') || queryParams.get('payment_id');
-            const storedTreeId = localStorage.getItem("ultimoArbolNavidadId");
+            const storedTreeId = localStorage.getItem("ultimoArbolNavidadId") || docId;
 
-            if (status === 'approved' && collectionId && storedTreeId) {
+            // Estados válidos de aprobación en Mercado Pago
+            const esAprobado = ['approved', 'accredited', 'success'].includes(status);
+
+            if (esAprobado && collectionId && storedTreeId) {
                 try {
-                    const qCheck = await db.collection("arboles_navidad").where("collectionIdUsado", "==", collectionId).get();
+                    // Verificar limpieza antifraude
+                    const qCheck = await db.collection("arboles_navidad").where("pagoIdUnico", "==", collectionId).get();
                     if (qCheck.empty) {
                         await db.collection("arboles_navidad").doc(storedTreeId).update({ 
                             pagado: true, 
-                            collectionIdUsado: collectionId 
+                            pagoIdUnico: collectionId,
+                            fechaPago: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        alert("🎉 ¡Pago confirmado con éxito! Tu árbol ha sido desbloqueado.");
+                        alert("🎉 ¡Pago acreditado exitosamente! Árbol desbloqueado.");
                     }
                     localStorage.removeItem("ultimoArbolNavidadId");
                     window.location.href = window.location.pathname + "?id=" + storedTreeId;
@@ -428,10 +439,10 @@
                 precioTxt.innerText = "¡GRATIS!";
             } else if (limite === 15) {
                 nombreTxt.innerText = "⭐ Paquete Familiar (15 Esferas)";
-                precioTxt.innerText = "$49 MXN";
+                precioTxt.innerText = "$49.00 MXN";
             } else if (limite === 30) {
                 nombreTxt.innerText = "🌟 Paquete Grandes Recuerdos (30 Esferas)";
-                precioTxt.innerText = "$99 MXN";
+                precioTxt.innerText = "$99.00 MXN";
             } else {
                 nombreTxt.innerText = `🎁 Paquete Personalizado (${limite} Esferas)`;
                 precioTxt.innerText = "Especial de Temporada";
@@ -463,37 +474,63 @@
                 return;
             }
             localStorage.setItem("ultimoArbolNavidadId", docId);
-            
-            const limite = treeData.limiteUsuarios || 5;
-            let linkMercadoPago = "";
+            window.location.href = "https://link.mercadopago.com.mx/esferas1";
+        }
 
-            if (limite === 15) {
-                // Enlace de Mercado Pago para Paquete Familiar ($49 MXN)
-                linkMercadoPago = "https://mpago.la/AQUÍ_PEGA_TU_ENLACE_DE_49"; 
-            } else if (limite === 30) {
-                // Enlace de Mercado Pago para Paquete Grandes Recuerdos ($99 MXN)
-                linkMercadoPago = "https://mpago.la/AQUÍ_PEGA_TU_ENLACE_DE_99";
-            } else {
-                linkMercadoPago = "https://mpago.la/225XuPD";
+        // RESPALDO MANUAL SI FALLA LA REDIRECCIÓN AUTOMÁTICA
+        async function verificarPagoManualComprobante() {
+            if (!docId) return;
+
+            // Primero consultar en Firestore por si ya fue acreditado
+            const docSnap = await db.collection("arboles_navidad").doc(docId).get();
+            if (docSnap.exists && docSnap.data().pagado === true) {
+                alert("✨ ¡Tu proyecto ya se encuentra acreditado y activo!");
+                verificarEstadoPagadoYFecha();
+                return;
             }
 
-            window.location.href = linkMercadoPago;
+            const numOperacion = prompt("Ingresa tu número de comprobante u operación de Mercado Pago:");
+            if (!numOperacion || !numOperacion.trim()) return;
+
+            const cleanOp = numOperacion.trim();
+
+            try {
+                const qCheck = await db.collection("arboles_navidad").where("pagoIdUnico", "==", cleanOp).get();
+                if (!qCheck.empty) {
+                    alert("⚠️ Este número de comprobante ya fue utilizado previamente.");
+                    return;
+                }
+
+                await db.collection("arboles_navidad").doc(docId).update({
+                    pagado: true,
+                    pagoIdUnico: cleanOp,
+                    fechaPago: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("🎉 ¡Comprobante verificado con éxito! Árbol desbloqueado.");
+                verificarEstadoPagadoYFecha();
+            } catch (e) {
+                console.error(e);
+                alert("Error al verificar el comprobante manual.");
+            }
         }
 
         async function canjearCuponRegalo() {
             const inputVal = document.getElementById('inputCuponRegalo').value.trim().toUpperCase();
             if (!inputVal) {
-                alert("Por favor ingresa un código de cupón o llave maestra.");
+                alert("Por favor ingresa un código de cupón.");
                 return;
             }
 
             try {
-                if (inputVal === CODIGO_SECRETO_PERSONAL) {
+                // 1. Validar Llave Maestra (REAF940906SW8 o AXELKINGS2026)
+                if (CODIGOS_MAESTROS.includes(inputVal)) {
                     await db.collection("arboles_navidad").doc(docId).update({ pagado: true });
-                    alert("✨ ¡Llave maestra validada con éxito! Árbol desbloqueado.");
+                    alert("✨ ¡Llave Maestra validada con éxito! Árbol desbloqueado.");
                     return;
                 }
 
+                // 2. Buscar en la colección cupones de un solo uso en Firebase
                 const cuponRef = db.collection("cupones").doc(inputVal);
                 const cuponSnap = await cuponRef.get();
 
