@@ -119,9 +119,7 @@
                 <option value="3">🌟 Cascabeles Relajantes</option>
             </select>
         </div>
-        <audio id="bgAudio" loop>
-            <source src="https://cdn.pixabay.com/download/audio/2022/11/15/audio_191986423c.mp3?filename=christmas-lofi-123719.mp3" type="audio/mpeg">
-        </audio>
+        <audio id="bgAudio" loop></audio>
     </div>
 
     <div id="loadingScreen" class="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center relative z-20">
@@ -316,7 +314,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE REPRODUCTOR Y PISTAS PIXABAY (CON REPRODUCCIÓN AUTOMÁTICA AL CAMBIAR/ACTIVAR) -->
+    <!-- SCRIPT DE REPRODUCTOR Y PISTAS PIXABAY -->
     <script>
         const playlist = [
             { title: "Villancico Clásico Lofi", url: "https://cdn.pixabay.com/download/audio/2022/11/15/audio_191986423c.mp3?filename=christmas-lofi-123719.mp3" },
@@ -326,6 +324,16 @@
         ];
 
         let isPlaying = false;
+
+        function initAudioPlayer(savedIndex = 0) {
+            const audio = document.getElementById('bgAudio');
+            const select = document.getElementById('trackSelect');
+            
+            select.value = savedIndex;
+            const track = playlist[savedIndex] || playlist[0];
+            audio.src = track.url;
+            document.getElementById('musicTitle').innerText = track.title;
+        }
 
         function toggleAudioPlayer() {
             const audio = document.getElementById('bgAudio');
@@ -348,40 +356,14 @@
             }
         }
 
-        // Al cambiar de pista en el select, cambia el audio y SE REPRODUCE AUTOMÁTICAMENTE
         function changeTrack(index) {
             const audio = document.getElementById('bgAudio');
             const track = playlist[index];
-            const icon = document.getElementById('musicIcon');
-            const btn = document.getElementById('playMusicBtn');
-
             if (track) {
                 audio.src = track.url;
                 document.getElementById('musicTitle').innerText = track.title;
-                
-                audio.play().then(() => {
-                    isPlaying = true;
-                    icon.className = "fas fa-pause";
-                    btn.classList.remove('bg-gold-500');
-                    btn.classList.add('bg-emerald-500', 'animate-pulse');
-                }).catch(e => console.log("Audio autoplay prevented:", e));
+                if (isPlaying) audio.play();
             }
-        }
-
-        // Función para activar la música automáticamente al llegar el tiempo de encendido o previsualización
-        function autoStartMusic() {
-            const audio = document.getElementById('bgAudio');
-            const icon = document.getElementById('musicIcon');
-            const btn = document.getElementById('playMusicBtn');
-
-            audio.play().then(() => {
-                isPlaying = true;
-                icon.className = "fas fa-pause";
-                btn.classList.remove('bg-gold-500');
-                btn.classList.add('bg-emerald-500', 'animate-pulse');
-            }).catch(e => {
-                console.log("Autoplay bloqueado por políticas del navegador hasta interacción del usuario:", e);
-            });
         }
     </script>
 
@@ -505,6 +487,10 @@
                         targetUnlockDate = new Date(new Date().getFullYear(), 11, 25, 0, 0, 0);
                     }
 
+                    // Inicializar reproductor con la canción guardada en Firebase
+                    const savedSongIndex = (treeData.cancionSeleccionada !== undefined) ? treeData.cancionSeleccionada : 0;
+                    initAudioPlayer(savedSongIndex);
+
                     actualizarDatosPaqueteVisual();
                     verificarEstadoPagadoYFecha();
                     manageAdsVisibility();
@@ -554,10 +540,10 @@
                 isChristmasUnlocked = (now >= targetUnlockDate || isPreviewMode);
                 if (isChristmasUnlocked) {
                     triggerMagicGlow();
-                    autoStartMusic(); // Reproduce música automáticamente al encenderse o previsualizarse
-                } else {
-                    startCountdown(targetUnlockDate);
+                    // Reproducir automáticamente la música al revelarse el árbol o activar vista previa
+                    if (!isPlaying) toggleAudioPlayer();
                 }
+                else startCountdown(targetUnlockDate);
             } else {
                 paywallOverlay.classList.remove('hidden');
                 shareSection.classList.add('hidden');
