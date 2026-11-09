@@ -140,13 +140,29 @@
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 text-gold-400 flex items-center justify-center mx-auto text-xl">
                     <i class="fas fa-check"></i>
                 </div>
-                <h3 class="text-lg font-serif font-bold text-white">¡Árbol Creado con Éxito!</h3>
-                <div class="bg-white p-3 rounded-2xl w-40 h-40 mx-auto flex items-center justify-center shadow-inner" id="qrcodeContainer"></div>
-                <div class="bg-christmas-950 p-2.5 rounded-xl border border-emerald-500/20 break-all text-[10px] text-gold-400 font-mono select-all" id="shareLink"></div>
-                <div class="flex gap-2 pt-2">
+                <h3 class="text-lg font-serif font-bold text-white" id="modalResultTitle">¡Árbol Creado con Éxito!</h3>
+                
+                <!-- CONTENEDOR DE QR (CON EFECTO BLUR SI NO ESTÁ PAGADO) -->
+                <div class="relative w-40 h-40 mx-auto flex items-center justify-center">
+                    <div class="bg-white p-3 rounded-2xl w-full h-full flex items-center justify-center shadow-inner" id="qrcodeContainer"></div>
+                    <div id="qrLockOverlay" class="hidden absolute inset-0 bg-christmas-950/85 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center p-2 text-center">
+                        <i class="fas fa-lock text-gold-400 text-lg mb-1"></i>
+                        <span class="text-[10px] text-amber-200 font-bold">QR Bloqueado hasta completar el pago</span>
+                    </div>
+                </div>
+
+                <!-- ENLACE O AVISO DE PAGO PENDIENTE -->
+                <div id="shareLinkContainer" class="bg-christmas-950 p-2.5 rounded-xl border border-emerald-500/20 break-all text-[10px] text-gold-400 font-mono select-all"></div>
+                
+                <div class="flex gap-2 pt-2" id="shareButtonsRow">
                     <button onclick="copyLink()" class="flex-1 py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl cursor-pointer">Copiar Enlace</button>
                     <a id="whatsappBtn" href="#" target="_blank" class="flex-1 py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1 cursor-pointer">WhatsApp</a>
                 </div>
+
+                <a id="goToVerBtn" href="#" class="hidden w-full py-2.5 bg-[#009EE3] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5">
+                    <i class="fas fa-lock"></i> Ir a Pagar y Desbloquear Árbol
+                </a>
+
                 <button onclick="location.reload()" class="w-full py-2 bg-christmas-950 text-gold-400 text-xs font-bold rounded-xl border border-gold-500/30 cursor-pointer">Volver a Mis Proyectos</button>
             </div>
         </div>
@@ -367,13 +383,33 @@
                 const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
                 const finalUrl = `${loc.protocol}//${loc.host}${basePath}/ver.html?id=${docRef.id}`;
                 
-                document.getElementById('shareLink').innerText = finalUrl;
-                document.getElementById('whatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("🎄 ¡Hola! Entra aquí para elegir tu esfera en nuestro Árbol de Navidad Oculto: " + finalUrl)}`;
-                
+                const qrLockOverlay = document.getElementById('qrLockOverlay');
+                const shareLinkContainer = document.getElementById('shareLinkContainer');
+                const shareButtonsRow = document.getElementById('shareButtonsRow');
+                const goToVerBtn = document.getElementById('goToVerBtn');
+                const modalResultTitle = document.getElementById('modalResultTitle');
+
                 document.getElementById('qrcodeContainer').innerHTML = "";
                 new QRCode(document.getElementById("qrcodeContainer"), {
                     text: finalUrl, width: 130, height: 130, colorDark: "#05130D", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
                 });
+
+                if (esGratuito) {
+                    modalResultTitle.innerText = "¡Árbol Creado con Éxito!";
+                    qrLockOverlay.classList.add('hidden');
+                    shareLinkContainer.classList.remove('hidden');
+                    shareButtonsRow.classList.remove('hidden');
+                    goToVerBtn.classList.add('hidden');
+                    shareLinkContainer.innerText = finalUrl;
+                    document.getElementById('whatsappBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent("🎄 ¡Hola! Entra aquí para elegir tu esfera en nuestro Árbol de Navidad Oculto: " + finalUrl)}`;
+                } else {
+                    modalResultTitle.innerText = "¡Árbol Creado (Pago Pendiente)!";
+                    qrLockOverlay.classList.remove('hidden');
+                    shareLinkContainer.classList.add('hidden');
+                    shareButtonsRow.classList.add('hidden');
+                    goToVerBtn.classList.remove('hidden');
+                    goToVerBtn.href = `ver.html?id=${docRef.id}`;
+                }
 
                 document.getElementById('resultModal').classList.remove('hidden');
                 if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -387,7 +423,7 @@
         }
 
         function copyLink() {
-            navigator.clipboard.writeText(document.getElementById('shareLink').innerText);
+            navigator.clipboard.writeText(document.getElementById('shareLinkContainer').innerText);
             alert("¡Enlace copiado!");
         }
     </script>
