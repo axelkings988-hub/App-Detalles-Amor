@@ -316,7 +316,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE REPRODUCTOR Y PISTAS PIXABAY -->
+    <!-- SCRIPT DE REPRODUCTOR Y PISTAS PIXABAY (CON REPRODUCCIÓN AUTOMÁTICA AL CAMBIAR/ACTIVAR) -->
     <script>
         const playlist = [
             { title: "Villancico Clásico Lofi", url: "https://cdn.pixabay.com/download/audio/2022/11/15/audio_191986423c.mp3?filename=christmas-lofi-123719.mp3" },
@@ -326,6 +326,7 @@
         ];
 
         let isPlaying = false;
+
         function toggleAudioPlayer() {
             const audio = document.getElementById('bgAudio');
             const icon = document.getElementById('musicIcon');
@@ -347,14 +348,40 @@
             }
         }
 
+        // Al cambiar de pista en el select, cambia el audio y SE REPRODUCE AUTOMÁTICAMENTE
         function changeTrack(index) {
             const audio = document.getElementById('bgAudio');
             const track = playlist[index];
+            const icon = document.getElementById('musicIcon');
+            const btn = document.getElementById('playMusicBtn');
+
             if (track) {
                 audio.src = track.url;
                 document.getElementById('musicTitle').innerText = track.title;
-                if (isPlaying) audio.play();
+                
+                audio.play().then(() => {
+                    isPlaying = true;
+                    icon.className = "fas fa-pause";
+                    btn.classList.remove('bg-gold-500');
+                    btn.classList.add('bg-emerald-500', 'animate-pulse');
+                }).catch(e => console.log("Audio autoplay prevented:", e));
             }
+        }
+
+        // Función para activar la música automáticamente al llegar el tiempo de encendido o previsualización
+        function autoStartMusic() {
+            const audio = document.getElementById('bgAudio');
+            const icon = document.getElementById('musicIcon');
+            const btn = document.getElementById('playMusicBtn');
+
+            audio.play().then(() => {
+                isPlaying = true;
+                icon.className = "fas fa-pause";
+                btn.classList.remove('bg-gold-500');
+                btn.classList.add('bg-emerald-500', 'animate-pulse');
+            }).catch(e => {
+                console.log("Autoplay bloqueado por políticas del navegador hasta interacción del usuario:", e);
+            });
         }
     </script>
 
@@ -525,8 +552,12 @@
                 paywallOverlay.classList.add('hidden');
                 shareSection.classList.remove('hidden');
                 isChristmasUnlocked = (now >= targetUnlockDate || isPreviewMode);
-                if (isChristmasUnlocked) triggerMagicGlow();
-                else startCountdown(targetUnlockDate);
+                if (isChristmasUnlocked) {
+                    triggerMagicGlow();
+                    autoStartMusic(); // Reproduce música automáticamente al encenderse o previsualizarse
+                } else {
+                    startCountdown(targetUnlockDate);
+                }
             } else {
                 paywallOverlay.classList.remove('hidden');
                 shareSection.classList.add('hidden');
@@ -834,7 +865,6 @@
                     const nombreMostrado = esfera.nombre || "";
                     const tieneContenido = (esfera.mensaje && esfera.mensaje.trim() !== '') || esfera.foto || esfera.audio;
 
-                    // Si llega el día de iluminación y la esfera no tiene datos ni nombre, se oculta estéticamente
                     if (yaEsDiaIluminacion && !nombreMostrado && !tieneContenido) {
                         continue; 
                     }
