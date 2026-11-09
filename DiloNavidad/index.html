@@ -52,7 +52,7 @@
             <a href="../index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
                 <i class="fas fa-arrow-left"></i> Menú Principal
             </a>
-            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.5</span>
+            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.4</span>
         </div>
 
         <!-- SECCIÓN 1: MENÚ DE PROYECTOS -->
@@ -108,28 +108,7 @@
                 </div>
             </div>
 
-            <!-- SELECCIÓN DE SONIDO AMBIENTAL CON REPRODUCCIÓN SEGURA -->
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-gold-400 flex items-center justify-between">
-                    <span>🎵 Sonido Ambiental del Árbol</span>
-                    <span id="previewSoundStatus" class="text-[10px] text-emerald-300 font-mono italic">Toca para probar</span>
-                </label>
-                <div class="flex gap-2 items-center">
-                    <select id="treeSoundSelect" onchange="cambiarTonoLista(this.value)" class="flex-1 bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                        <option value="0">🎄 Villancico Clásico Lofi</option>
-                        <option value="1">✨ Noche de Paz Instrumental</option>
-                        <option value="2">❄️ Magia de Navidad Acústica</option>
-                        <option value="3">🌟 Cascabeles Relajantes</option>
-                    </select>
-                    <button type="button" onclick="testPlayCurrentSound()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow cursor-pointer flex items-center gap-1" title="Reproducir Tono">
-                        <i class="fas fa-play" id="testPlayIcon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Elemento de audio global para pruebas -->
-            <audio id="previewAudioElement" preload="auto"></audio>
-
+            <!-- Estilo fijo clásico único -->
             <input type="hidden" id="treeStyle" value="gold">
 
             <div class="space-y-2 pt-1 border-t border-emerald-500/20">
@@ -147,7 +126,7 @@
             </button>
         </div>
 
-        <!-- MODAL RESULTADO QR -->
+        <!-- MODAL DE RESULTADO CON QR Y BOTÓN DE GESTIÓN -->
         <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-christmas-900 border border-gold-500/40 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl">
                 <div class="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 text-gold-400 flex items-center justify-center mx-auto text-xl">
@@ -196,60 +175,13 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const playlist = [
-            { title: "Villancico Clásico Lofi", url: "https://cdn.pixabay.com/download/audio/2022/11/15/audio_191986423c.mp3?filename=christmas-lofi-123719.mp3" },
-            { title: "Noche de Paz Instrumental", url: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_91d31980ee.mp3?filename=silent-night-guitar-version-10495.mp3" },
-            { title: "Magia de Navidad Acústica", url: "https://cdn.pixabay.com/download/audio/2022/11/20/audio_510b6528d9.mp3?filename=christmas-magic-124976.mp3" },
-            { title: "Cascabeles Relajantes", url: "https://cdn.pixabay.com/download/audio/2022/12/14/audio_3d1262d10c.mp3?filename=jingle-bells-chill-version-132371.mp3" }
-        ];
-
         let maxLimit = 5;
-        let isPreviewPlaying = false;
 
         window.onload = () => {
             const currentYear = new Date().getFullYear();
             document.getElementById('unlockDate').value = `${currentYear}-12-25`;
             loadMyProjects();
         };
-
-        function cambiarTonoLista(index) {
-            const audio = document.getElementById('previewAudioElement');
-            const track = playlist[index];
-            if (track) {
-                audio.src = track.url;
-                audio.load();
-                if (isPreviewPlaying) {
-                    audio.play().catch(e => console.log("Play interrupted:", e));
-                }
-            }
-        }
-
-        function testPlayCurrentSound() {
-            const select = document.getElementById('treeSoundSelect');
-            const audio = document.getElementById('previewAudioElement');
-            const icon = document.getElementById('testPlayIcon');
-            const statusTxt = document.getElementById('previewSoundStatus');
-
-            if (isPreviewPlaying) {
-                audio.pause();
-                isPreviewPlaying = false;
-                icon.className = "fas fa-play";
-                statusTxt.innerText = "Pausado";
-            } else {
-                const track = playlist[select.value];
-                if (!audio.src || audio.src === "" || !audio.src.includes(track.url)) {
-                    audio.src = track.url;
-                }
-                audio.play().then(() => {
-                    isPreviewPlaying = true;
-                    icon.className = "fas fa-pause";
-                    statusTxt.innerText = "Reproduciendo...";
-                }).catch(e => {
-                    console.log("Audio play blocked:", e);
-                    statusTxt.innerText = "Toca para reproducir";
-                });
-            }
-        }
 
         function loadMyProjects() {
             const listContainer = document.getElementById('projectsList');
@@ -325,7 +257,7 @@
                 loadMyProjects();
             } catch (err) {
                 console.error("Error al eliminar el proyecto:", err);
-                alert("Hubo al intentar eliminar el proyecto.");
+                alert("Hubo un error al intentar eliminar el proyecto.");
             }
         }
 
@@ -342,10 +274,6 @@
         function showProjectsMenu() {
             document.getElementById('createFormSection').classList.add('hidden');
             document.getElementById('projectsSection').classList.remove('hidden');
-            const audio = document.getElementById('previewAudioElement');
-            audio.pause();
-            isPreviewPlaying = false;
-            document.getElementById('testPlayIcon').className = "fas fa-play";
             loadMyProjects();
         }
 
@@ -369,7 +297,7 @@
             div.className = "bg-christmas-950/60 p-3 rounded-xl border border-emerald-500/20 flex items-center gap-2";
             div.innerHTML = `
                 <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-1 rounded font-bold">#${num}</span>
-                <input type="text" placeholder="Nombre para la esfera (Ej: Carlos)" class="sphere-name flex-1 bg-christmas-900 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
+                <input type="text" placeholder="Nombre para la esfera (Opcional)" class="sphere-name flex-1 bg-christmas-900 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 <button onclick="this.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs px-2 cursor-pointer"><i class="fas fa-trash"></i></button>
             `;
             container.appendChild(div);
@@ -393,23 +321,20 @@
             const title = document.getElementById('treeTitle').value.trim();
             const dateVal = document.getElementById('unlockDate').value;
             const timeVal = document.getElementById('unlockTime').value;
-            const soundIndex = parseInt(document.getElementById('treeSoundSelect').value);
-            const style = document.getElementById('treeStyle').value; 
+            const style = document.getElementById('treeStyle').value;
             const containerItems = document.getElementById('spheresContainer').children;
 
             if (!title) { alert("Ingresa un título principal."); return; }
             if (!dateVal || !timeVal) { alert("Selecciona la fecha y hora de activación."); return; }
-            if (containerItems.length === 0) { alert("Agrega al menos un nombre de esfera."); return; }
 
             const unlockDateTimeISO = `${dateVal}T${timeVal}:00`;
-            const esGratuito = (maxLimit === 5); 
+            const esGratuito = (maxLimit === 5);
 
             const spheresArray = [];
             for (let item of containerItems) {
                 const name = item.querySelector('.sphere-name').value.trim();
-                if (!name) { alert("Todas las esferas configuradas deben tener un nombre asignado."); return; }
                 spheresArray.push({ 
-                    nombre: name, 
+                    nombre: name || "", // Permitir esferas vacías inicialmente
                     mensaje: "", 
                     foto: "", 
                     audio: "", 
@@ -424,7 +349,6 @@
             const treeData = {
                 titulo: title,
                 estilo: style,
-                cancionSeleccionada: soundIndex,
                 fechaDesbloqueo: unlockDateTimeISO,
                 limiteUsuarios: maxLimit,
                 pagado: esGratuito, 
@@ -441,7 +365,6 @@
                 }
 
                 localStorage.setItem("ultimoArbolNavidadId", docRef.id);
-                document.getElementById('previewAudioElement').pause();
 
                 const loc = window.location;
                 const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
