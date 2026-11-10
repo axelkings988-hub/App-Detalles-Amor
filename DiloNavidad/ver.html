@@ -100,7 +100,7 @@
 
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA FIJO CON AUDIO DE SUPABASE (SIN SELECTOR) -->
+    <!-- REPRODUCTOR DE MÚSICA FIJO CON AUDIO DE SUPABASE -->
     <div class="fixed bottom-3 left-3 right-3 z-50 max-w-md mx-auto bg-christmas-900/90 backdrop-blur-md border border-gold-500/40 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 overflow-hidden flex-1">
             <div class="w-8 h-8 rounded-xl bg-gold-500/20 text-gold-400 border border-gold-500/30 flex items-center justify-center flex-shrink-0">
@@ -211,10 +211,25 @@
                 🎄 Toca tu esfera asignada para editarla o ver su contenido.
             </p>
 
+            <!-- SECCIÓN DE ACCIONES (SOLO VISIBLE PARA EL CREADOR) -->
             <div id="shareSection" class="hidden pt-3 border-t border-emerald-500/20 space-y-2">
                 <button id="creatorManageBtn" onclick="openCreatorManageModal()" class="hidden w-full py-2.5 bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold text-xs rounded-xl hover:bg-amber-600/50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                     <i class="fas fa-users-cog"></i> Editar Datos / Agregar Nombres (<span id="creatorCountDisplay">0</span>/<span id="creatorLimitDisplay">5</span>)
                 </button>
+                
+                <!-- BOTONES DE COMPARTIR Y QR EXCLUSIVOS PARA EL CREADOR -->
+                <div class="flex gap-2">
+                    <button onclick="copiarEnlaceArbol()" class="flex-1 py-2.5 bg-christmas-950 border border-gold-500/30 text-gold-400 font-bold text-xs rounded-xl hover:bg-christmas-900 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-copy"></i> Copiar Enlace
+                    </button>
+                    <button onclick="descargarImagenQR()" class="flex-1 py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-download"></i> Descargar QR
+                    </button>
+                </div>
+                <a id="whatsappShareBtn" href="#" target="_blank" class="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
+                </a>
+
                 <div id="hiddenQrContainer" class="hidden"></div>
             </div>
         </div>
@@ -487,13 +502,18 @@
 
         function verificarSiSoyCreador() {
             let savedIds = JSON.parse(localStorage.getItem('mis_arboles_navidad') || '[]');
+            const shareSection = document.getElementById('shareSection');
             const creatorBtn = document.getElementById('creatorManageBtn');
+
             if (savedIds.includes(docId)) {
+                // Si soy el creador, muestro la sección con los botones de compartir, QR y edición
+                shareSection.classList.remove('hidden');
                 creatorBtn.classList.remove('hidden');
                 document.getElementById('creatorCountDisplay').innerText = treeData.esferas.length;
                 document.getElementById('creatorLimitDisplay').innerText = treeData.limiteUsuarios || 5;
             } else {
-                creatorBtn.classList.add('hidden');
+                // Si es un invitado, oculto completamente la sección de compartir para mantener la pantalla limpia
+                shareSection.classList.add('hidden');
             }
         }
 
@@ -582,12 +602,10 @@
 
         function verificarEstadoPagadoYFecha() {
             const paywallOverlay = document.getElementById('paywallOverlay');
-            const shareSection = document.getElementById('shareSection');
             const now = new Date();
 
             if (treeData.pagado === true || isPreviewMode || now >= targetUnlockDate) {
                 paywallOverlay.classList.add('hidden');
-                shareSection.classList.remove('hidden');
                 isChristmasUnlocked = (now >= targetUnlockDate || isPreviewMode);
                 if (isChristmasUnlocked) {
                     triggerMagicGlow();
@@ -597,7 +615,6 @@
                 }
             } else {
                 paywallOverlay.classList.remove('hidden');
-                shareSection.classList.add('hidden');
                 isChristmasUnlocked = false;
                 startCountdown(targetUnlockDate);
             }
@@ -670,6 +687,26 @@
             new QRCode(container, {
                 text: currentUrl, width: 250, height: 250, colorDark: "#05130D", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
             });
+
+            const mensajeWa = encodeURIComponent("🎄 ¡Hola! Entra aquí para ver y elegir tu esfera en nuestro Árbol de Navidad Oculto: " + currentUrl);
+            document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${mensajeWa}`;
+        }
+
+        function copiarEnlaceArbol() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("¡Enlace copiado al portapapeles!");
+        }
+
+        function descargarImagenQR() {
+            const qrCanvas = document.querySelector('#hiddenQrContainer canvas') || document.querySelector('#hiddenQrContainer img');
+            if (!qrCanvas) return;
+            let imageUrl = qrCanvas.tagName === "CANVAS" ? qrCanvas.toDataURL("image/png") : qrCanvas.src;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imageUrl;
+            downloadLink.download = `ArbolNavidad_${treeData.titulo.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
 
         function togglePreviewMode() {
