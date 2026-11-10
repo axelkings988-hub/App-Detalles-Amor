@@ -100,14 +100,14 @@
 
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA NAVIDEÑA (PIXABAY) -->
+    <!-- REPRODUCTOR DE MÚSICA NAVIDEÑA (PIXABAY) CON PREDETERMINADO #3 -->
     <div class="fixed bottom-3 left-3 right-3 z-50 max-w-md mx-auto bg-christmas-900/90 backdrop-blur-md border border-gold-500/40 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 overflow-hidden flex-1">
             <div class="w-8 h-8 rounded-xl bg-gold-500/20 text-gold-400 border border-gold-500/30 flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-music text-xs animate-pulse"></i>
             </div>
             <div class="overflow-hidden">
-                <p id="currentTrackName" class="text-[10px] font-bold text-gold-400 truncate">Villancico Clásico</p>
+                <p id="currentTrackName" class="text-[10px] font-bold text-gold-400 truncate">We Wish You a Merry Christmas</p>
                 <p class="text-[8px] text-emerald-300/80 uppercase tracking-widest">Música Ambiental (Pixabay)</p>
             </div>
         </div>
@@ -115,7 +115,7 @@
             <select id="trackSelect" onchange="cambiarPistaMusica(this.value)" class="bg-christmas-950 border border-emerald-500/30 text-[10px] text-white rounded-lg px-2 py-1 focus:outline-none">
                 <option value="0">1. Joy to the World</option>
                 <option value="1">2. O Christmas Tree</option>
-                <option value="2">3. We Wish You a Merry Christmas</option>
+                <option value="2" selected>3. We Wish You a Merry Christmas</option>
             </select>
             <button onclick="togglePlayMusica()" id="playMusicBtn" class="w-8 h-8 rounded-xl bg-gold-500 text-christmas-950 font-bold flex items-center justify-center cursor-pointer shadow">
                 <i class="fas fa-play text-xs"></i>
@@ -216,23 +216,13 @@
                 🎄 Toca tu esfera asignada para editarla o ver su contenido.
             </p>
 
-            <!-- BOTONES DE COMPARTIR Y GESTIÓN EXCLUSIVA DEL CREADOR -->
+            <!-- SECCIÓN DE ACCIONES (SOLO BOTÓN DE GESTIÓN DE CREADOR, SIN BOTONES DE COMPARTIR PARA INVITADOS) -->
             <div id="shareSection" class="hidden pt-3 border-t border-emerald-500/20 space-y-2">
                 <button id="creatorManageBtn" onclick="openCreatorManageModal()" class="hidden w-full py-2.5 bg-amber-600/30 border border-amber-500/40 text-amber-300 font-bold text-xs rounded-xl hover:bg-amber-600/50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                     <i class="fas fa-users-cog"></i> Editar Datos / Agregar Nombres (<span id="creatorCountDisplay">0</span>/<span id="creatorLimitDisplay">5</span>)
                 </button>
-
-                <div class="flex gap-2">
-                    <button onclick="copiarEnlaceArbol()" class="flex-1 py-2.5 bg-christmas-950 border border-gold-500/30 text-gold-400 font-bold text-xs rounded-xl hover:bg-christmas-900 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                        <i class="fas fa-copy"></i> Copiar Enlace
-                    </button>
-                    <button onclick="descargarImagenQR()" class="flex-1 py-2.5 bg-gold-500 hover:bg-gold-400 text-christmas-950 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                        <i class="fas fa-download"></i> Descargar QR
-                    </button>
-                </div>
-                <a id="whatsappShareBtn" href="#" target="_blank" class="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                    <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
-                </a>
+                <!-- Contenedor oculto para generar QR interno sin mostrar botones al invitado -->
+                <div id="hiddenQrContainer" class="hidden"></div>
             </div>
         </div>
     </main>
@@ -325,19 +315,19 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE MÚSICA PIXABAY -->
+    <!-- SCRIPT DE MÚSICA PIXABAY (ESTABLE Y PREDETERMINADO #3) -->
     <script>
         const pixabayTracks = [
-            { name: "Joy to the World", url: "https://cdn.pixabay.com/download/audio/2022/11/10/audio_187652750e.mp3?filename=christmas-joy-126279.mp3" },
+            { name: "Joy to the World", url: "https://actions.google.com/sounds/v1/holidays/christmas_bells.ogg" },
             { name: "O Christmas Tree", url: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_9035f29d2f.mp3?filename=o-christmas-tree-8067.mp3" },
             { name: "We Wish You a Merry Christmas", url: "https://cdn.pixabay.com/download/audio/2022/11/25/audio_8f45a27173.mp3?filename=we-wish-you-a-merry-christmas-127914.mp3" }
         ];
 
-        let currentTrackIdx = 0;
+        let currentTrackIdx = 2; // Predeterminado pista 3 ("We Wish You a Merry Christmas")
         let isMusicPlaying = false;
 
-        function initMusica(indexGuardado = 0) {
-            currentTrackIdx = indexGuardado || 0;
+        function initMusica(indexGuardado = 2) {
+            currentTrackIdx = (indexGuardado !== undefined && indexGuardado !== null) ? indexGuardado : 2;
             const audio = document.getElementById('bgAudio');
             audio.src = pixabayTracks[currentTrackIdx].url;
             document.getElementById('currentTrackName').innerText = pixabayTracks[currentTrackIdx].name;
@@ -449,7 +439,7 @@
         const docId = urlParams.get('id');
 
         window.addEventListener('DOMContentLoaded', async () => {
-            initMusica(0);
+            initMusica(2);
             const queryParams = new URLSearchParams(window.location.search);
             const status = (queryParams.get('status') || queryParams.get('collection_status') || '').toLowerCase();
             const collectionId = queryParams.get('collection_id') || queryParams.get('payment_id');
@@ -497,6 +487,8 @@
                     
                     if (treeData.musicaIndex !== undefined) {
                         initMusica(treeData.musicaIndex);
+                    } else {
+                        initMusica(2);
                     }
 
                     if (treeData.fechaDesbloqueo) {
@@ -708,26 +700,6 @@
             new QRCode(container, {
                 text: currentUrl, width: 250, height: 250, colorDark: "#05130D", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
             });
-
-            const mensajeWa = encodeURIComponent("🎄 ¡Hola! Entra aquí para ver y elegir tu esfera en nuestro Árbol de Navidad Oculto: " + currentUrl);
-            document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${mensajeWa}`;
-        }
-
-        function copiarEnlaceArbol() {
-            navigator.clipboard.writeText(window.location.href);
-            alert("¡Enlace copiado al portapapeles!");
-        }
-
-        function descargarImagenQR() {
-            const qrCanvas = document.querySelector('#hiddenQrContainer canvas') || document.querySelector('#hiddenQrContainer img');
-            if (!qrCanvas) return;
-            let imageUrl = qrCanvas.tagName === "CANVAS" ? qrCanvas.toDataURL("image/png") : qrCanvas.src;
-            const downloadLink = document.createElement('a');
-            downloadLink.href = imageUrl;
-            downloadLink.download = `ArbolNavidad_${treeData.titulo.replace(/\s+/g, '_')}.png`;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
         }
 
         function togglePreviewMode() {
@@ -862,7 +834,6 @@
                     const fechaRev = targetUnlockDate || new Date();
                     const esDiaIluminacion = isPreviewMode || ahora >= fechaRev;
 
-                    // SI LLEGÓ EL DÍA Y NO TIENE NOMBRE/DATOS, SE MANTIENE BRILLANDO PERO SIN NOMBRE ESTÉTICO
                     if (esDiaIluminacion && !nombreMostrado && !tieneContenido) {
                         wrapper.className = "absolute flex flex-col items-center pointer-events-none";
                         wrapper.innerHTML = `
@@ -1037,7 +1008,6 @@
             clearInterval(recordTimer);
         }
 
-        // BLOQUEO ESTRICTO EXACTAMENTE A 48 HORAS DEL ENCENDIDO
         function checkEditDeadline() {
             if (isPreviewMode) return false;
             const now = new Date();
