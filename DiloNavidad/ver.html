@@ -242,7 +242,6 @@
             </button>
             <h3 class="text-lg font-serif font-bold text-white">Editar Datos del Árbol</h3>
             
-            <!-- CONFIGURACIÓN DE FECHA Y HORA DE APERTURA -->
             <div class="bg-christmas-950 p-3 rounded-2xl border border-emerald-500/20 text-left space-y-2">
                 <label class="text-[10px] font-bold text-gold-400 uppercase tracking-wider block">📅 Fecha y Hora de Apertura</label>
                 <div class="grid grid-cols-2 gap-2">
@@ -536,7 +535,6 @@
                 return;
             }
 
-            // Cargar fecha y hora actuales en los inputs del modal
             if (treeData.fechaDesbloqueo) {
                 const d = new Date(treeData.fechaDesbloqueo);
                 document.getElementById('modalUnlockDate').value = d.toISOString().split('T')[0];
@@ -653,6 +651,7 @@
                 startCountdown(targetUnlockDate);
             }
             renderNeonLights();
+            renderSpheres(); // Volver a renderizar esferas al cambiar estado de desbloqueo
         }
 
         function procesarPagoMercadoPago() {
@@ -875,14 +874,15 @@
                     const fechaRev = targetUnlockDate || new Date();
                     const esDiaIluminacion = isPreviewMode || ahora >= fechaRev;
 
-                    if (esDiaIluminacion && !nombreMostrado && !tieneContenido) {
+                    if (esDiaIluminacion && !nombreMostrazol && !tieneContenido) {
                         wrapper.className = "absolute flex flex-col items-center pointer-events-none";
                         wrapper.innerHTML = `
                             <div class="sphere-ornament ${claseColor} sphere-subtle-glow" style="width: ${esferaSize}px; height: ${esferaSize}px;"></div>
                         `;
                     } else {
                         const esMia = esfera.ocupadaPor === myDeviceId;
-                        const bloqueadaParaMi = (miEsferaIndex !== -1 && !esMia);
+                        // CORRECCIÓN: Solo se bloquea si el árbol NO está desbloqueado (isChristmasUnlocked es falso)
+                        const bloqueadaParaMi = !isChristmasUnlocked && (miEsferaIndex !== -1 && !esMia);
 
                         if (bloqueadaParaMi) {
                             wrapper.className = "absolute flex flex-col items-center pointer-events-none opacity-40";
