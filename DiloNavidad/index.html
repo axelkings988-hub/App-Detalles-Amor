@@ -14,7 +14,7 @@
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <!-- Supabase JS SDK (para limpieza de archivos al eliminar) -->
+    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -42,22 +42,20 @@
 
     <div class="max-w-md mx-auto space-y-4">
         
-        <!-- CONTENEDOR DE ANUNCIOS ADSTERRA (BARRA SUPERIOR) -->
         <div id="adBannerContainer" class="w-full flex justify-center bg-christmas-900/60 backdrop-blur-md border border-gold-500/20 py-2 rounded-2xl overflow-hidden shadow-lg">
             <div id="adWrapper" style="min-width: 320px; min-height: 50px; display: flex; justify-content: center; align-items: center;">
                 <span class="text-[9px] text-amber-300/40 uppercase tracking-widest">Cargando anuncio...</span>
             </div>
         </div>
 
-        <!-- BARRA SUPERIOR CON BOTÓN ATRÁS AL MENÚ PRINCIPAL -->
         <div class="flex items-center justify-between">
             <a href="../index.html" class="px-3 py-1.5 bg-christmas-900/80 border border-emerald-500/30 rounded-xl text-xs text-gold-400 font-semibold flex items-center gap-1.5 hover:bg-christmas-950 transition-colors">
                 <i class="fas fa-arrow-left"></i> Menú Principal
             </a>
-            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.3</span>
+            <span class="text-[10px] text-emerald-300 font-mono">DiloNavidad v2.5</span>
         </div>
 
-        <!-- SECCIÓN 1: MENÚ DE PROYECTOS REALIZADOS -->
+        <!-- SECCIÓN 1: MENÚ DE PROYECTOS -->
         <div id="projectsSection" class="bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <h2 class="text-sm font-serif font-bold text-gold-400 flex items-center gap-2">
@@ -73,7 +71,7 @@
             </div>
         </div>
 
-        <!-- SECCIÓN 2: FORMULARIO DE NUEVO PROYECTO (OCULTO INICIALMENTE) -->
+        <!-- SECCIÓN 2: FORMULARIO DE NUEVO PROYECTO -->
         <div id="createFormSection" class="hidden bg-christmas-900/85 backdrop-blur-xl border border-gold-500/20 p-6 rounded-3xl shadow-2xl space-y-4 relative">
             
             <button onclick="showProjectsMenu()" class="absolute top-4 left-4 text-xs text-gold-400 hover:text-white flex items-center gap-1 cursor-pointer">
@@ -82,7 +80,7 @@
 
             <div class="text-center space-y-1 pt-4">
                 <h1 class="text-xl font-serif font-bold text-white">Nuevo Árbol Navideño</h1>
-                <p class="text-[11px] text-emerald-200/80">Configura los espacios y la fecha de revelación</p>
+                <p class="text-[11px] text-emerald-200/80">Configura los espacios y la música ambiental</p>
             </div>
 
             <div class="space-y-1">
@@ -110,12 +108,16 @@
                 </div>
             </div>
 
+            <!-- SELECCIÓN DE MÚSICA NAVIDEÑA (PIXABAY) -->
             <div class="space-y-1">
-                <label class="text-xs font-bold text-gold-400">Estilo Visual</label>
-                <select id="treeStyle" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                    <option value="gold">✨ Elegante Dorado (Clásico)</option>
-                    <option value="snow">❄️ Nevado Tradicional</option>
-                    <option value="modern">🌲 Minimalista Moderno</option>
+                <label class="text-xs font-bold text-gold-400 flex items-center justify-between">
+                    <span>Música Navideña (Pixabay)</span>
+                    <button type="button" onclick="previewSelectedTrack()" class="text-[10px] text-gold-400 hover:underline"><i class="fas fa-volume-up"></i> Probar pista</button>
+                </label>
+                <select id="treeMusicTrack" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
+                    <option value="0">🎵 1. Joy to the World</option>
+                    <option value="1">🎵 2. O Christmas Tree</option>
+                    <option value="2">🎵 3. We Wish You a Merry Christmas</option>
                 </select>
             </div>
 
@@ -126,7 +128,7 @@
                         <i class="fas fa-plus"></i> Agregar
                     </button>
                 </div>
-                <div id="spheresContainer" class="space-y-2 max-h-[150px] overflow-y-auto pr-1"></div>
+                <div id="spheresContainer" class="space-y-2 max-h-[140px] overflow-y-auto pr-1"></div>
             </div>
 
             <button onclick="saveTreeToFirebase()" id="saveBtn" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-christmas-950 font-bold text-xs rounded-xl shadow-xl cursor-pointer">
@@ -142,7 +144,6 @@
                 </div>
                 <h3 class="text-lg font-serif font-bold text-white" id="modalResultTitle">¡Árbol Creado con Éxito!</h3>
                 
-                <!-- CONTENEDOR DE QR (CON EFECTO BLUR SI NO ESTÁ PAGADO) -->
                 <div class="relative w-40 h-40 mx-auto flex items-center justify-center">
                     <div class="bg-white p-3 rounded-2xl w-full h-full flex items-center justify-center shadow-inner" id="qrcodeContainer"></div>
                     <div id="qrLockOverlay" class="hidden absolute inset-0 bg-christmas-950/85 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center p-2 text-center">
@@ -151,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- ENLACE O AVISO DE PAGO PENDIENTE -->
                 <div id="shareLinkContainer" class="bg-christmas-950 p-2.5 rounded-xl border border-emerald-500/20 break-all text-[10px] text-gold-400 font-mono select-all"></div>
                 
                 <div class="flex gap-2 pt-2" id="shareButtonsRow">
@@ -168,7 +168,9 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
+    <!-- AUDIO PREVIEW HELPER -->
+    <audio id="previewAudioElement"></audio>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
@@ -186,6 +188,12 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        const pixabayUrls = [
+            "https://cdn.pixabay.com/download/audio/2022/11/10/audio_187652750e.mp3?filename=christmas-joy-126279.mp3",
+            "https://cdn.pixabay.com/download/audio/2021/11/25/audio_9035f29d2f.mp3?filename=o-christmas-tree-8067.mp3",
+            "https://cdn.pixabay.com/download/audio/2022/11/25/audio_8f45a27173.mp3?filename=we-wish-you-a-merry-christmas-127914.mp3"
+        ];
+
         let maxLimit = 5;
 
         window.onload = () => {
@@ -193,6 +201,13 @@
             document.getElementById('unlockDate').value = `${currentYear}-12-25`;
             loadMyProjects();
         };
+
+        function previewSelectedTrack() {
+            const idx = parseInt(document.getElementById('treeMusicTrack').value);
+            const audio = document.getElementById('previewAudioElement');
+            audio.src = pixabayUrls[idx];
+            audio.play().catch(e => console.log("Preview restricted:", e));
+        }
 
         function loadMyProjects() {
             const listContainer = document.getElementById('projectsList');
@@ -308,7 +323,7 @@
             div.className = "bg-christmas-950/60 p-3 rounded-xl border border-emerald-500/20 flex items-center gap-2";
             div.innerHTML = `
                 <span class="text-[10px] bg-gold-500/20 text-gold-400 px-2 py-1 rounded font-bold">#${num}</span>
-                <input type="text" placeholder="Nombre para la esfera (Ej: Carlos)" class="sphere-name flex-1 bg-christmas-900 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
+                <input type="text" placeholder="Nombre para la esfera (Opcional)" class="sphere-name flex-1 bg-christmas-900 border border-emerald-500/30 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
                 <button onclick="this.parentElement.remove(); updateCount();" class="text-red-400 hover:text-red-300 text-xs px-2 cursor-pointer"><i class="fas fa-trash"></i></button>
             `;
             container.appendChild(div);
@@ -332,22 +347,20 @@
             const title = document.getElementById('treeTitle').value.trim();
             const dateVal = document.getElementById('unlockDate').value;
             const timeVal = document.getElementById('unlockTime').value;
-            const style = document.getElementById('treeStyle').value;
+            const musicTrackIdx = parseInt(document.getElementById('treeMusicTrack').value);
             const containerItems = document.getElementById('spheresContainer').children;
 
             if (!title) { alert("Ingresa un título principal."); return; }
             if (!dateVal || !timeVal) { alert("Selecciona la fecha y hora de activación."); return; }
-            if (containerItems.length === 0) { alert("Agrega al menos un nombre de esfera."); return; }
 
             const unlockDateTimeISO = `${dateVal}T${timeVal}:00`;
-            const esGratuito = (maxLimit === 5); // 5 esferas = GRATIS (pagado: true automático)
+            const esGratuito = (maxLimit === 5);
 
             const spheresArray = [];
             for (let item of containerItems) {
                 const name = item.querySelector('.sphere-name').value.trim();
-                if (!name) { alert("Todas las esferas configuradas deben tener un nombre asignado."); return; }
                 spheresArray.push({ 
-                    nombre: name, 
+                    nombre: name || "", 
                     mensaje: "", 
                     foto: "", 
                     audio: "", 
@@ -361,7 +374,8 @@
 
             const treeData = {
                 titulo: title,
-                estilo: style,
+                estilo: "gold",
+                musicaIndex: musicTrackIdx,
                 fechaDesbloqueo: unlockDateTimeISO,
                 limiteUsuarios: maxLimit,
                 pagado: esGratuito, 
@@ -428,4 +442,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
