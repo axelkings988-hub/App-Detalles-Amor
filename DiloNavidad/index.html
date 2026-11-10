@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -108,18 +108,7 @@
                 </div>
             </div>
 
-            <!-- SELECCIÓN DE MÚSICA NAVIDEÑA (PIXABAY) -->
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-gold-400 flex items-center justify-between">
-                    <span>Música Navideña (Pixabay)</span>
-                    <button type="button" onclick="previewSelectedTrack()" class="text-[10px] text-gold-400 hover:underline"><i class="fas fa-volume-up"></i> Probar pista</button>
-                </label>
-                <select id="treeMusicTrack" class="w-full bg-christmas-950/80 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
-                    <option value="0">🎵 1. Joy to the World</option>
-                    <option value="1">🎵 2. O Christmas Tree</option>
-                    <option value="2">🎵 3. We Wish You a Merry Christmas</option>
-                </select>
-            </div>
+            <!-- (Selector de música eliminado por completo para mantener limpio el formulario) -->
 
             <div class="space-y-2 pt-1 border-t border-emerald-500/20">
                 <div class="flex items-center justify-between">
@@ -168,9 +157,6 @@
         </div>
     </div>
 
-    <!-- AUDIO PREVIEW HELPER -->
-    <audio id="previewAudioElement"></audio>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC-PGLDqJ2GLfm3ZaXdSxxlvm8MerM1nJY",
@@ -188,12 +174,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_Z0syhGi6oIhXvb7p3iKzWw_2J_ElxKq'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const pixabayUrls = [
-            "https://cdn.pixabay.com/download/audio/2022/11/10/audio_187652750e.mp3?filename=christmas-joy-126279.mp3",
-            "https://cdn.pixabay.com/download/audio/2021/11/25/audio_9035f29d2f.mp3?filename=o-christmas-tree-8067.mp3",
-            "https://cdn.pixabay.com/download/audio/2022/11/25/audio_8f45a27173.mp3?filename=we-wish-you-a-merry-christmas-127914.mp3"
-        ];
-
         let maxLimit = 5;
 
         window.onload = () => {
@@ -201,13 +181,6 @@
             document.getElementById('unlockDate').value = `${currentYear}-12-25`;
             loadMyProjects();
         };
-
-        function previewSelectedTrack() {
-            const idx = parseInt(document.getElementById('treeMusicTrack').value);
-            const audio = document.getElementById('previewAudioElement');
-            audio.src = pixabayUrls[idx];
-            audio.play().catch(e => console.log("Preview restricted:", e));
-        }
 
         function loadMyProjects() {
             const listContainer = document.getElementById('projectsList');
@@ -347,7 +320,6 @@
             const title = document.getElementById('treeTitle').value.trim();
             const dateVal = document.getElementById('unlockDate').value;
             const timeVal = document.getElementById('unlockTime').value;
-            const musicTrackIdx = parseInt(document.getElementById('treeMusicTrack').value);
             const containerItems = document.getElementById('spheresContainer').children;
 
             if (!title) { alert("Ingresa un título principal."); return; }
@@ -375,7 +347,7 @@
             const treeData = {
                 titulo: title,
                 estilo: "gold",
-                musicaIndex: musicTrackIdx,
+                musicaIndex: 2, // Fijo por defecto
                 fechaDesbloqueo: unlockDateTimeISO,
                 limiteUsuarios: maxLimit,
                 pagado: esGratuito, 
