@@ -100,14 +100,14 @@
 
     <div id="snowContainer" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA DESDE SUPABASE -->
+    <!-- REPRODUCTOR DE MÚSICA FIJO CON AUDIO DE SUPABASE (SIN SELECTOR) -->
     <div class="fixed bottom-3 left-3 right-3 z-50 max-w-md mx-auto bg-christmas-900/90 backdrop-blur-md border border-gold-500/40 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 overflow-hidden flex-1">
             <div class="w-8 h-8 rounded-xl bg-gold-500/20 text-gold-400 border border-gold-500/30 flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-music text-xs animate-pulse"></i>
             </div>
             <div class="overflow-hidden">
-                <p id="currentTrackName" class="text-[10px] font-bold text-gold-400 truncate">Audio Navidad</p>
+                <p class="text-[10px] font-bold text-gold-400 truncate">Audio Navidad</p>
                 <p class="text-[8px] text-emerald-300/80 uppercase tracking-widest">Música Navideña (Supabase)</p>
             </div>
         </div>
@@ -308,7 +308,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE MÚSICA DESDE SUPABASE -->
+    <!-- SCRIPT DE MÚSICA CON AUDIO DE SUPABASE -->
     <script>
         const AUDIO_URL_SUPABASE = "https://wqeesqlpgredszsmjcvx.supabase.co/storage/v1/object/public/Audio/Audio%20Navidad.mp3";
 
