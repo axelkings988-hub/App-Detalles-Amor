@@ -86,8 +86,8 @@
         }
         .neon-light {
             position: absolute;
-            width: 5px;
-            height: 5px;
+            width: 4px;
+            height: 4px;
             background-color: #fff;
             border-radius: 50%;
             animation: neonBlink 1.6s infinite ease-in-out;
@@ -139,7 +139,7 @@
                 <i class="fas fa-arrow-left"></i> Volver
             </a>
             <button onclick="togglePreviewMode()" id="previewBtn" class="text-[10px] bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
-                <i class="fas fa-eye"></i> Previsualizar Activación
+                <i class="fas fa-eye"></i> Previsualizar Temporizador
             </button>
         </div>
 
@@ -635,22 +635,32 @@
             const paywallOverlay = document.getElementById('paywallOverlay');
             const now = new Date();
 
-            if (treeData.pagado === true || isPreviewMode || now >= targetUnlockDate) {
-                paywallOverlay.classList.add('hidden');
-                isChristmasUnlocked = (now >= targetUnlockDate || isPreviewMode);
-                if (isChristmasUnlocked) {
+            // NOTA: Si isPreviewMode está activo, NO desbloqueamos el árbol para mantener la prueba del temporizador
+            const realUnlocked = treeData.pagado === true && now >= targetUnlockDate;
+
+            if (realUnlocked || isPreviewMode) {
+                if (realUnlocked) {
+                    paywallOverlay.classList.add('hidden');
+                    isChristmasUnlocked = true;
                     triggerMagicGlow();
                     autoPlayOnUnlock();
                 } else {
+                    // En modo previsualización, ocultamos pago pero respetamos que las esferas sigan bloqueadas por tiempo
+                    paywallOverlay.classList.add('hidden');
+                    isChristmasUnlocked = false;
                     startCountdown(targetUnlockDate);
                 }
+            } else if (treeData.pagado === true) {
+                paywallOverlay.classList.add('hidden');
+                isChristmasUnlocked = false;
+                startCountdown(targetUnlockDate);
             } else {
                 paywallOverlay.classList.remove('hidden');
                 isChristmasUnlocked = false;
                 startCountdown(targetUnlockDate);
             }
             renderNeonLights();
-            renderSpheres(); // <- Se asegura de renderizar las esferas correctamente al validar el estado
+            renderSpheres();
         }
 
         function procesarPagoMercadoPago() {
@@ -749,11 +759,10 @@
                 btn.className = "text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
                 autoPlayOnUnlock();
             } else {
-                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar Activación`;
+                btn.innerHTML = `<i class="fas fa-eye"></i> Previsualizar Temporizador`;
                 btn.className = "text-[10px] bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer";
             }
             verificarEstadoPagadoYFecha();
-            renderSpheres();
         }
 
         function startCountdown(targetDate) {
@@ -792,13 +801,15 @@
             { x: 17, y: 81 }, { x: 38, y: 81 }, { x: 62, y: 81 }, { x: 83, y: 81 }
         ];
 
+        // MAPA AMPLIADO Y OPTIMIZADO PARA 30 ESFERAS (Distribución perfecta en niveles del pino)
         const mapaCoordenadas30 = [
-            { x: 50, y: 20 }, { x: 43, y: 28 }, { x: 57, y: 28 },
-            { x: 36, y: 37 }, { x: 50, y: 37 }, { x: 64, y: 37 },
-            { x: 30, y: 46 }, { x: 41, y: 46 }, { x: 59, y: 46 }, { x: 70, y: 46 },
-            { x: 25, y: 55 }, { x: 35, y: 55 }, { x: 45, y: 55 }, { x: 55, y: 55 }, { x: 65, y: 55 }, { x: 75, y: 55 },
-            { x: 20, y: 64 }, { x: 29, y: 64 }, { x: 39, y: 64 }, { x: 50, y: 64 }, { x: 61, y: 64 }, { x: 71, y: 64 }, { x: 80, y: 64 },
-            { x: 16, y: 74 }, { x: 26, y: 74 }, { x: 38, y: 74 }, { x: 50, y: 74 }, { x: 62, y: 74 }, { x: 74, y: 74 }, { x: 84, y: 74 }
+            { x: 50, y: 19 }, 
+            { x: 44, y: 26 }, { x: 56, y: 26 },
+            { x: 38, y: 34 }, { x: 50, y: 34 }, { x: 62, y: 34 },
+            { x: 32, y: 43 }, { x: 41, y: 43 }, { x: 59, y: 43 }, { x: 68, y: 43 },
+            { x: 26, y: 52 }, { x: 34, y: 52 }, { x: 43, y: 52 }, { x: 57, y: 52 }, { x: 66, y: 52 }, { x: 74, y: 52 },
+            { x: 21, y: 62 }, { x: 29, y: 62 }, { x: 38, y: 62 }, { x: 50, y: 62 }, { x: 62, y: 62 }, { x: 71, y: 62 }, { x: 79, y: 62 },
+            { x: 16, y: 73 }, { x: 26, y: 73 }, { x: 38, y: 73 }, { x: 50, y: 73 }, { x: 62, y: 73 }, { x: 74, y: 73 }, { x: 84, y: 73 }
         ];
 
         const estilosEsferas = [
@@ -848,7 +859,7 @@
             const usar30 = totalConfigurado > 20;
             const mapaActivo = usar30 ? mapaCoordenadas30 : mapaCoordenadas20;
             const totalMostrarEnPino = usar30 ? Math.max(30, totalConfigurado) : 20;
-            const esferaSize = usar30 ? 18 : 22;
+            const esferaSize = usar30 ? 16 : 22; // Reducido ligeramente a 16px en el paquete de 30 para perfecta proporción
 
             let miEsferaIndex = -1;
             treeData.esferas.forEach((e, idx) => {
@@ -880,7 +891,6 @@
                         `;
                     } else {
                         const esMia = esfera.ocupadaPor === myDeviceId;
-                        // CORRECCIÓN: Si el árbol ya está desbloqueado por fecha o preview, NINGUNA esfera se bloquea para nadie
                         const bloqueadaParaMi = !isChristmasUnlocked && (miEsferaIndex !== -1 && !esMia);
 
                         if (bloqueadaParaMi) {
