@@ -499,7 +499,6 @@
                     actualizarDatosPaqueteVisual();
                     verificarEstadoPagadoYFecha();
                     manageAdsVisibility();
-                    renderSpheres();
                     renderNeonLights();
                     initSnow();
                     generarQRoculto();
@@ -651,7 +650,7 @@
                 startCountdown(targetUnlockDate);
             }
             renderNeonLights();
-            renderSpheres(); // Volver a renderizar esferas al cambiar estado de desbloqueo
+            renderSpheres(); // <- Se asegura de renderizar las esferas correctamente al validar el estado
         }
 
         function procesarPagoMercadoPago() {
@@ -874,14 +873,14 @@
                     const fechaRev = targetUnlockDate || new Date();
                     const esDiaIluminacion = isPreviewMode || ahora >= fechaRev;
 
-                    if (esDiaIluminacion && !nombreMostrazol && !tieneContenido) {
+                    if (esDiaIluminacion && !nombreMostrado && !tieneContenido) {
                         wrapper.className = "absolute flex flex-col items-center pointer-events-none";
                         wrapper.innerHTML = `
                             <div class="sphere-ornament ${claseColor} sphere-subtle-glow" style="width: ${esferaSize}px; height: ${esferaSize}px;"></div>
                         `;
                     } else {
                         const esMia = esfera.ocupadaPor === myDeviceId;
-                        // CORRECCIÓN: Solo se bloquea si el árbol NO está desbloqueado (isChristmasUnlocked es falso)
+                        // CORRECCIÓN: Si el árbol ya está desbloqueado por fecha o preview, NINGUNA esfera se bloquea para nadie
                         const bloqueadaParaMi = !isChristmasUnlocked && (miEsferaIndex !== -1 && !esMia);
 
                         if (bloqueadaParaMi) {
