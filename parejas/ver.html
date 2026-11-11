@@ -305,6 +305,7 @@
             document.getElementById('hintTextDisplay').innerText = `💡 Pista: "${proyectoGlobalData.pista || 'Ninguna'}"`;
         }
 
+        // REGLA DE VISUALIZACIÓN LIMPIA PARA EL DESTINATARIO FINAL
         function inicializarProyectoCompleto() {
             const data = proyectoGlobalData;
             document.getElementById('heart-game-section').classList.remove('hidden');
@@ -312,17 +313,25 @@
             document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
             
             const dateElement = document.getElementById('mainDate');
-            if (data.activarContador && data.fechaEspecialTimestamp) {
+            const counterSection = document.getElementById('loveCounterSection');
+
+            const tieneFecha = Boolean(data.fecha);
+            const tieneContadorActivo = Boolean(data.activarContador && data.fechaEspecialTimestamp);
+
+            if (tieneContadorActivo) {
+                // Caso B: Fecha + Contador encendido (oculta texto estático, muestra reloj en vivo)
                 dateElement.classList.add('hidden');
                 iniciarContadorTiempoReal(data.fechaEspecialTimestamp);
-                document.getElementById('loveCounterSection').classList.remove('hidden');
-            } else if (data.fecha) {
+                counterSection.classList.remove('hidden');
+            } else if (tieneFecha) {
+                // Caso A: Solo fecha (muestra texto elegante, oculta reloj)
                 dateElement.innerText = data.fecha;
                 dateElement.classList.remove('hidden');
-                document.getElementById('loveCounterSection').classList.add('hidden');
+                counterSection.classList.add('hidden');
             } else {
+                // Caso C: Ambos vacíos (oculta ambos por completo)
                 dateElement.classList.add('hidden');
-                document.getElementById('loveCounterSection').classList.add('hidden');
+                counterSection.classList.add('hidden');
             }
 
             document.getElementById('cardMessage').innerText = data.mensaje || '';
@@ -450,7 +459,6 @@
                 if (heartClicks === 10) {
                     if (typeof confetti === 'function') confetti();
 
-                    // Si no está pagado, calculamos los días restantes para mostrar el menú oculto de expiración
                     if (proyectoGlobalData && proyectoGlobalData.pagado !== true) {
                         const createdAt = proyectoGlobalData.createdAtMs || (proyectoGlobalData.creado ? proyectoGlobalData.creado.toMillis() : Date.now());
                         const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
