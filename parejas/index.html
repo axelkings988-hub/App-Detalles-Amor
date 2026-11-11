@@ -1,5 +1,3 @@
-Archivo index.
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -170,9 +168,11 @@ Archivo index.
                 <input type="text" id="nombresInput" placeholder="Ej. Ana y Francisco" required class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
             </div>
 
+            <!-- GESTIÓN UNIFICADA DE FECHA Y CONTADOR -->
             <div class="space-y-3 bg-burgundy-950/50 p-4 rounded-2xl border border-rose-500/20">
-                <label class="text-xs font-semibold text-rose-200 block">2. FECHA ESPECIAL:</label>
-                <input type="text" id="fechaInput" placeholder="Ej. 14 de Febrero de 2024 (Texto visible)" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                <label class="text-xs font-semibold text-rose-200 block">2. FECHA ESPECIAL (DD/MM/AAAA):</label>
+                <input type="text" id="fechaInput" placeholder="Ej. 06/09/2017" maxlength="10" class="w-full px-4 py-2.5 rounded-xl bg-burgundy-950/80 border border-rose-500/30 text-xs text-rose-100 placeholder-rose-400/50 focus:outline-none focus:border-rose-500">
+                <p class="text-[10px] text-rose-300/70 italic">Se mostrará automáticamente elegante (Ej. 6 de septiembre del 2017).</p>
                 
                 <div class="pt-2 flex items-center justify-between border-t border-rose-500/10">
                     <span class="text-xs text-rose-200">¿Activar contador de tiempo en vivo?</span>
@@ -180,8 +180,8 @@ Archivo index.
                 </div>
 
                 <div id="fechaEspecificaContainer" class="hidden space-y-1 pt-1">
-                    <label class="text-[11px] font-semibold text-rose-300">Selecciona la fecha y hora exactas:</label>
-                    <input type="datetime-local" id="fechaEspecialTimestampInput" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 focus:outline-none focus:border-rose-500">
+                    <label class="text-[11px] font-semibold text-rose-300">Hora exacta (Formato 24 hrs):</label>
+                    <input type="time" id="horaEspecialInput" value="00:00" class="w-full px-3 py-2 rounded-xl bg-burgundy-950 border border-rose-500/30 text-xs text-rose-100 focus:outline-none focus:border-rose-500">
                 </div>
             </div>
 
@@ -494,6 +494,27 @@ Archivo index.
         let proyectoActualId = null;
         let proyectoDatosCache = null;
 
+        // Función de utilidad para formatear fecha numérica (DD/MM/AAAA) a texto elegante (DD de MM del AAAA)
+        function formatearFechaElegante(fechaStr) {
+            if (!fechaStr) return "";
+            const partes = fechaStr.trim().split('/');
+            if (partes.length !== 3) return fechaStr; // Si no cumple el formato, devuelve el texto original
+
+            const dia = parseInt(partes[0], 10);
+            const mesNum = parseInt(partes[1], 10);
+            const anio = partes[2];
+
+            const meses = [
+                "enero", "febrero", "marzo", "abril", "mayo", "junio",
+                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+            ];
+
+            if (mesNum < 1 || mesNum > 12) return fechaStr;
+            const nombreMes = meses[mesNum - 1];
+
+            return `${dia} de ${nombreMes} del ${anio}`;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
 
@@ -661,6 +682,7 @@ Archivo index.
             document.getElementById('audioPreviewContainer').classList.add('hidden');
             document.getElementById('activarContadorCheck').checked = false;
             document.getElementById('fechaEspecificaContainer').classList.add('hidden');
+            document.getElementById('horaEspecialInput').value = "00:00";
         }
 
         async function editarDatosProyecto() {
@@ -688,12 +710,13 @@ Archivo index.
                     if (proyectoDatosCache.activarContador) {
                         document.getElementById('activarContadorCheck').checked = true;
                         document.getElementById('fechaEspecificaContainer').classList.remove('hidden');
-                        if (proyectoDatosCache.fechaEspecialTimestamp) {
-                            document.getElementById('fechaEspecialTimestampInput').value = proyectoDatosCache.fechaEspecialTimestamp;
+                        if (proyectoDatosCache.horaEspecial) {
+                            document.getElementById('horaEspecialInput').value = proyectoDatosCache.horaEspecial;
                         }
                     } else {
                         document.getElementById('activarContadorCheck').checked = false;
                         document.getElementById('fechaEspecificaContainer').classList.add('hidden');
+                        document.getElementById('horaEspecialInput').value = "00:00";
                     }
 
                     if (proyectoDatosCache.voiceNoteBase64) {
@@ -758,7 +781,7 @@ Archivo index.
                             if (width > height) {
                                 if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
                             } else {
-                                if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+                                if (height > MAX_HEIGHT) { width = Math.round((height * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
                             }
                             canvas.width = width; canvas.height = height;
                             const ctx = canvas.getContext('2d');
@@ -895,9 +918,12 @@ Archivo index.
 
                 const nombreProj = document.getElementById('nombreProyectoInput').value.trim() || "Mi Detalle";
                 const nombres = document.getElementById('nombresInput').value.trim();
-                const fecha = document.getElementById('fechaInput').value.trim();
+                const fechaInputVal = document.getElementById('fechaInput').value.trim();
                 const mensaje = document.getElementById('mensajeInput').value.trim();
                 
+                // Formateo automático de la fecha a texto elegante
+                const fechaElegante = formatearFechaElegante(fechaInputVal);
+
                 const protegerSeleccionado = document.querySelector('input[name="protegerOpcion"]:checked').value === 'si';
                 const passwordVal = protegerSeleccionado ? document.getElementById('detallePassword').value.trim() : null;
                 const pistaVal = protegerSeleccionado ? document.getElementById('detallePista').value.trim() : null;
@@ -910,18 +936,29 @@ Archivo index.
                 }
 
                 const activarContador = document.getElementById('activarContadorCheck').checked;
-                const fechaEspecialTimestamp = activarContador ? document.getElementById('fechaEspecialTimestampInput').value : "";
+                const horaEspecialVal = document.getElementById('horaEspecialInput').value || "00:00";
+                
+                let fechaEspecialTimestamp = "";
+                if (activarContador && fechaInputVal) {
+                    const partesFecha = fechaInputVal.split('/');
+                    if (partesFecha.length === 3) {
+                        const [dia, mes, anio] = partesFecha;
+                        fechaEspecialTimestamp = `${anio}-${mes}-${dia}T${horaEspecialVal}:00`;
+                    }
+                }
 
                 let docRef;
                 const datosAEnviar = {
                     nombreProyecto: nombreProj,
                     nombres: nombres,
-                    fecha: fecha,
+                    fechaInputRaw: fechaInputVal,
+                    fecha: fechaElegante,
                     mensaje: mensaje,
                     privado: protegerSeleccionado,
                     password: passwordVal,
                     pista: pistaVal,
                     activarContador: activarContador,
+                    horaEspecial: horaEspecialVal,
                     fechaEspecialTimestamp: fechaEspecialTimestamp,
                     voiceNoteBase64: recordedAudioBase64 || (proyectoDatosCache ? proyectoDatosCache.voiceNoteBase64 : null),
                     pagado: proyectoDatosCache ? (proyectoDatosCache.pagado || false) : false,
@@ -936,7 +973,6 @@ Archivo index.
                 } else {
                     docRef = await db.collection("detalles").add(datosAEnviar);
                     proyectoActualId = docRef.id;
-                    // Registramos la prueba activa en este dispositivo para control antifraude
                     localStorage.setItem("proyectoPruebaActivoId", proyectoActualId);
                 }
 
@@ -984,7 +1020,6 @@ Archivo index.
             } catch(e) {}
         }
 
-        // PANEL DE GESTIÓN CON ACTIVACIÓN MANUAL DE PRUEBA
         function mostrarPanelGestion(data) {
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('formContainer').classList.add('hidden');
@@ -998,7 +1033,6 @@ Archivo index.
             const estaActivado = data.activacionPruebaManual === true || data.pagado === true;
 
             if (data.pagado === true) {
-                // Ya pagado / permanente
                 activateTrialSection.classList.add('hidden');
                 paySection.classList.add('hidden');
                 resultBox.classList.remove('hidden');
@@ -1008,7 +1042,6 @@ Archivo index.
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), { text: finalLink, width: 95, height: 95 });
             } else if (estaActivado) {
-                // Prueba de 7 días ya activada manualmente
                 activateTrialSection.classList.add('hidden');
                 paySection.classList.remove('hidden');
                 resultBox.classList.remove('hidden');
@@ -1018,14 +1051,12 @@ Archivo index.
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById("qrcode"), { text: finalLink, width: 95, height: 95 });
             } else {
-                // Aún no activa la prueba gratuita (muestra el botón amigable)
                 activateTrialSection.classList.remove('hidden');
                 resultBox.classList.add('hidden');
                 paySection.classList.add('hidden');
             }
         }
 
-        // ACCIÓN DEL BOTÓN [ 🚀 ACTIVAR CÓDIGO QR GRATIS ]
         async function activarPruebaGratuita() {
             if (!proyectoActualId) return;
 
@@ -1046,7 +1077,6 @@ Archivo index.
             }
         }
 
-        // VALIDACIÓN DE CONTRASEÑA EN VISTA PREVIA
         function abrirVistaPreviaPantallaCompleta() {
             if (!proyectoDatosCache) return;
 
@@ -1056,7 +1086,6 @@ Archivo index.
             document.getElementById('panelContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.remove('hidden');
 
-            // Comprobar si tiene contraseña
             if (proyectoDatosCache.privado && proyectoDatosCache.password) {
                 document.getElementById('pv-passwordScreen').classList.remove('hidden');
                 document.getElementById('pv-accessPasswordInput').value = '';
@@ -1087,17 +1116,27 @@ Archivo index.
             document.getElementById('pv-mainTitle').innerText = `Nuestra Historia: ${proyectoDatosCache.nombres}`;
             
             const dateEl = document.getElementById('pv-mainDate');
-            if (proyectoDatosCache.activarContador && proyectoDatosCache.fechaEspecialTimestamp) {
+            const counterSec = document.getElementById('pv-loveCounterSection');
+
+            const tieneFecha = Boolean(proyectoDatosCache.fecha);
+            const tieneContador = Boolean(proyectoDatosCache.activarContador && proyectoDatosCache.fechaEspecialTimestamp);
+
+            // Reglas de visualización limpia (Casos A, B y C)
+            if (!tieneFecha && !tieneContador) {
+                // Caso C: Vacío total
                 dateEl.classList.add('hidden');
-                iniciarContadorTiempoRealPv(proyectoDatosCache.fechaEspecialTimestamp);
-                document.getElementById('pv-loveCounterSection').classList.remove('hidden');
-            } else if (proyectoDatosCache.fecha) {
+                counterSec.classList.add('hidden');
+            } else if (tieneFecha && !tieneContador) {
+                // Caso A: Solo fecha estática elegante
                 dateEl.innerText = proyectoDatosCache.fecha;
                 dateEl.classList.remove('hidden');
-                document.getElementById('pv-loveCounterSection').classList.add('hidden');
-            } else {
-                dateEl.classList.add('hidden');
-                document.getElementById('pv-loveCounterSection').classList.add('hidden');
+                counterSec.classList.add('hidden');
+            } else if (tieneContador) {
+                // Caso B: Fecha elegante + Contador dinámico en vivo
+                dateEl.innerText = proyectoDatosCache.fecha;
+                dateEl.classList.remove('hidden');
+                iniciarContadorTiempoRealPv(proyectoDatosCache.fechaEspecialTimestamp);
+                counterSec.classList.remove('hidden');
             }
 
             document.getElementById('pv-cardMessage').innerText = proyectoDatosCache.mensaje;
