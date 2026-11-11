@@ -312,17 +312,27 @@
             document.getElementById('mainTitle').innerText = `Nuestra Historia: ${data.nombres || ''}`;
             
             const dateElement = document.getElementById('mainDate');
-            if (data.activarContador && data.fechaEspecialTimestamp) {
+            const counterSection = document.getElementById('loveCounterSection');
+
+            const tieneFecha = Boolean(data.fecha);
+            const tieneContador = Boolean(data.activarContador && data.fechaEspecialTimestamp);
+
+            // Reglas de visualización limpia (Casos A, B y C)
+            if (!tieneFecha && !tieneContador) {
+                // Caso C: Vacío total
                 dateElement.classList.add('hidden');
-                iniciarContadorTiempoReal(data.fechaEspecialTimestamp);
-                document.getElementById('loveCounterSection').classList.remove('hidden');
-            } else if (data.fecha) {
+                counterSection.classList.add('hidden');
+            } else if (tieneFecha && !tieneContador) {
+                // Caso A: Solo fecha estática elegante
                 dateElement.innerText = data.fecha;
                 dateElement.classList.remove('hidden');
-                document.getElementById('loveCounterSection').classList.add('hidden');
-            } else {
-                dateElement.classList.add('hidden');
-                document.getElementById('loveCounterSection').classList.add('hidden');
+                counterSection.classList.add('hidden');
+            } else if (tieneContador) {
+                // Caso B: Fecha elegante + Contador dinámico en vivo
+                dateElement.innerText = data.fecha;
+                dateElement.classList.remove('hidden');
+                iniciarContadorTiempoReal(data.fechaEspecialTimestamp);
+                counterSection.classList.remove('hidden');
             }
 
             document.getElementById('cardMessage').innerText = data.mensaje || '';
@@ -450,7 +460,6 @@
                 if (heartClicks === 10) {
                     if (typeof confetti === 'function') confetti();
 
-                    // Si no está pagado, calculamos los días restantes para mostrar el menú oculto de expiración
                     if (proyectoGlobalData && proyectoGlobalData.pagado !== true) {
                         const createdAt = proyectoGlobalData.createdAtMs || (proyectoGlobalData.creado ? proyectoGlobalData.creado.toMillis() : Date.now());
                         const diasTranscurridos = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
