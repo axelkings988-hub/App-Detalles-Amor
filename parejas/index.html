@@ -400,6 +400,19 @@
                     </div>
                 </section>
 
+                <!-- 1. RASCA Y GANA SECRETO (DEBAJO DEL CARRUSEL) -->
+                <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
+                    <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
+                        <i class="fas fa-ticket-alt text-gold-400"></i> Rasca y Gana Sorpresa
+                    </h3>
+                    <p class="text-xs text-rose-300/80">Desliza el dedo o el cursor sobre la tarjeta para descubrir tu premio:</p>
+                    
+                    <div class="relative w-full max-w-[280px] h-32 mx-auto rounded-2xl overflow-hidden shadow-inner border border-rose-500/30 bg-burgundy-950 flex items-center justify-center p-4">
+                        <div id="premioOculto" class="text-xs font-bold text-gold-400 text-center px-2"></div>
+                        <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full cursor-pointer touch-none"></canvas>
+                    </div>
+                </section>
+
                 <!-- CARTA DE AMOR -->
                 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 space-y-2">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center gap-2"><i class="fas fa-envelope-open-text text-rose-400"></i> Mensaje Especial</h3>
@@ -420,10 +433,110 @@
                     </div>
                 </section>
 
-                <!-- NOTA DE VOZ -->
-                <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-2">
+                <!-- NOTA DE VOZ (DISEÑO BARRAS HORIZONTALES) -->
+                <section id="pv-voiceSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 text-center space-y-3">
                     <h3 class="text-xs font-bold text-rose-200 flex items-center justify-center gap-2"><i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz</h3>
-                    <audio id="pv-voicePlayer" controls class="w-full h-8 mt-1 accent-rose-500"></audio>
+                    
+                    <!-- Reproductor horizontal estilizado -->
+                    <div class="bg-burgundy-950/80 p-3 rounded-2xl border border-rose-500/20 flex items-center gap-3">
+                        <button onclick="toggleAudioPreview()" id="playAudioBtn" class="w-10 h-10 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-center shadow flex-shrink-0 active:scale-95 transition-transform">
+                            <i id="audioPlayIcon" class="fas fa-play text-xs ml-0.5"></i>
+                        </button>
+                        <div class="flex-1 space-y-1">
+                            <div class="flex justify-between text-[10px] text-rose-300 font-mono">
+                                <span id="audioCurrentTime">00:00</span>
+                                <span id="audioDuration">00:10</span>
+                            </div>
+                            <!-- Barras de onda simuladas en horizontal -->
+                            <div class="flex items-center gap-1 h-5 w-full cursor-pointer" onclick="seekAudio(event)">
+                                <div class="h-3 w-1 bg-rose-500 rounded-full animate-pulse"></div>
+                                <div class="h-5 w-1 bg-rose-400 rounded-full"></div>
+                                <div class="h-2 w-1 bg-rose-600 rounded-full"></div>
+                                <div class="h-4 w-1 bg-rose-500 rounded-full"></div>
+                                <div class="h-5 w-1 bg-gold-400 rounded-full"></div>
+                                <div class="h-3 w-1 bg-rose-400 rounded-full"></div>
+                                <div class="h-4 w-1 bg-rose-500 rounded-full"></div>
+                                <div class="h-2 w-1 bg-rose-600 rounded-full"></div>
+                                <div class="h-5 w-1 bg-rose-400 rounded-full"></div>
+                                <div class="h-3 w-1 bg-rose-500 rounded-full"></div>
+                                <div class="h-4 w-1 bg-gold-400 rounded-full"></div>
+                                <div class="h-2 w-1 bg-rose-600 rounded-full"></div>
+                                <div class="h-5 w-1 bg-rose-400 rounded-full"></div>
+                                <div class="h-3 w-1 bg-rose-500 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <audio id="pv-voicePlayer" class="hidden"></audio>
+                </section>
+
+                <!-- 2. CERTIFICADO OFICIAL DEL AMOR (DEBAJO DEL AUDIO) -->
+                <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-6 shadow-2xl space-y-4 text-center relative overflow-hidden">
+                    <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
+                        <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
+                    </h3>
+
+                    <!-- CONTENEDOR DEL CERTIFICADO CLÁSICO PERGAMINO -->
+                    <div class="relative bg-[#FDFBF7] text-[#3B0A11] p-6 rounded-3xl shadow-2xl border-4 border-[#D4AF37] max-w-sm mx-auto space-y-4 overflow-hidden text-center font-sans">
+                        
+                        <!-- MARCA DE AGUA CONDICIONAL -->
+                        <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 rotate-[-25deg] z-10">
+                            <span class="text-2xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
+                        </div>
+
+                        <!-- CINTILLO ROJO SUPERIOR -->
+                        <div class="bg-gradient-to-r from-[#831843] via-[#BE185D] to-[#831843] text-white py-2 px-4 rounded-xl shadow-md text-center transform -rotate-1">
+                            <p class="text-[9px] tracking-widest uppercase font-semibold text-rose-200">Reconocimiento Oficial</p>
+                            <h4 class="text-xs font-bold tracking-wide">CERTIFICADO DE AMOR Y CONSTANCIA</h4>
+                        </div>
+
+                        <!-- LOGO O MARCA -->
+                        <div class="space-y-0.5">
+                            <span class="text-sm font-bold tracking-widest text-rose-900 font-cursive">Dilo D' QRazón</span>
+                            <p class="text-[10px] text-gray-500 uppercase">Certifica que la hermosa historia de:</p>
+                        </div>
+
+                        <!-- NOMBRES DE LA PAREJA -->
+                        <div class="py-1">
+                            <h2 class="text-xl font-cursive font-bold text-[#831843]" id="certNombresPreview"></h2>
+                            <p class="text-[10px] text-gray-600 italic">Han superado con éxito el tiempo compartidos</p>
+                        </div>
+
+                        <!-- FECHA Y CONTADORES MINIATURA -->
+                        <div class="bg-[#F3E8E8]/50 p-3 rounded-2xl border border-rose-900/10 space-y-2">
+                            <p class="text-[10px] font-semibold text-gray-600 uppercase">Desde el <span id="certFechaPreview" class="text-rose-900 font-bold"></span></p>
+                            
+                            <div class="grid grid-cols-6 gap-1 text-center">
+                                <div class="bg-white p-1 rounded border border-rose-900/25"><span class="text-[11px] font-bold text-rose-900 block" id="certAnos">0</span><span class="text-[6px] text-gray-500">AÑOS</span></div>
+                                <div class="bg-white p-1 rounded border border-rose-900/25"><span class="text-[11px] font-bold text-rose-900 block" id="certMeses">0</span><span class="text-[6px] text-gray-500">MESES</span></div>
+                                <div class="bg-white p-1 rounded border border-rose-900/25"><span class="text-[11px] font-bold text-rose-900 block" id="certDias">0</span><span class="text-[6px] text-gray-500">DÍAS</span></div>
+                                <div class="bg-white p-1 rounded border border-rose-900/25"><span class="text-[11px] font-bold text-rose-900 block" id="certHoras">0</span><span class="text-[6px] text-gray-500">HRS</span></div>
+                                <div class="bg-white p-1 rounded border border-rose-900/25"><span class="text-[11px] font-bold text-rose-900 block" id="certMinutos">0</span><span class="text-[6px] text-gray-500">MIN</span></div>
+                                <div class="bg-white p-1 rounded border border-rose-900/25"><span class="text-[11px] font-bold text-rose-900 block" id="certSegundos">0</span><span class="text-[6px] text-gray-500">SEG</span></div>
+                            </div>
+                        </div>
+
+                        <!-- SELLO DORADO Y CÓDIGO QR INFERIOR -->
+                        <div class="flex items-center justify-between pt-2 border-t border-gold-500/30">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 p-0.5 shadow flex items-center justify-center">
+                                <div class="w-full h-full rounded-full border-2 border-dashed border-yellow-100 flex flex-col items-center justify-center text-center p-1">
+                                    <i class="fas fa-heart text-white text-[8px] drop-shadow"></i>
+                                    <span class="text-[5px] font-bold text-yellow-950 uppercase">Sello</span>
+                                </div>
+                            </div>
+
+                            <div class="text-right space-y-0.5">
+                                <p class="text-[8px] font-mono font-bold text-gray-500">FOLIO: DDQR-004892</p>
+                                <div class="bg-gray-900 text-white p-1 rounded inline-block text-[7px]">QR Oficial</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTÓN DE DESCARGA CONDICIONAL -->
+                    <div class="pt-2">
+                        <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                            <i class="fas fa-download"></i> Descargar Certificado en PDF / Alta Calidad
+                        </button>
+                    </div>
                 </section>
 
                 <!-- CONTADOR DE TIEMPO ESTÉTICO -->
@@ -485,6 +598,31 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CÓDIGO_ESPECIAL_MAESTRO = "REAF940906SW8";
+        
+        // Banco de 20 premios para el Rasca y Gana
+        const bancoPremiosRasca = [
+            "Un masaje relajante de 15 minutos sin pretextos 💆‍♂️",
+            "Una cena de antojitos pagada por tu tóxico/a favorito/a 🌮",
+            "Un vale por un abrazo apretado de 5 minutos seguidos 🤗",
+            "El poder absoluto de elegir la película o serie de hoy 🎬",
+            "Un postre sorpresa entregado en la puerta de tu casa 🍰",
+            "Una sesión de besos infinitos sin mirar el reloj 💋",
+            "Un desayuno preparado en la cama con mucho amor ☕",
+            "Un 'Sí' incondicional a cualquier capricho durante 24 horas ✨",
+            "Una noche de spa y mascarillas juntos en casa 🧖‍♀️",
+            "Un cumplido sincero cada hora durante todo un día 🗣️",
+            "Una escapada sorpresa a cenar helado a medianoche 🍦",
+            "El control total de la música en el próximo viaje en auto 🎶",
+            "Una carta escrita a mano con las 10 cosas que más amo de ti 💌",
+            "Un día libre de lavar trastes o hacer los deberes pesados 🧽",
+            "Una sesión de cosquillas y risas hasta que duelan las mejillas 😂",
+            "Un vale por un 'Perdón' automático en nuestra próxima discusión 🏳️",
+            "Una tarde de videojuegos o maratón de tu hobby favorito 🎮",
+            "Un apretón de manos secreto y un café pagado hoy ☕",
+            "Una serenata improvisada con la peor voz del mundo 🎤",
+            "Un 'Te amo' escrito en un post-it escondido en tu chamarra ❤️"
+        ];
+
         let mediaRecorder = null;
         let audioChunks = [];
         let recordedAudioBase64 = null;
@@ -494,11 +632,10 @@
         let proyectoActualId = null;
         let proyectoDatosCache = null;
 
-        // Función de utilidad para formatear fecha numérica (DD/MM/AAAA) a texto elegante (DD de MM del AAAA)
         function formatearFechaElegante(fechaStr) {
             if (!fechaStr) return "";
             const partes = fechaStr.trim().split('/');
-            if (partes.length !== 3) return fechaStr; // Si no cumple el formato, devuelve el texto original
+            if (partes.length !== 3) return fechaStr;
 
             const dia = parseInt(partes[0], 10);
             const mesNum = parseInt(partes[1], 10);
@@ -510,9 +647,7 @@
             ];
 
             if (mesNum < 1 || mesNum > 12) return fechaStr;
-            const nombreMes = meses[mesNum - 1];
-
-            return `${dia} de ${nombreMes} del ${anio}`;
+            return `${dia} de ${meses[mesNum - 1]} del ${anio}`;
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -655,7 +790,6 @@
         }
 
         async function mostrarFormularioCreacion() {
-            // Control Antifraude: 1 sola prueba activa por dispositivo/IP
             const pruebaActivaId = localStorage.getItem("proyectoPruebaActivoId");
             if (pruebaActivaId && pruebaActivaId !== proyectoActualId) {
                 try {
@@ -694,7 +828,7 @@
                     proyectoDatosCache = docSnap.data();
                     document.getElementById('nombreProyectoInput').value = proyectoDatosCache.nombreProyecto || '';
                     document.getElementById('nombresInput').value = proyectoDatosCache.nombres || '';
-                    document.getElementById('fechaInput').value = proyectoDatosCache.fecha || '';
+                    document.getElementById('fechaInput').value = proyectoDatosCache.fechaInputRaw || proyectoDatosCache.fecha || '';
                     document.getElementById('mensajeInput').value = proyectoDatosCache.mensaje || '';
                     
                     if (proyectoDatosCache.privado && proyectoDatosCache.password) {
@@ -921,8 +1055,14 @@
                 const fechaInputVal = document.getElementById('fechaInput').value.trim();
                 const mensaje = document.getElementById('mensajeInput').value.trim();
                 
-                // Formateo automático de la fecha a texto elegante
                 const fechaElegante = formatearFechaElegante(fechaInputVal);
+
+                // Asignar o mantener el premio Rasca y Gana aleatorio fijo por proyecto
+                let premioRascaAsignado = proyectoDatosCache?.premioRasca;
+                if (!premioRascaAsignado) {
+                    const indiceAleatorio = Math.floor(Math.random() * bancoPremiosRasca.length);
+                    premioRascaAsignado = bancoPremiosRasca[indiceAleatorio];
+                }
 
                 const protegerSeleccionado = document.querySelector('input[name="protegerOpcion"]:checked').value === 'si';
                 const passwordVal = protegerSeleccionado ? document.getElementById('detallePassword').value.trim() : null;
@@ -954,6 +1094,7 @@
                     fechaInputRaw: fechaInputVal,
                     fecha: fechaElegante,
                     mensaje: mensaje,
+                    premioRasca: premioRascaAsignado,
                     privado: protegerSeleccionado,
                     password: passwordVal,
                     pista: pistaVal,
@@ -1121,18 +1262,14 @@
             const tieneFecha = Boolean(proyectoDatosCache.fecha);
             const tieneContador = Boolean(proyectoDatosCache.activarContador && proyectoDatosCache.fechaEspecialTimestamp);
 
-            // Reglas de visualización limpia (Casos A, B y C)
             if (!tieneFecha && !tieneContador) {
-                // Caso C: Vacío total
                 dateEl.classList.add('hidden');
                 counterSec.classList.add('hidden');
             } else if (tieneFecha && !tieneContador) {
-                // Caso A: Solo fecha estática elegante
                 dateEl.innerText = proyectoDatosCache.fecha;
                 dateEl.classList.remove('hidden');
                 counterSec.classList.add('hidden');
             } else if (tieneContador) {
-                // Caso B: Fecha elegante + Contador dinámico en vivo
                 dateEl.innerText = proyectoDatosCache.fecha;
                 dateEl.classList.remove('hidden');
                 iniciarContadorTiempoRealPv(proyectoDatosCache.fechaEspecialTimestamp);
@@ -1143,8 +1280,18 @@
             pvPhotosArray = proyectoDatosCache.fotos || [];
             buildPvCarousel();
 
+            // Inicializar Rasca y Gana
+            inicializarRascaGana(proyectoDatosCache.premioRasca || "Un gran abrazo sorpresa");
+
+            // Configurar Certificado y Estado de Pago en Vista Previa
+            const esPagado = proyectoDatosCache.pagado === true;
+            document.getElementById('marcaAguaPrueba').style.display = esPagado ? 'none' : 'flex';
+            document.getElementById('certNombresPreview').innerText = proyectoDatosCache.nombres || 'Francisco & Ana';
+            document.getElementById('certFechaPreview').innerText = proyectoDatosCache.fecha || '06 de septiembre del 2017';
+
             if (proyectoDatosCache.voiceNoteBase64) {
-                document.getElementById('pv-voicePlayer').src = proyectoDatosCache.voiceNoteBase64;
+                const voicePlayer = document.getElementById('pv-voicePlayer');
+                voicePlayer.src = proyectoDatosCache.voiceNoteBase64;
                 document.getElementById('pv-voiceSection').classList.remove('hidden');
             } else {
                 document.getElementById('pv-voiceSection').classList.add('hidden');
@@ -1157,6 +1304,68 @@
 
             document.getElementById('pv-heart-section').classList.remove('hidden');
             document.getElementById('pv-mainContent').classList.add('hidden');
+        }
+
+        // Lógica del Rasca y Gana
+        function inicializarRascaGana(premioTexto) {
+            document.getElementById('premioOculto').innerText = premioTexto;
+            
+            const canvas = document.getElementById('scratchCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth || 280;
+            canvas.height = canvas.offsetHeight || 128;
+
+            ctx.fillStyle = '#831843';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#FCE7F3';
+            ctx.textAlign = 'center';
+            ctx.fillText("✨ ¡Raspa aquí para descubrir! ✨", canvas.width / 2, canvas.height / 2 + 4);
+
+            let isDrawing = false;
+
+            function raspar(e) {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 22, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+
+            canvas.onmousedown = () => isDrawing = true;
+            canvas.onmousemove = raspar;
+            window.onmouseup = () => isDrawing = false;
+
+            canvas.ontouchstart = () => isDrawing = true;
+            canvas.ontouchmove = raspar;
+            window.ontouchend = () => isDrawing = false;
+        }
+
+        // Reproductor de Audio Horizontal
+        function toggleAudioPreview() {
+            const player = document.getElementById('pv-voicePlayer');
+            const icon = document.getElementById('audioPlayIcon');
+            if (player.paused) {
+                player.play();
+                icon.className = 'fas fa-pause text-xs';
+            } else {
+                player.pause();
+                icon.className = 'fas fa-play text-xs ml-0.5';
+            }
+        }
+
+        function intentarDescargarCertificado() {
+            const esPagado = proyectoDatosCache?.pagado === true;
+            if (!esPagado) {
+                alert("🔒 Para obtener el certificado limpio, en alta resolución y sin marca de agua, pídele a tu pareja que active el acceso permanente por $25 MXN.");
+                return;
+            }
+            window.print();
         }
 
         let pvClicks = 0;
@@ -1212,6 +1421,7 @@
                 }
                 if (meses < 0) { anos--; meses += 12; }
 
+                // Actualizar contadores principales
                 document.getElementById('pv-boxAnos').style.display = anos > 0 ? 'flex' : 'none';
                 document.getElementById('pv-boxMeses').style.display = meses > 0 ? 'flex' : 'none';
                 document.getElementById('pv-boxDias').style.display = dias > 0 ? 'flex' : 'none';
@@ -1223,6 +1433,14 @@
                 document.getElementById('pv-counterHours').innerText = horas;
                 document.getElementById('pv-counterMinutes').innerText = minutos;
                 document.getElementById('pv-counterSeconds').innerText = segundos;
+
+                // Sincronizar contadores miniatura del certificado
+                document.getElementById('certAnos').innerText = anos;
+                document.getElementById('certMeses').innerText = meses;
+                document.getElementById('certDias').innerText = dias;
+                document.getElementById('certHoras').innerText = horas;
+                document.getElementById('certMinutos').innerText = minutos;
+                document.getElementById('certSegundos').innerText = segundos;
             }
             actualizar();
             pvCountdownInterval = setInterval(actualizar, 1000);
