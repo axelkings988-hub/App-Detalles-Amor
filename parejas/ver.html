@@ -115,7 +115,7 @@
             </div>
             <div class="flex items-center space-x-2">
                 <i class="fas fa-volume-up text-xs text-rose-300"></i>
-                <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustVolume(this.value)" class="w-16 h-1 accent-rose-500 bg-rose-950 rounded-lg cursor-pointer">
+                <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="0.8" oninput="adjustVolume(this.value)" class="w-16 h-1 accent-rose-500 bg-burgundy-950 rounded-lg cursor-pointer">
             </div>
         </div>
     </div>
@@ -130,16 +130,17 @@
             <h1 class="text-3xl font-bold font-cursive text-rose-100 mb-2">Desbloquea Mi Sorpresa</h1>
             <p class="text-xs text-rose-300/80 mb-6">Toca el corazón para llenarlo de amor...</p>
 
-            <div id="heartContainer" onclick="handleHeartClick()" class="relative w-36 h-36 mx-auto mb-6 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
-                <svg class="absolute inset-0 w-full h-full text-burgundy-950 fill-current drop-shadow-lg" viewBox="0 0 24 24">
+            <!-- CONTENEDOR CORREGIDO PARA CAPTAR CLICS CORRECTAMENTE -->
+            <div id="heartClickArea" onclick="handleHeartClick()" class="relative w-36 h-36 mx-auto mb-6 cursor-pointer select-none transition-transform duration-150 flex items-center justify-center">
+                <svg class="absolute inset-0 w-full h-full text-burgundy-950 fill-current drop-shadow-lg pointer-events-none" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
-                <div id="heartFill" class="absolute bottom-0 left-0 w-full overflow-hidden" style="height: 0%;">
+                <div id="heartFill" class="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none" style="height: 0%;">
                     <svg class="w-36 h-36 text-rose-500 fill-current absolute bottom-0 left-0 drop-shadow-[0_0_15px_rgba(236,72,153,0.8)]" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                 </div>
-                <span id="clickCounter" class="relative z-10 text-xl font-bold text-white drop-shadow-md">0 / 10</span>
+                <span id="clickCounter" class="relative z-10 text-xl font-bold text-white drop-shadow-md pointer-events-none">0 / 10</span>
             </div>
             <p id="tapHint" class="text-xs text-rose-300 italic font-medium animate-pulse">¡Haz clic o toca aquí!</p>
             
@@ -211,7 +212,7 @@
             </div>
         </section>
 
-        <!-- MENSAJE DE VOZ (DISEÑO BARRAS HORIZONTALES) -->
+        <!-- MENSAJE DE VOZ -->
         <section id="voiceNoteSection" class="hidden bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-3 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-microphone-alt text-rose-400"></i> Tu Mensaje de Voz
@@ -255,30 +256,25 @@
 
             <div id="printableCertificate" class="relative bg-[#FDFBF7] text-[#3B0A11] p-6 rounded-3xl shadow-2xl border-4 border-[#D4AF37] max-w-sm mx-auto space-y-4 overflow-hidden text-center font-sans">
                 
-                <!-- MARCA DE AGUA CONDICIONAL -->
                 <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 rotate-[-25deg] z-10">
                     <span class="text-2xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
                 </div>
 
-                <!-- CINTILLO ROJO SUPERIOR -->
                 <div class="bg-gradient-to-r from-[#831843] via-[#BE185D] to-[#831843] text-white py-2 px-4 rounded-xl shadow-md text-center transform -rotate-1">
                     <p class="text-[9px] tracking-widest uppercase font-semibold text-rose-200">Reconocimiento Oficial</p>
                     <h4 class="text-xs font-bold tracking-wide">CERTIFICADO DE AMOR Y CONSTANCIA</h4>
                 </div>
 
-                <!-- LOGO O MARCA -->
                 <div class="space-y-0.5">
                     <span class="text-sm font-bold tracking-widest text-rose-900 font-cursive">Dilo D' QRazón</span>
                     <p class="text-[10px] text-gray-500 uppercase">Certifica que la hermosa historia de:</p>
                 </div>
 
-                <!-- NOMBRES DE LA PAREJA -->
                 <div class="py-1">
                     <h2 class="text-xl font-cursive font-bold text-[#831843]" id="certNombresPreview"></h2>
                     <p class="text-[10px] text-gray-600 italic">Han superado con éxito el tiempo compartidos</p>
                 </div>
 
-                <!-- FECHA Y CONTADORES MINIATURA -->
                 <div class="bg-[#F3E8E8]/50 p-3 rounded-2xl border border-rose-900/10 space-y-2">
                     <p class="text-[10px] font-semibold text-gray-600 uppercase">Desde el <span id="certFechaPreview" class="text-rose-900 font-bold"></span></p>
                     
@@ -292,7 +288,6 @@
                     </div>
                 </div>
 
-                <!-- SELLO DORADO Y CÓDIGO QR INFERIOR -->
                 <div class="flex items-center justify-between pt-2 border-t border-gold-500/30">
                     <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 p-0.5 shadow flex items-center justify-center">
                         <div class="w-full h-full rounded-full border-2 border-dashed border-yellow-100 flex flex-col items-center justify-center text-center p-1">
@@ -308,7 +303,6 @@
                 </div>
             </div>
 
-            <!-- BOTÓN DE DESCARGA CONDICIONAL -->
             <div class="pt-2">
                 <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                     <i class="fas fa-download"></i> Descargar Certificado en PDF / Alta Calidad
@@ -465,10 +459,8 @@
             totalSlides = photosArray.length > 0 ? photosArray.length : 1;
             buildCarousel();
 
-            // Inicializar Rasca y Gana en vista pública
             inicializarRascaGanaPublico(data.premioRasca || "Un gran abrazo sorpresa");
 
-            // Configurar Certificado y Estado de Pago
             const esPagado = data.pagado === true;
             document.getElementById('marcaAguaPrueba').style.display = esPagado ? 'none' : 'flex';
             document.getElementById('certNombresPreview').innerText = data.nombres || 'Francisco & Ana';
@@ -632,7 +624,6 @@
                 document.getElementById('counterMinutes').innerText = minutos;
                 document.getElementById('counterSeconds').innerText = segundos;
 
-                // Miniatura de contadores en el certificado
                 document.getElementById('certAnos').innerText = anos;
                 document.getElementById('certMeses').innerText = meses;
                 document.getElementById('certDias').innerText = dias;
