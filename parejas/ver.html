@@ -252,15 +252,15 @@
                 <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
             </div>
 
-            <!-- Fecha de inicio alineada junto a "Escribiendo nuestra historia desde el" y Contadores centrados -->
-            <div class="space-y-2 px-2">
-                <!-- Fecha de relación integrada justo después del texto fijo de la imagen -->
-                <p class="text-[9.5px] font-semibold text-gray-800 text-center -mt-2">
-                    <span id="certFecha" class="text-rose-900 font-bold">Fecha</span>
-                </p>
+            <!-- Zona central: Fecha de relación (subida y alineada a la derecha) y contadores centrados -->
+            <div class="space-y-1 px-4">
+                <!-- Fecha de relación ajustada más arriba y hacia la derecha -->
+                <div class="text-right pr-6 -mt-3">
+                    <span class="text-[9.5px] font-semibold text-rose-900" id="certFecha">Fecha</span>
+                </div>
 
-                <!-- Grid de contadores centrados en los círculos dorados -->
-                <div class="grid grid-cols-6 gap-2 max-w-[280px] mx-auto text-center pt-1">
+                <!-- Grid de contadores perfectamente centrados en las esferas -->
+                <div class="grid grid-cols-6 gap-1 max-w-[270px] mx-auto text-center pt-0.5">
                     <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
                     <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
                     <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
@@ -270,15 +270,15 @@
                 </div>
             </div>
 
-            <!-- Zona Inferior: Folio ajustado a la derecha de "CERTIFICADO FOLIO ÚNICO:" y fecha de emisión elevada -->
-            <div class="pb-[4%] text-center space-y-1.5">
-                <!-- Folio Único colocado exactamente a la derecha de la etiqueta impresa en la imagen -->
-                <div class="text-center pl-28">
-                    <span class="text-[9px] font-mono font-bold text-rose-950 tracking-wider bg-white/40 px-1 rounded" id="certFolio">DDQR-OFICIAL</span>
+            <!-- Zona inferior: Folio subido a la línea de título y fecha de emisión elevada a la derecha -->
+            <div class="pb-[5%] space-y-1">
+                <!-- Folio subido justo a la derecha de "CERTIFICADO FOLIO ÚNICO:" -->
+                <div class="pl-36">
+                    <span class="text-[9px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
                 </div>
                 
-                <!-- Frase de emisión elevada y centrada entre el sello y el corazón -->
-                <div class="text-[7.5px] text-gray-600 italic leading-tight max-w-[170px] mx-auto -mt-1">
+                <!-- Fecha de emisión subida y alineada hacia la derecha en medio del sello y el corazón -->
+                <div class="text-[7.5px] text-gray-600 italic leading-tight text-right pr-12 -mt-1">
                     <p>Contando hasta su emisión el día</p>
                     <p class="font-semibold text-gray-800 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
                 </div>
