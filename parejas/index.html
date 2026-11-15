@@ -461,49 +461,63 @@
                     <audio id="pv-voicePlayer" class="hidden"></audio>
                 </section>
 
-                <!-- CERTIFICADO OFICIAL DEL AMOR (USANDO BASEFOTO.JPG EN VISTA PREVIA) -->
-                <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 shadow-2xl space-y-3 text-center">
-                    <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden text-left aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
-                        
-                        <!-- Marca de agua de prueba -->
-                        <div id="pv-marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
-                            <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
-                        </div>
+               <!-- CERTIFICADO OFICIAL DEL AMOR (INDEX.HTML / VISTA PREVIA) -->
+<section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-4 shadow-2xl space-y-3 text-center">
+    
+    <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
+    <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
+        
+        <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
+        <div id="pv-marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
+            <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
+        </div>
 
-                        <!-- Datos dinámicos sobre la plantilla -->
-                        <div class="absolute inset-0 z-10 flex flex-col justify-between p-6 text-center select-none">
-                            <div class="pt-[32%] space-y-1">
-                                <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="pv-certNombres">Nombres</h2>
-                            </div>
+        <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA EXACTA -->
+        <div class="absolute inset-0 z-10 select-none">
+            
+            <!-- NOMBRES DE LA PAREJA (Centrado arriba) -->
+            <div class="absolute w-full text-center" style="top: 36%;">
+                <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="pv-certNombres">Nombres</h2>
+            </div>
 
-                            <div class="space-y-2 px-4">
-                                <p class="text-[10px] font-semibold text-gray-800">
-                                    Escribiendo nuestra historia desde el <span id="pv-certFecha" class="text-rose-900 font-bold">Fecha</span>
-                                </p>
+            <!-- FECHA DE RELACIÓN (Justo después de "Escribiendo nuestra historia desde el") -->
+            <div class="absolute w-full text-center" style="top: 51.5%;">
+                <span class="text-[10px] font-semibold text-rose-950 bg-white/30 px-2 py-0.5 rounded" id="pv-certFecha">Fecha</span>
+            </div>
 
-                                <div class="grid grid-cols-6 gap-1 pt-1 max-w-[260px] mx-auto">
-                                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="pv-certAnos">0</span></div>
-                                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="pv-certMeses">0</span></div>
-                                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="pv-certDias">0</span></div>
-                                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="pv-certHoras">0</span></div>
-                                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="pv-certMinutos">0</span></div>
-                                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="pv-certSegundos">0</span></div>
-                                </div>
-                            </div>
+            <!-- CONTADORES DE TIEMPO (Centrados exactamente dentro de las 6 esferas) -->
+            <div class="absolute w-full px-4" style="top: 57.5%;">
+                <div class="grid grid-cols-6 gap-1 max-w-[270px] mx-auto text-center">
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="pv-certAnos">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="pv-certMeses">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="pv-certDias">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="pv-certHoras">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="pv-certMinutos">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="pv-certSegundos">0</span></div>
+                </div>
+            </div>
 
-                            <div class="pb-[8%] space-y-1">
-                                <p class="text-[9px] font-mono font-bold text-gray-700 tracking-widest" id="pv-certFolio">DDQR-OFICIAL</p>
-                                <p class="text-[8px] text-gray-600 italic">
-                                    Contando hasta su emisión el día <span id="pv-certEmision" class="font-semibold text-gray-800">Fecha Hoy</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+            <!-- FOLIO ÚNICO (Justo al lado de "CERTIFICADO FOLIO ÚNICO:") -->
+            <div class="absolute" style="top: 68.2%; left: 51%;">
+                <span class="text-[9.5px] font-mono font-bold text-rose-950 tracking-wider" id="pv-certFolio">DDQR-OFICIAL</span>
+            </div>
 
-                    <button onclick="intentarDescargarCertificadoPv()" class="w-full py-2.5 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg">
-                        <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
-                    </button>
-                </section>
+            <!-- FECHA DE EMISIÓN (En el espacio central entre el sello y el corazón) -->
+            <div class="absolute text-right" style="top: 73.5%; right: 18%;">
+                <div class="text-[7.5px] text-gray-700 italic leading-tight">
+                    <p>Contando hasta su emisión el día</p>
+                    <p class="font-semibold text-gray-900 pt-0.5" id="pv-certEmision">Fecha Hoy</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <button onclick="intentarDescargarCertificadoPv()" class="w-full py-2.5 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg">
+        <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
+    </button>
+</section>
+                
 
                 <!-- CONTADOR DE TIEMPO ESTÉTICO -->
                 <section id="pv-loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 text-center shadow-2xl space-y-4">
