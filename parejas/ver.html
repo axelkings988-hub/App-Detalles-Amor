@@ -244,36 +244,44 @@
             <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
         </div>
 
-        <!-- 2. CAPA DE DATOS DINÁMICOS CON LAS NUEVAS POSICIONES -->
+        <!-- 2. CAPA DE DATOS DINÁMICOS SOBRE LA PLANTILLA -->
         <div class="absolute inset-0 z-10 flex flex-col justify-between p-6 select-none">
             
-            <!-- NOMBRES: Bajados un poco más (pt-[43%]) -->
+            <!-- Zona Superior: Nombres de la pareja -->
             <div class="pt-[43%] text-center">
                 <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
             </div>
 
-            <!-- CONTADOR DE TIEMPO COMPARTIDO: Ajustado a la izquierda, espaciado y más abajo -->
-            <div class="px-2 pt-4">
-                <div class="grid grid-cols-6 gap-2 max-w-[280px] ml-2 text-center">
-                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
-                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
-                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
-                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
-                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
-                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
+            <!-- Zona Central: Fecha de inicio y Contador centrado en los círculos -->
+            <div class="space-y-1.5 px-2">
+                <!-- Fecha de inicio recuperada -->
+                <p class="text-[9.5px] font-semibold text-gray-800 text-center">
+                    <span id="certFecha" class="text-rose-900 font-bold">Fecha</span>
+                </p>
+
+                <!-- Grid de contadores perfectamente centrados dentro de cada esfera -->
+                <div class="grid grid-cols-6 gap-2 max-w-[280px] mx-auto text-center pt-1">
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
+                    <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
                 </div>
             </div>
 
-            <!-- ZONA INFERIOR: Folio subido y texto de emisión en 3 renglones en medio del sello y el corazón -->
-            <div class="pb-[5%] text-center space-y-1">
-                <!-- Folio Único (Subido) -->
-                <p class="text-[9px] font-mono font-bold text-gray-700 tracking-widest" id="certFolio">DDQR-OFICIAL</p>
+            <!-- Zona Inferior: Folio ajustado junto al título y fecha de emisión subida -->
+            <div class="pb-[3%] text-center space-y-1">
+                <!-- Folio Único (Subido a la altura de la línea de título) -->
+                <div class="flex justify-center items-center gap-1.5">
+                    <span class="text-[8.5px] font-bold text-gray-700 tracking-wider">CERTIFICADO FOLIO ÚNICO:</span>
+                    <span class="text-[9px] font-mono font-bold text-rose-900" id="certFolio">DDQR-OFICIAL</span>
+                </div>
                 
-                <!-- Texto de emisión en 3 renglones centrado -->
-                <div class="text-[7.5px] text-gray-600 italic leading-tight max-w-[180px] mx-auto">
-                    <p>Contando hasta</p>
-                    <p>su emisión el día</p>
-                    <p class="font-semibold text-gray-800" id="certEmisionFecha">Fecha Hoy</p>
+                <!-- Fecha de emisión subida un poco más arriba en medio del sello y el corazón -->
+                <div class="text-[7.5px] text-gray-600 italic leading-tight max-w-[180px] mx-auto pt-0.5">
+                    <p>Contando hasta su emisión el día</p>
+                    <p class="font-semibold text-gray-800 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
                 </div>
             </div>
 
