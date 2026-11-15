@@ -230,37 +230,36 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-       <!-- CERTIFICADO OFICIAL DEL AMOR (USANDO BASEFOTO.JPG) -->
+       <!-- CERTIFICADO OFICIAL DEL AMOR (USANDO BASEFOTO.JPG CON COORDENADAS EXACTAS) -->
 <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
     <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
         <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
     </h3>
 
     <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
-    <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden text-left aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
+    <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
         
         <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
         <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
             <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
         </div>
 
-        <!-- 2. CAPA DE DATOS DINÁMICOS SOBRE LA PLANTILLA -->
-        <div class="absolute inset-0 z-10 flex flex-col justify-between p-6 select-none">
+        <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA EXACTA -->
+        <div class="absolute inset-0 z-10 select-none">
             
-            <!-- Nombres de la pareja -->
-            <div class="pt-[43%] text-center">
+            <!-- NOMBRES DE LA PAREJA (Centrado arriba) -->
+            <div class="absolute w-full text-center" style="top: 36%;">
                 <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
             </div>
 
-            <!-- Zona central: Fecha de relación (subida y alineada a la derecha) y contadores centrados -->
-            <div class="space-y-1 px-4">
-                <!-- Fecha de relación ajustada más arriba y hacia la derecha -->
-                <div class="text-right pr-6 -mt-3">
-                    <span class="text-[9.5px] font-semibold text-rose-900" id="certFecha">Fecha</span>
-                </div>
+            <!-- FECHA DE RELACIÓN (Justo después de "Escribiendo nuestra historia desde el") -->
+            <div class="absolute w-full text-center" style="top: 51.5%;">
+                <span class="text-[10px] font-semibold text-rose-950 bg-white/30 px-2 py-0.5 rounded" id="certFecha">Fecha</span>
+            </div>
 
-                <!-- Grid de contadores perfectamente centrados en las esferas -->
-                <div class="grid grid-cols-6 gap-1 max-w-[270px] mx-auto text-center pt-0.5">
+            <!-- CONTADORES DE TIEMPO (Centrados exactamente dentro de las 6 esferas) -->
+            <div class="absolute w-full px-4" style="top: 57.5%;">
+                <div class="grid grid-cols-6 gap-1 max-w-[270px] mx-auto text-center">
                     <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
                     <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
                     <div class="flex items-center justify-center h-8"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
@@ -270,17 +269,16 @@
                 </div>
             </div>
 
-            <!-- Zona inferior: Folio subido a la línea de título y fecha de emisión elevada a la derecha -->
-            <div class="pb-[5%] space-y-1">
-                <!-- Folio subido justo a la derecha de "CERTIFICADO FOLIO ÚNICO:" -->
-                <div class="pl-36">
-                    <span class="text-[9px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
-                </div>
-                
-                <!-- Fecha de emisión subida y alineada hacia la derecha en medio del sello y el corazón -->
-                <div class="text-[7.5px] text-gray-600 italic leading-tight text-right pr-12 -mt-1">
+            <!-- FOLIO ÚNICO (Justo al lado de "CERTIFICADO FOLIO ÚNICO:") -->
+            <div class="absolute" style="top: 68.2%; left: 51%;">
+                <span class="text-[9.5px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
+            </div>
+
+            <!-- FECHA DE EMISIÓN (En el espacio central entre el sello y el corazón) -->
+            <div class="absolute text-right" style="top: 73.5%; right: 18%;">
+                <div class="text-[7.5px] text-gray-700 italic leading-tight">
                     <p>Contando hasta su emisión el día</p>
-                    <p class="font-semibold text-gray-800 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
+                    <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
                 </div>
             </div>
 
