@@ -231,62 +231,63 @@
         </section>
 
         <!-- CERTIFICADO OFICIAL DEL AMOR (USANDO BASEFOTO.JPG) -->
-        <section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
-            <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
-                <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
-            </h3>
+<section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
+    <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
+        <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
+    </h3>
 
-            <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
-            <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden text-left aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
+    <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
+    <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden text-left aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
+        
+        <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
+        <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
+            <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
+        </div>
+
+        <!-- 2. CAPA DE DATOS DINÁMICOS CON LAS NUEVAS POSICIONES -->
+        <div class="absolute inset-0 z-10 flex flex-col justify-between p-6 select-none">
+            
+            <!-- NOMBRES: Bajados un poco más (pt-[43%]) -->
+            <div class="pt-[43%] text-center">
+                <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
+            </div>
+
+            <!-- CONTADOR DE TIEMPO COMPARTIDO: Ajustado a la izquierda, espaciado y más abajo -->
+            <div class="px-2 pt-4">
+                <div class="grid grid-cols-6 gap-2 max-w-[280px] ml-2 text-center">
+                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
+                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
+                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
+                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
+                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
+                    <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
+                </div>
+            </div>
+
+            <!-- ZONA INFERIOR: Folio subido y texto de emisión en 3 renglones en medio del sello y el corazón -->
+            <div class="pb-[5%] text-center space-y-1">
+                <!-- Folio Único (Subido) -->
+                <p class="text-[9px] font-mono font-bold text-gray-700 tracking-widest" id="certFolio">DDQR-OFICIAL</p>
                 
-                <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA (Se oculta al pagar) -->
-                <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
-                    <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
-                </div>
-
-                <!-- 2. CAPA DE DATOS DINÁMICOS SOBRE LA PLANTILLA -->
-                <div class="absolute inset-0 z-10 flex flex-col justify-between p-6 text-center select-none">
-                    
-                    <!-- Nombres de la pareja -->
-                    <div class="pt-[32%] space-y-1">
-                        <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
-                    </div>
-
-                    <!-- Fecha de inicio y contadores dorados -->
-                    <div class="space-y-2 px-4">
-                        <p class="text-[10px] font-semibold text-gray-800">
-                            Escribiendo nuestra historia desde el <span id="certFecha" class="text-rose-900 font-bold">Fecha</span>
-                        </p>
-
-                        <div class="grid grid-cols-6 gap-1 pt-1 max-w-[260px] mx-auto">
-                            <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
-                            <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
-                            <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
-                            <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
-                            <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
-                            <div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
-                        </div>
-                    </div>
-
-                    <!-- Folio y Fecha de Expedición -->
-                    <div class="pb-[8%] space-y-1">
-                        <p class="text-[9px] font-mono font-bold text-gray-700 tracking-widest" id="certFolio">DDQR-OFICIAL</p>
-                        <p class="text-[8px] text-gray-600 italic">
-                            Contando hasta su emisión el día <span id="certEmisionFecha" class="font-semibold text-gray-800">Fecha Hoy</span>
-                        </p>
-                    </div>
-
+                <!-- Texto de emisión en 3 renglones centrado -->
+                <div class="text-[7.5px] text-gray-600 italic leading-tight max-w-[180px] mx-auto">
+                    <p>Contando hasta</p>
+                    <p>su emisión el día</p>
+                    <p class="font-semibold text-gray-800" id="certEmisionFecha">Fecha Hoy</p>
                 </div>
             </div>
 
-            <!-- BOTÓN DE DESCARGA -->
-            <div class="pt-2">
-                <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
-                </button>
-            </div>
-        </section>
+        </div>
+    </div>
 
+    <!-- BOTÓN DE DESCARGA -->
+    <div class="pt-2">
+        <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
+        </button>
+    </div>
+</section>
+        
         <!-- CONTADOR DE TIEMPO ESTÉTICO -->
         <section id="loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
