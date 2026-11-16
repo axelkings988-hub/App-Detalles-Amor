@@ -37,19 +37,26 @@
         #heartFill { transition: height 0.25s ease-out; }
 
         @media print {
+            @page { size: auto; margin: 0mm; }
+            body { background: #ffffff !important; }
             body * { visibility: hidden !important; }
             #certificadoImprimir, #certificadoImprimir * { visibility: visible !important; }
             #certificadoImprimir {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
+                position: fixed !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
                 width: 100% !important;
-                max-width: 100% !important;
+                max-width: 420px !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 border: none !important;
                 box-shadow: none !important;
-                background: transparent !important;
+                background: #ffffff !important;
+            }
+            #certificadoImprimir h3, 
+            #certificadoImprimir button {
+                display: none !important;
             }
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -251,13 +258,13 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-        <!-- CERTIFICADO OFICIAL DEL AMOR (VER.HTML) - ORDEN CORREGIDO -->
+        <!-- CERTIFICADO OFICIAL DEL AMOR (VER.HTML) - NÚMEROS PERFECTAMENTE ALINEADOS -->
         <section id="certificadoImprimir" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
             </h3>
 
-            <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
+            <!-- Contenedor con la proporción exacta de basefoto.jpg (912x1168) -->
             <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
                 
                 <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
@@ -265,7 +272,7 @@
                     <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
                 </div>
 
-                <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA EXACTA Y ORDEN CORREGIDO -->
+                <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA Y ALINEACIÓN EXACTA DE CÍRCULOS -->
                 <div class="absolute inset-0 z-10 select-none">
                     
                     <!-- NOMBRES DE LA PAREJA -->
@@ -278,15 +285,26 @@
                         <span class="text-[10px] font-semibold text-rose-950" id="certFecha">Fecha</span>
                     </div>
 
-                    <!-- CONTADORES DE TIEMPO (Orden: Años, Meses, Días, Horas, Minutos, Segundos) -->
-                    <div class="absolute w-full px-6" style="top: 62%;">
-                        <div class="grid grid-cols-6 gap-1 max-w-[280px] mx-auto text-center">
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
+                    <!-- CONTADORES DE TIEMPO (Alineados milimétricamente en 6 columnas con espaciadores) -->
+                    <div class="absolute w-full px-4" style="top: 61.8%;">
+                        <div class="grid grid-cols-11 gap-0 max-w-[310px] mx-auto text-center items-center">
+                            <!-- Años -->
+                            <div class="col-span-1 flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certAnos">0</span></div>
+                            <div class="col-span-1"></div> <!-- Espaciador -->
+                            <!-- Meses -->
+                            <div class="col-span-1 flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certMeses">0</span></div>
+                            <div class="col-span-1"></div> <!-- Espaciador -->
+                            <!-- Días -->
+                            <div class="col-span-1 flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certDias">0</span></div>
+                            <div class="col-span-1"></div> <!-- Espaciador -->
+                            <!-- Horas -->
+                            <div class="col-span-1 flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certHoras">0</span></div>
+                            <div class="col-span-1"></div> <!-- Espaciador -->
+                            <!-- Minutos -->
+                            <div class="col-span-1 flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certMinutos">0</span></div>
+                            <div class="col-span-1"></div> <!-- Espaciador -->
+                            <!-- Segundos -->
+                            <div class="col-span-1 flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certSegundos">0</span></div>
                         </div>
                     </div>
 
@@ -467,7 +485,7 @@
             document.getElementById('premioOculto').innerText = data.premioRasca || "¡Un abrazo gigante sorpresa!";
             setTimeout(() => inicializarRascaCanvas('scratchCanvas'), 200);
 
-            // Inyección de datos en el Certificado Oficial con basefoto.jpg y orden correcto
+            // Inyección de datos en el Certificado Oficial con basefoto.jpg y alineación corregida
             document.getElementById('certNombres').innerText = data.nombres || "";
             document.getElementById('certFecha').innerText = data.fecha || "";
             document.getElementById('certFolio').innerText = `DDQR-${docId ? docId.substring(0, 6).toUpperCase() : 'OFICIAL'}`;
