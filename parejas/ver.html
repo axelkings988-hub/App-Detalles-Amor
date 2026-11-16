@@ -36,7 +36,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
 
-        /* ESTILOS DE IMPRESIÓN OPTIMIZADOS PARA PC Y MÓVILES */
+       /* ESTILOS DE IMPRESIÓN DEFINITIVOS PARA PC Y MÓVILES */
         @media print {
             body * { visibility: hidden; }
             #printableCertificado, #printableCertificado * { visibility: visible; }
@@ -54,7 +54,7 @@
                 overflow: hidden !important;
             }
 
-            /* Contenedor absoluto que abarca toda la hoja carta física (216mm x 279mm) */
+            /* Contenedor fijo de toda la hoja carta */
             #printableCertificado {
                 position: fixed !important;
                 left: 0 !important;
@@ -79,17 +79,62 @@
                 image-rendering: -webkit-optimize-contrast;
             }
             
-            /* Forzar tamaño grande imponente que llena la hoja manteniendo la proporción 912x1168 */
+            /* Tarjeta principal con tamaño grande óptimo y centrado absoluto */
             #printableCertificado .aspect-\[912\/1168\] {
-                width: 190mm !important; /* Ocupa casi todo el ancho de la hoja carta */
-                max-width: 190mm !important;
+                width: 185mm !important;
+                max-width: 185mm !important;
                 height: auto !important;
                 aspect-ratio: 912 / 1168 !important;
                 object-fit: contain !important;
+                position: relative !important;
                 margin: auto !important;
             }
+
+            /* CORRECCIÓN ABSOLUTA DE POSICIONES INTERNAS PARA QUE NADA SE SALGA */
+            #printableCertificado #marcaAguaPrueba {
+                display: none !important; /* Oculta la marca de agua en la impresión final por estética */
+            }
+
+            /* Nombres de la pareja */
+            #printableCertificado div[style*="top: 36%"] {
+                top: 35.5% !important;
+            }
+
+            /* Fecha de relación */
+            #printableCertificado div[style*="top: 50.5%"] {
+                top: 50.2% !important;
+            }
+
+            /* Contenedor de los contadores (alineados exactamente con las esferas) */
+            #printableCertificado div[style*="top: 62%"] {
+                top: 61.2% !important;
+            }
+
+            /* Folio único */
+            #printableCertificado div[style*="top: 70%"] {
+                top: 69.5% !important;
+            }
+
+            /* Fecha de emisión */
+            #printableCertificado div[style*="top: 81.5%"] {
+                top: 81% !important;
+            }
+
+            /* Tamaños de fuente proporcionales a la impresión grande */
+            #printableCertificado h2 {
+                font-size: 26px !important;
+            }
             
-            /* Optimización de fuentes para alta nitidez a gran escala */
+            #printableCertificado span {
+                font-size: 11px !important;
+            }
+
+            #printableCertificado .grid span {
+                font-size: 13px !important; /* Números del contador perfectamente legibles y centrados */
+                font-weight: bold !important;
+            }
+            
+            /* Optimización de fuentes */
             #printableCertificado h2, 
             #printableCertificado span, 
             #printableCertificado p {
@@ -97,7 +142,7 @@
                 text-rendering: optimizeLegibility;
             }
             
-            /* Ocultar el botón físico de descarga */
+            /* Ocultar botón de descarga físico */
             #printableCertificado .pt-2 {
                 display: none !important;
             }
