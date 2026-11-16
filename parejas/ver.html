@@ -36,7 +36,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
 
-     /* ESTILOS DE IMPRESIÓN ROBUSTOS PARA PC Y MÓVILES */
+    /* ESTILOS DE IMPRESIÓN DEFINITIVOS PARA PC Y MÓVILES */
         @media print {
             body * { visibility: hidden; }
             #printableCertificado, #printableCertificado * { visibility: visible; }
@@ -52,15 +52,16 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: hidden !important;
+                background: white !important;
             }
 
-            /* Contenedor principal de toda la hoja física */
+            /* Forzar el lienzo de impresión a tamaño carta exacto */
             #printableCertificado {
-                position: fixed !important;
+                position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
-                width: 216mm !important;
-                height: 279mm !important;
+                width: 215.9mm !important;
+                height: 279.4mm !important;
                 max-width: none !important;
                 max-height: none !important;
                 transform: none !important;
@@ -69,41 +70,44 @@
                 background: white !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
+                overflow: hidden !important;
                 
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 image-rendering: -webkit-optimize-contrast;
             }
             
-            /* Tamaño óptimo de la tarjeta para que llene la hoja sin saltar a página 2 */
+            /* Contenedor de la tarjeta dimensionado proporcionalmente al papel carta */
             #printableCertificado .aspect-\[912\/1168\] {
-                width: 175mm !important;
-                max-width: 175mm !important;
-                height: auto !important;
-                aspect-ratio: 912 / 1168 !important;
-                object-fit: contain !important;
-                position: relative !important;
-                margin: auto !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 190mm !important;
+                height: 243mm !important;
+                max-width: none !important;
+                max-height: none !important;
+                margin: 0 !important;
+                background-size: cover !important;
+                background-position: center !important;
             }
 
-            /* CONGELAR Y PROTEGER LAS POSICIONES ORIGINALES DE TUS CONTENEDORES ABSOLUTOS */
-            #printableCertificado div[class*="absolute"] {
+            /* BLINDAJE DE POSICIONES ABSOLUTAS INTERNAS PARA QUE NADA SE MUEVA */
+            #printableCertificado div {
                 position: absolute !important;
             }
 
-            /* Asegurar visibilidad y tamaño correcto de los contadores y textos dinámicos */
+            /* Asegurar que los textos, contadores y fechas mantengan sus fuentes legibles */
             #printableCertificado span, 
-            #printableCertificado div {
+            #printableCertificado h2,
+            #printableCertificado p {
                 -webkit-font-smoothing: antialiased;
                 text-rendering: optimizeLegibility;
             }
 
-            /* Ocultar el botón físico de descarga al imprimir */
-            #printableCertificado .pt-2 {
+            /* Ocultar el botón físico de descarga */
+            #printableCertificado .pt-2,
+            #printableCertificado button {
                 display: none !important;
             }
         }
