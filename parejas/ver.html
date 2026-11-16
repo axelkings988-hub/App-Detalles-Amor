@@ -37,42 +37,62 @@
         #heartFill { transition: height 0.25s ease-out; }
 
         /* ESTILOS DE IMPRESIÓN PARA EL CERTIFICADO */
-        @media print {
-            body * { visibility: hidden; }
-            #printableCertificado, #printableCertificado * { visibility: visible; }
-            
-            @page {
-                size: auto;
-                margin: 0mm;
-            }
-            
-            body, html {
-                height: 100%;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden;
-            }
+       @media print {
+    body * { visibility: hidden; }
+    #printableCertificado, #printableCertificado * { visibility: visible; }
+    
+    @page {
+        size: letter portrait; /* Forzar tamaño carta vertical estándar */
+        margin: 0mm;
+    }
+    
+    body, html {
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden;
+    }
 
-            #printableCertificado {
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                width: 100% !important;
-                max-width: 450px !important;
-                box-shadow: none !important;
-                border: none !important;
-                background: white !important;
-                margin: 0 !important;
-                padding: 10px !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            
-            #printableCertificado .pt-2 {
-                display: none !important;
-            }
-        }
+    /* Contenedor adaptado exactamente a la proporción de tus 912x1168 píxeles */
+    #printableCertificado {
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 100% !important;
+        max-width: 410px !important; /* Ancho optimizado para papel sin desbordar la altura */
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        
+        /* Máxima nitidez en impresión */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        image-rendering: -webkit-optimize-contrast;
+    }
+    
+    /* Forzar que la caja del certificado mantenga la proporción exacta de tu imagen (912x1168) */
+    #printableCertificado .aspect-\[912\/1168\] {
+        aspect-ratio: 912 / 1168 !important;
+        width: 100% !important;
+        max-height: 95vh !important;
+        object-fit: contain !important;
+    }
+    
+    /* Suavizado de fuentes tipográficas para que las letras se vean impresas en imprenta */
+    #printableCertificado h2, 
+    #printableCertificado span, 
+    #printableCertificado p {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+    
+    #printableCertificado .pt-2 {
+        display: none !important;
+    }
+}
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
