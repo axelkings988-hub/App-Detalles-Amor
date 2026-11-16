@@ -35,6 +35,44 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
+
+        /* ESTILOS DE IMPRESIÓN PARA EL CERTIFICADO */
+        @media print {
+            body * { visibility: hidden; }
+            #printableCertificado, #printableCertificado * { visibility: visible; }
+            
+            @page {
+                size: auto;
+                margin: 0mm;
+            }
+            
+            body, html {
+                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden;
+            }
+
+            #printableCertificado {
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 100% !important;
+                max-width: 450px !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+                margin: 0 !important;
+                padding: 10px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            #printableCertificado .pt-2 {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
@@ -111,6 +149,7 @@
             <span class="inline-block px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full text-xs font-semibold uppercase tracking-widest mb-4">
                 Regalo Especial
             </span>
+
             <h1 class="text-3xl font-bold font-cursive text-rose-100 mb-2">Desbloquea Mi Sorpresa</h1>
             <p class="text-xs text-rose-300/80 mb-6">Toca el corazón para llenarlo de amor...</p>
 
@@ -230,68 +269,72 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-      <!-- CERTIFICADO OFICIAL DEL AMOR (VER.HTML) -->
-<section class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
-    <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
-        <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
-    </h3>
+        <!-- CERTIFICADO OFICIAL DEL AMOR (CON ID PARA IMPRESIÓN LIMPIA) -->
+        <section id="printableCertificado" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
+            <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
+                <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
+            </h3>
 
-    <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
-    <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
-        
-        <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
-        <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
-            <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
-        </div>
+            <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
+            <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
+                
+                <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
+                <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
+                    <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
+                </div>
 
-        <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA EXACTA -->
-        <div class="absolute inset-0 z-10 select-none">
-            
-            <!-- NOMBRES DE LA PAREJA -->
-            <div class="absolute w-full text-center" style="top: 36%;">
-                <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
-            </div>
+                <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA EXACTA -->
+                <div class="absolute inset-0 z-10 select-none">
+                    
+                    <!-- NOMBRES DE LA PAREJA -->
+                    <div class="absolute w-full text-center" style="top: 36%;">
+                        <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
+                    </div>
 
-            <!-- 1. FECHA DE RELACIÓN (Movida un poco más a la derecha) -->
-            <div class="absolute" style="top: 50.5%; left: 61%;">
-                <span class="text-[10px] font-semibold text-rose-950" id="certFecha">Fecha</span>
-            </div>
+                    <!-- 1. FECHA DE RELACIÓN -->
+                    <div class="absolute" style="top: 50.5%; left: 61%;">
+                        <span class="text-[10px] font-semibold text-rose-950" id="certFecha">Fecha</span>
+                    </div>
 
-            <!-- 2. CONTADORES DE TIEMPO (Centrados en las esferas) -->
-            <div class="absolute w-full px-6" style="top: 62%;">
-                <div class="grid grid-cols-6 gap-2 max-w-[290px] mx-auto text-center">
-                    <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
-                    <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
-                    <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
-                    <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
-                    <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
-                    <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
+                    <!-- 2. CONTADORES DE TIEMPO -->
+                    <div class="absolute w-full px-6" style="top: 62%;">
+                        <div class="grid grid-cols-6 gap-2 max-w-[290px] mx-auto text-center">
+                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. FOLIO ÚNICO -->
+                    <div class="absolute" style="top: 70%; left: 63%;">
+                        <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
+                    </div>
+
+                    <!-- 4. FECHA DE EMISIÓN -->
+                    <div class="absolute text-center" style="top: 81.5%; left: 38%; right: 25%;">
+                        <div class="text-[7.5px] text-gray-800 italic leading-tight">
+                            <p>Contando hasta su emisión el día</p>
+                            <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- 3. FOLIO ÚNICO (Bajado un poquito) -->
-            <div class="absolute" style="top: 70%; left: 63%;">
-                <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
+            <!-- BOTÓN DE DESCARGA -->
+            <div class="pt-2">
+                <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
+                </button>
             </div>
+        </section>
 
-            <!-- 4. FECHA DE EMISIÓN (Bajada un interlineado y movida a la derecha) -->
-            <div class="absolute text-center" style="top: 81.5%; left: 38%; right: 25%;">
-                <div class="text-[7.5px] text-gray-800 italic leading-tight">
-                    <p>Contando hasta su emisión el día</p>
-                    <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- BOTÓN DE DESCARGA -->
-    <div class="pt-2">
-        <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
-        </button>
-    </div>
-</section>       
+    </main>
+</body>
+</html>       
         <!-- CONTADOR DE TIEMPO ESTÉTICO -->
         <section id="loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
