@@ -43,20 +43,22 @@
         #pv-heartFill { transition: height 0.25s ease-out; }
 
         @media print {
+            @page { size: auto; margin: 0mm; }
+            body { background: #ffffff !important; }
             body * { visibility: hidden !important; }
             #printablePostal, #printablePostal * { visibility: visible !important; }
             #printablePostal {
-                position: absolute !important;
+                position: fixed !important;
                 left: 50% !important;
-                top: 0 !important;
-                transform: translateX(-50%) !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
                 width: auto !important;
                 max-width: 320px !important;
                 box-shadow: none !important;
                 border: none !important;
-                background: transparent !important;
+                background: #ffffff !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: 10px !important;
             }
             .no-print { display: none !important; }
             * {
