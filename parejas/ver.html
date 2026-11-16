@@ -37,26 +37,49 @@
         #heartFill { transition: height 0.25s ease-out; }
 
         /* ESTILOS DE IMPRESIÓN PARA EL CERTIFICADO */
-        @media print {
-            body * { visibility: hidden !important; }
-            #certificadoImprimir, #certificadoImprimir * { visibility: visible !important; }
-            #certificadoImprimir {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                border: none !important;
-                box-shadow: none !important;
-                background: transparent !important;
-            }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+       @media print {
+        @page {
+            size: auto;
+            margin: 0mm;
         }
+        body * { 
+            visibility: hidden !important; 
+        }
+        #certificadoImprimir, #certificadoImprimir * { 
+            visibility: visible !important; 
+        }
+        #certificadoImprimir {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        /* Ocultar títulos, botón de descarga y marca de agua extra si no se desea */
+        #certificadoImprimir h3, 
+        #certificadoImprimir button {
+            display: none !important;
+        }
+        /* Forzar impresión exacta de la tarjeta y su imagen base */
+        #certificadoImprimir > div:nth-child(2) {
+            width: 100% !important;
+            max-width: 450px !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
