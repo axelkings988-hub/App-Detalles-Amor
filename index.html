@@ -22,59 +22,60 @@
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="w-full max-w-md mx-auto relative pb-8">
+    <!-- CONTENEDOR PRINCIPAL RELATIVO -->
+    <div class="w-full max-w-md mx-auto relative">
         
-        <!-- ENCABEZADO / IMAGEN DE PRESENTACIÓN -->
-        <div class="text-center relative">
+        <!-- IMAGEN DE FONDO (ENCABEZADO) -->
+        <div class="text-center w-full">
             <img src="1793883420453.jpg" alt="Dilo D' QRazón" class="w-full rounded-3xl shadow-2xl border border-rose-500/30 block">
         </div>
 
-        <!-- MENÚ DE OPCIONES SUPERPUESTO -->
-        <!-- Usamos un margen negativo (mt-[-3rem] o similar) para que suba y quede encima de la imagen -->
-        <div class="relative z-10 mx-4 space-y-3 mt-[-3.5rem]">
+        <!-- MENÚ FLOTANTE A MEDIACIÓN DE LA IMAGEN -->
+        <!-- Usamos absolute, top-1/2 -translate-y-1/2 para centrarlo exactamente en el medio de la postal -->
+        <div class="absolute top-[52%] left-4 right-4 z-10 space-y-2.5 -translate-y-1/2">
             
             <!-- Minisitio de Parejas -->
-            <a href="parejas/index.html" class="flex items-center p-3.5 bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl hover:bg-rose-50 transition border-l-4 border-rose-500">
-                <div class="bg-rose-100 p-2.5 rounded-xl text-rose-600 mr-3 text-lg">❤️</div>
+            <a href="parejas/index.html" class="flex items-center p-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-lg hover:bg-rose-50 transition border-l-4 border-rose-500">
+                <div class="bg-rose-100 p-2 rounded-lg text-rose-600 mr-3 text-base">❤️</div>
                 <div>
-                    <h2 class="font-bold text-sm text-slate-900">Minisitio de Parejas</h2>
-                    <p class="text-[11px] text-slate-500">Sorprende a tu pareja con detalles románticos.</p>
+                    <h2 class="font-bold text-xs sm:text-sm text-slate-900">Minisitio de Parejas</h2>
+                    <p class="text-[10px] text-slate-500">Sorprende a tu pareja con detalles románticos.</p>
                 </div>
             </a>
 
             <!-- Árbol de Navidad Oculto -->
-            <a href="DiloNavidad/index.html" class="flex items-center p-3.5 bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl hover:bg-rose-50 transition border-l-4 border-emerald-500">
-                <div class="bg-emerald-100 p-2.5 rounded-xl text-emerald-600 mr-3 text-lg">🎄</div>
+            <a href="DiloNavidad/index.html" class="flex items-center p-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-lg hover:bg-rose-50 transition border-l-4 border-emerald-500">
+                <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3 text-base">🎄</div>
                 <div>
-                    <h2 class="font-bold text-sm text-slate-900">Árbol de Navidad Oculto</h2>
-                    <p class="text-[11px] text-slate-500">Crea un árbol colaborativo con esferas sorpresa.</p>
+                    <h2 class="font-bold text-xs sm:text-sm text-slate-900">Árbol de Navidad Oculto</h2>
+                    <p class="text-[10px] text-slate-500">Crea un árbol colaborativo con esferas sorpresa.</p>
                 </div>
             </a>
 
             <!-- Mensaje Temporizador -->
-            <a href="temporizador/index.html" class="flex items-center p-3.5 bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl hover:bg-rose-50 transition border-l-4 border-amber-500">
-                <div class="bg-amber-100 p-2.5 rounded-xl text-amber-600 mr-3 text-lg">⏳</div>
+            <a href="temporizador/index.html" class="flex items-center p-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-lg hover:bg-rose-50 transition border-l-4 border-amber-500">
+                <div class="bg-amber-100 p-2 rounded-lg text-amber-600 mr-3 text-base">⏳</div>
                 <div>
-                    <h2 class="font-bold text-sm text-slate-900">Mensaje Temporizador</h2>
-                    <p class="text-[11px] text-slate-500">Envía mensajes con cuenta regresiva especial.</p>
+                    <h2 class="font-bold text-xs sm:text-sm text-slate-900">Mensaje Temporizador</h2>
+                    <p class="text-[10px] text-slate-500">Envía mensajes con cuenta regresiva especial.</p>
                 </div>
             </a>
 
             <!-- Placa QR de Mascota -->
-            <a href="mascotas/index.html" class="flex items-center p-3.5 bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl hover:bg-rose-50 transition border-l-4 border-cyan-500">
-                <div class="bg-cyan-100 p-2.5 rounded-xl text-cyan-600 mr-3 text-lg">🐾</div>
+            <a href="mascotas/index.html" class="flex items-center p-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-lg hover:bg-rose-50 transition border-l-4 border-cyan-500">
+                <div class="bg-cyan-100 p-2 rounded-lg text-cyan-600 mr-3 text-base">🐾</div>
                 <div>
-                    <h2 class="font-bold text-sm text-slate-900">Placa QR de Mascota</h2>
-                    <p class="text-[11px] text-slate-500">Genera medallas con colores neón y perfil de emergencia.</p>
+                    <h2 class="font-bold text-xs sm:text-sm text-slate-900">Placa QR de Mascota</h2>
+                    <p class="text-[10px] text-slate-500">Genera medallas con colores neón y perfil de emergencia.</p>
                 </div>
             </a>
 
-            <!-- Atención al Cliente -->
-            <a href="https://wa.me/528128869036" target="_blank" class="flex items-center p-3.5 bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl hover:bg-rose-50 transition border-l-4 border-emerald-600">
-                <div class="bg-emerald-100 p-2.5 rounded-xl text-emerald-600 mr-3 text-lg">💬</div>
+            <!-- Atención al Cliente (Recuerda cambiar tu_numero por tu teléfono real) -->
+            <a href="https://wa.me/528128869036" target="_blank" class="flex items-center p-3 bg-white/95 backdrop-blur-md text-slate-800 rounded-xl shadow-lg hover:bg-rose-50 transition border-l-4 border-emerald-600">
+                <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600 mr-3 text-base">💬</div>
                 <div>
-                    <h2 class="font-bold text-sm text-slate-900">Atención al Cliente</h2>
-                    <p class="text-[11px] text-slate-500">¿Hiciste tu pago y no se vio el QR? Toca aquí para ayudarte.</p>
+                    <h2 class="font-bold text-xs sm:text-sm text-slate-900">Atención al Cliente</h2>
+                    <p class="text-[10px] text-slate-500">¿Pago no visto? Toca aquí para ayudarte por WhatsApp.</p>
                 </div>
             </a>
 
