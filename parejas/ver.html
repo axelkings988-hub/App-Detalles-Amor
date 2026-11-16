@@ -36,7 +36,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
 
-       /* ESTILOS DE IMPRESIÓN DEFINITIVOS (RESPETANDO ESTADO DE PAGO Y MARCA DE AGUA) */
+      /* ESTILOS DE IMPRESIÓN DEFINITIVOS Y CORREGIDOS */
         @media print {
             body * { visibility: hidden; }
             #printableCertificado, #printableCertificado * { visibility: visible; }
@@ -54,7 +54,7 @@
                 overflow: hidden !important;
             }
 
-            /* Contenedor fijo de toda la hoja carta */
+            /* Contenedor fijo que abarca exactamente toda la hoja carta */
             #printableCertificado {
                 position: fixed !important;
                 left: 0 !important;
@@ -79,10 +79,10 @@
                 image-rendering: -webkit-optimize-contrast;
             }
             
-            /* Tarjeta principal con tamaño grande óptimo y centrado absoluto */
+            /* Tarjeta principal con tamaño ideal para llenar la hoja sin crear segunda página */
             #printableCertificado .aspect-\[912\/1168\] {
-                width: 185mm !important;
-                max-width: 185mm !important;
+                width: 175mm !important;
+                max-width: 175mm !important;
                 height: auto !important;
                 aspect-ratio: 912 / 1168 !important;
                 object-fit: contain !important;
@@ -90,55 +90,25 @@
                 margin: auto !important;
             }
 
-            /* CORRECCIÓN DE POSICIONES INTERNAS PARA QUE NADA SE SALGA */
-            /* Nombres de la pareja */
-            #printableCertificado div[style*="top: 36%"] {
-                top: 35.5% !important;
+            /* ASEGURAR QUE TODOS LOS CONTENEDORES DE TEXTO Y CONTADORES MANTENGAN SU POSICIÓN ORIGINAL */
+            #printableCertificado div[class*="absolute"] {
+                /* Permitir que las clases absolutas originales de tu diseño funcionen sin alteración forzada */
+                transform: none !important;
             }
 
-            /* Fecha de relación */
-            #printableCertificado div[style*="top: 50.5%"] {
-                top: 50.2% !important;
-            }
-
-            /* Contenedor de los contadores */
-            #printableCertificado div[style*="top: 62%"] {
-                top: 61.2% !important;
-            }
-
-            /* Folio único */
-            #printableCertificado div[style*="top: 70%"] {
-                top: 69.5% !important;
-            }
-
-            /* Fecha de emisión */
-            #printableCertificado div[style*="top: 81.5%"] {
-                top: 81% !important;
-            }
-
-            /* Tamaños de fuente proporcionales a la impresión grande */
+            /* Ajustes finos proporcionales para la vista de impresión grande */
             #printableCertificado h2 {
-                font-size: 26px !important;
-            }
-            
-            #printableCertificado span {
-                font-size: 11px !important;
+                font-size: 24px !important;
             }
 
-            #printableCertificado .grid span {
-                font-size: 13px !important;
+            /* Tamaños específicos para los números del contador dentro de las esferas */
+            #printableCertificado .grid span, 
+            #printableCertificado div span[id^="cert"] {
+                font-size: 12px !important;
                 font-weight: bold !important;
             }
-            
-            /* Optimización de fuentes */
-            #printableCertificado h2, 
-            #printableCertificado span, 
-            #printableCertificado p {
-                -webkit-font-smoothing: antialiased;
-                text-rendering: optimizeLegibility;
-            }
-            
-            /* Ocultar botón de descarga físico */
+
+            /* Ocultar el botón físico de descarga para que no salga impreso */
             #printableCertificado .pt-2 {
                 display: none !important;
             }
