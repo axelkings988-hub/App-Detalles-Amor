@@ -36,7 +36,7 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
 
-      /* ESTILOS DE IMPRESIÓN DEFINITIVOS Y CORREGIDOS */
+     /* ESTILOS DE IMPRESIÓN ROBUSTOS PARA PC Y MÓVILES */
         @media print {
             body * { visibility: hidden; }
             #printableCertificado, #printableCertificado * { visibility: visible; }
@@ -54,7 +54,7 @@
                 overflow: hidden !important;
             }
 
-            /* Contenedor fijo que abarca exactamente toda la hoja carta */
+            /* Contenedor principal de toda la hoja física */
             #printableCertificado {
                 position: fixed !important;
                 left: 0 !important;
@@ -79,7 +79,7 @@
                 image-rendering: -webkit-optimize-contrast;
             }
             
-            /* Tarjeta principal con tamaño ideal para llenar la hoja sin crear segunda página */
+            /* Tamaño óptimo de la tarjeta para que llene la hoja sin saltar a página 2 */
             #printableCertificado .aspect-\[912\/1168\] {
                 width: 175mm !important;
                 max-width: 175mm !important;
@@ -90,25 +90,19 @@
                 margin: auto !important;
             }
 
-            /* ASEGURAR QUE TODOS LOS CONTENEDORES DE TEXTO Y CONTADORES MANTENGAN SU POSICIÓN ORIGINAL */
+            /* CONGELAR Y PROTEGER LAS POSICIONES ORIGINALES DE TUS CONTENEDORES ABSOLUTOS */
             #printableCertificado div[class*="absolute"] {
-                /* Permitir que las clases absolutas originales de tu diseño funcionen sin alteración forzada */
-                transform: none !important;
+                position: absolute !important;
             }
 
-            /* Ajustes finos proporcionales para la vista de impresión grande */
-            #printableCertificado h2 {
-                font-size: 24px !important;
+            /* Asegurar visibilidad y tamaño correcto de los contadores y textos dinámicos */
+            #printableCertificado span, 
+            #printableCertificado div {
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
             }
 
-            /* Tamaños específicos para los números del contador dentro de las esferas */
-            #printableCertificado .grid span, 
-            #printableCertificado div span[id^="cert"] {
-                font-size: 12px !important;
-                font-weight: bold !important;
-            }
-
-            /* Ocultar el botón físico de descarga para que no salga impreso */
+            /* Ocultar el botón físico de descarga al imprimir */
             #printableCertificado .pt-2 {
                 display: none !important;
             }
