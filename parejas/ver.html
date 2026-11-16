@@ -45,8 +45,7 @@
                 position: fixed !important;
                 left: 50% !important;
                 top: 50% !important;
-                /* ZOOM DE IMPRESIÓN DEL CERTIFICADO (scale 1.35) */
-                transform: translate(-50%, -50%) scale(1.35) !important;
+                transform: translate(-50%, -50%) !important;
                 width: 100% !important;
                 max-width: 420px !important;
                 margin: 0 !important;
@@ -259,7 +258,7 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-        <!-- CERTIFICADO OFICIAL DEL AMOR (VER.HTML) -->
+        <!-- CERTIFICADO OFICIAL DEL AMOR (VER.HTML) - NÚMEROS PERFECTAMENTE ALINEADOS -->
         <section id="certificadoImprimir" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
@@ -268,9 +267,9 @@
             <!-- Contenedor con la proporción exacta de basefoto.jpg (912x1168) -->
             <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
                 
-                <!-- 1. MARCA DE AGUA DE PRUEBA (COLOR MÁS INTENSO Y VISIBLE: opacity-30 y borde más marcado) -->
-                <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30 rotate-[-25deg] z-20">
-                    <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl shadow-lg bg-rose-100/10">Versión de Prueba</span>
+                <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
+                <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
+                    <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
                 </div>
 
                 <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA Y ALINEACIÓN EXACTA DE CÍRCULOS -->
@@ -733,8 +732,8 @@
                         if (diasRestantes < 0) diasRestantes = 0;
 
                         const noticeBox = document.getElementById('trialExpirationNotice');
-                        const noticeTest = document.getElementById('trialNoticeText');
-                        noticeTest.innerText = `⚠️ Este es un detalle de prueba que expira en ${diasRestantes} ${diasRestantes === 1 ? 'día' : 'días'}. Consérvalo para siempre por solo $25 MXN.`;
+                        const noticeText = document.getElementById('trialNoticeText');
+                        noticeText.innerText = `⚠️ Este es un detalle de prueba que expira en ${diasRestantes} ${diasRestantes === 1 ? 'día' : 'días'}. Consérvalo para siempre por solo $25 MXN.`;
                         noticeBox.classList.remove('hidden');
                     }
 
