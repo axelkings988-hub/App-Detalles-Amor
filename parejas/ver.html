@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Librería html2canvas para captura exacta de impresión -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- Firebase y Supabase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -35,82 +37,6 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
-
-    /* ESTILOS DE IMPRESIÓN DEFINITIVOS PARA PC Y MÓVILES */
-        @media print {
-            body * { visibility: hidden; }
-            #printableCertificado, #printableCertificado * { visibility: visible; }
-            
-            @page {
-                size: letter portrait;
-                margin: 0mm;
-            }
-            
-            body, html {
-                width: 100% !important;
-                height: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden !important;
-                background: white !important;
-            }
-
-            /* Forzar el lienzo de impresión a tamaño carta exacto */
-            #printableCertificado {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 215.9mm !important;
-                height: 279.4mm !important;
-                max-width: none !important;
-                max-height: none !important;
-                transform: none !important;
-                box-shadow: none !important;
-                border: none !important;
-                background: white !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden !important;
-                
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                image-rendering: -webkit-optimize-contrast;
-            }
-            
-            /* Contenedor de la tarjeta dimensionado proporcionalmente al papel carta */
-            #printableCertificado .aspect-\[912\/1168\] {
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                width: 190mm !important;
-                height: 243mm !important;
-                max-width: none !important;
-                max-height: none !important;
-                margin: 0 !important;
-                background-size: cover !important;
-                background-position: center !important;
-            }
-
-            /* BLINDAJE DE POSICIONES ABSOLUTAS INTERNAS PARA QUE NADA SE MUEVA */
-            #printableCertificado div {
-                position: absolute !important;
-            }
-
-            /* Asegurar que los textos, contadores y fechas mantengan sus fuentes legibles */
-            #printableCertificado span, 
-            #printableCertificado h2,
-            #printableCertificado p {
-                -webkit-font-smoothing: antialiased;
-                text-rendering: optimizeLegibility;
-            }
-
-            /* Ocultar el botón físico de descarga */
-            #printableCertificado .pt-2,
-            #printableCertificado button {
-                display: none !important;
-            }
-        }
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
@@ -307,7 +233,7 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-        <!-- CERTIFICADO OFICIAL DEL AMOR (CON ID PARA IMPRESIÓN LIMPIA) -->
+        <!-- CERTIFICADO OFICIAL DEL AMOR (CON ID PARA CAPTURA HTML2CANVAS) -->
         <section id="printableCertificado" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
@@ -362,17 +288,14 @@
                 </div>
             </div>
 
-            <!-- BOTÓN DE DESCARGA -->
+            <!-- BOTÓN DE DESCARGA E IMPRESIÓN CON HTML2CANVAS -->
             <div class="pt-2">
                 <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <i class="fas fa-download"></i> Descargar Certificado en Alta Calidad
+                    <i class="fas fa-download"></i> Descargar / Imprimir Certificado
                 </button>
             </div>
         </section>
 
-    </main>
-</body>
-</html>       
         <!-- CONTADOR DE TIEMPO ESTÉTICO -->
         <section id="loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold font-cursive text-rose-100 flex items-center justify-center gap-2">
@@ -592,12 +515,48 @@
             }
         }
 
+        // FUNCIÓN BLINDADA CON HTML2CANVAS PARA IMPRESIÓN EXACTA
         function intentarDescargarCertificado() {
             if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
                 alert("🔒 Para obtener el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
                 return;
             }
-            window.print();
+
+            const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
+            
+            // Ocultar temporalmente el botón de descarga dentro de la captura si lo hubiera
+            html2canvas(elementoCertificado, {
+                scale: 3, // Máxima nitidez tipo imprenta
+                useCORS: true,
+                backgroundColor: null
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const ventanaImpresion = window.open('', '_blank');
+                
+                ventanaImpresion.document.write(`
+                    <html>
+                        <head>
+                            <title>Certificado Oficial del Amor</title>
+                            <style>
+                                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: white; }
+                                img { width: 100%; max-width: 190mm; height: auto; object-fit: contain; }
+                                @media print {
+                                    body { margin: 0; }
+                                    @page { size: letter portrait; margin: 0mm; }
+                                    img { width: 100%; height: 100vh; object-fit: contain; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <img src="${imgData}" onload="window.print(); window.close();" />
+                        </body>
+                    </html>
+                `);
+                ventanaImpresion.document.close();
+            }).catch(err => {
+                console.error("Error al generar la imagen del certificado:", err);
+                window.print(); // Fallback por seguridad
+            });
         }
 
         function toggleCustomVoicePlay(mode) {
