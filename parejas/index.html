@@ -42,27 +42,54 @@
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); width: 100%; }
         #pv-heartFill { transition: height 0.25s ease-out; }
 
-        @media print {
-            body * { visibility: hidden; }
-            #printablePostal, #printablePostal * { visibility: visible; }
-            #printablePostal {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                transform: none !important;
-                width: 85% !important;
-                max-width: 450px !important;
-                box-shadow: none !important;
-                border: none !important;
-                background: white !important;
-                margin: 0 !important;
-            }
-            #qrContainer {
-        top: 4.5% !important;
-        right: 13.5% !important;
+       @media print {
+    body * { visibility: hidden; }
+    #printablePostal, #printablePostal * { visibility: visible; }
+    
+    /* Configuración universal para evitar páginas en blanco extra */
+    @page {
+        size: auto;
+        margin: 0mm;
     }
-            .no-print { display: none !important; }
-        }
+    
+    body, html {
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    /* Contenedor principal de la postal adaptado para impresión limpia */
+    #printablePostal {
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 300px !important;
+        max-width: 90% !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        margin: 0 !important;
+        padding: 12px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    #printablePostal img {
+        width: 100% !important;
+        max-width: 280px !important;
+        height: auto !important;
+    }
+    
+    /* Posición exacta y universal del QR al imprimir en cualquier dispositivo */
+    #qrContainer {
+        top: 4.5% !important;
+        right: 18.5% !important;
+    }
+    
+    .no-print { display: none !important; }
+}
     </style>
     <link rel="manifest" href="../manifest.json">
 </head>
