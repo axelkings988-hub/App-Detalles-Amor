@@ -49,7 +49,7 @@
     <!-- Pantalla de Carga -->
     <div id="loadingScreen" class="text-center space-y-3">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto"></div>
-        <p id="loadingText" class="text-xs text-slate-300">Cargando invitación...</p>
+        <p id="loadingText" class="text-xs text-slate-300">Cargando sobre sorpresa...</p>
     </div>
 
     <!-- Paso 1: Registro del Invitado -->
@@ -59,7 +59,7 @@
         </div>
 
         <div class="space-y-1">
-            <span class="text-[10px] uppercase tracking-widest text-indigo-300 font-bold">Invitación Especial</span>
+            <span class="text-[10px] uppercase tracking-widest text-indigo-300 font-bold">Sobre Sorpresa</span>
             <h1 id="tituloDinamica" class="text-xl font-serif font-bold text-white">Dinámica de Colores</h1>
             <p id="disponiblesText" class="text-xs text-emerald-400 font-semibold pt-1"></p>
         </div>
@@ -73,7 +73,7 @@
 
             <button onclick="reclamarColor()" id="btnReclamar" 
                 class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2">
-                <i class="fas fa-magic"></i> Abrir mi Carta y Ver mi Color
+                <i class="fas fa-magic"></i> Abrir mi Sobre y Ver mi Color
             </button>
         </div>
     </div>
@@ -83,7 +83,7 @@
         <div class="bg-slate-900/95 backdrop-blur-xl border-2 border-amber-400/50 rounded-3xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
             
             <div class="space-y-1">
-                <span class="text-[10px] uppercase tracking-widest text-amber-400 font-bold">Carta Oficial • Dilo D' QRazón</span>
+                <span class="text-[10px] uppercase tracking-widest text-amber-400 font-bold">Sobre Oficial • Dilo D' QRazón</span>
                 <h2 id="cardDinamicaTitle" class="text-sm font-semibold text-slate-300"></h2>
             </div>
 
@@ -112,7 +112,7 @@
             <i class="fas fa-lock"></i>
         </div>
         <h2 class="text-lg font-serif font-bold text-white">Colores Agotados</h2>
-        <p class="text-xs text-slate-300">Todos los colores disponibles para esta dinámica ya fueron reclamados por otros participantes.</p>
+        <p class="text-xs text-slate-300">Todos los colores disponibles para este sobre ya fueron reclamados por otros participantes.</p>
     </div>
 
     <script>
@@ -181,7 +181,7 @@
         async function reclamarColor() {
             const nombre = document.getElementById('invitadoNombre').value.trim();
             if (!nombre) {
-                alert("Por favor escribe tu nombre antes de abrir tu carta.");
+                alert("Por favor escribe tu nombre antes de abrir tu sobre.");
                 return;
             }
 
@@ -230,7 +230,7 @@
                     console.error("Error en transacción:", error);
                     alert("No se pudo asignar el color. Intenta de nuevo.");
                     btn.disabled = false;
-                    btn.innerHTML = `<i class="fas fa-magic"></i> Abrir mi Carta y Ver mi Color`;
+                    btn.innerHTML = `<i class="fas fa-magic"></i> Abrir mi Sobre y Ver mi Color`;
                 }
             }
         }
@@ -262,4 +262,3 @@
     </script>
 </body>
 </html>
-
