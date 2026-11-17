@@ -37,13 +37,6 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
-
-        /* ESTILOS ANTIDIFUMINADO PARA EL CERTIFICADO Y SUS TEXTOS */
-        #printableCertificado .aspect-\[912\/1168\] * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
-        }
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
@@ -240,35 +233,29 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-        <!-- CERTIFICADO OFICIAL DEL AMOR (CON COORDENADAS PERFECTAMENTE UNIFICADAS) -->
+        <!-- CERTIFICADO OFICIAL DEL AMOR (VISTA VISUAL EN PANTALLA) -->
         <section id="printableCertificado" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
             </h3>
 
-            <!-- Contenedor con la proporción exacta de tu imagen basefoto.jpg (912x1168) -->
+            <!-- Contenedor visual -->
             <div class="relative w-full max-w-sm mx-auto rounded-2xl shadow-2xl overflow-hidden aspect-[912/1168] bg-cover bg-center" style="background-image: url('basefoto.jpg');">
                 
-                <!-- 1. MARCA DE AGUA DINÁMICA DE PRUEBA -->
+                <!-- 1. MARCA DE AGUA VISUAL -->
                 <div id="marcaAguaPrueba" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 rotate-[-25deg] z-20">
                     <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
                 </div>
 
-                <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA UNIFICADA (CORREGIDA PARA NOMBRES Y CONTADORES) -->
+                <!-- 2. CAPA DE DATOS VISUAL -->
                 <div class="absolute inset-0 z-10 select-none">
-                    
-                    <!-- NOMBRES DE LA PAREJA (Alineados exactamente al centro estricto) -->
-                    <div class="absolute w-full text-center" style="top: 35.5%;">
+                    <div class="absolute w-full text-center" style="top: 34.5%;">
                         <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
                     </div>
-
-                    <!-- 1. FECHA DE RELACIÓN -->
-                    <div class="absolute" style="top: 50.2%; left: 61%;">
+                    <div class="absolute" style="top: 49.8%; left: 61%;">
                         <span class="text-[10px] font-semibold text-rose-950" id="certFecha">Fecha</span>
                     </div>
-
-                    <!-- 2. CONTADORES DE TIEMPO (Centrado absoluto perfecto en esferas) -->
-                    <div class="absolute w-full px-6" style="top: 61.2%;">
+                    <div class="absolute w-full px-6" style="top: 60.8%;">
                         <div class="grid grid-cols-6 gap-2 max-w-[290px] mx-auto text-center">
                             <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certAnos">0</span></div>
                             <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certMeses">0</span></div>
@@ -278,24 +265,19 @@
                             <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certSegundos">0</span></div>
                         </div>
                     </div>
-
-                    <!-- 3. FOLIO ÚNICO -->
-                    <div class="absolute" style="top: 69.5%; left: 63%;">
+                    <div class="absolute" style="top: 69.2%; left: 63%;">
                         <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
                     </div>
-
-                    <!-- 4. FECHA DE EMISIÓN -->
-                    <div class="absolute text-center" style="top: 81%; left: 38%; right: 25%;">
+                    <div class="absolute text-center" style="top: 80.8%; left: 38%; right: 25%;">
                         <div class="text-[7.5px] text-gray-800 italic leading-tight">
                             <p>Contando hasta su emisión el día</p>
                             <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            <!-- BOTONES DE ACCIÓN: IMPRIMIR Y GUARDAR IMAGEN -->
+            <!-- BOTONES DE ACCIÓN -->
             <div class="pt-2 flex flex-col sm:flex-row gap-2">
                 <button onclick="imprimirCertificadoConCanvas()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
                     <i class="fas fa-print"></i> Imprimir Certificado
@@ -344,6 +326,57 @@
             </p>
         </section>
     </main>
+
+    <!-- CONTENEDOR OCULTO DE ALTA RESOLUCIÓN FIJA (912x1168 px REALES PARA CERO DIFUMINADO Y 100% PRECISIÓN) -->
+    <div id="exportContainerWrapper" style="position: absolute; left: -9999px; top: -9999px; width: 912px; height: 1168px; overflow: hidden;">
+        <div id="exportCertificado" style="position: relative; width: 912px; height: 1168px; background-image: url('basefoto.jpg'); background-size: cover; background-position: center;">
+            
+            <!-- Marca de agua oculta si es prueba -->
+            <div id="exportMarcaAgua" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0.15; transform: rotate(-25deg); z-index: 20;">
+                <span style="font-size: 85px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #831843; border: 10px solid #831843; padding: 20px; border-radius: 20px;">Versión de Prueba</span>
+            </div>
+
+            <!-- Datos dinámicos con coordenadas de alta resolución fijas -->
+            <div style="position: absolute; inset: 0; z-index: 10;">
+                
+                <!-- Nombres -->
+                <div style="position: absolute; width: 100%; top: 385px; text-align: center;">
+                    <h2 id="expCertNombres" style="font-family: 'Dancing Script', cursive; font-size: 68px; font-weight: bold; color: #3B0A11; margin: 0;">Nombres</h2>
+                </div>
+
+                <!-- Fecha de relación -->
+                <div style="position: absolute; top: 588px; left: 556px;">
+                    <span id="expCertFecha" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 600; color: #230408;">Fecha</span>
+                </div>
+
+                <!-- Contadores -->
+                <div style="position: absolute; width: 100%; top: 718px; padding: 0 50px;">
+                    <div style="display: flex; justify-content: center; gap: 28px; width: 680px; margin: 0 auto; text-align: center;">
+                        <div style="width: 85px; display: flex; justify-content: center;"><span id="expCertAnos" style="font-size: 32px; font-weight: bold; color: #111;">0</span></div>
+                        <div style="width: 85px; display: flex; justify-content: center;"><span id="expCertMeses" style="font-size: 32px; font-weight: bold; color: #111;">0</span></div>
+                        <div style="width: 85px; display: flex; justify-content: center;"><span id="expCertDias" style="font-size: 32px; font-weight: bold; color: #111;">0</span></div>
+                        <div style="width: 85px; display: flex; justify-content: center;"><span id="expCertHoras" style="font-size: 32px; font-weight: bold; color: #111;">0</span></div>
+                        <div style="width: 85px; display: flex; justify-content: center;"><span id="expCertMinutos" style="font-size: 32px; font-weight: bold; color: #111;">0</span></div>
+                        <div style="width: 85px; display: flex; justify-content: center;"><span id="expCertSegundos" style="font-size: 32px; font-weight: bold; color: #111;">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Folio -->
+                <div style="position: absolute; top: 812px; left: 574px;">
+                    <span id="expCertFolio" style="font-family: monospace; font-size: 24px; font-weight: bold; color: #230408; letter-spacing: 0.05em;">DDQR-OFICIAL</span>
+                </div>
+
+                <!-- Fecha emisión -->
+                <div style="position: absolute; top: 948px; left: 345px; width: 330px; text-align: center;">
+                    <div style="font-size: 18px; color: #1f2937; font-style: italic; line-height: 1.3;">
+                        <p style="margin: 0;">Contando hasta su emisión el día</p>
+                        <p id="expCertEmisionFecha" style="margin: 2px 0 0 0; font-weight: 600; color: #111;">Fecha Hoy</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -459,13 +492,20 @@
             document.getElementById('premioOculto').innerText = data.premioRasca || "¡Un abrazo gigante sorpresa!";
             setTimeout(() => inicializarRascaCanvas('scratchCanvas'), 200);
 
-            // Inyección de datos en el Certificado Oficial con basefoto.jpg
+            // Inyección de datos tanto en la vista visual como en el contenedor oculto de alta resolución
             document.getElementById('certNombres').innerText = data.nombres || "";
+            document.getElementById('expCertNombres').innerText = data.nombres || "";
+
             document.getElementById('certFecha').innerText = data.fecha || "";
-            document.getElementById('certFolio').innerText = `DDQR-${docId ? docId.substring(0, 6).toUpperCase() : 'OFICIAL'}`;
+            document.getElementById('expCertFecha').innerText = data.fecha || "";
+
+            const folioTxt = `DDQR-${docId ? docId.substring(0, 6).toUpperCase() : 'OFICIAL'}`;
+            document.getElementById('certFolio').innerText = folioTxt;
+            document.getElementById('expCertFolio').innerText = folioTxt;
             
             const hoyStr = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
             document.getElementById('certEmisionFecha').innerText = hoyStr;
+            document.getElementById('expCertEmisionFecha').innerText = hoyStr;
 
             if (data.fechaEspecialTimestamp) {
                 const fInicio = new Date(data.fechaEspecialTimestamp);
@@ -484,21 +524,27 @@
                 if(dias < 0) { meses--; dias += new Date(fEmision.getFullYear(), fEmision.getMonth(), 0).getDate(); }
                 if(meses < 0) { anos--; meses += 12; }
 
+                // Vista visual
                 document.getElementById('certAnos').innerText = anos;
                 document.getElementById('certMeses').innerText = meses;
                 document.getElementById('certDias').innerText = dias;
                 document.getElementById('certHoras').innerText = h;
                 document.getElementById('certMinutos').innerText = m;
                 document.getElementById('certSegundos').innerText = s;
+
+                // Contenedor oculto alta resolución
+                document.getElementById('expCertAnos').innerText = anos;
+                document.getElementById('expCertMeses').innerText = meses;
+                document.getElementById('expCertDias').innerText = dias;
+                document.getElementById('expCertHoras').innerText = h;
+                document.getElementById('expCertMinutos').innerText = m;
+                document.getElementById('expCertSegundos').innerText = s;
             }
 
-            const marcaAguaEl = document.getElementById('marcaAguaPrueba');
-            if (data.pagado === true) {
-                if (marcaAguaEl) marcaAguaEl.style.display = 'none';
-            } else {
-                if (marcaAguaEl) marcaAguaEl.style.display = 'flex';
-            }
-
+            const pagadoEstado = data.pagado === true;
+            document.getElementById('marcaAguaPrueba').style.display = pagadoEstado ? 'none' : 'flex';
+            document.getElementById('exportMarcaAgua').style.display = pagadoEstado ? 'none' : 'flex';
+            
             currentQuizIndex = 0;
             quizScore = 0;
             document.getElementById('quizScore').innerText = `Puntos: 0`;
@@ -525,17 +571,17 @@
             }
         }
 
-        // FUNCIÓN 1: IMPRIMIR CERTIFICADO CON HTML2CANVAS OPTIMIZADO Y NÍTIDO
+        // FUNCIÓN 1: IMPRIMIR DESDE EL CONTENEDOR DE ALTA RESOLUCIÓN FIJA
         function imprimirCertificadoConCanvas() {
             if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
                 alert("🔒 Para obtener el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
                 return;
             }
 
-            const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
+            const elementoExportar = document.getElementById('exportCertificado');
             
-            html2canvas(elementoCertificado, {
-                scale: 4, // Escala de ultra alta definición para evitar cualquier difuminado
+            html2canvas(elementoExportar, {
+                scale: 2, // 2x sobre 912px da más de 1800px de ancho: nitidez total imprenta
                 useCORS: true,
                 backgroundColor: null,
                 logging: false
@@ -569,17 +615,17 @@
             });
         }
 
-        // FUNCIÓN 2: GUARDAR / DESCARGAR DIRECTAMENTE COMO IMAGEN JPG ULTRA NÍTIDA
+        // FUNCIÓN 2: GUARDAR IMAGEN DESDE EL CONTENEDOR DE ALTA RESOLUCIÓN FIJA
         function descargarCertificadoImagen() {
             if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
                 alert("🔒 Para descargar el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
                 return;
             }
 
-            const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
+            const elementoExportar = document.getElementById('exportCertificado');
             
-            html2canvas(elementoCertificado, {
-                scale: 4, // Ultra alta resolución para que la imagen base no se vea difuminada al hacer zoom
+            html2canvas(elementoExportar, {
+                scale: 2, // Calidad impecable sin difuminar en ningún celular o PC
                 useCORS: true,
                 backgroundColor: null,
                 logging: false
