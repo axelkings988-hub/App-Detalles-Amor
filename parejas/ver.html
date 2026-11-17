@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Librería html2canvas para captura exacta de impresión y guardado -->
+    <!-- Librería html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- Firebase y Supabase SDKs -->
@@ -37,6 +37,13 @@
         .font-cursive { font-family: 'Dancing Script', cursive; }
         .carousel-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1); }
         #heartFill { transition: height 0.25s ease-out; }
+
+        /* ESTILOS ANTIDIFUMINADO PARA EL CERTIFICADO Y SUS TEXTOS */
+        #printableCertificado .aspect-\[912\/1168\] * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
     </style>
 </head>
 <body class="min-h-screen relative pb-20 antialiased">
@@ -233,7 +240,7 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-        <!-- CERTIFICADO OFICIAL DEL AMOR (CON ID PARA CAPTURA HTML2CANVAS) -->
+        <!-- CERTIFICADO OFICIAL DEL AMOR (CON COORDENADAS PERFECTAMENTE UNIFICADAS) -->
         <section id="printableCertificado" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
@@ -247,38 +254,38 @@
                     <span class="text-3xl font-black uppercase tracking-widest text-[#831843] border-4 border-[#831843] p-4 rounded-xl">Versión de Prueba</span>
                 </div>
 
-                <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA EXACTA -->
+                <!-- 2. CAPA DE DATOS DINÁMICOS CON POSICIÓN ABSOLUTA UNIFICADA (CORREGIDA PARA NOMBRES Y CONTADORES) -->
                 <div class="absolute inset-0 z-10 select-none">
                     
-                    <!-- NOMBRES DE LA PAREJA -->
-                    <div class="absolute w-full text-center" style="top: 36%;">
+                    <!-- NOMBRES DE LA PAREJA (Alineados exactamente al centro estricto) -->
+                    <div class="absolute w-full text-center" style="top: 35.5%;">
                         <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
                     </div>
 
                     <!-- 1. FECHA DE RELACIÓN -->
-                    <div class="absolute" style="top: 50.5%; left: 61%;">
+                    <div class="absolute" style="top: 50.2%; left: 61%;">
                         <span class="text-[10px] font-semibold text-rose-950" id="certFecha">Fecha</span>
                     </div>
 
-                    <!-- 2. CONTADORES DE TIEMPO -->
-                    <div class="absolute w-full px-6" style="top: 62%;">
+                    <!-- 2. CONTADORES DE TIEMPO (Centrado absoluto perfecto en esferas) -->
+                    <div class="absolute w-full px-6" style="top: 61.2%;">
                         <div class="grid grid-cols-6 gap-2 max-w-[290px] mx-auto text-center">
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certAnos">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMeses">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certDias">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certHoras">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certMinutos">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-xs font-bold text-gray-900" id="certSegundos">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certAnos">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certMeses">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certDias">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certHoras">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certMinutos">0</span></div>
+                            <div class="flex items-center justify-center"><span class="text-[11px] font-bold text-gray-900" id="certSegundos">0</span></div>
                         </div>
                     </div>
 
                     <!-- 3. FOLIO ÚNICO -->
-                    <div class="absolute" style="top: 70%; left: 63%;">
+                    <div class="absolute" style="top: 69.5%; left: 63%;">
                         <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
                     </div>
 
                     <!-- 4. FECHA DE EMISIÓN -->
-                    <div class="absolute text-center" style="top: 81.5%; left: 38%; right: 25%;">
+                    <div class="absolute text-center" style="top: 81%; left: 38%; right: 25%;">
                         <div class="text-[7.5px] text-gray-800 italic leading-tight">
                             <p>Contando hasta su emisión el día</p>
                             <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
@@ -518,7 +525,7 @@
             }
         }
 
-        // FUNCIÓN 1: IMPRIMIR CERTIFICADO MEDIANTE CAPTURA EXACTA CON HTML2CANVAS
+        // FUNCIÓN 1: IMPRIMIR CERTIFICADO CON HTML2CANVAS OPTIMIZADO Y NÍTIDO
         function imprimirCertificadoConCanvas() {
             if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
                 alert("🔒 Para obtener el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
@@ -528,9 +535,10 @@
             const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
             
             html2canvas(elementoCertificado, {
-                scale: 3, // Máxima nitidez tipo imprenta
+                scale: 4, // Escala de ultra alta definición para evitar cualquier difuminado
                 useCORS: true,
-                backgroundColor: null
+                backgroundColor: null,
+                logging: false
             }).then(canvas => {
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 const ventanaImpresion = window.open('', '_blank');
@@ -561,7 +569,7 @@
             });
         }
 
-        // FUNCIÓN 2: GUARDAR / DESCARGAR DIRECTAMENTE COMO IMAGEN JPG
+        // FUNCIÓN 2: GUARDAR / DESCARGAR DIRECTAMENTE COMO IMAGEN JPG ULTRA NÍTIDA
         function descargarCertificadoImagen() {
             if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
                 alert("🔒 Para descargar el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
@@ -571,9 +579,10 @@
             const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
             
             html2canvas(elementoCertificado, {
-                scale: 3, // Alta calidad para galería
+                scale: 4, // Ultra alta resolución para que la imagen base no se vea difuminada al hacer zoom
                 useCORS: true,
-                backgroundColor: null
+                backgroundColor: null,
+                logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'Certificado-Nuestra-Historia.jpg';
