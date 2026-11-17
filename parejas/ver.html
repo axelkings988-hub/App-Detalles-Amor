@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Librería html2canvas para captura exacta de impresión -->
+    <!-- Librería html2canvas para captura exacta de impresión y guardado -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- Firebase y Supabase SDKs -->
@@ -288,10 +288,13 @@
                 </div>
             </div>
 
-            <!-- BOTÓN DE DESCARGA E IMPRESIÓN CON HTML2CANVAS -->
-            <div class="pt-2">
-                <button onclick="intentarDescargarCertificado()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <i class="fas fa-download"></i> Descargar / Imprimir Certificado
+            <!-- BOTONES DE ACCIÓN: IMPRIMIR Y GUARDAR IMAGEN -->
+            <div class="pt-2 flex flex-col sm:flex-row gap-2">
+                <button onclick="imprimirCertificadoConCanvas()" class="w-full py-3 bg-gradient-to-r from-gold-500 to-amber-600 text-burgundy-950 text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i class="fas fa-print"></i> Imprimir Certificado
+                </button>
+                <button onclick="descargarCertificadoImagen()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i class="fas fa-download"></i> Guardar Imagen
                 </button>
             </div>
         </section>
@@ -515,8 +518,8 @@
             }
         }
 
-        // FUNCIÓN BLINDADA CON HTML2CANVAS PARA IMPRESIÓN EXACTA
-        function intentarDescargarCertificado() {
+        // FUNCIÓN 1: IMPRIMIR CERTIFICADO MEDIANTE CAPTURA EXACTA CON HTML2CANVAS
+        function imprimirCertificadoConCanvas() {
             if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
                 alert("🔒 Para obtener el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
                 return;
@@ -524,7 +527,6 @@
 
             const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
             
-            // Ocultar temporalmente el botón de descarga dentro de la captura si lo hubiera
             html2canvas(elementoCertificado, {
                 scale: 3, // Máxima nitidez tipo imprenta
                 useCORS: true,
@@ -554,8 +556,32 @@
                 `);
                 ventanaImpresion.document.close();
             }).catch(err => {
-                console.error("Error al generar la imagen del certificado:", err);
-                window.print(); // Fallback por seguridad
+                console.error("Error al generar la impresión:", err);
+                window.print();
+            });
+        }
+
+        // FUNCIÓN 2: GUARDAR / DESCARGAR DIRECTAMENTE COMO IMAGEN JPG
+        function descargarCertificadoImagen() {
+            if (!proyectoGlobalData || proyectoGlobalData.pagado !== true) {
+                alert("🔒 Para descargar el certificado limpio, en alta resolución y sin marca de agua, activa el acceso permanente por $25 MXN.");
+                return;
+            }
+
+            const elementoCertificado = document.querySelector('#printableCertificado .aspect-\\[912\\/1168\\]');
+            
+            html2canvas(elementoCertificado, {
+                scale: 3, // Alta calidad para galería
+                useCORS: true,
+                backgroundColor: null
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Certificado-Nuestra-Historia.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                link.click();
+            }).catch(err => {
+                console.error("Error al descargar la imagen:", err);
+                alert("Hubo un error al generar la imagen. Inténtalo de nuevo.");
             });
         }
 
