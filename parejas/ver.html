@@ -231,7 +231,7 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-    <!-- CERTIFICADO OFICIAL DEL AMOR (AJUSTE FINAL DE COORDENADAS) -->
+    <!-- CERTIFICADO OFICIAL DEL AMOR (AJUSTE MILIMÉTRICO FINAL) -->
         <section id="printableCertificado" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
@@ -250,30 +250,36 @@
                         <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
                     </div>
 
-                    <!-- 2. Fecha especial de relación (Bajada a su línea correcta) -->
-                    <div class="absolute w-full text-center" style="top: 51%;">
+                    <!-- 2. Fecha de relación (Agregados 15 espacios/desplazamiento adelante y bajada a su línea) -->
+                    <div class="absolute w-full text-center" style="top: 50.5%; padding-left: 75px;">
                         <span class="text-[11px] font-semibold text-rose-950" id="certFecha">Fecha</span>
                     </div>
 
-                    <!-- 3. Contadores (Centrados perfectamente dentro de las 6 esferas) -->
+                    <!-- 3. Contadores (Ajustados de manera independiente cada uno) -->
                     <div class="absolute w-full" style="top: 61.5%;">
                         <div class="grid grid-cols-6 gap-0 max-w-[280px] mx-auto text-center px-1">
-                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certAnos">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certMeses">0</span></div>
+                            <!-- Años: un backspace a la izquierda (-3px) -->
+                            <div class="flex items-center justify-center" style="position: relative; left: -3px;"><span class="text-[10px] font-bold text-gray-900" id="certAnos">0</span></div>
+                            <!-- Meses: un backspace a la izquierda (-3px) -->
+                            <div class="flex items-center justify-center" style="position: relative; left: -3px;"><span class="text-[10px] font-bold text-gray-900" id="certMeses">0</span></div>
+                            <!-- Días: perfecto -->
                             <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certDias">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certHoras">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certMinutos">0</span></div>
-                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certSegundos">0</span></div>
+                            <!-- Horas: 1 espacio adelante (+3px) -->
+                            <div class="flex items-center justify-center" style="position: relative; left: 3px;"><span class="text-[10px] font-bold text-gray-900" id="certHoras">0</span></div>
+                            <!-- Minutos: 2 espacios adelante (+7px) -->
+                            <div class="flex items-center justify-center" style="position: relative; left: 7px;"><span class="text-[10px] font-bold text-gray-900" id="certMinutos">0</span></div>
+                            <!-- Segundos: 3 espacios adelante (+11px) -->
+                            <div class="flex items-center justify-center" style="position: relative; left: 11px;"><span class="text-[10px] font-bold text-gray-900" id="certSegundos">0</span></div>
                         </div>
                     </div>
 
-                    <!-- 4. Folio único (Devuelto a su lugar al lado de la etiqueta de folio) -->
-                    <div class="absolute" style="top: 67.5%; left: 63%;">
+                    <!-- 4. Folio único (1 interlineado abajo -> top mayor) -->
+                    <div class="absolute" style="top: 69.5%; left: 63%;">
                         <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
                     </div>
 
-                    <!-- 5. Fecha de emisión (Bajada a su recuadro inferior derecho) -->
-                    <div class="absolute text-center" style="top: 76.5%; left: 45%; right: 18%;">
+                    <!-- 5. Fecha de emisión (1 interlineado abajo y 2 backspaces hacia la izquierda) -->
+                    <div class="absolute text-center" style="top: 79.5%; left: 38%; right: 25%;">
                         <div class="text-[7.5px] text-gray-800 italic leading-tight">
                             <p>Contando hasta su emisión el día</p>
                             <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
