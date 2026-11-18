@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -51,7 +50,7 @@
                 Sobre Sorpresa / Colores
             </h1>
             <p class="text-xs text-slate-300">
-                Asigna cartas y colores únicos sin repeticiones mediante un enlace o QR.
+                Selecciona los colores de tu preferencia y asígnalos sin repeticiones.
             </p>
         </div>
 
@@ -91,19 +90,16 @@
                     class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-400">
             </div>
 
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-amber-400 flex justify-between">
-                    <span>Cantidad de Colores (Máx. 10)</span>
-                    <span id="contadorLabel" class="text-indigo-300">5 colores</span>
-                </label>
-                <input type="range" id="cantidadColores" min="2" max="10" value="5" oninput="actualizarListaInputs()"
-                    class="w-full accent-amber-400 cursor-pointer">
-            </div>
-
             <div class="space-y-2 pt-1">
-                <label class="text-xs font-bold text-amber-400 block">Personaliza los Colores</label>
-                <div id="coloresInputsContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <!-- Se llena dinámicamente con JS -->
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-amber-400">Selecciona los Colores a Incluir</label>
+                    <span id="contadorSeleccionados" class="text-[11px] text-indigo-300 font-semibold">9 seleccionados</span>
+                </div>
+                <p class="text-[10px] text-slate-400">Marca o desmarca las casillas según los colores que quieras usar:</p>
+                
+                <!-- Lista de casillas con los colores solicitados -->
+                <div id="checklistColores" class="space-y-2 max-h-64 overflow-y-auto pr-1 bg-slate-950/90 p-3 rounded-xl border border-slate-800">
+                    <!-- Se genera por JavaScript -->
                 </div>
             </div>
 
@@ -164,17 +160,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const paletaDefault = [
-            { nombre: "Rojo Pasión", hex: "#EF4444" },
-            { nombre: "Azul Rey", hex: "#3B82F6" },
-            { nombre: "Verde Esmeralda", hex: "#10B981" },
-            { nombre: "Amarillo Sol", hex: "#F59E0B" },
-            { nombre: "Morado Místico", hex: "#8B5CF6" },
-            { nombre: "Rosa Mexicano", hex: "#EC4899" },
-            { nombre: "Naranja Vibrante", hex: "#F97316" },
-            { nombre: "Turquesa", hex: "#06B6D4" },
-            { nombre: "Blanco Perla", hex: "#F8FAFC" },
-            { nombre: "Negro Elegante", hex: "#1E293B" }
+        // Lista fija con los colores solicitados
+        const coloresDisponiblesMaster = [
+            { id: 0, nombre: "Rojo", hex: "#EF4444" },
+            { id: 1, nombre: "Morado", hex: "#8B5CF6" },
+            { id: 2, nombre: "Rosa", hex: "#EC4899" },
+            { id: 3, nombre: "Negro", hex: "#1E293B" },
+            { id: 4, nombre: "Azul cielo", hex: "#38BDF8" },
+            { id: 5, nombre: "Amarillo", hex: "#FACC15" },
+            { id: 6, nombre: "Fiusha", hex: "#D946EF" },
+            { id: 7, nombre: "Café", hex: "#9A3412" },
+            { id: 8, nombre: "Verde", hex: "#10B981" }
         ];
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -185,7 +181,7 @@
             document.getElementById('homeSection').classList.add('hidden');
             document.getElementById('formSection').classList.remove('hidden');
             document.getElementById('resultSection').classList.add('hidden');
-            actualizarListaInputs();
+            generarChecklistColores();
         }
 
         function volverAlHome() {
@@ -193,6 +189,35 @@
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('resultSection').classList.add('hidden');
             renderizarMisProyectos();
+        }
+
+        function generarChecklistColores() {
+            const container = document.getElementById('checklistColores');
+            container.innerHTML = '';
+
+            coloresDisponiblesMaster.forEach((col, index) => {
+                const item = document.createElement('label');
+                item.className = "flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 cursor-pointer transition";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-5 h-5 rounded-full shadow-inner border border-white/20 shrink-0" style="background-color: ${col.hex};"></span>
+                        <span class="text-xs font-semibold text-white">${col.nombre}</span>
+                    </div>
+                    <input type="checkbox" id="chk_color_${index}" value="${index}" checked onchange="actualizarContadorSeleccionados()"
+                        class="w-4 h-4 accent-amber-400 rounded cursor-pointer">
+                `;
+                container.appendChild(item);
+            });
+            actualizarContadorSeleccionados();
+        }
+
+        function actualizarContadorSeleccionados() {
+            let seleccionados = 0;
+            coloresDisponiblesMaster.forEach((_, index) => {
+                const chk = document.getElementById(`chk_color_${index}`);
+                if (chk && chk.checked) seleccionados++;
+            });
+            document.getElementById('contadorSeleccionados').innerText = `${seleccionados} seleccionados`;
         }
 
         function renderizarMisProyectos() {
@@ -214,7 +239,6 @@
             const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
 
             misProyectos.forEach((proj) => {
-                // Apunta a ver.html en minúsculas
                 const shareUrl = `${baseUrl}ver.html?id=${proj.id}`;
                 const card = document.createElement('div');
                 card.className = "bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow";
@@ -255,27 +279,6 @@
             });
         }
 
-        function actualizarListaInputs() {
-            const cantidad = parseInt(document.getElementById('cantidadColores').value);
-            document.getElementById('contadorLabel').innerText = `${cantidad} colores`;
-            
-            const container = document.getElementById('coloresInputsContainer');
-            container.innerHTML = '';
-
-            for (let i = 0; i < cantidad; i++) {
-                const def = paletaDefault[i] || { nombre: `Color ${i + 1}`, hex: "#6366F1" };
-                const row = document.createElement('div');
-                row.className = "flex items-center gap-2 bg-slate-950/90 p-2 rounded-xl border border-slate-800";
-                row.innerHTML = `
-                    <span class="text-[10px] font-bold text-slate-500 w-4 text-center">${i + 1}</span>
-                    <input type="color" id="colorHex_${i}" value="${def.hex}" class="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0">
-                    <input type="text" id="colorName_${i}" value="${def.nombre}" placeholder="Nombre del color" 
-                        class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400">
-                `;
-                container.appendChild(row);
-            }
-        }
-
         async function crearDinamica() {
             const titulo = document.getElementById('tituloDinamica').value.trim();
             if (!titulo) {
@@ -283,19 +286,23 @@
                 return;
             }
 
-            const cantidad = parseInt(document.getElementById('cantidadColores').value);
             const listaColores = [];
+            coloresDisponiblesMaster.forEach((col, index) => {
+                const chk = document.getElementById(`chk_color_${index}`);
+                if (chk && chk.checked) {
+                    listaColores.push({
+                        id: listaColores.length,
+                        nombre: col.nombre,
+                        hex: col.hex,
+                        ocupadoPor: null,
+                        nombreInvitado: null
+                    });
+                }
+            });
 
-            for (let i = 0; i < cantidad; i++) {
-                const nombre = document.getElementById(`colorName_${i}`).value.trim() || `Color ${i + 1}`;
-                const hex = document.getElementById(`colorHex_${i}`).value;
-                listaColores.push({
-                    id: i,
-                    nombre: nombre,
-                    hex: hex,
-                    ocupadoPor: null,
-                    nombreInvitado: null
-                });
+            if (listaColores.length === 0) {
+                alert("Debes seleccionar al menos un color para la dinámica.");
+                return;
             }
 
             const btn = document.getElementById('btnCrear');
@@ -344,5 +351,4 @@
         }
     </script>
 </body>
-  </html>
-  
+</html>
