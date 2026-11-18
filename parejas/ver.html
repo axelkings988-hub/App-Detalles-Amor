@@ -231,7 +231,7 @@
             <audio id="finalVoicePlayer" class="hidden"></audio>
         </section>
 
-    <!-- CERTIFICADO OFICIAL DEL AMOR (AJUSTE FINO Y DEFINITIVO) -->
+    <!-- CERTIFICADO OFICIAL DEL AMOR (AJUSTE FINAL Y DEFINITIVO) -->
         <section id="printableCertificado" class="bg-burgundy-900/50 backdrop-blur-lg border border-rose-500/20 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
             <h3 class="text-base font-bold text-rose-100 flex items-center justify-center gap-2">
                 <i class="fas fa-award text-gold-400"></i> Certificado Oficial del Amor
@@ -250,8 +250,8 @@
                         <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
                     </div>
 
-                    <!-- 2. Fecha de relación (13 espacios adelante / padding-left aumentado) -->
-                    <div class="absolute w-full text-center" style="top: 50.5%; padding-left: 95px;">
+                    <!-- 2. Fecha de relación (Movida fuertemente hacia adelante con padding-left) -->
+                    <div class="absolute w-full" style="top: 50.5%; padding-left: 150px; text-align: left;">
                         <span class="text-[11px] font-semibold text-rose-950" id="certFecha">Fecha</span>
                     </div>
 
@@ -260,12 +260,12 @@
                         <div class="grid grid-cols-6 gap-0 max-w-[280px] mx-auto text-center px-1">
                             <!-- Años: 1 backspace (-3px) -->
                             <div class="flex items-center justify-center" style="position: relative; left: -3px;"><span class="text-[10px] font-bold text-gray-900" id="certAnos">0</span></div>
-                            <!-- Meses: 1 backspace (-3px) -->
-                            <div class="flex items-center justify-center" style="position: relative; left: -3px;"><span class="text-[10px] font-bold text-gray-900" id="certMeses">0</span></div>
-                            <!-- Días: perfecto (0) -->
+                            <!-- Meses: perfecto (sin mover) -->
+                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certMeses">0</span></div>
+                            <!-- Días: perfecto (sin mover) -->
                             <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certDias">0</span></div>
-                            <!-- Horas: 1 espacio adelante (+3px) -->
-                            <div class="flex items-center justify-center" style="position: relative; left: 3px;"><span class="text-[10px] font-bold text-gray-900" id="certHoras">0</span></div>
+                            <!-- Horas: perfecto (sin mover) -->
+                            <div class="flex items-center justify-center"><span class="text-[10px] font-bold text-gray-900" id="certHoras">0</span></div>
                             <!-- Minutos: 1 espacio adelante (+3px) -->
                             <div class="flex items-center justify-center" style="position: relative; left: 3px;"><span class="text-[10px] font-bold text-gray-900" id="certMinutos">0</span></div>
                             <!-- Segundos: 2 espacios adelante (+6px) -->
@@ -273,13 +273,13 @@
                         </div>
                     </div>
 
-                    <!-- 4. Folio único (1 enter de bajada / top incrementado) -->
-                    <div class="absolute" style="top: 71%; left: 63%;">
+                    <!-- 4. Folio único (1 enter abajo / top incrementado) -->
+                    <div class="absolute" style="top: 71.5%; left: 63%;">
                         <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider" id="certFolio">DDQR-OFICIAL</span>
                     </div>
 
-                    <!-- 5. Fecha de expedición (1 enter de bajada y 2 backspaces a la izquierda / left ajustado) -->
-                    <div class="absolute text-center" style="top: 80.5%; left: 40%; right: 23%;">
+                    <!-- 5. Fecha de expedición (1 backspace / movida ligeramente a la izquierda) -->
+                    <div class="absolute text-center" style="top: 79.5%; left: 35%; right: 28%;">
                         <div class="text-[7.5px] text-gray-800 italic leading-tight">
                             <p>Contando hasta su emisión el día</p>
                             <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
