@@ -251,51 +251,51 @@
                 <h2 class="text-2xl font-cursive font-bold text-[#3B0A11] drop-shadow-sm" id="certNombres">Nombres</h2>
             </div>
 
-            <!-- 2. Fecha de relación (Alineada justo después de "desde:") -->
-            <div class="absolute" style="top: 50.3%; left: 57%;">
+            <!-- 2. Fecha de relación (+2 espacios adelante: left de 57% a 59%) -->
+            <div class="absolute" style="top: 50.3%; left: 59%;">
                 <span class="text-[10.5px] font-semibold text-rose-950 whitespace-nowrap" id="certFecha">Fecha</span>
             </div>
 
-            <!-- 3. Contadores (Centrados horizontal y verticalmente dentro de cada círculo) -->
-            <div class="absolute w-full" style="top: 61.5%;">
+            <!-- 3. Contadores (Bajados un poco: top de 61.5% a 62.2%) -->
+            <div class="absolute w-full" style="top: 62.2%;">
                 <div class="grid grid-cols-6 gap-0 max-w-[276px] mx-auto text-center">
-                    <!-- Años -->
+                    <!-- Años: sin cambios (-6px) -->
                     <div class="flex items-center justify-center" style="position: relative; left: -6px;">
                         <span class="text-[10px] font-bold text-gray-900" id="certAnos">0</span>
                     </div>
-                    <!-- Meses -->
+                    <!-- Meses: sin cambios (-5px) -->
                     <div class="flex items-center justify-center" style="position: relative; left: -5px;">
                         <span class="text-[10px] font-bold text-gray-900" id="certMeses">0</span>
                     </div>
-                    <!-- Días -->
+                    <!-- Días: sin cambios (-3px) -->
                     <div class="flex items-center justify-center" style="position: relative; left: -3px;">
                         <span class="text-[10px] font-bold text-gray-900" id="certDias">0</span>
                     </div>
-                    <!-- Horas -->
-                    <div class="flex items-center justify-center" style="position: relative; left: -1px;">
+                    <!-- Horas: +1 espacio adelante (-1px -> +2px) -->
+                    <div class="flex items-center justify-center" style="position: relative; left: 2px;">
                         <span class="text-[10px] font-bold text-gray-900" id="certHoras">0</span>
                     </div>
-                    <!-- Minutos -->
-                    <div class="flex items-center justify-center" style="position: relative; left: 1px;">
+                    <!-- Minutos: +1 espacio adelante (1px -> 4px) -->
+                    <div class="flex items-center justify-center" style="position: relative; left: 4px;">
                         <span class="text-[10px] font-bold text-gray-900" id="certMinutos">0</span>
                     </div>
-                    <!-- Segundos -->
-                    <div class="flex items-center justify-center" style="position: relative; left: 3px;">
+                    <!-- Segundos: +1 espacio adelante (3px -> 6px) -->
+                    <div class="flex items-center justify-center" style="position: relative; left: 6px;">
                         <span class="text-[10px] font-bold text-gray-900" id="certSegundos">0</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 4. Folio único (Bajado para quedar alineado con "CERTIFICADO FOLIO ÚNICO:") -->
-            <div class="absolute" style="top: 69.5%; left: 61%;">
+            <!-- 4. Folio único (Un poco más abajo: top de 69.5% a 70.3%) -->
+            <div class="absolute" style="top: 70.3%; left: 61%;">
                 <span class="text-[10px] font-mono font-bold text-rose-950 tracking-wider whitespace-nowrap" id="certFolio">DDQR-OFICIAL</span>
             </div>
 
-            <!-- 5. Fecha de expedición -->
-            <div class="absolute text-center" style="top: 77.5%; left: 35%; right: 28%;">
-                <div class="text-[7.5px] text-gray-800 italic leading-tight">
+            <!-- 5. Fecha de expedición (+1 espacio adelante con left/right y +1 interlineado con pt-1.5) -->
+            <div class="absolute text-center" style="top: 77.5%; left: 36.5%; right: 26.5%;">
+                <div class="text-[7.5px] text-gray-800 italic leading-normal">
                     <p>Contando hasta su emisión el día</p>
-                    <p class="font-semibold text-gray-900 pt-0.5" id="certEmisionFecha">Fecha Hoy</p>
+                    <p class="font-semibold text-gray-900 pt-1.5" id="certEmisionFecha">Fecha Hoy</p>
                 </div>
             </div>
 
@@ -306,7 +306,6 @@
         📸 Tómale una captura de pantalla a este certificado para guardarlo en tu galería.
     </p>
 </section>
-
         
         <!-- CONTADOR DE TIEMPO ESTÉTICO -->
         <section id="loveCounterSection" class="hidden bg-burgundy-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
