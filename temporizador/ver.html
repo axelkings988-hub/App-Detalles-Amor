@@ -67,6 +67,68 @@
             transition: background 0.8s ease-in-out;
         }
 
+        /* Lienzo de luz fluida para pantalla de espera */
+        #lienzoLuzFluida {
+            --color-principal: rgba(245, 158, 11, 0.28);
+            --color-acento: rgba(251, 191, 36, 0.22);
+            --ola-gradiente: linear-gradient(125deg, rgba(245, 158, 11, 0.14), rgba(109, 40, 217, 0.22), rgba(251, 191, 36, 0.16));
+        }
+
+        .ola-luz-fluida {
+            position: absolute;
+            inset: -25%;
+            background: var(--ola-gradiente);
+            background-size: 240% 240%;
+            filter: blur(28px);
+            animation: moverOlaLuz 9s ease-in-out infinite alternate, respirarOla 6s ease-in-out infinite;
+        }
+
+        .esfera-aurora-a {
+            position: absolute;
+            width: 24rem;
+            height: 24rem;
+            top: 14%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 9999px;
+            background: radial-gradient(circle, var(--color-principal) 0%, transparent 70%);
+            filter: blur(42px);
+            animation: flotarEsferaA 11s ease-in-out infinite alternate;
+        }
+
+        .esfera-aurora-b {
+            position: absolute;
+            width: 22rem;
+            height: 22rem;
+            bottom: -4rem;
+            right: -3rem;
+            border-radius: 9999px;
+            background: radial-gradient(circle, var(--color-acento) 0%, transparent 72%);
+            filter: blur(48px);
+            animation: flotarEsferaB 13s ease-in-out infinite alternate;
+        }
+
+        @keyframes moverOlaLuz {
+            0% { background-position: 0% 25%; transform: translate3d(-2%, -2%, 0) scale(1); }
+            50% { background-position: 100% 75%; transform: translate3d(2%, 1%, 0) scale(1.04); }
+            100% { background-position: 20% 90%; transform: translate3d(-1%, 2%, 0) scale(1); }
+        }
+
+        @keyframes respirarOla {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 0.95; }
+        }
+
+        @keyframes flotarEsferaA {
+            0% { transform: translate(-62%, -8%) scale(0.95); opacity: 0.65; }
+            100% { transform: translate(-34%, 12%) scale(1.12); opacity: 0.95; }
+        }
+
+        @keyframes flotarEsferaB {
+            0% { transform: translate(12%, 10%) scale(1.08); opacity: 0.6; }
+            100% { transform: translate(-24%, -14%) scale(0.92); opacity: 0.9; }
+        }
+
         /* Fondo para la Edición Romántica con máximo brillo del GIF */
         .bg-pareja-revelado {
             background-image: linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.20)), url('./gif-besos-de-amor.gif') !important;
@@ -101,10 +163,17 @@
         }
     </style>
 </head>
-<body id="bodyBg" class="p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
+<body id="bodyBg" class="p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat relative overflow-x-hidden">
+
+    <!-- LIENZO DE LUZ FLUIDA EN MOVIMIENTO (ACTIVO MIENTRAS CORRE EL TEMPORIZADOR) -->
+    <div id="lienzoLuzFluida" class="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-opacity duration-700">
+        <div class="ola-luz-fluida"></div>
+        <div class="esfera-aurora-a"></div>
+        <div class="esfera-aurora-b"></div>
+    </div>
 
     <!-- CONTENEDOR PRINCIPAL -->
-    <div id="mainContainer" class="w-full max-w-md p-2 text-center space-y-4 relative overflow-hidden">
+    <div id="mainContainer" class="w-full max-w-md p-2 text-center space-y-4 relative z-10 overflow-hidden">
         
         <!-- CABECERA DE ESPERA (SE OCULTA AL REVELAR) -->
         <div id="headerEspera" class="space-y-2">
@@ -229,21 +298,31 @@
             const body = document.getElementById('bodyBg');
             const badge = document.getElementById('badgeEstilo');
             const badgeRev = document.getElementById('badgeEstiloRevelado');
+            const lienzo = document.getElementById('lienzoLuzFluida');
 
             if(estilo === 'familiar') {
                 body.style.background = "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)";
+                lienzo.style.setProperty('--color-principal', 'rgba(34, 211, 238, 0.28)');
+                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.22)');
+                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(34, 211, 238, 0.16), rgba(14, 116, 144, 0.24), rgba(251, 191, 36, 0.15))');
                 badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-cyan-500 text-white";
                 badge.innerText = "✨ Edición Mágica";
                 badgeRev.className = badge.className;
                 badgeRev.innerText = badge.innerText;
             } else if(estilo === 'pareja') {
                 body.style.background = "linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%)";
+                lienzo.style.setProperty('--color-principal', 'rgba(244, 63, 94, 0.30)');
+                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.22)');
+                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(244, 63, 94, 0.18), rgba(136, 19, 55, 0.24), rgba(251, 191, 36, 0.16))');
                 badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-rose-500 text-white";
                 badge.innerText = "💖 Edición Romántica";
                 badgeRev.className = badge.className;
                 badgeRev.innerText = badge.innerText;
             } else {
                 body.style.background = "linear-gradient(135deg, #31103F 0%, #4C1D95 50%, #6D28D9 100%)";
+                lienzo.style.setProperty('--color-principal', 'rgba(168, 85, 247, 0.28)');
+                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.26)');
+                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(245, 158, 11, 0.16), rgba(109, 40, 217, 0.24), rgba(251, 191, 36, 0.18))');
                 badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-amber-400 text-amber-950";
                 badge.innerText = "🎉 Edición Cumpleaños";
                 badgeRev.className = badge.className;
@@ -336,6 +415,9 @@
         }
 
         function revelarRegalo(data) {
+            const lienzo = document.getElementById('lienzoLuzFluida');
+            if (lienzo) lienzo.classList.add('hidden');
+
             document.getElementById('headerEspera').classList.add('hidden');
             document.getElementById('headerRevelacion').classList.remove('hidden');
             document.getElementById('countdownBox').classList.add('hidden');
