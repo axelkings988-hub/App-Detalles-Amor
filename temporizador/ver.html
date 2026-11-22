@@ -67,66 +67,139 @@
             transition: background 0.8s ease-in-out;
         }
 
-        /* Lienzo de luz fluida para pantalla de espera */
+        /* Lienzo de luz fluida, líneas y esferas perceptibles en espera */
         #lienzoLuzFluida {
-            --color-principal: rgba(245, 158, 11, 0.28);
-            --color-acento: rgba(251, 191, 36, 0.22);
-            --ola-gradiente: linear-gradient(125deg, rgba(245, 158, 11, 0.14), rgba(109, 40, 217, 0.22), rgba(251, 191, 36, 0.16));
+            --color-principal: rgba(245, 158, 11, 0.45);
+            --color-acento: rgba(168, 85, 247, 0.42);
+            --color-linea: rgba(251, 191, 36, 0.45);
+            --ola-gradiente: linear-gradient(125deg, rgba(245, 158, 11, 0.24), rgba(109, 40, 217, 0.34), rgba(251, 191, 36, 0.25));
         }
 
         .ola-luz-fluida {
             position: absolute;
             inset: -25%;
             background: var(--ola-gradiente);
-            background-size: 240% 240%;
-            filter: blur(28px);
-            animation: moverOlaLuz 9s ease-in-out infinite alternate, respirarOla 6s ease-in-out infinite;
+            background-size: 260% 260%;
+            filter: blur(22px);
+            animation: moverOlaLuz 7s ease-in-out infinite alternate, respirarOla 4.5s ease-in-out infinite;
         }
 
         .esfera-aurora-a {
             position: absolute;
-            width: 24rem;
-            height: 24rem;
-            top: 14%;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 22rem;
+            height: 22rem;
+            top: 8%;
+            left: -4rem;
             border-radius: 9999px;
-            background: radial-gradient(circle, var(--color-principal) 0%, transparent 70%);
-            filter: blur(42px);
-            animation: flotarEsferaA 11s ease-in-out infinite alternate;
+            background: radial-gradient(circle, var(--color-principal) 0%, transparent 72%);
+            filter: blur(26px);
+            animation: flotarEsferaA 8s ease-in-out infinite alternate;
         }
 
         .esfera-aurora-b {
             position: absolute;
-            width: 22rem;
-            height: 22rem;
-            bottom: -4rem;
-            right: -3rem;
+            width: 24rem;
+            height: 24rem;
+            bottom: 4%;
+            right: -5rem;
             border-radius: 9999px;
             background: radial-gradient(circle, var(--color-acento) 0%, transparent 72%);
-            filter: blur(48px);
-            animation: flotarEsferaB 13s ease-in-out infinite alternate;
+            filter: blur(28px);
+            animation: flotarEsferaB 9s ease-in-out infinite alternate;
+        }
+
+        .linea-luz {
+            position: absolute;
+            left: -35%;
+            width: 170%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-linea), rgba(255, 255, 255, 0.65), var(--color-linea), transparent);
+            box-shadow: 0 0 14px var(--color-linea);
+            filter: blur(0.6px);
+            opacity: 0.7;
+        }
+
+        .linea-luz-1 {
+            top: 24%;
+            transform: rotate(-14deg);
+            animation: deslizarLinea1 5.5s linear infinite;
+        }
+
+        .linea-luz-2 {
+            top: 56%;
+            transform: rotate(11deg);
+            animation: deslizarLinea2 7s linear infinite;
+        }
+
+        .linea-luz-3 {
+            top: 80%;
+            transform: rotate(-8deg);
+            animation: deslizarLinea3 6.2s linear infinite;
+        }
+
+        .emoji-expansivo {
+            position: absolute;
+            left: 50%;
+            top: 46%;
+            font-size: 1.6rem;
+            line-height: 1;
+            pointer-events: none;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.35));
+            animation: brotarYExpandir var(--duracion, 3.6s) cubic-bezier(0.16, 1, 0.3, 1) infinite;
+            animation-delay: var(--retraso, 0s);
         }
 
         @keyframes moverOlaLuz {
-            0% { background-position: 0% 25%; transform: translate3d(-2%, -2%, 0) scale(1); }
-            50% { background-position: 100% 75%; transform: translate3d(2%, 1%, 0) scale(1.04); }
-            100% { background-position: 20% 90%; transform: translate3d(-1%, 2%, 0) scale(1); }
+            0% { background-position: 0% 20%; transform: translate3d(-3%, -2%, 0) scale(1); }
+            100% { background-position: 100% 80%; transform: translate3d(3%, 2%, 0) scale(1.06); }
         }
 
         @keyframes respirarOla {
-            0%, 100% { opacity: 0.55; }
-            50% { opacity: 0.95; }
+            0%, 100% { opacity: 0.65; }
+            50% { opacity: 1; }
         }
 
         @keyframes flotarEsferaA {
-            0% { transform: translate(-62%, -8%) scale(0.95); opacity: 0.65; }
-            100% { transform: translate(-34%, 12%) scale(1.12); opacity: 0.95; }
+            0% { transform: translate(-15%, -10%) scale(0.9); }
+            100% { transform: translate(42%, 18%) scale(1.18); }
         }
 
         @keyframes flotarEsferaB {
-            0% { transform: translate(12%, 10%) scale(1.08); opacity: 0.6; }
-            100% { transform: translate(-24%, -14%) scale(0.92); opacity: 0.9; }
+            0% { transform: translate(15%, 12%) scale(1.15); }
+            100% { transform: translate(-45%, -22%) scale(0.92); }
+        }
+
+        @keyframes deslizarLinea1 {
+            0% { transform: translate3d(-25%, -12px, 0) rotate(-14deg); opacity: 0.15; }
+            50% { opacity: 0.85; }
+            100% { transform: translate3d(25%, 12px, 0) rotate(-14deg); opacity: 0.15; }
+        }
+
+        @keyframes deslizarLinea2 {
+            0% { transform: translate3d(25%, 10px, 0) rotate(11deg); opacity: 0.15; }
+            50% { opacity: 0.8; }
+            100% { transform: translate3d(-25%, -10px, 0) rotate(11deg); opacity: 0.15; }
+        }
+
+        @keyframes deslizarLinea3 {
+            0% { transform: translate3d(-20%, 8px, 0) rotate(-8deg); opacity: 0.15; }
+            50% { opacity: 0.75; }
+            100% { transform: translate3d(20%, -8px, 0) rotate(-8deg); opacity: 0.15; }
+        }
+
+        @keyframes brotarYExpandir {
+            0% {
+                transform: translate(-50%, -50%) scale(0.35) rotate(0deg);
+                opacity: 0;
+            }
+            18% {
+                opacity: 0.95;
+            }
+            100% {
+                transform: translate(calc(-50% + var(--dx, 120px)), calc(-50% + var(--dy, -140px))) scale(var(--escala-fin, 1.55)) rotate(var(--rotacion, 35deg));
+                opacity: 0;
+            }
         }
 
         /* Fondo para la Edición Romántica con máximo brillo del GIF */
@@ -165,11 +238,15 @@
 </head>
 <body id="bodyBg" class="p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat relative overflow-x-hidden">
 
-    <!-- LIENZO DE LUZ FLUIDA EN MOVIMIENTO (ACTIVO MIENTRAS CORRE EL TEMPORIZADOR) -->
+    <!-- LIENZO DE LUZ FLUIDA, LÍNEAS, ESFERAS Y EMOJIS EN BUCLE -->
     <div id="lienzoLuzFluida" class="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-opacity duration-700">
         <div class="ola-luz-fluida"></div>
         <div class="esfera-aurora-a"></div>
         <div class="esfera-aurora-b"></div>
+        <div class="linea-luz linea-luz-1"></div>
+        <div class="linea-luz linea-luz-2"></div>
+        <div class="linea-luz linea-luz-3"></div>
+        <div id="contenedorEmojisBucle" class="absolute inset-0 overflow-hidden"></div>
     </div>
 
     <!-- CONTENEDOR PRINCIPAL -->
@@ -198,28 +275,28 @@
         </div>
 
         <!-- CANDADO DE PROTECCIÓN ANIMADO -->
-        <div id="candadoBox" class="relative w-40 h-40 mx-auto rounded-3xl bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center p-3 shadow-2xl border-2 border-white/20">
-            <div class="candado-animado text-6xl mb-1 filter drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">🔐</div>
+        <div id="candadoBox" class="relative z-20 w-40 h-40 mx-auto rounded-3xl bg-black/55 backdrop-blur-md flex flex-col items-center justify-center p-3 shadow-2xl border-2 border-white/25">
+            <div class="candado-animado text-6xl mb-1 filter drop-shadow-[0_0_12px_rgba(255,215,0,0.65)]">🔐</div>
             <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider drop-shadow">Bloqueado</span>
         </div>
 
         <!-- MODO TEMPORIZADOR -->
-        <div id="countdownBox" class="space-y-3">
+        <div id="countdownBox" class="relative z-20 space-y-3">
             <p class="text-xs text-amber-100 font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">El contenido se desbloqueará en:</p>
             <div id="cajasTiempo" class="flex flex-wrap items-center justify-center gap-2 text-center">
-                <div id="boxDays" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
+                <div id="boxDays" class="bg-black/50 backdrop-blur-md p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
                     <span id="days" class="text-xl font-extrabold block text-white drop-shadow">00</span>
                     <span class="text-[8px] uppercase text-amber-200 font-bold">Días</span>
                 </div>
-                <div id="boxHours" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
+                <div id="boxHours" class="bg-black/50 backdrop-blur-md p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
                     <span id="hours" class="text-xl font-extrabold block text-white drop-shadow">00</span>
                     <span class="text-[8px] uppercase text-amber-200 font-bold">Horas</span>
                 </div>
-                <div id="boxMinutes" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
+                <div id="boxMinutes" class="bg-black/50 backdrop-blur-md p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
                     <span id="minutes" class="text-xl font-extrabold block text-white drop-shadow">00</span>
                     <span class="text-[8px] uppercase text-amber-200 font-bold">Min</span>
                 </div>
-                <div id="boxSeconds" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20 transition-all duration-300">
+                <div id="boxSeconds" class="bg-black/50 backdrop-blur-md p-2.5 rounded-xl border border-white/20 shadow-lg w-20 transition-all duration-300">
                     <span id="seconds" class="text-xl font-extrabold block text-white drop-shadow transition-all duration-300">00</span>
                     <span id="labelSeconds" class="text-[8px] uppercase text-amber-200 font-bold">Seg</span>
                 </div>
@@ -264,15 +341,25 @@
             cumpleaños: "https://media.giphy.com/media/3o7tT127O8vXzE2F6U/giphy.gif"
         };
 
+        const emojisPorEstilo = {
+            familiar: ["✨", "🌟", "💫", "💛", "🎇", "🤍","🌈", "⚡"],
+            pareja: ["💖", "💘", "✨", "💕", "🌹", "💫","🔥", "👨🏻‍❤️‍💋‍👨🏻", "💞", "👩🏻‍❤️‍💋‍👨🏻"],
+            cumpleaños: ["🎉", "🎂", "🎈", "✨", "🥳", "🎁"]
+        };
+
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
-            if(!id) return;
+            if(!id) {
+                generarBucleEmojis('cumpleaños');
+                return;
+            }
 
             const doc = await db.collection("temporizadores").doc(id).get();
             if(doc.exists) {
                 datosGlobales = doc.data();
                 aplicarEstilo(datosGlobales.estilo);
+                generarBucleEmojis(datosGlobales.estilo);
                 configurarMensajeEspera(datosGlobales.tipoSorpresa);
                 document.getElementById('txtDe').innerText = datosGlobales.de;
                 document.getElementById('txtPara').innerText = datosGlobales.para;
@@ -280,6 +367,39 @@
                 iniciarReloj(datosGlobales.targetDate, datosGlobales);
             }
         });
+
+        function generarBucleEmojis(estilo) {
+            const cont = document.getElementById('contenedorEmojisBucle');
+            if (!cont) return;
+            cont.innerHTML = "";
+
+            const pool = emojisPorEstilo[estilo] || emojisPorEstilo['cumpleaños'];
+            const totalEmojis = 18;
+
+            for (let i = 0; i < totalEmojis; i++) {
+                const span = document.createElement('span');
+                span.className = 'emoji-expansivo';
+                span.innerText = pool[Math.floor(Math.random() * pool.length)];
+
+                const angulo = (Math.PI * 2 * i) / totalEmojis + (Math.random() * 0.45 - 0.22);
+                const distancia = 140 + Math.random() * 190;
+                const dx = Math.round(Math.cos(angulo) * distancia);
+                const dy = Math.round(Math.sin(angulo) * distancia);
+                const duracion = (2.8 + Math.random() * 2.2).toFixed(2) + "s";
+                const retraso = (i * 0.22).toFixed(2) + "s";
+                const escalaFin = (1.25 + Math.random() * 0.7).toFixed(2);
+                const rotacion = Math.round(Math.random() * 90 - 45) + "deg";
+
+                span.style.setProperty('--dx', `${dx}px`);
+                span.style.setProperty('--dy', `${dy}px`);
+                span.style.setProperty('--duracion', duracion);
+                span.style.setProperty('--retraso', retraso);
+                span.style.setProperty('--escala-fin', escalaFin);
+                span.style.setProperty('--rotacion', rotacion);
+
+                cont.appendChild(span);
+            }
+        }
 
         function configurarMensajeEspera(tipoSorpresa) {
             const el = document.getElementById('mensajeTipoEspera');
@@ -302,27 +422,30 @@
 
             if(estilo === 'familiar') {
                 body.style.background = "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)";
-                lienzo.style.setProperty('--color-principal', 'rgba(34, 211, 238, 0.28)');
-                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.22)');
-                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(34, 211, 238, 0.16), rgba(14, 116, 144, 0.24), rgba(251, 191, 36, 0.15))');
+                lienzo.style.setProperty('--color-principal', 'rgba(34, 211, 238, 0.45)');
+                lienzo.style.setProperty('--color-acento', 'rgba(56, 189, 248, 0.40)');
+                lienzo.style.setProperty('--color-linea', 'rgba(103, 232, 249, 0.55)');
+                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(34, 211, 238, 0.24), rgba(14, 116, 144, 0.34), rgba(251, 191, 36, 0.20))');
                 badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-cyan-500 text-white";
                 badge.innerText = "✨ Edición Mágica";
                 badgeRev.className = badge.className;
                 badgeRev.innerText = badge.innerText;
             } else if(estilo === 'pareja') {
                 body.style.background = "linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%)";
-                lienzo.style.setProperty('--color-principal', 'rgba(244, 63, 94, 0.30)');
-                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.22)');
-                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(244, 63, 94, 0.18), rgba(136, 19, 55, 0.24), rgba(251, 191, 36, 0.16))');
+                lienzo.style.setProperty('--color-principal', 'rgba(244, 63, 94, 0.48)');
+                lienzo.style.setProperty('--color-acento', 'rgba(251, 113, 133, 0.40)');
+                lienzo.style.setProperty('--color-linea', 'rgba(253, 164, 175, 0.55)');
+                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(244, 63, 94, 0.26), rgba(136, 19, 55, 0.34), rgba(251, 191, 36, 0.18))');
                 badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-rose-500 text-white";
                 badge.innerText = "💖 Edición Romántica";
                 badgeRev.className = badge.className;
                 badgeRev.innerText = badge.innerText;
             } else {
                 body.style.background = "linear-gradient(135deg, #31103F 0%, #4C1D95 50%, #6D28D9 100%)";
-                lienzo.style.setProperty('--color-principal', 'rgba(168, 85, 247, 0.28)');
-                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.26)');
-                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(245, 158, 11, 0.16), rgba(109, 40, 217, 0.24), rgba(251, 191, 36, 0.18))');
+                lienzo.style.setProperty('--color-principal', 'rgba(168, 85, 247, 0.46)');
+                lienzo.style.setProperty('--color-acento', 'rgba(251, 191, 36, 0.42)');
+                lienzo.style.setProperty('--color-linea', 'rgba(253, 224, 71, 0.58)');
+                lienzo.style.setProperty('--ola-gradiente', 'linear-gradient(125deg, rgba(245, 158, 11, 0.24), rgba(109, 40, 217, 0.34), rgba(251, 191, 36, 0.25))');
                 badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-amber-400 text-amber-950";
                 badge.innerText = "🎉 Edición Cumpleaños";
                 badgeRev.className = badge.className;
@@ -338,40 +461,35 @@
             const spanSeconds = document.getElementById('seconds');
             const labelSeconds = document.getElementById('labelSeconds');
 
-            // Ocultar días si es 0
             if (d <= 0) {
                 boxDays.classList.add('hidden');
             } else {
                 boxDays.classList.remove('hidden');
             }
 
-            // Ocultar horas si no hay días y horas es 0
             if (d <= 0 && h <= 0) {
                 boxHours.classList.add('hidden');
             } else {
                 boxHours.classList.remove('hidden');
             }
 
-            // Ocultar minutos si no hay días ni horas y minutos es 0
             if (d <= 0 && h <= 0 && m <= 0) {
                 boxMinutes.classList.add('hidden');
             } else {
                 boxMinutes.classList.remove('hidden');
             }
 
-            // Agrandar caja de segundos cuando solo quedan segundos
             const soloSegundos = (d <= 0 && h <= 0 && m <= 0);
             if (soloSegundos) {
-                boxSeconds.className = "bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border-2 border-amber-300/60 shadow-2xl w-32 transition-all duration-300";
+                boxSeconds.className = "bg-black/55 backdrop-blur-md px-6 py-4 rounded-2xl border-2 border-amber-300/60 shadow-2xl w-32 transition-all duration-300";
                 spanSeconds.className = "text-4xl font-black block text-white drop-shadow transition-all duration-300";
                 labelSeconds.className = "text-[10px] uppercase text-amber-200 font-bold mt-1 block";
             } else {
-                boxSeconds.className = "bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20 transition-all duration-300";
+                boxSeconds.className = "bg-black/50 backdrop-blur-md p-2.5 rounded-xl border border-white/20 shadow-lg w-20 transition-all duration-300";
                 spanSeconds.className = "text-xl font-extrabold block text-white drop-shadow transition-all duration-300";
                 labelSeconds.className = "text-[8px] uppercase text-amber-200 font-bold";
             }
 
-            // Tornar dígitos en rojo cuando falten 10 segundos o menos
             if (totalSegundos <= 10 && totalSegundos > 0) {
                 spanSeconds.classList.add('alerta-roja');
             } else {
@@ -424,7 +542,7 @@
             document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
 
-            document.getElementById('txtMarquesina').innerText = `⚡ ${data.mensaje} ⚡`;
+            document.getElementById('txtMarquesina').innerText = `${data.mensaje}`;
             document.getElementById('ledPanelContainer').classList.remove('hidden');
 
             const body = document.getElementById('bodyBg');
