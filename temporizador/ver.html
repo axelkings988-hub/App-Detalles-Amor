@@ -93,6 +93,12 @@
             cursor: pointer;
             z-index: 10;
         }
+
+        /* Alerta de últimos 10 segundos en rojo */
+        .alerta-roja {
+            color: #FF3B30 !important;
+            text-shadow: 0 0 14px rgba(255, 59, 48, 0.95) !important;
+        }
     </style>
 </head>
 <body id="bodyBg" class="p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen text-white bg-cover bg-center bg-no-repeat">
@@ -100,14 +106,25 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <div id="mainContainer" class="w-full max-w-md p-2 text-center space-y-4 relative overflow-hidden">
         
-        <!-- CABECERA -->
-        <div class="space-y-1.5">
-            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md">Sorpresa Protegida</span>
-            <div class="nombre-destacado pt-1">
-                Para: <span id="txtPara">...</span>
+        <!-- CABECERA DE ESPERA (SE OCULTA AL REVELAR) -->
+        <div id="headerEspera" class="space-y-2">
+            <span id="badgeEstilo" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block">Sorpresa Protegida</span>
+            <p id="mensajeTipoEspera" class="text-sm font-normal text-amber-100 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] pt-1">
+                Preparando tu sorpresa...
+            </p>
+            <p class="text-base font-extrabold tracking-wide text-amber-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
+                🗝️ CONTENIDO CONFIDENCIAL 🚫
+            </p>
+        </div>
+
+        <!-- CABECERA DE REVELACIÓN: PRIMERO "DE", SEGUNDO "PARA" -->
+        <div id="headerRevelacion" class="hidden space-y-1.5">
+            <span id="badgeEstiloRevelado" class="text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block">Sorpresa Revelada</span>
+            <div class="nombre-destacado text-lg pt-1">
+                De: <span id="txtDe">...</span>
             </div>
-            <div class="nombre-destacado text-lg">
-                De parte de: <span id="txtDe">...</span>
+            <div class="nombre-destacado">
+                Para: <span id="txtPara">...</span>
             </div>
         </div>
 
@@ -120,22 +137,22 @@
         <!-- MODO TEMPORIZADOR -->
         <div id="countdownBox" class="space-y-3">
             <p class="text-xs text-amber-100 font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">El contenido se desbloqueará en:</p>
-            <div class="grid grid-cols-4 gap-1.5 text-center">
-                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+            <div id="cajasTiempo" class="flex flex-wrap items-center justify-center gap-2 text-center">
+                <div id="boxDays" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
                     <span id="days" class="text-xl font-extrabold block text-white drop-shadow">00</span>
                     <span class="text-[8px] uppercase text-amber-200 font-bold">Días</span>
                 </div>
-                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+                <div id="boxHours" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
                     <span id="hours" class="text-xl font-extrabold block text-white drop-shadow">00</span>
                     <span class="text-[8px] uppercase text-amber-200 font-bold">Horas</span>
                 </div>
-                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
+                <div id="boxMinutes" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20">
                     <span id="minutes" class="text-xl font-extrabold block text-white drop-shadow">00</span>
                     <span class="text-[8px] uppercase text-amber-200 font-bold">Min</span>
                 </div>
-                <div class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg">
-                    <span id="seconds" class="text-xl font-extrabold block text-white drop-shadow">00</span>
-                    <span class="text-[8px] uppercase text-amber-200 font-bold">Seg</span>
+                <div id="boxSeconds" class="bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20 transition-all duration-300">
+                    <span id="seconds" class="text-xl font-extrabold block text-white drop-shadow transition-all duration-300">00</span>
+                    <span id="labelSeconds" class="text-[8px] uppercase text-amber-200 font-bold">Seg</span>
                 </div>
             </div>
             <p class="text-[10px] italic text-amber-200/90 drop-shadow">🔒 Protegido con candado hasta finalizar el tiempo.</p>
@@ -187,53 +204,140 @@
             if(doc.exists) {
                 datosGlobales = doc.data();
                 aplicarEstilo(datosGlobales.estilo);
-                document.getElementById('txtPara').innerText = datosGlobales.para;
+                configurarMensajeEspera(datosGlobales.tipoSorpresa);
                 document.getElementById('txtDe').innerText = datosGlobales.de;
+                document.getElementById('txtPara').innerText = datosGlobales.para;
 
                 iniciarReloj(datosGlobales.targetDate, datosGlobales);
             }
         });
 
+        function configurarMensajeEspera(tipoSorpresa) {
+            const el = document.getElementById('mensajeTipoEspera');
+            if (tipoSorpresa === 'audio') {
+                el.innerText = "Un audio te espera, ten paciencia";
+            } else if (tipoSorpresa === 'cupon') {
+                el.innerText = "Falta poco para rascar tu premio";
+            } else if (tipoSorpresa === 'foto') {
+                el.innerText = "Cargando foto sorpresa...";
+            } else {
+                el.innerText = "Tu sorpresa está por revelarse...";
+            }
+        }
+
         function aplicarEstilo(estilo) {
             const body = document.getElementById('bodyBg');
             const badge = document.getElementById('badgeEstilo');
+            const badgeRev = document.getElementById('badgeEstiloRevelado');
 
             if(estilo === 'familiar') {
                 body.style.background = "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)";
-                badge.className += " bg-cyan-500 text-white";
+                badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-cyan-500 text-white";
                 badge.innerText = "✨ Edición Mágica";
+                badgeRev.className = badge.className;
+                badgeRev.innerText = badge.innerText;
             } else if(estilo === 'pareja') {
                 body.style.background = "linear-gradient(135deg, #230408 0%, #3B0A11 50%, #58111A 100%)";
-                badge.className += " bg-rose-500 text-white";
+                badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-rose-500 text-white";
                 badge.innerText = "💖 Edición Romántica";
+                badgeRev.className = badge.className;
+                badgeRev.innerText = badge.innerText;
             } else {
                 body.style.background = "linear-gradient(135deg, #31103F 0%, #4C1D95 50%, #6D28D9 100%)";
-                badge.className += " bg-amber-400 text-amber-950";
+                badge.className = "text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold shadow-md inline-block bg-amber-400 text-amber-950";
                 badge.innerText = "🎉 Edición Cumpleaños";
+                badgeRev.className = badge.className;
+                badgeRev.innerText = badge.innerText;
+            }
+        }
+
+        function actualizarVisibilidadCajas(d, h, m, totalSegundos) {
+            const boxDays = document.getElementById('boxDays');
+            const boxHours = document.getElementById('boxHours');
+            const boxMinutes = document.getElementById('boxMinutes');
+            const boxSeconds = document.getElementById('boxSeconds');
+            const spanSeconds = document.getElementById('seconds');
+            const labelSeconds = document.getElementById('labelSeconds');
+
+            // Ocultar días si es 0
+            if (d <= 0) {
+                boxDays.classList.add('hidden');
+            } else {
+                boxDays.classList.remove('hidden');
+            }
+
+            // Ocultar horas si no hay días y horas es 0
+            if (d <= 0 && h <= 0) {
+                boxHours.classList.add('hidden');
+            } else {
+                boxHours.classList.remove('hidden');
+            }
+
+            // Ocultar minutos si no hay días ni horas y minutos es 0
+            if (d <= 0 && h <= 0 && m <= 0) {
+                boxMinutes.classList.add('hidden');
+            } else {
+                boxMinutes.classList.remove('hidden');
+            }
+
+            // Agrandar caja de segundos cuando solo quedan segundos
+            const soloSegundos = (d <= 0 && h <= 0 && m <= 0);
+            if (soloSegundos) {
+                boxSeconds.className = "bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border-2 border-amber-300/60 shadow-2xl w-32 transition-all duration-300";
+                spanSeconds.className = "text-4xl font-black block text-white drop-shadow transition-all duration-300";
+                labelSeconds.className = "text-[10px] uppercase text-amber-200 font-bold mt-1 block";
+            } else {
+                boxSeconds.className = "bg-black/40 backdrop-blur-sm p-2.5 rounded-xl border border-white/20 shadow-lg w-20 transition-all duration-300";
+                spanSeconds.className = "text-xl font-extrabold block text-white drop-shadow transition-all duration-300";
+                labelSeconds.className = "text-[8px] uppercase text-amber-200 font-bold";
+            }
+
+            // Tornar dígitos en rojo cuando falten 10 segundos o menos
+            if (totalSegundos <= 10 && totalSegundos > 0) {
+                spanSeconds.classList.add('alerta-roja');
+            } else {
+                spanSeconds.classList.remove('alerta-roja');
             }
         }
 
         function iniciarReloj(targetIso, data) {
             const targetTime = new Date(targetIso).getTime();
 
-            const intervalo = setInterval(() => {
+            const tick = () => {
                 const now = new Date().getTime();
                 const diff = targetTime - now;
 
-                if(diff <= 0) {
+                if (diff <= 0) {
                     clearInterval(intervalo);
                     revelarRegalo(data);
-                    return;
+                    return true;
                 }
 
-                document.getElementById('days').innerText = Math.floor(diff / (1000*60*60*24));
-                document.getElementById('hours').innerText = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-                document.getElementById('minutes').innerText = Math.floor((diff % (1000*60*60)) / (1000*60));
-                document.getElementById('seconds').innerText = Math.floor((diff % (1000*60)) / 1000);
-            }, 1000);
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                const totalSegundos = Math.floor(diff / 1000);
+
+                document.getElementById('days').innerText = d;
+                document.getElementById('hours').innerText = h;
+                document.getElementById('minutes').innerText = m;
+                document.getElementById('seconds').innerText = s;
+
+                actualizarVisibilidadCajas(d, h, m, totalSegundos);
+                return false;
+            };
+
+            if (!tick()) {
+                var intervalo = setInterval(() => {
+                    tick();
+                }, 1000);
+            }
         }
 
         function revelarRegalo(data) {
+            document.getElementById('headerEspera').classList.add('hidden');
+            document.getElementById('headerRevelacion').classList.remove('hidden');
             document.getElementById('countdownBox').classList.add('hidden');
             document.getElementById('candadoBox').classList.add('hidden');
             document.getElementById('revealedBox').classList.remove('hidden');
