@@ -288,7 +288,7 @@
 
             <div id="editModeSection" class="hidden space-y-3 text-left">
                 <div id="deadlineWarning" class="hidden p-2.5 bg-amber-500/20 border border-amber-500/40 rounded-xl text-[11px] text-amber-300 text-center font-semibold">
-                    ⚠️ El período de edición ha finalizado (Bloqueo estricto a 48 horas del encendido).
+                    ⚠️ El período de edición ha finalizado (Bloqueo estricto a 5 minutos del encendido).
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-gold-400">Tu Nombre</label>
@@ -530,7 +530,7 @@
 
         function openCreatorManageModal() {
             if (checkEditDeadline()) {
-                alert("⚠️ El período de edición ha finalizado (Bloqueo estricto a 48 horas del encendido).");
+                alert("⚠️ El período de edición ha finalizado (Bloqueo estricto a 5 minutos del encendido).");
                 return;
             }
 
@@ -635,7 +635,6 @@
             const paywallOverlay = document.getElementById('paywallOverlay');
             const now = new Date();
 
-            // NOTA: Si isPreviewMode está activo, NO desbloqueamos el árbol para mantener la prueba del temporizador
             const realUnlocked = treeData.pagado === true && now >= targetUnlockDate;
 
             if (realUnlocked || isPreviewMode) {
@@ -645,7 +644,6 @@
                     triggerMagicGlow();
                     autoPlayOnUnlock();
                 } else {
-                    // En modo previsualización, ocultamos pago pero respetamos que las esferas sigan bloqueadas por tiempo
                     paywallOverlay.classList.add('hidden');
                     isChristmasUnlocked = false;
                     startCountdown(targetUnlockDate);
@@ -801,7 +799,6 @@
             { x: 17, y: 81 }, { x: 38, y: 81 }, { x: 62, y: 81 }, { x: 83, y: 81 }
         ];
 
-        // MAPA AMPLIADO Y OPTIMIZADO PARA 30 ESFERAS (Distribución perfecta en niveles del pino)
         const mapaCoordenadas30 = [
             { x: 50, y: 19 }, 
             { x: 44, y: 26 }, { x: 56, y: 26 },
@@ -859,7 +856,7 @@
             const usar30 = totalConfigurado > 20;
             const mapaActivo = usar30 ? mapaCoordenadas30 : mapaCoordenadas20;
             const totalMostrarEnPino = usar30 ? Math.max(30, totalConfigurado) : 20;
-            const esferaSize = usar30 ? 16 : 22; // Reducido ligeramente a 16px en el paquete de 30 para perfecta proporción
+            const esferaSize = usar30 ? 16 : 22;
 
             let miEsferaIndex = -1;
             treeData.esferas.forEach((e, idx) => {
@@ -1061,7 +1058,7 @@
         function checkEditDeadline() {
             if (isPreviewMode) return false;
             const now = new Date();
-            const editDeadline = new Date(targetUnlockDate.getTime() - (48 * 60 * 60 * 1000));
+            const editDeadline = new Date(targetUnlockDate.getTime() - (5 * 60 * 1000));
             return now >= editDeadline;
         }
 
@@ -1178,7 +1175,7 @@
 
         async function saveSphereChanges() {
             if (checkEditDeadline()) {
-                alert("⚠️ El período de edición ha finalizado (Bloqueo estricto a 48 horas).");
+                alert("⚠️ El período de edición ha finalizado (Bloqueo estricto a 5 minutos).");
                 return;
             }
 
