@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -42,6 +43,11 @@
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+        }
+
+        /* Miniatura 3D de cumpleaños */
+        #miniaturaCumple3D {
+            background: linear-gradient(90deg, #E9D5FF 0%, #F3E8FF 50%, #FFFFFF 50%, #F8FAFC 100%);
         }
     </style>
 </head>
@@ -110,10 +116,13 @@
 
             <!-- VISTA PREVIA DEL REGALO ANIMADO -->
             <div class="flex items-center justify-center gap-3 bg-amber-900/30 p-3 rounded-2xl border border-amber-500/20">
-                <img id="gifPreview" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif" class="w-16 h-16 object-cover rounded-xl border border-amber-400/30">
+                <div class="relative w-20 h-20 rounded-xl border border-amber-400/30 overflow-hidden flex-shrink-0">
+                    <img id="gifPreview" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2pxbGNkODNvd3B1a2cxeXBpZW8ybzRydGpvMWRsNm9sZ3BhcnFkayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HBtn7hJbB3NefuA/giphy.gif" class="w-full h-full object-cover">
+                    <div id="miniaturaCumple3D" class="hidden w-full h-full"></div>
+                </div>
                 <div class="text-left">
                     <p class="font-bold text-amber-200 text-xs">Portada Animada</p>
-                    <p class="text-[10px] text-amber-300/70">Asignada automáticamente según el diseño.</p>
+                    <p id="descripcionPortada" class="text-[10px] text-amber-300/70">Asignada automáticamente según el diseño.</p>
                 </div>
             </div>
 
@@ -301,6 +310,8 @@
         let audioBase64 = "";
         let fotoBase64 = "";
         let timerGrabacionInterval;
+        let miniaturaCumpleAnimId = null;
+        let miniaturaCumpleRenderer = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             renderizarProyectosGuardados();
@@ -320,6 +331,116 @@
                 } catch(e) {}
             }
         });
+
+        function detenerMiniaturaCumple3D() {
+            if (miniaturaCumpleAnimId) {
+                cancelAnimationFrame(miniaturaCumpleAnimId);
+                miniaturaCumpleAnimId = null;
+            }
+            if (miniaturaCumpleRenderer) {
+                miniaturaCumpleRenderer.dispose();
+                miniaturaCumpleRenderer = null;
+            }
+            const cont = document.getElementById('miniaturaCumple3D');
+            if (cont) cont.innerHTML = '';
+        }
+
+        function iniciarMiniaturaCumple3D() {
+            const cont = document.getElementById('miniaturaCumple3D');
+            if (!cont || typeof THREE === 'undefined') return;
+
+            detenerMiniaturaCumple3D();
+
+            const width = cont.clientWidth || 80;
+            const height = cont.clientHeight || 80;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(44, width / height, 0.1, 50);
+            camera.position.set(0, 1.25, 7.8);
+            camera.lookAt(0, 0.25, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            cont.appendChild(renderer.domElement);
+            miniaturaCumpleRenderer = renderer;
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+            const dirLight = new THREE.DirectionalLight(0xfff7ed, 1.1);
+            dirLight.position.set(3, 6, 5);
+            scene.add(dirLight);
+            const neonLight = new THREE.PointLight(0x00e5ff, 2.2, 12);
+            neonLight.position.set(-2, 0, 2.5);
+            scene.add(neonLight);
+
+            const grupo = new THREE.Group();
+            grupo.position.y = -0.35;
+            scene.add(grupo);
+
+            const plat = new THREE.Mesh(
+                new THREE.CylinderGeometry(1.85, 2.05, 0.28, 8),
+                new THREE.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x00b4d8, emissiveIntensity: 0.45, flatShading: true })
+            );
+            grupo.add(plat);
+
+            const cakeMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, flatShading: true });
+            const techMat = new THREE.MeshStandardMaterial({ color: 0x00e5ff, emissive: 0x00b4d8, emissiveIntensity: 0.5, flatShading: true });
+
+            const baseCake = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.9, 0.55, 8), cakeMat);
+            baseCake.position.y = 0.42;
+            const topCake = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 0.45, 8), cakeMat);
+            topCake.position.y = 0.92;
+            const vela = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 6), techMat);
+            vela.position.y = 1.28;
+            grupo.add(baseCake, topCake, vela);
+
+            const cajaMat = new THREE.MeshStandardMaterial({ color: 0x14b8a6, flatShading: true });
+            const listonMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, flatShading: true });
+            for (let i = 0; i < 3; i++) {
+                const ang = i * 2.1;
+                const caja = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.32), cajaMat);
+                const liston = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.07, 0.34), listonMat);
+                caja.add(liston);
+                caja.position.set(Math.cos(ang) * 1.32, 0.35 + i * 0.38, Math.sin(ang) * 1.32);
+                grupo.add(caja);
+            }
+
+            const globoMat = new THREE.MeshStandardMaterial({ color: 0xf9a8d4, emissive: 0xdb2777, emissiveIntensity: 0.2, flatShading: true });
+            const g1 = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 1), globoMat);
+            g1.scale.set(0.95, 1.15, 0.95);
+            g1.position.set(-1.05, 1.85, -0.2);
+            const g2 = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 1), globoMat);
+            g2.scale.set(0.95, 1.15, 0.95);
+            g2.position.set(1.05, 2.0, 0.2);
+            scene.add(g1, g2);
+
+            const colores = [0xff0055, 0xffbe0b, 0x00f5d4, 0x3a86ff, 0xf472b6];
+            const confeti = [];
+            const geoC = new THREE.PlaneGeometry(0.14, 0.09);
+            for (let i = 0; i < 30; i++) {
+                const m = new THREE.Mesh(geoC, new THREE.MeshBasicMaterial({ color: colores[i % colores.length], side: THREE.DoubleSide }));
+                m.position.set((Math.random() - 0.5) * 3.2, Math.random() * 3.5 - 1, (Math.random() - 0.5) * 1.5);
+                confeti.push({ mesh: m, vy: 0.02 + Math.random() * 0.025, vr: (Math.random() - 0.5) * 0.12 });
+                scene.add(m);
+            }
+
+            const reloj = new THREE.Clock();
+            function loop() {
+                miniaturaCumpleAnimId = requestAnimationFrame(loop);
+                const t = reloj.getElapsedTime();
+                grupo.rotation.y = t * 0.65;
+                g1.position.y = 1.85 + Math.sin(t * 1.6) * 0.14;
+                g2.position.y = 2.0 + Math.cos(t * 1.5) * 0.14;
+                confeti.forEach((c) => {
+                    c.mesh.position.y -= c.vy;
+                    c.mesh.rotation.x += c.vr;
+                    c.mesh.rotation.y += c.vr;
+                    if (c.mesh.position.y < -2.2) c.mesh.position.y = 2.6;
+                });
+                renderer.render(scene, camera);
+            }
+            loop();
+        }
 
         function obtenerProyectosLocales() {
             try { return JSON.parse(localStorage.getItem("misTemporizadores") || "[]"); } catch(e) { return []; }
@@ -382,6 +503,7 @@
         }
 
         function volverAlDashboard() {
+            detenerMiniaturaCumple3D();
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('saveLoadingScreen').classList.add('hidden');
@@ -394,6 +516,7 @@
             document.getElementById('previewContainer').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
             document.getElementById('formTitleHeader').innerText = "Modificar Temporizador ⏳";
+            actualizarVistaPreviaRegalo();
         }
 
         function eliminarProyecto(firebaseId) {
@@ -407,7 +530,22 @@
 
         function actualizarVistaPreviaRegalo() {
             const estilo = document.getElementById('estiloDiseno').value;
-            document.getElementById('gifPreview').src = gifsRegalos[estilo];
+            const imgPreview = document.getElementById('gifPreview');
+            const div3D = document.getElementById('miniaturaCumple3D');
+            const descPortada = document.getElementById('descripcionPortada');
+
+            if (estilo === 'cumpleaños') {
+                imgPreview.classList.add('hidden');
+                div3D.classList.remove('hidden');
+                if (descPortada) descPortada.innerText = "Escena 3D low-poly de cumpleaños con pastel, regalos y globos.";
+                setTimeout(iniciarMiniaturaCumple3D, 30);
+            } else {
+                detenerMiniaturaCumple3D();
+                div3D.classList.add('hidden');
+                imgPreview.classList.remove('hidden');
+                imgPreview.src = gifsRegalos[estilo];
+                if (descPortada) descPortada.innerText = "Asignada automáticamente según el diseño.";
+            }
 
             const bodyEl = document.body;
             if (estilo === 'pareja') {
@@ -540,6 +678,7 @@
                 if(!contenidoSorpresa) { alert("Escribe el premio del cupón."); return; }
             }
 
+            detenerMiniaturaCumple3D();
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('saveLoadingScreen').classList.remove('hidden');
 
@@ -581,6 +720,7 @@
                 alert("Error al guardar en Firebase.");
                 document.getElementById('saveLoadingScreen').classList.add('hidden');
                 document.getElementById('formContainer').classList.remove('hidden');
+                actualizarVistaPreviaRegalo();
             }
         }
 
@@ -631,6 +771,7 @@
         }
 
         async function abrirVistaPrevia(docId, yaPagado) {
+            detenerMiniaturaCumple3D();
             document.getElementById('homeDashboard').classList.add('hidden');
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('previewContainer').classList.remove('hidden');
